@@ -664,9 +664,16 @@ $('#overcrank').addEventListener('click', () => {
 });
 $('#share').addEventListener('click', async () => {
   const title = $('#share-card').textContent ?? `CULL #${state.seed}`;
+  const replayUrl = ($('#replay-link') as HTMLAnchorElement).href;
   try {
-    if (navigator.share) await navigator.share({ title: 'CULL Contact Sheet', text: title, url: ($('#replay-link') as HTMLAnchorElement).href });
-    else await navigator.clipboard.writeText(`${title}\n${($('#replay-link') as HTMLAnchorElement).href}`);
+    if (navigator.share) {
+      const sheetData = ($('#download-sheet') as HTMLAnchorElement).href.split(',')[1] ?? '';
+      const bytes = Uint8Array.from(atob(sheetData), (character) => character.charCodeAt(0));
+      const sheetFile = new File([bytes], `cull-${state.seed}.png`, { type: 'image/png' });
+      const shareText = `${title}\n${replayUrl}`;
+      if (navigator.canShare?.({ files: [sheetFile] })) await navigator.share({ title: 'CULL Contact Sheet', text: shareText, files: [sheetFile] });
+      else await navigator.share({ title: 'CULL Contact Sheet', text: shareText, url: replayUrl });
+    } else await navigator.clipboard.writeText(`${title}\n${replayUrl}`);
   } catch { /* The user may dismiss the native share sheet. */ }
 });
 

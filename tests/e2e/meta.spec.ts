@@ -31,6 +31,14 @@ test('records a local result and exports a 1080x1350 contact sheet with a replay
     return [image.naturalWidth, image.naturalHeight];
   });
   expect(contactSize).toEqual([1080, 1350]);
+  await page.evaluate(() => {
+    Object.defineProperty(navigator, 'canShare', { configurable: true, value: (data: ShareData) => Boolean(data.files?.length) });
+    Object.defineProperty(navigator, 'share', { configurable: true, value: async (data: ShareData) => { Object.assign(window, { __sharedFile: data.files?.[0] instanceof File ? { name: data.files[0].name, size: data.files[0].size, type: data.files[0].type } : null }); } });
+  });
+  await page.locator('#share').click();
+  const sharedFile = await page.evaluate(() => (window as Window & { __sharedFile?: { name: string; size: number; type: string } | null }).__sharedFile);
+  expect(sharedFile).toEqual(expect.objectContaining({ name: 'cull-42.png', type: 'image/png' }));
+  expect(sharedFile?.size).toBeGreaterThan(0);
   const replayUrl = await page.locator('#replay-link').getAttribute('href');
   expect(replayUrl).toBeTruthy();
   expect(decodeReplay(new URL(replayUrl!).hash.slice(1))).toEqual(expect.objectContaining({ seed: 42, frames: expect.any(Array) }));

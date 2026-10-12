@@ -22,3 +22,4 @@
 - 2026-10-12: Carry cumulative `totalDistance` across Shoot scenes and include it in the canonical state hash so filmography summaries describe the complete run and replay checks cover that value.
 - 2026-10-12: Separate audio into master, music, and effects buses; expose persisted volume, mono, and calm-mix controls while retaining gesture-gated AudioContext creation.
 - 2026-10-12: Build the optional six-second WebM from the selected contact-sheet captures through MediaRecorder; keep PNG export available when browser recording is unsupported.
+- 2026-10-12: Attach the PNG to native Web Share when file sharing is available; embed the replay URL in shared text so it remains available alongside the image.
