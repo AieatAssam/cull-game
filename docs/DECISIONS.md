@@ -23,3 +23,4 @@
 - 2026-10-12: Separate audio into master, music, and effects buses; expose persisted volume, mono, and calm-mix controls while retaining gesture-gated AudioContext creation.
 - 2026-10-12: Build the optional six-second WebM from the selected contact-sheet captures through MediaRecorder; keep PNG export available when browser recording is unsupported.
 - 2026-10-12: Attach the PNG to native Web Share when file sharing is available; embed the replay URL in shared text so it remains available alongside the image.
+- 2026-10-12: Unlock cosmetic film stocks from the highest locally recorded cinematography grade (Kodachrome B, bleach bypass A, Ilford B&W S); persist the selected stock locally and apply it to both the live viewfinder and captured frames. Keep gameplay lens unlocks separate because their rules must be encoded in replay identity before they can be safely selectable.
