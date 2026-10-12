@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import './style.css';
 import { stateHash } from './sim/hash';
 import { updateRenderCamera } from './render/camera';
@@ -329,6 +330,27 @@ const satchel = new THREE.Mesh(new THREE.BoxGeometry(0.23, 0.22, 0.16), darkMate
 satchel.position.set(-0.27, 0.52, -0.03); actorDetail.add(satchel);
 const satchelFlap = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.08, 0.17), trimMaterial);
 satchelFlap.position.set(-0.27, 0.63, -0.02); actorDetail.add(satchelFlap);
+function batchTalentDetail() {
+  actorDetail.updateMatrixWorld(true);
+  const materialGeometries = new Map<THREE.Material, THREE.BufferGeometry[]>();
+  actorDetail.traverse((node) => {
+    if (!(node instanceof THREE.Mesh)) return;
+    const transformed = node.geometry.clone();
+    transformed.applyMatrix4(node.matrixWorld);
+    const geometry = transformed.index ? transformed.toNonIndexed() : transformed;
+    if (geometry !== transformed) transformed.dispose();
+    const geometries = materialGeometries.get(node.material) ?? [];
+    geometries.push(geometry);
+    materialGeometries.set(node.material, geometries);
+  });
+  actorDetail.clear();
+  for (const [material, geometries] of materialGeometries) {
+    const geometry = mergeGeometries(geometries, false);
+    geometries.forEach((part) => part.dispose());
+    if (geometry) actorDetail.add(new THREE.Mesh(geometry, material));
+  }
+}
+batchTalentDetail();
 talent.add(actorDetail);
 const talentProxy = new THREE.Mesh(new THREE.DodecahedronGeometry(0.58, 0), coatMaterial);
 talentProxy.position.y = 0.63; talent.add(talentProxy); talentProxy.visible = false;
@@ -345,6 +367,29 @@ function syncTalentLod() {
 
 const entityMeshes = new Map<string, THREE.Object3D>();
 const extraCostumes = ['#547b7b', '#a9684d', '#756f91', '#b49359'].map((color) => new THREE.Color(color));
+function batchStaticMeshes(group: THREE.Group) {
+  group.updateMatrixWorld(true);
+  const materialGeometries = new Map<THREE.Material, Array<{ mesh: THREE.Mesh; geometry: THREE.BufferGeometry }>>();
+  const dynamicParts = new Set(['monitor-cone', 'continuity-prop', 'extras-crowd', 'extras-heads', 'extras-wall', 'swarm-cloud', 'bridge-planks']);
+  for (const child of [...group.children]) {
+    if (!(child instanceof THREE.Mesh) || child instanceof THREE.InstancedMesh || dynamicParts.has(child.name) || Array.isArray(child.material)) continue;
+    const transformed = child.geometry.clone();
+    transformed.applyMatrix4(child.matrixWorld);
+    const geometry = transformed.index ? transformed.toNonIndexed() : transformed;
+    if (geometry !== transformed) transformed.dispose();
+    const parts = materialGeometries.get(child.material) ?? [];
+    parts.push({ mesh: child, geometry });
+    materialGeometries.set(child.material, parts);
+  }
+  for (const [material, parts] of materialGeometries) {
+    if (parts.length < 2) { parts.forEach(({ geometry }) => geometry.dispose()); continue; }
+    const geometry = mergeGeometries(parts.map(({ geometry: part }) => part), false);
+    parts.forEach(({ geometry: part }) => part.dispose());
+    if (!geometry) continue;
+    for (const { mesh } of parts) group.remove(mesh);
+    group.add(new THREE.Mesh(geometry, material));
+  }
+}
 function buildEntity(entity: CastEntity) {
   const kind = entity.kind;
   const group = new THREE.Group();
@@ -404,16 +449,23 @@ function buildEntity(entity: CastEntity) {
     const belt = new THREE.Mesh(new THREE.BoxGeometry(0.43, 0.08, 0.34), new THREE.MeshLambertMaterial({ color: '#d19a4c', flatShading: true }));
     belt.position.set(0, 0.36, 0); group.add(belt);
   } else if (kind === 'bridge') {
-    const planks = new THREE.InstancedMesh(new THREE.BoxGeometry(0.48, 0.1, 1.8), new THREE.MeshLambertMaterial({ color: '#8d6040', flatShading: true }), 28);
-    planks.name = 'bridge-planks'; planks.count = 28;
+    const material = new THREE.MeshLambertMaterial({ color: '#8d6040', flatShading: true });
+    const pieces: THREE.BufferGeometry[] = [];
     for (let i = 0; i < 28; i++) {
-      const matrix = new THREE.Matrix4().makeTranslation(-6.75 + i * 0.5, 0, 0);
-      planks.setMatrixAt(i, matrix);
+      const plank = new THREE.BoxGeometry(0.48, 0.1, 1.8);
+      plank.translate(-6.75 + i * 0.5, 0, 0);
+      pieces.push(plank.toNonIndexed()); plank.dispose();
     }
-    group.add(planks);
-    const ropePoints = [new THREE.Vector3(-7, 0.5, -0.8), new THREE.Vector3(7, 0.5, -0.8), new THREE.Vector3(-7, 0.5, 0.8), new THREE.Vector3(7, 0.5, 0.8)];
-    const ropes = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(ropePoints), new THREE.LineBasicMaterial({ color: '#554332' }));
-    ropes.name = 'bridge-ropes'; group.add(ropes);
+    for (const z of [-0.8, 0.8]) {
+      const rail = new THREE.CylinderGeometry(0.035, 0.035, 14, 5);
+      rail.rotateZ(Math.PI / 2); rail.translate(0, 0.5, z);
+      pieces.push(rail.toNonIndexed()); rail.dispose();
+    }
+    const geometry = mergeGeometries(pieces, false);
+    pieces.forEach((piece) => piece.dispose());
+    if (!geometry) throw new Error('Could not merge bridge geometry');
+    const bridge = new THREE.Mesh(geometry, material);
+    bridge.name = 'bridge-planks'; group.add(bridge);
   } else if (kind === 'rumour') {
     material = new THREE.MeshLambertMaterial({ color: '#899b9a', transparent: true, opacity: 0.34, flatShading: true, depthWrite: false });
     for (let i = 0; i < 4; i++) {
@@ -437,18 +489,28 @@ function buildEntity(entity: CastEntity) {
     const propBand = new THREE.Mesh(new THREE.BoxGeometry(1.23, 0.11, 1.03), new THREE.MeshLambertMaterial({ color: '#d6ad73', flatShading: true }));
     propBand.name = 'continuity-band'; propBand.position.y = 0.08; group.add(propBand);
   } else if (kind === 'reel') {
-    const can = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.36, 0.3, 10), new THREE.MeshLambertMaterial({ color: '#168fa4', flatShading: true }));
-    can.name = 'reel-can'; group.add(can);
-    const rim = new THREE.Mesh(new THREE.TorusGeometry(0.34, 0.055, 5, 10), new THREE.MeshLambertMaterial({ color: '#d1a85f', flatShading: true }));
-    rim.position.y = 0.17; group.add(rim);
-    const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.035, 8), new THREE.MeshBasicMaterial({ color: '#e8d3a8' }));
-    hub.position.y = 0.18; group.add(hub);
-    const spindle = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.045, 6), new THREE.MeshBasicMaterial({ color: '#34343a' }));
-    spindle.position.y = 0.21; group.add(spindle);
+    const parts: THREE.BufferGeometry[] = [];
+    const addPart = (geometry: THREE.BufferGeometry, color: string, y = 0) => {
+      geometry.translate(0, y, 0);
+      const shade = new THREE.Color(color);
+      const colors = new Float32Array(geometry.attributes.position!.count * 3);
+      for (let i = 0; i < colors.length; i += 3) colors.set([shade.r, shade.g, shade.b], i);
+      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+      parts.push(geometry.toNonIndexed()); geometry.dispose();
+    };
+    addPart(new THREE.CylinderGeometry(0.36, 0.36, 0.3, 10), '#168fa4');
+    addPart(new THREE.TorusGeometry(0.34, 0.055, 5, 10), '#d1a85f', 0.17);
+    addPart(new THREE.CylinderGeometry(0.12, 0.12, 0.035, 8), '#e8d3a8', 0.18);
+    addPart(new THREE.CylinderGeometry(0.03, 0.03, 0.045, 6), '#34343a', 0.21);
+    const geometry = mergeGeometries(parts, false);
+    parts.forEach((part) => part.dispose());
+    if (!geometry) throw new Error('Could not merge reel geometry');
+    group.add(new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({ color: '#ffffff', vertexColors: true, flatShading: true })));
   } else {
     material = new THREE.MeshLambertMaterial({ color: '#3fd8ff', flatShading: true });
     group.add(new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.42, 0.7, 8), material));
   }
+  batchStaticMeshes(group);
   return group;
 }
 function syncEntities(showTransientRings = true) {
