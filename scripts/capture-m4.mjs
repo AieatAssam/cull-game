@@ -21,6 +21,14 @@ for (const [index, name] of scenes) {
     }, index);
     await page.waitForTimeout(200);
     await page.screenshot({ path: `${outDir}/${name}-${w}x${h}.png` });
+    if (w === 1280) {
+      await page.evaluate(() => {
+        const state = window.__cull.state();
+        window.__cull.setCamera(state.talent.x, state.talent.z, 12);
+        window.__cull.step(1);
+      });
+      await page.locator('.gate').screenshot({ path: `${outDir}/${name}-crop.png` });
+    }
     console.log('set', name, w, h);
   }
 }

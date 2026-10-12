@@ -15,7 +15,7 @@ import { mulberry32 } from './sim/rng';
 import { UrchinLodBuckets } from './render/lod-buckets';
 import { createDailiesCast, SCENE_LOOKS } from './render/dailies';
 import { measureSilhouettes } from './render/silhouettes';
-import { PATH_RISE, SPRITE_SIZE, bevelledBlockGeometry, createTableTextures, raisedPathGeometry } from './render/set-dressing';
+import { PATH_RISE, SPRITE_SIZE, createSetDressing, createTableTextures, raisedPathGeometry } from './render/set-dressing';
 import { DPR_SCALES, nextDprTier } from './render/adaptive-dpr';
 import { AudioDirector, type AudioSettings } from './audio/director';
 import { dailySeed } from './meta/daily';
@@ -110,7 +110,7 @@ shell.className = 'stage';
 shell.innerHTML = `
   <header class="topbar"><div class="brand"><span class="rec-dot"></span><strong>CULL</strong><span class="tagline">CAMERA DEPARTMENT</span></div><label class="stock-control">STOCK <select id="film-stock" aria-label="Film stock"><option value="clean">35 MM · CLEAN</option><option value="kodachrome">KODACHROME · B</option><option value="bleach">BLEACH BYPASS · A</option><option value="ilford">ILFORD B&W · S</option></select></label><details class="sound-settings" id="sound-settings"><summary>SOUND</summary><div class="sound-panel"><label>MASTER <input id="volume-master" aria-label="Master volume" type="range" min="0" max="100" value="100" /></label><label>MUSIC <input id="volume-music" aria-label="Music volume" type="range" min="0" max="100" value="80" /></label><label>EFFECTS <input id="volume-sfx" aria-label="Effects volume" type="range" min="0" max="100" value="80" /></label><label><input id="mono-audio" type="checkbox" /> MONO</label><label><input id="calm-audio" type="checkbox" /> CALM MIX</label></div></details><div class="readout"><a class="daily-link" href="?daily=1">DAILY</a><span>TAKE 01</span><b id="timecode">01:30</b><span id="lens">35 MM</span><button class="pause-button" id="pause" aria-label="Pause game">Ⅱ</button></div></header>
   <div class="composition"><aside class="margin margin-left"><div class="slate">SCENE 01<br><strong>BACKLOT</strong><small>SEED <span id="seed">00001</span></small><small id="best">BEST —</small></div><div class="hint"><span class="hint-mark">↖</span> WASD / DRAG<br>TO FRAME THE SHOT<div class="preview" id="preview"></div></div></aside>
-    <div class="gate-wrap"><div class="gate-label"><span id="gate-ratio">VIEWFINDER · GATE 1:1</span><span id="lod">SHE IS IN A MEDIUM SHOT</span></div><div class="gate" id="gate"><div class="thirds"></div><div class="focus-band" id="focus-band" hidden></div><div class="gate-corners"></div><div class="sprockets left"></div><div class="sprockets right"></div><div id="mount" class="mount"></div><div class="frame-message" id="message">Keep her in the shot.</div><p class="coach hidden" id="coach"></p><div class="title-card hidden" id="title-card"><p class="title-kicker">SCENE 01 · TAKE 01</p><h1>CULL</h1><p>Nothing exists unless it is in the shot. You hold the camera. She walks.</p></div><div class="cut-flash" id="cut-flash"></div><div class="slice" id="slice"></div><div class="peel" id="peel"></div><div class="cut-stamp" id="cut-stamp">CUT</div><i class="spark" style="--dx:-18px;--dy:-24px;left:70%;top:40%"></i><i class="spark" style="--dx:16px;--dy:-20px;left:72%;top:46%"></i><i class="spark" style="--dx:8px;--dy:18px;left:68%;top:50%"></i><i class="spark" style="--dx:-22px;--dy:8px;left:74%;top:42%"></i></div><div class="gate-foot"><span>55° TABLETOP</span><span id="status">ROLLING</span></div></div>
+    <div class="gate-wrap"><div class="gate-label"><span id="gate-ratio">VIEWFINDER · GATE 1:1</span><span id="lod">SHE IS IN A MEDIUM SHOT</span></div><div class="gate" id="gate"><div class="thirds"></div><div class="focus-band" id="focus-band" hidden></div><div class="gate-corners"></div><div class="sprockets left"></div><div class="sprockets right"></div><div id="mount" class="mount"></div><div class="depth-blur top"></div><div class="depth-blur bottom"></div><div class="frame-message" id="message">Keep her in the shot.</div><p class="coach hidden" id="coach"></p><div class="title-card hidden" id="title-card"><p class="title-kicker">SCENE 01 · TAKE 01</p><h1>CULL</h1><p>Nothing exists unless it is in the shot. You hold the camera. She walks.</p></div><div class="cut-flash" id="cut-flash"></div><div class="slice" id="slice"></div><div class="peel" id="peel"></div><div class="cut-stamp" id="cut-stamp">CUT</div><i class="spark" style="--dx:-18px;--dy:-24px;left:70%;top:40%"></i><i class="spark" style="--dx:16px;--dy:-20px;left:72%;top:46%"></i><i class="spark" style="--dx:8px;--dy:18px;left:68%;top:50%"></i><i class="spark" style="--dx:-22px;--dy:8px;left:74%;top:42%"></i></div><div class="gate-foot"><span>55° TABLETOP</span><span id="status">ROLLING</span></div></div>
     <aside class="margin margin-right"><div class="camera-mark">Slate<small>CAM 01</small></div><div class="call-sheet"><span>CALL SHEET</span><div id="call-sheet">Looking outside the frame…</div></div></aside>
   </div>
   <footer class="controlbar"><div class="controls"><span><kbd>WASD</kbd> PAN</span><span><kbd>−</kbd> / <kbd>+</kbd> ZOOM</span><span><kbd>SPACE</kbd> HOLD</span><span><kbd>Q</kbd> / <kbd>E</kbd> ROTATE</span></div><div class="mobile-controls"><button id="hold" aria-label="Hold Talent">HOLD</button><label>ZOOM <input id="zoom-slider" aria-label="Zoom" type="range" min="10" max="48" value="30" /></label></div><div class="assist-controls"><button id="left-hand" type="button" aria-pressed="false">LEFT HAND</button><button id="overcrank" type="button" aria-pressed="false">75% SPEED</button></div><div class="film"><span>FILM</span><div class="film-track"><i id="filmbar"></i></div><b id="film">90s</b></div></footer>
@@ -227,9 +227,15 @@ refreshFilmStocks();
 refreshLensSelector();
 const hemi = new THREE.HemisphereLight('#fff1dc', '#8d6b4a', 0.7);
 scene.add(hemi);
-const keyLight = new THREE.DirectionalLight('#ffd9a0', 1.85);
+const keyLight = new THREE.DirectionalLight('#ffd9a0', 0.45);
 keyLight.position.set(-14, 18, 6);
 scene.add(keyLight);
+const keySpot = new THREE.SpotLight('#ffd9a0', 28, 52, 1.05, 0.88, 1);
+keySpot.position.set(-10, 18, 7);
+scene.add(keySpot, keySpot.target);
+const moon = new THREE.DirectionalLight('#d5e4f5', 0);
+moon.position.set(16, 12, -9);
+scene.add(moon);
 const urchinBuckets = new UrchinLodBuckets(scene, spriteAssets.urchinTiers);
 function displayPoint(x: number, z: number) {
   if (state.lens !== 'fisheye') return { x, z };
@@ -246,7 +252,7 @@ function detailFactor(x: number, z: number) {
   return lensLodFactor(state.lens, projected.x, projected.y);
 }
 const tableTextures = createTableTextures();
-const floorMaterial = new THREE.MeshLambertMaterial({ map: tableTextures.cork, color: '#c9a46b', emissive: '#000000' });
+const floorMaterial = new THREE.MeshPhongMaterial({ map: tableTextures.cork, color: '#c9a46b', emissive: '#000000', shininess: 2, specular: '#000000' });
 const floor = new THREE.Mesh(new THREE.PlaneGeometry(400, 30), floorMaterial);
 floor.rotation.x = -Math.PI / 2;
 floor.position.y = -0.12;
@@ -268,96 +274,38 @@ function syncTerrain() {
   terrainTiles = state.tiles;
   renderedLook = lookIndex;
   const look = SCENE_LOOKS[Math.min(lookIndex, SCENE_LOOKS.length - 1)]!;
-  const dress = new THREE.Object3D();
-  for (const child of [...terrainGroup.children]) {
-    terrainGroup.remove(child);
-    if (child instanceof THREE.Mesh || child instanceof THREE.InstancedMesh) {
+  const disposeObject = (child: THREE.Object3D) => {
+    if (child instanceof THREE.Mesh) {
       child.geometry.dispose();
       const materials = Array.isArray(child.material) ? child.material : [child.material];
       materials.forEach((material) => material.dispose());
     }
+    child.children.forEach(disposeObject);
+  };
+  for (const child of [...terrainGroup.children]) {
+    terrainGroup.remove(child);
+    disposeObject(child);
   }
   const pathTiles = state.tiles.filter((tile) => tile.kind === 'path');
   const setTiles = state.tiles.filter((tile) => tile.kind === 'set');
   if (pathTiles.length) {
+    const night = lookIndex === 2;
     const mesh = new THREE.Mesh(
       raisedPathGeometry(pathTiles),
-      new THREE.MeshLambertMaterial({
-        map: tableTextures.felt, color: look.path, vertexColors: true, side: THREE.DoubleSide,
-        emissive: lookIndex === 2 ? '#3a2a16' : '#000000',
-      }),
+      night
+        ? new THREE.MeshPhongMaterial({
+          map: tableTextures.felt, color: look.path, vertexColors: true, side: THREE.DoubleSide,
+          emissive: '#3a2a16', shininess: 26, specular: '#9bb4d0',
+        })
+        : new THREE.MeshLambertMaterial({
+          map: lookIndex === 1 ? tableTextures.paper : tableTextures.felt,
+          color: look.path, vertexColors: true, side: THREE.DoubleSide,
+        }),
     );
     mesh.name = 'felt-path';
     terrainGroup.add(mesh);
   }
-  if (setTiles.length) {
-    const mesh = new THREE.InstancedMesh(
-      bevelledBlockGeometry(),
-      new THREE.MeshLambertMaterial({ map: tableTextures.cardboard, color: look.block, vertexColors: true, side: THREE.DoubleSide }),
-      setTiles.length,
-    );
-    setTiles.forEach((tile, index) => mesh.setMatrixAt(index, new THREE.Matrix4().makeTranslation(tile.x, 0, tile.z)));
-    mesh.instanceMatrix.needsUpdate = true;
-    mesh.name = 'cardboard-flats';
-    terrainGroup.add(mesh);
-    const shades = new THREE.InstancedMesh(
-      new THREE.PlaneGeometry(1, 1),
-      new THREE.MeshBasicMaterial({ map: tableTextures.shadow, transparent: true, depthWrite: false }),
-      setTiles.length,
-    );
-    setTiles.forEach((tile, index) => {
-      dress.position.set(tile.x, 0.02, tile.z);
-      dress.rotation.set(-Math.PI / 2, 0, 0);
-      dress.scale.set(1.35, 1.15, 1);
-      dress.updateMatrix();
-      shades.setMatrixAt(index, dress.matrix);
-    });
-    shades.instanceMatrix.needsUpdate = true;
-    shades.renderOrder = 2;
-    terrainGroup.add(shades);
-  }
-  const lampSpots = lookIndex === 2
-    ? pathTiles.filter((tile, index, all) => all.findIndex((other) => Math.abs(other.x - tile.x) < 9) === index)
-    : [];
-  if (lampSpots.length) {
-    const pools = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({
-      map: tableTextures.pool, color: '#ffb347', transparent: true, depthWrite: false,
-      polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4,
-      blending: THREE.AdditiveBlending,
-    }), lampSpots.length);
-    const posts = new THREE.InstancedMesh(
-      new THREE.BoxGeometry(0.18, 2.2, 0.18),
-      new THREE.MeshLambertMaterial({ color: '#1e1a17' }),
-      lampSpots.length,
-    );
-    const heads = new THREE.InstancedMesh(
-      new THREE.BoxGeometry(0.78, 0.22, 0.78),
-      new THREE.MeshBasicMaterial({ color: '#ffb347' }),
-      lampSpots.length,
-    );
-    lampSpots.forEach((tile, index) => {
-      dress.position.set(tile.x, PATH_RISE + 0.08, tile.z);
-      dress.rotation.set(-Math.PI / 2, 0, 0);
-      dress.scale.set(12, 12, 1);
-      dress.updateMatrix();
-      pools.setMatrixAt(index, dress.matrix);
-      dress.position.set(tile.x, 1.1, tile.z + 1.7);
-      dress.rotation.set(0, 0, 0);
-      dress.scale.set(1, 1, 1);
-      dress.updateMatrix();
-      posts.setMatrixAt(index, dress.matrix);
-      dress.position.set(tile.x, 2.24, tile.z + 1.7);
-      dress.updateMatrix();
-      heads.setMatrixAt(index, dress.matrix);
-    });
-    pools.instanceMatrix.needsUpdate = true;
-    posts.instanceMatrix.needsUpdate = true;
-    heads.instanceMatrix.needsUpdate = true;
-    pools.renderOrder = 2;
-    terrainGroup.add(pools);
-    terrainGroup.add(posts);
-    terrainGroup.add(heads);
-  }
+  terrainGroup.add(createSetDressing(lookIndex, pathTiles, setTiles, tableTextures));
 }
 
 const castShadows = new THREE.InstancedMesh(
@@ -558,9 +506,9 @@ function syncEntities(showTransientRings = true) {
   let shade = 0;
   const putShade = (x: number, z: number, width: number, depth: number) => {
     if (shade >= 512) return;
-    transform.position.set(x, PATH_RISE + 0.03, z);
-    transform.rotation.set(-Math.PI / 2, 0, 0);
-    transform.scale.set(width, depth, 1);
+    transform.position.set(x + 0.46, PATH_RISE + 0.04, z + 0.32);
+    transform.rotation.set(-Math.PI / 2, 0.4, 0);
+    transform.scale.set(width * 1.35, depth * 0.85, 1);
     transform.updateMatrix();
     castShadows.setMatrixAt(shade++, transform.matrix);
   };
@@ -702,11 +650,20 @@ function renderViewfinder(showTransientRings = true) {
   pathMaterial.color.set(look.path);
   keyLight.color.set(look.key);
   const night = sceneLookIndex() === 2;
-  keyLight.intensity = night ? 1.65 : 1.85;
-  hemi.intensity = night ? 1.85 : 0.7;
+  const city = sceneLookIndex() === 1;
+  keyLight.intensity = night ? 0.25 : 0.4;
+  keySpot.color.set(look.key);
+  keySpot.intensity = night ? 16 : 34;
+  keySpot.position.set(state.camera.x - 9, 18, state.camera.z + 6);
+  keySpot.target.position.set(state.camera.x + 6, 0, state.camera.z - 4);
+  moon.intensity = night ? 0.9 : 0;
+  hemi.intensity = night ? 1.35 : 0.55;
   hemi.color.set(look.hemi);
   hemi.groundColor.set(look.fill);
   floorMaterial.emissive.set(night ? '#152033' : '#000000');
+  floorMaterial.shininess = night ? 22 : 2;
+  floorMaterial.specular.set(night ? '#8aa4c0' : '#000000');
+  $('#gate').classList.toggle('tilt-shift', city);
   syncCamera();
   syncTerrain();
   syncTalentLod();

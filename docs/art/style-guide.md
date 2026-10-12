@@ -36,7 +36,8 @@ Each scene changes the set, not the cast.
 
 - Chunky, slightly uneven forms. Outlines are ink and about 4 px at 128 px source size.
 - Terrain blocks are cardboard flats, taller than they are wide, with a contact shadow from the key light.
-- The path is one raised felt ribbon with bevelled edges, not a grid of tiles. The floor is cork. Standing props are cardboard with a lighter top and a contact shadow.
+- The path is one hand-cut felt strip: rounded corners, a stitched and frayed edge, and a lighter bevel on the key side. It is not a stack of tiles. The table is cork grain; City path is paper fibre.
+- Backlot dressing is crates, sandbags, C-stands, cable and tape. Miniature City is paper buildings, kerbs, lamps, and a tilt-shift blur at the gate edges. Night Shoot keeps the sodium pools, adds a wet sheen on the path, and a cool moonlight rim. Dressing stays quieter than the cast.
 - Hazard silhouettes stay readable at a medium zoom on every set: at least 20 px tall in the 1280×720 gate, and no two kinds share an ink outline tighter than IoU 0.7. Fills stay inside the palette and clear the ground.
 - Cast drawings share one light: a lighter patch toward the top left, a darker edge toward the bottom right.
 - No cyan debug boxes, wireframe cones, or layout grids in the play view. A brass ring may flash for one LOD change.
@@ -44,7 +45,7 @@ Each scene changes the set, not the cast.
 ## Lighting
 
 - Orthographic camera at 55°. The set is a table, not a landscape.
-- One warm key from the upper left and a coloured fill from the scene table above.
+- One warm key from the upper left, falling off toward the lower right, with contact shadows shifted that way. A coloured fill comes from the scene table above.
 - Night Shoot keeps the same shapes. A cool fill lifts the table off the sky, and sodium practicals (`#ffb347`) throw a pool on the felt from a lamp at the path edge. The Talent stays carmine. The exposure rule (in frame = lit) is later work.
 - Inside the gate, a soft vignette and film grain darken the edges. The centre of the frame is where detail reads. Wide zoom still simplifies hazards by LOD; that is the same idea in the simulation.
 
