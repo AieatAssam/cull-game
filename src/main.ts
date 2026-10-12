@@ -13,6 +13,7 @@ import { createShootState, createShootSceneState, stepShoot } from './sim/shoot'
 import { inputForBot, type BotKind } from './bots/players';
 import { mulberry32 } from './sim/rng';
 import { UrchinLodBuckets } from './render/lod-buckets';
+import { loadSpriteAssets } from './render/sprite-assets';
 import { CastBounds } from './render/cast-bounds';
 import { DPR_SCALES, nextDprTier } from './render/adaptive-dpr';
 import { AudioDirector, type AudioSettings } from './audio/director';
@@ -27,6 +28,8 @@ import { lensFeats, unlockedLenses } from './meta/lenses';
 import { monitorConeContains } from './sim/m6';
 import { lensAspect, lensLodFactor, lensRenderTicks, type LensId } from './sim/lenses';
 import type { CastEntity, InputFrame, SimState } from './sim/types';
+
+const spriteAssets = await loadSpriteAssets(import.meta.env.BASE_URL);
 
 const app = document.querySelector<HTMLElement>('#app');
 if (!app) throw new Error('Missing app root');
@@ -223,7 +226,7 @@ scene.add(new THREE.HemisphereLight('#fff9ec', '#716a60', 2.1));
 const keyLight = new THREE.DirectionalLight('#fffaf2', 1.2);
 keyLight.position.set(-8, 14, 9);
 scene.add(keyLight);
-const urchinBuckets = new UrchinLodBuckets(scene);
+const urchinBuckets = new UrchinLodBuckets(scene, spriteAssets.urchinTiers);
 function displayPoint(x: number, z: number) {
   if (state.lens !== 'fisheye') return { x, z };
   const basis = cameraBasis(state.camera.yaw);
@@ -283,77 +286,10 @@ function syncTerrain() {
 }
 
 const talent = new THREE.Group();
-const actorDetail = new THREE.Group();
-const coatMaterial = new THREE.MeshLambertMaterial({ color: '#bf382d', flatShading: true });
-const trimMaterial = new THREE.MeshLambertMaterial({ color: '#e8a85e', flatShading: true });
-const darkMaterial = new THREE.MeshLambertMaterial({ color: '#292a30', flatShading: true });
-const skinMaterial = new THREE.MeshLambertMaterial({ color: '#e0b894', flatShading: true });
-const coatBody = new THREE.Mesh(new THREE.CapsuleGeometry(0.29, 0.25, 3, 6), coatMaterial);
-coatBody.position.y = 0.72;
-actorDetail.add(coatBody);
-const coatTail = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.31, 0.42, 7), coatMaterial);
-coatTail.position.y = 0.43; coatTail.rotation.x = Math.PI;
-actorDetail.add(coatTail);
-const collar = new THREE.Mesh(new THREE.ConeGeometry(0.31, 0.2, 5), trimMaterial);
-collar.position.y = 0.98; collar.rotation.x = Math.PI;
-actorDetail.add(collar);
-const scarf = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.36, 0.08), trimMaterial);
-scarf.position.set(0, 0.82, 0.245);
-actorDetail.add(scarf);
-for (const side of [-1, 1]) {
-  const arm = new THREE.Mesh(new THREE.CapsuleGeometry(0.09, 0.28, 2, 5), coatMaterial);
-  arm.position.set(side * 0.3, 0.69, 0.015); arm.rotation.z = side * -0.2;
-  actorDetail.add(arm);
-  const hand = new THREE.Mesh(new THREE.SphereGeometry(0.085, 6, 5), skinMaterial);
-  hand.position.set(side * 0.34, 0.47, 0.03); actorDetail.add(hand);
-  const boot = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.19, 0.3), darkMaterial);
-  boot.position.set(side * 0.15, 0.12, 0.06); actorDetail.add(boot);
-  const trouser = new THREE.Mesh(new THREE.CylinderGeometry(0.105, 0.09, 0.25, 5), darkMaterial);
-  trouser.position.set(side * 0.15, 0.27, 0); actorDetail.add(trouser);
-}
-const belt = new THREE.Mesh(new THREE.TorusGeometry(0.24, 0.035, 4, 8), trimMaterial);
-belt.rotation.x = Math.PI / 2; belt.position.y = 0.56; actorDetail.add(belt);
-const head = new THREE.Mesh(new THREE.SphereGeometry(0.2, 9, 7), skinMaterial);
-head.position.set(0, 1.13, 0.045); actorDetail.add(head);
-const hair = new THREE.Mesh(new THREE.SphereGeometry(0.205, 8, 5, 0, Math.PI * 2, 0, Math.PI * 0.55), darkMaterial);
-hair.position.set(0, 1.19, 0.02); actorDetail.add(hair);
-const beret = new THREE.Mesh(new THREE.SphereGeometry(0.2, 8, 5, 0, Math.PI * 2, 0, Math.PI * 0.48), coatMaterial);
-beret.scale.set(1.12, 0.42, 1.05); beret.position.set(0.01, 1.34, 0.005); actorDetail.add(beret);
-const brim = new THREE.Mesh(new THREE.CylinderGeometry(0.19, 0.2, 0.04, 8), darkMaterial);
-brim.position.y = 1.31; actorDetail.add(brim);
-const eyeMaterial = new THREE.MeshBasicMaterial({ color: '#242329' });
-for (const side of [-1, 1]) {
-  const eye = new THREE.Mesh(new THREE.SphereGeometry(0.025, 5, 4), eyeMaterial);
-  eye.position.set(side * 0.07, 1.15, 0.222); actorDetail.add(eye);
-}
-const satchel = new THREE.Mesh(new THREE.BoxGeometry(0.23, 0.22, 0.16), darkMaterial);
-satchel.position.set(-0.27, 0.52, -0.03); actorDetail.add(satchel);
-const satchelFlap = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.08, 0.17), trimMaterial);
-satchelFlap.position.set(-0.27, 0.63, -0.02); actorDetail.add(satchelFlap);
-function batchTalentDetail() {
-  actorDetail.updateMatrixWorld(true);
-  const materialGeometries = new Map<THREE.Material, THREE.BufferGeometry[]>();
-  actorDetail.traverse((node) => {
-    if (!(node instanceof THREE.Mesh)) return;
-    const transformed = node.geometry.clone();
-    transformed.applyMatrix4(node.matrixWorld);
-    const geometry = transformed.index ? transformed.toNonIndexed() : transformed;
-    if (geometry !== transformed) transformed.dispose();
-    const geometries = materialGeometries.get(node.material) ?? [];
-    geometries.push(geometry);
-    materialGeometries.set(node.material, geometries);
-  });
-  actorDetail.clear();
-  for (const [material, geometries] of materialGeometries) {
-    const geometry = mergeGeometries(geometries, false);
-    geometries.forEach((part) => part.dispose());
-    if (geometry) actorDetail.add(new THREE.Mesh(geometry, material));
-  }
-}
-batchTalentDetail();
-talent.add(actorDetail);
-const talentProxy = new THREE.Mesh(new THREE.DodecahedronGeometry(0.58, 0), coatMaterial);
-talentProxy.position.y = 0.63; talent.add(talentProxy); talentProxy.visible = false;
+const talentSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: spriteAssets.talent, transparent: true, alphaTest: 0.02, depthWrite: false }));
+talentSprite.center.set(0.5, 0);
+talentSprite.scale.set(1.05, 1.55, 1);
+talent.add(talentSprite);
 scene.add(talent);
 let renderedTalentTier = -1;
 function syncTalentLod() {
@@ -361,16 +297,15 @@ function syncTalentLod() {
   if (tier === renderedTalentTier) return;
   renderedTalentTier = tier;
   talent.visible = tier < 4;
-  actorDetail.visible = tier <= 1;
-  talentProxy.visible = tier >= 2 && tier < 4;
+  talentSprite.scale.set(tier <= 1 ? 1.05 : 0.9, tier <= 1 ? 1.55 : 1.3, 1);
 }
 
 const entityMeshes = new Map<string, THREE.Object3D>();
-const extraCostumes = ['#547b7b', '#a9684d', '#756f91', '#b49359'].map((color) => new THREE.Color(color));
+const transform = new THREE.Object3D();
 function batchStaticMeshes(group: THREE.Group) {
   group.updateMatrixWorld(true);
   const materialGeometries = new Map<THREE.Material, Array<{ mesh: THREE.Mesh; geometry: THREE.BufferGeometry }>>();
-  const dynamicParts = new Set(['monitor-cone', 'continuity-prop', 'extras-crowd', 'extras-heads', 'extras-wall', 'swarm-cloud', 'bridge-planks']);
+  const dynamicParts = new Set(['monitor-cone', 'continuity-prop', 'extras-crowd-0', 'extras-crowd-1', 'extras-crowd-2', 'extras-crowd-3', 'swarm-cloud', 'bridge-planks']);
   for (const child of [...group.children]) {
     if (!(child instanceof THREE.Mesh) || child instanceof THREE.InstancedMesh || dynamicParts.has(child.name) || Array.isArray(child.material)) continue;
     const transformed = child.geometry.clone();
@@ -395,13 +330,10 @@ function buildEntity(entity: CastEntity) {
   const group = new THREE.Group();
   let material: THREE.Material;
   if (kind === 'glass') {
-    material = new THREE.MeshLambertMaterial({ color: '#74dce0', transparent: true, opacity: 0.42, side: THREE.DoubleSide });
-    const pad = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.08, 1.5), material);
-    pad.name = 'glass-surface'; pad.position.y = 0.08; group.add(pad);
-    const edge = new THREE.Mesh(new THREE.EdgesGeometry(new THREE.BoxGeometry(1.54, 0.1, 1.54)), new THREE.LineBasicMaterial({ color: '#d2ffff' }));
-    edge.position.y = 0.08; group.add(edge);
-    const seam = new THREE.Mesh(new THREE.BoxGeometry(1.34, 0.015, 0.025), new THREE.MeshBasicMaterial({ color: '#d2ffff', transparent: true, opacity: 0.65 }));
-    seam.position.set(0, 0.13, 0); group.add(seam);
+    const glass = new THREE.Mesh(new THREE.PlaneGeometry(1.54, 1.54), new THREE.MeshBasicMaterial({
+      map: spriteAssets.glass, transparent: true, alphaTest: 0.015, side: THREE.DoubleSide, depthWrite: false,
+    }));
+    glass.name = 'glass-surface'; glass.rotation.x = -Math.PI / 2; glass.position.y = 0.08; group.add(glass);
   } else if (kind === 'urchin') {
     material = new THREE.MeshLambertMaterial({ color: '#ff4b3e', flatShading: true });
     const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.62, 0), material);
@@ -418,94 +350,45 @@ function buildEntity(entity: CastEntity) {
       group.add(spike);
     }
   } else if (kind === 'boulder') {
-    material = new THREE.MeshLambertMaterial({ color: '#b84b3b', flatShading: true });
-    const rock = new THREE.Mesh(new THREE.DodecahedronGeometry(0.72, 1), material);
-    rock.name = 'boulder-body'; rock.scale.set(1.12, 0.88, 0.96); group.add(rock);
-    const facets = new THREE.Mesh(new THREE.DodecahedronGeometry(0.43, 0), new THREE.MeshLambertMaterial({ color: '#d08052', flatShading: true }));
-    facets.position.set(-0.12, 0.29, 0.28); facets.scale.set(1.2, 0.45, 0.38); group.add(facets);
-    const scar = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.34, 0.035), new THREE.MeshBasicMaterial({ color: '#633a35' }));
-    scar.position.set(0.28, 0.22, 0.41); scar.rotation.z = -0.55; group.add(scar);
+    const rock = new THREE.Sprite(new THREE.SpriteMaterial({ map: spriteAssets.boulder, transparent: true, alphaTest: 0.02, depthWrite: false }));
+    rock.center.set(0.5, 0); rock.scale.set(1.85, 1.55, 1); group.add(rock);
   } else if (kind === 'extras') {
     const capacity = Math.max(12, entity.members?.length ?? 0);
-    const crowd = new THREE.InstancedMesh(new THREE.CapsuleGeometry(0.105, 0.2, 2, 5), new THREE.MeshLambertMaterial({ color: '#547b7b', flatShading: true }), capacity);
-    crowd.name = 'extras-crowd'; crowd.count = 0; group.add(crowd);
-    const heads = new THREE.InstancedMesh(new THREE.SphereGeometry(0.09, 5, 4), new THREE.MeshLambertMaterial({ color: '#d6a47e', flatShading: true }), capacity);
-    heads.name = 'extras-heads'; heads.count = 0; group.add(heads);
-    const wall = new THREE.Mesh(new THREE.BoxGeometry(4, 1.2, 0.45), new THREE.MeshLambertMaterial({ color: '#9b6041', flatShading: true }));
-    wall.name = 'extras-wall'; wall.position.y = 0.6; wall.visible = false; group.add(wall);
+    spriteAssets.extras.forEach((texture, index) => {
+      const crowd = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({
+        map: texture, transparent: true, alphaTest: 0.02, side: THREE.DoubleSide, depthWrite: false,
+      }), capacity);
+      crowd.name = `extras-crowd-${index}`; crowd.count = 0; group.add(crowd);
+    });
   } else if (kind === 'swarm') {
-    const swarm = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.08, 0), new THREE.MeshBasicMaterial({ color: '#ff4b3e' }), 12);
+    const swarm = new THREE.InstancedMesh(new THREE.PlaneGeometry(0.34, 0.34), new THREE.MeshBasicMaterial({
+      map: spriteAssets.swarmMoth, transparent: true, alphaTest: 0.02, side: THREE.DoubleSide, depthWrite: false,
+    }), 12);
     swarm.name = 'swarm-cloud'; swarm.count = 0; group.add(swarm);
   } else if (kind === 'stagehand') {
-    material = new THREE.MeshLambertMaterial({ color: '#232323', flatShading: true });
-    const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.22, 0.35, 3, 6), material);
-    body.name = 'stagehand-body'; body.position.y = 0.46; group.add(body);
-    const hood = new THREE.Mesh(new THREE.SphereGeometry(0.2, 7, 5), material);
-    hood.scale.set(1, 0.9, 0.94); hood.position.set(0, 0.84, 0.015); group.add(hood);
-    const face = new THREE.Mesh(new THREE.SphereGeometry(0.115, 7, 5), new THREE.MeshLambertMaterial({ color: '#b68c66' }));
-    face.position.set(0, 0.82, 0.16); group.add(face);
-    const hat = new THREE.Mesh(new THREE.CylinderGeometry(0.27, 0.2, 0.07, 7), new THREE.MeshLambertMaterial({ color: '#34343a', flatShading: true }));
-    hat.position.y = 0.99; group.add(hat);
-    const belt = new THREE.Mesh(new THREE.BoxGeometry(0.43, 0.08, 0.34), new THREE.MeshLambertMaterial({ color: '#d19a4c', flatShading: true }));
-    belt.position.set(0, 0.36, 0); group.add(belt);
+    const stagehand = new THREE.Sprite(new THREE.SpriteMaterial({ map: spriteAssets.stagehand, transparent: true, alphaTest: 0.02, depthWrite: false }));
+    stagehand.center.set(0.5, 0); stagehand.scale.set(1.05, 1.75, 1); group.add(stagehand);
   } else if (kind === 'bridge') {
-    const material = new THREE.MeshLambertMaterial({ color: '#8d6040', flatShading: true });
-    const pieces: THREE.BufferGeometry[] = [];
-    for (let i = 0; i < 28; i++) {
-      const plank = new THREE.BoxGeometry(0.48, 0.1, 1.8);
-      plank.translate(-6.75 + i * 0.5, 0, 0);
-      pieces.push(plank.toNonIndexed()); plank.dispose();
-    }
-    for (const z of [-0.8, 0.8]) {
-      const rail = new THREE.CylinderGeometry(0.035, 0.035, 14, 5);
-      rail.rotateZ(Math.PI / 2); rail.translate(0, 0.5, z);
-      pieces.push(rail.toNonIndexed()); rail.dispose();
-    }
-    const geometry = mergeGeometries(pieces, false);
-    pieces.forEach((piece) => piece.dispose());
-    if (!geometry) throw new Error('Could not merge bridge geometry');
-    const bridge = new THREE.Mesh(geometry, material);
-    bridge.name = 'bridge-planks'; group.add(bridge);
+    const bridge = new THREE.Mesh(new THREE.PlaneGeometry(14, 1.8), new THREE.MeshBasicMaterial({
+      map: spriteAssets.bridge, transparent: true, alphaTest: 0.015, side: THREE.DoubleSide, depthWrite: false,
+    }));
+    bridge.name = 'bridge-planks'; bridge.rotation.x = -Math.PI / 2; bridge.position.y = 0.05; group.add(bridge);
   } else if (kind === 'rumour') {
-    material = new THREE.MeshLambertMaterial({ color: '#899b9a', transparent: true, opacity: 0.34, flatShading: true, depthWrite: false });
-    for (let i = 0; i < 4; i++) {
-      const puff = new THREE.Mesh(new THREE.IcosahedronGeometry(0.36 + (i % 2) * 0.06, 1), material);
-      puff.position.set(Math.cos(i * Math.PI / 2) * 0.24, 0.35 + (i % 2) * 0.16, Math.sin(i * Math.PI / 2) * 0.22);
-      puff.scale.set(1.1, 0.76, 1); group.add(puff);
-    }
+    const smoke = new THREE.Sprite(new THREE.SpriteMaterial({ map: spriteAssets.rumour, transparent: true, alphaTest: 0.015, depthWrite: false }));
+    smoke.center.set(0.5, 0.1); smoke.scale.set(1.55, 1.4, 1); group.add(smoke);
   } else if (kind === 'monitor' || kind === 'red-monitor') {
-    material = new THREE.MeshLambertMaterial({ color: kind === 'monitor' ? '#424a4a' : '#c72d29', flatShading: true });
-    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.1, 1.2, 5), material);
-    pole.position.y = 0.6; group.add(pole);
-    const lens = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.34, 0.3), material);
-    lens.position.set(0, 1.25, 0); group.add(lens);
+    const texture = kind === 'monitor' ? spriteAssets.monitorTeal : spriteAssets.monitorRed;
+    const monitor = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, alphaTest: 0.02, depthWrite: false }));
+    monitor.center.set(0.5, 0); monitor.scale.set(1.55, 1.8, 1); group.add(monitor);
     const cone = new THREE.Mesh(new THREE.ConeGeometry(0.8, 2.3, 4, 1, true), new THREE.MeshBasicMaterial({ color: kind === 'monitor' ? '#43c9d8' : '#e43b33', transparent: true, opacity: 0.22, wireframe: true }));
     cone.name = 'monitor-cone'; cone.position.set(0, 0.6, 1.2); group.add(cone);
   } else if (kind === 'continuity') {
     const propKind = entity.propSequence?.[entity.propIndex ?? 0] ?? entity.propIndex ?? 0;
-    material = new THREE.MeshLambertMaterial({ color: ['#aa7651', '#b43a31', '#9e8a72', '#745b40'][propKind % 4], flatShading: true });
-    const prop = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.8, 1), material);
-    prop.name = 'continuity-prop'; group.add(prop);
-    const propBand = new THREE.Mesh(new THREE.BoxGeometry(1.23, 0.11, 1.03), new THREE.MeshLambertMaterial({ color: '#d6ad73', flatShading: true }));
-    propBand.name = 'continuity-band'; propBand.position.y = 0.08; group.add(propBand);
+    const prop = new THREE.Sprite(new THREE.SpriteMaterial({ map: spriteAssets.continuity[propKind % 4], transparent: true, alphaTest: 0.02, depthWrite: false }));
+    prop.name = 'continuity-prop'; prop.center.set(0.5, 0); prop.scale.set(1.45, 1.25, 1); group.add(prop);
   } else if (kind === 'reel') {
-    const parts: THREE.BufferGeometry[] = [];
-    const addPart = (geometry: THREE.BufferGeometry, color: string, y = 0) => {
-      geometry.translate(0, y, 0);
-      const shade = new THREE.Color(color);
-      const colors = new Float32Array(geometry.attributes.position!.count * 3);
-      for (let i = 0; i < colors.length; i += 3) colors.set([shade.r, shade.g, shade.b], i);
-      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-      parts.push(geometry.toNonIndexed()); geometry.dispose();
-    };
-    addPart(new THREE.CylinderGeometry(0.36, 0.36, 0.3, 10), '#168fa4');
-    addPart(new THREE.TorusGeometry(0.34, 0.055, 5, 10), '#d1a85f', 0.17);
-    addPart(new THREE.CylinderGeometry(0.12, 0.12, 0.035, 8), '#e8d3a8', 0.18);
-    addPart(new THREE.CylinderGeometry(0.03, 0.03, 0.045, 6), '#34343a', 0.21);
-    const geometry = mergeGeometries(parts, false);
-    parts.forEach((part) => part.dispose());
-    if (!geometry) throw new Error('Could not merge reel geometry');
-    group.add(new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({ color: '#ffffff', vertexColors: true, flatShading: true })));
+    const reel = new THREE.Sprite(new THREE.SpriteMaterial({ map: spriteAssets.reel, transparent: true, alphaTest: 0.02, depthWrite: false }));
+    reel.center.set(0.5, 0); reel.scale.set(1.05, 1.05, 1); group.add(reel);
   } else {
     material = new THREE.MeshLambertMaterial({ color: '#3fd8ff', flatShading: true });
     group.add(new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.42, 0.7, 8), material));
@@ -520,8 +403,9 @@ function syncEntities(showTransientRings = true) {
     let object = entityMeshes.get(entity.id);
     if (!object) { object = buildEntity(entity); entityMeshes.set(entity.id, object); scene.add(object); }
     const point = displayPoint(entity.x, entity.z);
-    object.position.set(point.x, entity.kind === 'glass' ? 0 : entity.kind === 'boulder' ? 0.72 : 0.68, point.z);
-    object.rotation.y = entity.age * 0.015;
+    const spriteEntity = entity.kind === 'boulder' || entity.kind === 'stagehand' || entity.kind === 'reel' || entity.kind === 'extras' || entity.kind === 'continuity';
+    object.position.set(point.x, entity.kind === 'glass' || spriteEntity ? 0 : 0.68, point.z);
+    object.rotation.y = spriteEntity ? 0 : entity.age * 0.015;
     if (entity.kind === 'rumour') object.scale.setScalar(Math.max(0.1, entity.radius ?? 0.5));
     if (entity.kind === 'monitor' || entity.kind === 'red-monitor') {
       object.rotation.y = -(entity.heading ?? 0) + Math.PI / 2;
@@ -529,28 +413,31 @@ function syncEntities(showTransientRings = true) {
       if (cone) cone.scale.set(1, 1, Math.min(2, (entity.range ?? 18) / 14));
     }
     if (entity.kind === 'continuity') {
-      const mesh = object.getObjectByName('continuity-prop') as THREE.Mesh | undefined;
+      const prop = object.getObjectByName('continuity-prop') as THREE.Sprite | undefined;
       const propKind = entity.propSequence?.[entity.propIndex ?? 0] ?? entity.propIndex ?? 0;
-      if (mesh?.material instanceof THREE.MeshLambertMaterial) mesh.material.color.set(['#aa7651', '#b43a31', '#9e8a72', '#745b40'][propKind % 4]!);
+      if (prop?.material instanceof THREE.SpriteMaterial) {
+        prop.material.map = spriteAssets.continuity[propKind % 4]!;
+        prop.material.needsUpdate = true;
+      }
       object.scale.set(1 + (propKind % 2) * 0.25, 1, 1);
     }
     if (entity.kind === 'extras') {
-      const crowd = object.getObjectByName('extras-crowd') as THREE.InstancedMesh;
-      const heads = object.getObjectByName('extras-heads') as THREE.InstancedMesh;
-      const wall = object.getObjectByName('extras-wall')!;
       const tier = entity.lodTier ?? lodTier(1000 / state.camera.zoom * detailFactor(entity.x, entity.z));
-      let count = 0;
+      const crowds = spriteAssets.extras.map((_, index) => object.getObjectByName(`extras-crowd-${index}`) as THREE.InstancedMesh);
+      crowds.forEach((crowd) => { crowd.count = 0; });
       for (const member of entity.members ?? []) {
-        if (member.cut || tier >= 2) continue;
-        const bodyMatrix = new THREE.Matrix4().makeTranslation(member.dx, 0.31, member.dz);
-        const headMatrix = new THREE.Matrix4().makeTranslation(member.dx, 0.59, member.dz + 0.015);
-        const costume = extraCostumes[Math.abs(Math.floor(member.dx * 11 + member.dz * 17)) % extraCostumes.length]!;
-        crowd.setMatrixAt(count, bodyMatrix); crowd.setColorAt(count, costume);
-        heads.setMatrixAt(count, headMatrix); count++;
+        if (member.cut) continue;
+        const costume = Math.abs(Math.floor(member.dx * 11 + member.dz * 17)) % crowds.length;
+        const crowd = crowds[costume]!;
+        const index = crowd.count++;
+        const isWide = tier >= 2;
+        transform.position.set(member.dx, isWide ? 0.48 : 0.78, member.dz);
+        transform.quaternion.copy(camera.quaternion);
+        transform.scale.set(isWide ? 0.56 : 0.8, isWide ? 0.86 : 1.36, 1);
+        transform.updateMatrix();
+        crowd.setMatrixAt(index, transform.matrix);
       }
-      crowd.count = count; heads.count = count;
-      crowd.instanceMatrix.needsUpdate = true; if (crowd.instanceColor) crowd.instanceColor.needsUpdate = true; heads.instanceMatrix.needsUpdate = true;
-      wall.visible = tier >= 2;
+      crowds.forEach((crowd) => { crowd.instanceMatrix.needsUpdate = true; });
     }
     if (entity.kind === 'swarm') {
       const swarm = object.getObjectByName('swarm-cloud') as THREE.InstancedMesh;
@@ -558,7 +445,12 @@ function syncEntities(showTransientRings = true) {
       object.visible = tier < 4; swarm.count = tier < 4 ? 12 : 0;
       for (let i = 0; i < swarm.count; i++) {
         const angle = i * Math.PI * 2 / 12;
-        swarm.setMatrixAt(i, new THREE.Matrix4().makeTranslation(Math.cos(angle) * 0.55, 0.35 + Math.sin(i * 1.7) * 0.16, Math.sin(angle) * 0.55));
+        transform.position.set(Math.cos(angle) * 0.55, 0.35 + Math.sin(i * 1.7) * 0.16, Math.sin(angle) * 0.55);
+        transform.quaternion.copy(camera.quaternion);
+        transform.rotation.z = angle + Math.sin(state.tick * 0.07 + i) * 0.2;
+        transform.scale.setScalar(0.65 + (i % 3) * 0.12);
+        transform.updateMatrix();
+        swarm.setMatrixAt(i, transform.matrix);
       }
       swarm.instanceMatrix.needsUpdate = true;
     }
@@ -573,7 +465,7 @@ function syncEntities(showTransientRings = true) {
     const found = state.entities.find((entity) => entity.id === id);
     if (!found || found.cut || !found.spawned) object.visible = false;
   }
-  urchinBuckets.update(state.entities, state.camera.zoom, state.tick, showTransientRings && !window.matchMedia('(prefers-reduced-motion: reduce)').matches, detailFactor, displayPoint);
+  urchinBuckets.update(state.entities, state.camera.zoom, state.tick, showTransientRings && !window.matchMedia('(prefers-reduced-motion: reduce)').matches, detailFactor, displayPoint, camera.quaternion);
 }
 
 function syncCamera() {

@@ -1,45 +1,10 @@
 import * as THREE from 'three';
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { lodTier, type LodTier } from '../sim/lod';
 import { TUNING } from '../sim/tuning';
 import type { CastEntity } from '../sim/types';
+import type { SpriteAssets } from './sprite-assets';
 
 const tierNames = ['close', 'medium', 'wide', 'proxy'] as const;
-
-function merged(geometries: THREE.BufferGeometry[]) {
-  const compatible = geometries.map((geometry) => geometry.index ? geometry.toNonIndexed() : geometry);
-  const result = mergeGeometries(compatible, false);
-  for (const geometry of new Set([...geometries, ...compatible])) geometry.dispose();
-  if (!result) throw new Error('Could not merge LOD geometry');
-  result.computeVertexNormals();
-  return result;
-}
-
-function spikeGeometry(count: number) {
-  const pieces: THREE.BufferGeometry[] = [new THREE.IcosahedronGeometry(0.55, 1)];
-  const up = new THREE.Vector3(0, 1, 0);
-  for (let i = 0; i < count; i++) {
-    const angle = i * Math.PI * 2 / count;
-    const spike = new THREE.ConeGeometry(0.13, 0.5, 4);
-    const direction = new THREE.Vector3(Math.cos(angle), 0, Math.sin(angle));
-    spike.applyMatrix4(new THREE.Matrix4().compose(
-      new THREE.Vector3(direction.x * 0.48, 0.02, direction.z * 0.48),
-      new THREE.Quaternion().setFromUnitVectors(up, direction),
-      new THREE.Vector3(1, 1, 1),
-    ));
-    pieces.push(spike);
-  }
-  return merged(pieces);
-}
-
-export function makeUrchinLodGeometries(): THREE.BufferGeometry[] {
-  return [
-    spikeGeometry(8),
-    spikeGeometry(4),
-    new THREE.OctahedronGeometry(0.62, 0),
-    new THREE.BoxGeometry(0.9, 0.9, 0.9),
-  ];
-}
 
 export class UrchinLodBuckets {
   private readonly meshes: Array<THREE.InstancedMesh | null>;
@@ -49,10 +14,11 @@ export class UrchinLodBuckets {
   private readonly ringMaterial = new THREE.MeshBasicMaterial({ color: '#3fd8ff', transparent: true, opacity: 0.7, side: THREE.DoubleSide, depthWrite: false });
   private readonly transform = new THREE.Object3D();
 
-  constructor(private readonly scene: THREE.Scene, color = '#ff4b3e', capacity = TUNING.performance.maxEntities) {
-    const geometries = makeUrchinLodGeometries();
-    this.meshes = geometries.map((geometry, tier) => {
-      const mesh = new THREE.InstancedMesh(geometry, new THREE.MeshLambertMaterial({ color, flatShading: true }), capacity);
+  constructor(private readonly scene: THREE.Scene, textures: SpriteAssets['urchinTiers'], capacity = TUNING.performance.maxEntities) {
+    this.meshes = textures.map((texture, tier) => {
+      const mesh = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({
+        map: texture, transparent: true, alphaTest: 0.04, side: THREE.DoubleSide, depthWrite: false,
+      }), capacity);
       mesh.name = `urchin-lod-${tierNames[tier]}`;
       mesh.count = 0;
       mesh.frustumCulled = false;
@@ -63,7 +29,7 @@ export class UrchinLodBuckets {
     this.meshes.push(null); // Sub-pixel tier has no geometry and never enters a bucket.
   }
 
-  update(entities: CastEntity[], zoom: number, tick: number, showTransientRings = true, detailFactor: (x: number, z: number) => number = () => 1, displayPoint: (x: number, z: number) => { x: number; z: number } = (x, z) => ({ x, z })) {
+  update(entities: CastEntity[], zoom: number, tick: number, showTransientRings = true, detailFactor: (x: number, z: number) => number = () => 1, displayPoint: (x: number, z: number) => { x: number; z: number } = (x, z) => ({ x, z }), cameraQuaternion = new THREE.Quaternion()) {
     for (const mesh of this.meshes) if (mesh) mesh.count = 0;
     for (const entity of entities) {
       if (entity.kind !== 'urchin' || !entity.spawned || entity.cut) continue;
@@ -89,9 +55,10 @@ export class UrchinLodBuckets {
       if (!bucket) continue;
       const index = bucket.count++;
       const point = displayPoint(entity.x, entity.z);
-      this.transform.position.set(point.x, 0.68, point.z);
-      this.transform.rotation.set(0, entity.age * 0.015, 0);
-      this.transform.scale.setScalar(1);
+      this.transform.position.set(point.x, 0.8, point.z);
+      this.transform.quaternion.copy(cameraQuaternion);
+      this.transform.rotateZ(entity.age * 0.015);
+      this.transform.scale.set(1.65, 1.65, 1);
       this.transform.updateMatrix();
       bucket.setMatrixAt(index, this.transform.matrix);
       bucket.instanceMatrix.needsUpdate = true;

@@ -8,11 +8,11 @@
 
 Desktop view, with the viewfinder and call sheet:
 
-![CULL desktop gameplay](artifacts/screens/m10/1280x800.png)
+![CULL desktop gameplay](artifacts/screens/m4/1280x800.png)
 
 Mobile layout and touch controls:
 
-![CULL mobile gameplay](artifacts/screens/m10/390x844.png)
+![CULL mobile gameplay](artifacts/screens/m4/390x844.png)
 
 Contact sheet and share summary:
 
@@ -20,11 +20,15 @@ Contact sheet and share summary:
 
 Sound settings and film-stock looks are available in the current build. The screenshot set for earlier milestones is in [`artifacts/screens/`](artifacts/screens/).
 
+The visual direction is documented in [the art bible](docs/ART-DIRECTION.md). It defines a handmade miniature film set with palette identities for the carmine Talent, varied Extras, charcoal and coral hazards, teal/red cameras, violet smoke, mint Glass, and brass/plywood props.
+
+![CULL's painted character and prop roster](artwork/roster-preview.png)
+
 ## What is implemented
 
 - Deterministic fixed-tick simulation, seeded scene generation, camera pan/zoom/rotation, Talent pathing, hazards, film, and cut lifecycle.
 - Multiple entity behaviors, level-of-detail tiers, adaptive pixel ratio, accessibility controls, reduced-motion support, and optional audio settings.
-- A miniature film-set art pass gives the Talent a layered red-coat costume, adds varied silhouettes and colors to Extras, and gives hazards and props distinct material details while preserving their existing LOD rules.
+- A consistent hand-painted sprite set gives the Talent, Extras, hazards, cameras, Bridge, Glass, and Continuity props distinct silhouettes and palette identities while preserving their simulation bounds and LOD rules.
 - UTC daily seed, local filmography and personal best, transparent run grades, replay URLs, contact-sheet PNGs re-rendered from deterministic simulation replay, native file sharing when supported, and optional WebM director reels.
 - Grade-unlocked cosmetic film stocks: Kodachrome (B), bleach bypass (A), and Ilford black and white (S). Lens feats unlock Anamorphic, Tilt-shift, Fisheye, Long Lens, and Super 8; replay URLs preserve lens identity.
 
