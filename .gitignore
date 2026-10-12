@@ -4,4 +4,3 @@ playwright-report
 test-results
 
 *.tsbuildinfo
-.staging-main.ts
