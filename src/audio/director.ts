@@ -116,18 +116,53 @@ export class AudioDirector {
 
   playCue(name: 'cut' | 'pop' | 'reel' | 'lod' | 'wrap') {
     if (!this.context || !this.master || !this.sfxBus) return;
-    const frequenciesByCue = { cut: [740, 180], pop: [220, 880], reel: [520, 1040], lod: [900, 240], wrap: [90, 440] };
+    if (name === 'cut') { this.playSplice(); return; }
+    const frequenciesByCue = { pop: [220, 880], reel: [520, 1040], lod: [900, 240], wrap: [90, 440] };
     const [from, to] = frequenciesByCue[name];
     const now = this.context.currentTime;
     const oscillator = this.context.createOscillator();
     const gain = this.context.createGain();
     oscillator.type = name === 'wrap' ? 'sawtooth' : 'triangle';
     oscillator.frequency.setValueAtTime(from, now);
-    oscillator.frequency.exponentialRampToValueAtTime(to, now + (name === 'cut' ? 0.06 : 0.16));
+    oscillator.frequency.exponentialRampToValueAtTime(to, now + 0.16);
     gain.gain.setValueAtTime(0.08 * (this.currentSettings.calm ? 0.5 : 1), now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + (name === 'cut' ? 0.12 : 0.24));
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.24);
     oscillator.connect(gain); gain.connect(this.sfxBus);
     oscillator.start(now); oscillator.stop(now + 0.25);
     oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
+  }
+
+  /** Tape splice: a noise snip plus a short low thump. Presentation only. */
+  private playSplice() {
+    if (!this.context || !this.sfxBus) return;
+    const now = this.context.currentTime;
+    const duration = 0.07;
+    const length = Math.max(1, Math.floor(this.context.sampleRate * duration));
+    const buffer = this.context.createBuffer(1, length, this.context.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < length; i++) {
+      const envelope = 1 - i / length;
+      data[i] = (Math.random() * 2 - 1) * envelope * envelope;
+    }
+    const noise = this.context.createBufferSource();
+    const filter = this.context.createBiquadFilter();
+    const gain = this.context.createGain();
+    noise.buffer = buffer;
+    filter.type = 'highpass';
+    filter.frequency.value = 900;
+    gain.gain.setValueAtTime(0.35 * (this.currentSettings.calm ? 0.45 : 1), now);
+    noise.connect(filter); filter.connect(gain); gain.connect(this.sfxBus);
+    noise.start(now);
+    const thump = this.context.createOscillator();
+    const thumpGain = this.context.createGain();
+    thump.type = 'triangle';
+    thump.frequency.setValueAtTime(180, now);
+    thump.frequency.exponentialRampToValueAtTime(50, now + 0.08);
+    thumpGain.gain.setValueAtTime(0.2 * (this.currentSettings.calm ? 0.45 : 1), now);
+    thumpGain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+    thump.connect(thumpGain); thumpGain.connect(this.sfxBus);
+    thump.start(now); thump.stop(now + 0.14);
+    noise.onended = () => { noise.disconnect(); filter.disconnect(); gain.disconnect(); };
+    thump.onended = () => { thump.disconnect(); thumpGain.disconnect(); };
   }
 }

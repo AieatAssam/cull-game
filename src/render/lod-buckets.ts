@@ -11,7 +11,7 @@ export class UrchinLodBuckets {
   private readonly tiers = new Map<string, LodTier>();
   private readonly rings = new Map<string, THREE.Mesh<THREE.RingGeometry, THREE.MeshBasicMaterial>>();
   private readonly ringGeometry = new THREE.RingGeometry(0.76, 0.83, 28);
-  private readonly ringMaterial = new THREE.MeshBasicMaterial({ color: '#3fd8ff', transparent: true, opacity: 0.7, side: THREE.DoubleSide, depthWrite: false });
+  private readonly ringMaterial = new THREE.MeshBasicMaterial({ color: '#e2b04a', transparent: true, opacity: 0.85, side: THREE.DoubleSide, depthWrite: false });
   private readonly transform = new THREE.Object3D();
 
   constructor(private readonly scene: THREE.Scene, textures: SpriteAssets['urchinTiers'], capacity = TUNING.performance.maxEntities) {
@@ -58,7 +58,7 @@ export class UrchinLodBuckets {
       this.transform.position.set(point.x, 0.8, point.z);
       this.transform.quaternion.copy(cameraQuaternion);
       this.transform.rotateZ(entity.age * 0.015);
-      this.transform.scale.set(1.65, 1.65, 1);
+      this.transform.scale.set(2.2, 2.2, 1);
       this.transform.updateMatrix();
       bucket.setMatrixAt(index, this.transform.matrix);
       bucket.instanceMatrix.needsUpdate = true;
