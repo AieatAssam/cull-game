@@ -19,6 +19,7 @@ import { dailySeed } from './meta/daily';
 import { loadFilmography, personalBest, recordResult } from './meta/filmography';
 import { gradeMetrics, smoothnessFromMeanJerk, thirdsDistance } from './meta/grade';
 import { decodeReplay, encodeReplay } from './replay/codec';
+import { selectReplayContactFrames } from './replay/contact-frames';
 import { makeContactSheet, type ContactFrame } from './ui/contact-sheet';
 import { filmStocks, loadFilmStock, saveFilmStock, unlockedFilmStocks, type FilmStock } from './meta/film-stock';
 import { lensFeats, unlockedLenses } from './meta/lenses';
@@ -450,7 +451,7 @@ function buildEntity(entity: CastEntity) {
   }
   return group;
 }
-function syncEntities() {
+function syncEntities(showTransientRings = true) {
   for (const entity of state.entities) {
     if (entity.kind === 'urchin') continue;
     if (entity.cut || !entity.spawned) continue;
@@ -510,7 +511,7 @@ function syncEntities() {
     const found = state.entities.find((entity) => entity.id === id);
     if (!found || found.cut || !found.spawned) object.visible = false;
   }
-  urchinBuckets.update(state.entities, state.camera.zoom, state.tick, !window.matchMedia('(prefers-reduced-motion: reduce)').matches, detailFactor, displayPoint);
+  urchinBuckets.update(state.entities, state.camera.zoom, state.tick, showTransientRings && !window.matchMedia('(prefers-reduced-motion: reduce)').matches, detailFactor, displayPoint);
 }
 
 function syncCamera() {
@@ -557,9 +558,14 @@ function captureContactFrame() {
   pendingCloseCallRank = Number.POSITIVE_INFINITY;
   lastContactTick = state.tick;
 }
-function saveRunSummary() {
+async function saveRunSummary() {
   if (!state.failed || resultSaved) return;
   resultSaved = true;
+  const download = $('#download-sheet') as HTMLAnchorElement;
+  const shareButton = $('#share') as HTMLButtonElement;
+  const reelButton = $('#make-reel') as HTMLButtonElement;
+  download.removeAttribute('href'); download.dataset.ready = 'false'; download.setAttribute('aria-busy', 'true'); download.textContent = 'REPLAYING TAKE…';
+  shareButton.disabled = true; reelButton.disabled = true; reelButton.textContent = 'REPLAYING…';
   const metrics = {
     thirdsPercent: activeTicks ? Math.round(thirdsTicks / activeTicks * 100) : 0,
     smoothness: smoothnessFromMeanJerk(activeTicks ? jerkTotal / activeTicks : 0),
@@ -588,20 +594,14 @@ function saveRunSummary() {
     return item;
   }));
   refreshPersonalBest();
-  const sheetFrames: ScoredFrame[] = [];
-  const addFrame = (frame: ScoredFrame | undefined) => { if (frame && !sheetFrames.includes(frame) && sheetFrames.length < 9) sheetFrames.push(frame); };
-  addFrame(contactFrames.find((frame) => frame.label === 'Opening'));
-  closeCallFrames.forEach(addFrame);
-  addFrame(contactFrames.find((frame) => frame.label === 'Best thirds'));
-  addFrame(contactFrames.find((frame) => frame.label === 'Fatal frame'));
-  const samples = contactFrames.filter((frame) => frame.label.startsWith('Take'));
-  for (const index of [0, Math.floor(samples.length / 2), samples.length - 1]) addFrame(samples[index]);
-  for (const frame of contactFrames) addFrame(frame);
+  const sheetFrames = await renderReplayContactFrames();
   const sheet = makeContactSheet(sheetFrames);
   directorReelFrames = sheetFrames.map((frame) => frame.image);
-  const download = $('#download-sheet') as HTMLAnchorElement;
   download.href = sheet.toDataURL('image/png');
   download.download = `cull-${state.seed}.png`;
+  download.textContent = 'CONTACT SHEET ↓';
+  download.dataset.ready = 'true'; download.setAttribute('aria-busy', 'false');
+  shareButton.disabled = false; reelButton.disabled = false; reelButton.textContent = "DIRECTOR'S REEL";
   const shareCard = `CULL #${state.seed} · ${entry.location} · ${state.lens} · ${entry.meters} m · ✂ ${entry.cuts} cuts · ${entry.score} pts · ${grade} grade${overcrankUsed ? ' · 75% SPEED ASSIST' : ''}`;
   $('#share-card').textContent = shareCard;
   $('#grade-detail').textContent = `GRADE ${grade} · THIRDS ${metrics.thirdsPercent}% · SMOOTH ${Math.round(metrics.smoothness)} · CLOSE CALLS ${metrics.closeCalls} · REELS ${metrics.reelsCollected}/${metrics.reelsAvailable}`;
@@ -622,8 +622,7 @@ function saveRunSummary() {
   const replayLink = $('#replay-link') as HTMLAnchorElement;
   replayLink.href = replay.toString();
 }
-function render() {
-  audio.update(state);
+function renderViewfinder(showTransientRings = true) {
   const nightPalette = state.shoot?.sceneIndex === 2;
   if (nightPalette !== renderedNightPalette) {
     renderedNightPalette = nightPalette;
@@ -636,9 +635,49 @@ function render() {
   syncTalentLod();
   const talentPoint = displayPoint(state.talent.x, state.talent.z);
   talent.position.set(talentPoint.x, 0, talentPoint.z);
-  syncEntities();
+  syncEntities(showTransientRings);
   castBounds.update(state.entities);
   renderer.render(scene, camera);
+}
+async function renderReplayContactFrames(): Promise<ScoredFrame[]> {
+  const terminalState = state;
+  let selected: Awaited<ReturnType<typeof selectReplayContactFrames>>['frames'] = [];
+  try {
+    const initial = createTake(terminalState.seed);
+    initial.lens = terminalState.lens;
+    if (initial.lens === 'long-lens') initial.camera.zoom = TUNING.minZoom;
+    selected = (await selectReplayContactFrames(initial, inputLog, terminalState)).frames;
+    const rendered: ScoredFrame[] = [];
+    for (const candidate of selected) {
+      state = candidate.state;
+      renderedTalentTier = -1;
+      renderViewfinder(false);
+      const frame = document.createElement('canvas'); frame.width = 180; frame.height = 180;
+      const context = frame.getContext('2d');
+      if (!context) continue;
+      context.fillStyle = '#1b1e24'; context.fillRect(0, 0, frame.width, frame.height);
+      context.filter = stockFilters[currentStock];
+      const source = renderer.domElement;
+      const sourceAspect = source.width / source.height;
+      const drawWidth = sourceAspect >= 1 ? frame.width : frame.height * sourceAspect;
+      const drawHeight = sourceAspect >= 1 ? frame.width / sourceAspect : frame.height;
+      context.drawImage(source, (frame.width - drawWidth) / 2, (frame.height - drawHeight) / 2, drawWidth, drawHeight);
+      context.filter = 'none';
+      rendered.push({ image: frame, label: candidate.label, tick: candidate.tick, rank: candidate.rank });
+    }
+    return rendered.length ? rendered : contactFrames;
+  } catch {
+    return contactFrames;
+  } finally {
+    state = terminalState;
+    urchinBuckets.reset();
+    renderedTalentTier = -1;
+    renderViewfinder();
+  }
+}
+function render() {
+  audio.update(state);
+  renderViewfinder();
   captureContactFrame();
   updateHud();
 }
@@ -683,7 +722,7 @@ function updateHud() {
     $('#end-title').textContent = state.failed.toUpperCase().replaceAll('-', ' ');
     $('#end-detail').textContent = `TAKE ${String(state.seed).padStart(5, '0')} · ${Math.floor(state.talent.x)} METRES · ${state.cuts.length} CUT`;
     $('#end-card').classList.remove('hidden');
-    saveRunSummary();
+    void saveRunSummary();
   }
 }
 

@@ -13,8 +13,10 @@ export function makeContactSheet(frames: readonly (CanvasImageSource | ContactFr
     const x = marginX + (index % 3) * (cellWidth + gap);
     const y = marginY + Math.floor(index / 3) * (cellHeight + gap);
     context.fillStyle = '#e8e4da'; context.fillRect(x, y, cellWidth, cellHeight);
-    const selected = frames[index] ?? frames.at(-1);
-    const frame = selected && 'image' in selected ? selected.image : selected;
+    const selected = frames[index];
+    const fallback = selected ? undefined : frames.at(-1);
+    const display = selected ?? fallback;
+    const frame = display && 'image' in display ? display.image : display;
     if (frame) {
       const source = frame as CanvasImageSource & { width?: number; height?: number; videoWidth?: number; videoHeight?: number };
       const sourceWidth = source.videoWidth ?? source.width ?? cellWidth;
@@ -38,6 +40,9 @@ export function makeContactSheet(frames: readonly (CanvasImageSource | ContactFr
       }
       context.fillStyle = 'rgba(20, 20, 20, 0.78)'; context.fillRect(x, y + cellHeight - 24, cellWidth, 24);
       context.fillStyle = '#fff'; context.font = `bold ${Math.round(width * 0.012)}px monospace`; context.fillText(selected.label.toUpperCase(), x + 8, y + cellHeight - 8);
+    } else if (fallback) {
+      context.fillStyle = 'rgba(20, 20, 20, 0.78)'; context.fillRect(x, y + cellHeight - 24, cellWidth, 24);
+      context.fillStyle = '#d1c9b9'; context.font = `bold ${Math.round(width * 0.012)}px monospace`; context.fillText('HOLD FRAME', x + 8, y + cellHeight - 8);
     }
   }
   context.fillStyle = '#e8e4da';

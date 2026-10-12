@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { dailySeed } from '../src/meta/daily';
 import { loadFilmography, personalBest, recordResult, type FilmographyEntry, type StorageLike } from '../src/meta/filmography';
 import { decodeReplay, encodeReplay } from '../src/replay/codec';
+import { selectReplayContactFrames } from '../src/replay/contact-frames';
 import { stateHash } from '../src/sim/hash';
 import { loadFilmStock, saveFilmStock, unlockedFilmStocks } from '../src/meta/film-stock';
 import { unlockedLenses } from '../src/meta/lenses';
@@ -54,6 +55,16 @@ describe('M9 daily seed, filmography, and replay data', () => {
     const encoded = encodeReplay(42, frames, 'anamorphic');
     expect(decodeReplay(encoded)).toEqual({ seed: 42, frames, lens: 'anamorphic' });
     expect(encodeReplay(42, frames)).not.toBe(encoded);
+  });
+
+  it('selects the same contact-sheet moments from the same simulation input stream', async () => {
+    const inputs = Array.from({ length: 601 }, () => neutral);
+    const first = await selectReplayContactFrames(createState(31), inputs);
+    const second = await selectReplayContactFrames(createState(31), inputs);
+    expect(first.frames.map(({ label, tick, state }) => [label, tick, stateHash(state)]))
+      .toEqual(second.frames.map(({ label, tick, state }) => [label, tick, stateHash(state)]));
+    expect(stateHash(first.finalState)).toBe(stateHash(second.finalState));
+    expect(first.frames[0]).toMatchObject({ label: 'Opening', tick: 1 });
   });
 
   it('rejects malformed, oversized, and invalid-frame replay URLs', () => {

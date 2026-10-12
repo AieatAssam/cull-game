@@ -14,6 +14,7 @@ test('records a local result and exports a 1080x1350 contact sheet with a replay
   const expectedHash = await page.evaluate(() => window.__cull.hash());
   await page.evaluate(() => window.__cull.finishForShare());
   await expect(page.locator('#end-card')).toBeVisible();
+  await expect(page.locator('#download-sheet')).toHaveAttribute('data-ready', 'true');
   await expect(page.locator('#grade-detail')).toContainText('GRADE');
   await expect(page.locator('#filmography-list li').first()).toContainText('BACKLOT');
   const reelButton = page.locator('#make-reel');
@@ -81,6 +82,7 @@ test('unlocked lens rules and lens identity carry through the replay URL', async
   await page.evaluate(() => { window.__cull.step(3); });
   const expectedHash = await page.evaluate(() => window.__cull.hash());
   await page.evaluate(() => window.__cull.finishForShare());
+  await expect(page.locator('#download-sheet')).toHaveAttribute('data-ready', 'true');
   const replayHref = await page.locator('#replay-link').getAttribute('href');
   expect(replayHref).toBeTruthy();
   expect(decodeReplay(new URL(replayHref!).hash.slice(1)).lens).toBe('anamorphic');
