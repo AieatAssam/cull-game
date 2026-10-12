@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CastBounds } from '../src/render/cast-bounds';
+import { PATH_RISE, raisedPathGeometry } from '../src/render/set-dressing';
 import type { CastEntity } from '../src/sim/types';
 
 describe('visual signature helpers', () => {
@@ -19,5 +20,22 @@ describe('visual signature helpers', () => {
     expect(positions.getY(24)).toBeCloseTo(1.625);
     expect(colors.getX(24)).toBeLessThan(0.03);
     bounds.dispose();
+  });
+
+  it('raises the path into one bevelled ribbon instead of a stack of flat tiles', () => {
+    const heights = (geometry: ReturnType<typeof raisedPathGeometry>) => {
+      const position = geometry.getAttribute('position');
+      return Array.from({ length: position.count }, (_, index) => position.getY(index));
+    };
+    const lone = raisedPathGeometry([{ x: 0, z: 0 }]);
+    const pair = raisedPathGeometry([{ x: 0, z: 0 }, { x: 1, z: 0 }]);
+    const single = heights(lone);
+    const joined = heights(pair);
+    expect(Math.max(...single)).toBeCloseTo(PATH_RISE);
+    expect(Math.min(...single)).toBeCloseTo(0);
+    const onGround = (samples: number[]) => samples.filter((y) => y < 0.001).length;
+    expect(onGround(joined)).toBeLessThan(onGround(single) * 2);
+    lone.dispose();
+    pair.dispose();
   });
 });

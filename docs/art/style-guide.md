@@ -29,14 +29,15 @@ Each scene changes the set, not the cast.
 |---|---|---|---|---|---|
 | Backlot | `#f0d7b0` | plywood | felt green | `#a56b3c` | warm key `#ffd9a0` |
 | Miniature City | `#d5e6ee` | `#7eaea4` | paper `#f4ead4` | `#c4513a` | cool fill `#5d7c99` |
-| Night Shoot | `#10141c` | `#1b2433` | plywood | `#2c3a52` | sodium `#ffb347` |
+| Night Shoot | `#141a24` | `#31445c` | plywood | `#3d4e68` | sodium pools `#ffb347` |
 | Long Take | `#1a120e` | `#4a3024` | carmine | `#2a1c16` | warm key |
 
 ## Shape language
 
 - Chunky, slightly uneven forms. Outlines are ink and about 4 px at 128 px source size.
 - Terrain blocks are cardboard flats, taller than they are wide, with a contact shadow from the key light.
-- The path is a felt or paper strip. It is not a grid.
+- The path is one raised felt ribbon with bevelled edges, not a grid of tiles. The floor is cork. Standing props are cardboard with a lighter top and a contact shadow.
+- Hazard silhouettes stay readable at a medium zoom on every set: at least 20 px tall in the 1280×720 gate, and no two kinds share an ink outline tighter than IoU 0.7. Fills stay inside the palette and clear the ground.
 - Cast drawings share one light: a lighter patch toward the top left, a darker edge toward the bottom right.
 - No cyan debug boxes, wireframe cones, or layout grids in the play view. A brass ring may flash for one LOD change.
 
@@ -44,7 +45,7 @@ Each scene changes the set, not the cast.
 
 - Orthographic camera at 55°. The set is a table, not a landscape.
 - One warm key from the upper left and a coloured fill from the scene table above.
-- Night Shoot keeps the same shapes and turns the key into a sodium practical. The Talent stays carmine.
+- Night Shoot keeps the same shapes. A cool fill lifts the table off the sky, and sodium practicals (`#ffb347`) throw a pool on the felt from a lamp at the path edge. The Talent stays carmine. The exposure rule (in frame = lit) is later work.
 - Inside the gate, a soft vignette and film grain darken the edges. The centre of the frame is where detail reads. Wide zoom still simplifies hazards by LOD; that is the same idea in the simulation.
 
 ## The cut

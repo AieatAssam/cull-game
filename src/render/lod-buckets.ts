@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { lodTier, type LodTier } from '../sim/lod';
 import { TUNING } from '../sim/tuning';
 import type { CastEntity } from '../sim/types';
+import { PATH_RISE, SPRITE_SIZE } from './set-dressing';
 import type { SpriteAssets } from './sprite-assets';
 
 const tierNames = ['close', 'medium', 'wide', 'proxy'] as const;
@@ -55,10 +56,10 @@ export class UrchinLodBuckets {
       if (!bucket) continue;
       const index = bucket.count++;
       const point = displayPoint(entity.x, entity.z);
-      this.transform.position.set(point.x, 0.8, point.z);
+      this.transform.position.set(point.x, PATH_RISE + SPRITE_SIZE.urchin * 0.22, point.z);
       this.transform.quaternion.copy(cameraQuaternion);
       this.transform.rotateZ(entity.age * 0.015);
-      this.transform.scale.set(2.2, 2.2, 1);
+      this.transform.scale.set(SPRITE_SIZE.urchin, SPRITE_SIZE.urchin, 1);
       this.transform.updateMatrix();
       bucket.setMatrixAt(index, this.transform.matrix);
       bucket.instanceMatrix.needsUpdate = true;
