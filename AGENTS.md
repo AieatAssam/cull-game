@@ -10,5 +10,5 @@
 - Put tuning values in `src/sim/tuning.ts`; archetype data belongs in `data/archetypes.json`.
 - Every rule change needs tests. Never weaken a test to get green. Hash changes need a matching decision entry.
 - Avoid new dependencies without justification. No paid services, API keys, runtime network calls, analytics, streak penalties, or monetized random rewards.
-- Work in milestones M0–M10 from `docs/CULL.md`, update `docs/PROGRESS.md` and `docs/DECISIONS.md`, and commit each green step.
+- Work in milestones M0–M10 from `docs/CULL.md`, update `docs/PROGRESS.md` and `docs/DECISIONS.md`, and commit each green step. `npm run validate:m5` and `npm run validate:m6` print report-only acceptance gates while their bot criteria remain red.
 - Do not push, deploy, or modify files outside this repository.

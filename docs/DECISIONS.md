@@ -9,3 +9,10 @@
 - 2026-10-12: Continue into M3 per Assam's direction despite the M2 bot kill criterion; retain the failed ratio and pending human test as open evidence.
 - 2026-10-12: Store hysteretic LOD tiers in simulation state and hashes; render Urchins with one instanced bucket per visible tier and omit sub-pixel instances. Debug tier previews may exceed gameplay zoom to capture all five tiers.
 - 2026-10-12: Represent Extras as seeded member offsets with independent culling and 0.8 u/s motion; hold Swarm spawn points unconsumed below 4 lpx; model Bridge plank loss at wide tiers; collect or steal Reels through CAST cuts.
+- 2026-10-12: Anchor generated scenes' initial Talent and camera to the generated path entrance; otherwise the M5 generator's z-offset starts Talent off-route and biases bot outcomes.
+- 2026-10-12: Keep M6 Shoot progression opt-in with `?shoot=1` until its full 20-seed duration gate passes; the same entry point exposes all four ordered segments for scripted validation.
+- 2026-10-12: Use 200-seed M5 results as the current acceptance record: Adaptive 88%, Tracker 100%, Adaptive/Tracker 0.936×, Wide/Adaptive 0.489×, Close/Adaptive 0.831×; Chaos 1,000/1,000 finite and generation p95 3.55 ms. Preserve all red gates in progress and keep CI reporting them non-blocking.
+- 2026-10-12: Track the Wrap in path-distance units instead of world X so fork detours do not make the strike line outrun Talent; start each active line 12 path-units behind.
+- 2026-10-12: Restrict M6 introductions to biome order and activate the Red Monitor's hostile cone only while the monitor itself is in the playable gate; the monitor is unloaded with its SET when off-frame.
+- 2026-10-12: Keep M7 CAST boxes in one dynamic LineSegments buffer and only lower render DPR from the 60-frame median; resolution never climbs mid-run.
+- 2026-10-12: Keep the M4 roster browser fixture available through `?roster=1`; its E2E test must not assume the M5 generated world always contains every later-roster entity in the same opening frame.

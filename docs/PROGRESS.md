@@ -5,15 +5,19 @@
 - [x] M2 Greybox: Talent, Urchin LOD, Boulder, Glass floor, 10 seeded strips, keyboard/mouse/touch controls, bot comparison and four Chromium screenshots. Automated browser checks pass; human fun test is pending.
 - [x] M3 Full LOD: hysteretic Talent/entity tiers, four shared instanced Urchin geometry buckets plus sub-pixel culling, tier-change rings, and five tier screenshots. Tier oscillation, bucket selection, and ring cues are covered by unit/browser checks.
 - [x] M4 Roster part 1: deterministic Extras crowds (4–12 moving members), size-culled Swarm, motion-gated Stagehand, LOD-sensitive Rope Bridge and collectible Reels. Per-rule sim scenarios plus mobile/desktop roster browser checks pass.
-- [ ] M5 Generator and bots
-- [ ] M6 Roster part 2 and Shoot structure
-- [ ] M7 Visual signature
-- [ ] M8 Audio
+- [ ] M5 Generator and bots — implementation and 40-template catalog are present; acceptance gates remain red (latest 200-seed report below).
+- [ ] M6 Roster part 2 and Shoot structure — entity rules and opt-in `?shoot=1` four-part Shoot are implemented; the AdaptiveBot gate remains red.
+- [ ] M7 Visual signature — batched CAST AABBs, Night Shoot palette shift, and one-way adaptive DPR are implemented. M5/M6 phone and desktop screenshots were inspected; draw calls/triangles measured 10/8,014 and 8/5,826. The full ~20-image golden set remains.
+- [ ] M8 Audio — lazy WebAudio sources, stereo pan, LOD filtering, 96 BPM pulse, and cut/pop/reel/LOD/Wrap cues are implemented; settings and calm mix remain.
 - [ ] M9 Meta and share
 - [ ] M10 Polish and human gate
 
-**KILL-CRITERION WARNING:** after one tuning pass, the smart framing bot averaged 6.66 distance versus TrackerBot's 7.37 across 20 seeds (0.90×, below the required 1.3×). The human test is still pending. Assam directed continuation through the next phases despite the failed automated criterion.
+**KILL-CRITERION WARNING:** the M2 20-seed smart framing bot averaged 6.66 distance versus TrackerBot's 7.37 (0.90×, below the required 1.3×). Assam directed continuation through later phases; the human test is still pending.
+
+M5 latest 200-seed report: Adaptive completed **88%** (target ≥95%), Tracker completed **100%** (target ≤40%), Adaptive/Tracker distance **0.936×** (target ≥1.3×), Wide/Adaptive **0.489×** (pass), Close/Adaptive **0.831×** (fail). Adaptive failures: 11 fell, 13 hit. Chaos passed **1,000/1,000** finite runs and generator p95 was **3.55 ms** (target ≤50 ms). The strict validated startup remains opt-in (`?validated`) and can reject seeds; normal startup uses seeded generated scenes. CI runs the failed M5 gate as a non-blocking report.
+
+M6 latest Adaptive Shoot report: **7/20** seeds reached the complete 40-second finale; min/mean/max run times were **85.2 / 214.0 / 257.8 s**. The 3–8 minute full-Shoot gate is not met. Scenes, biome order, ledger, monitors, recurring prop and Wrap remain available for manual/scripted play through `?shoot=1`. CI reports this acceptance gate without blocking ordinary checks.
 
 Performance: M2 recorded 0.75 ms p95; repeated M3/M4 Node runs measured 1.43–1.95 ms p95 while other Chromium processes saturated the 2-core environment, so the current performance gate is unresolved and needs a quieter rerun. M3/M4 browser counters were 6/12 draw calls and 138/940 triangles. The current production JavaScript measures 136.04 KB gzip and 112.41 KB brotli, under the 300 KB cap; simulated slow-3G load is estimated at 2.2 s versus the 2.0 s target.
 
-Next step: implement M5's chunk templates, generator, validator and bots; rerun the Node performance benchmark on an idle machine and schedule the still-pending 10-minute M2 human test with Assam and 3–5 cold players.
+Next step: implement M9 filmography, daily seed, replay/share and contact sheet; keep the M5/M6 bot acceptance failures visible. The public GitHub repository exists; branch/tag push is pending credential scope repair.

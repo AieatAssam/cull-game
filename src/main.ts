@@ -6,16 +6,30 @@ import { inFrame } from './sim/frame';
 import { NEUTRAL_INPUT, step } from './sim/step';
 import { lodTier } from './sim/lod';
 import { TUNING } from './sim/tuning';
-import { createState } from './sim/world';
+import { createGeneratedState, createState } from './sim/world';
+import { createValidatedState } from './gen/validated';
+import { createShootState, createShootSceneState, stepShoot } from './sim/shoot';
+import { inputForBot, type BotKind } from './bots/players';
+import { mulberry32 } from './sim/rng';
 import { UrchinLodBuckets } from './render/lod-buckets';
+import { CastBounds } from './render/cast-bounds';
+import { DPR_SCALES, nextDprTier } from './render/adaptive-dpr';
+import { AudioDirector } from './audio/director';
 import type { CastEntity, InputFrame, SimState } from './sim/types';
 
 const app = document.querySelector<HTMLElement>('#app');
 if (!app) throw new Error('Missing app root');
+const audio = new AudioDirector();
+const unlockAudio = () => { if (!audio.started) void audio.startFromGesture().catch(() => undefined); };
 const query = new URLSearchParams(location.search);
 const frozen = query.has('frozen');
 const urlSeed = Number(query.get('seed') ?? '1');
-let state: SimState = createState(Number.isFinite(urlSeed) ? urlSeed : 1);
+const seed = Number.isFinite(urlSeed) ? urlSeed : 1;
+const botName = query.get('bot');
+const bot = (['tracker', 'wide', 'close', 'adaptive', 'chaos'] as string[]).includes(botName ?? '') ? botName as BotKind : undefined;
+const createTake = (takeSeed: number) => query.has('shoot') ? createShootState(takeSeed) : query.has('roster') ? createState(takeSeed) : query.has('validated') ? createValidatedState(takeSeed) : createGeneratedState(takeSeed);
+let botRandom = mulberry32((seed ^ 0xb07b07) >>> 0);
+let state: SimState = createTake(seed);
 let paused = false;
 let pointer: { id: number; x: number; y: number } | null = null;
 const keys = new Set<string>();
@@ -25,6 +39,7 @@ let zoomPulse = 0;
 let rotationPulse: -1 | 0 | 1 = 0;
 let simAccumulator = 0;
 let previousTime = 0;
+let frameSamples: number[] = [];
 
 const shell = document.createElement('section');
 shell.className = 'stage';
@@ -46,7 +61,9 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color('#e8e4da');
 const camera = new THREE.OrthographicCamera(-15, 15, 15, -15, 0.1, 200);
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'low-power' });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25));
+const baseDpr = Math.min(window.devicePixelRatio, 1.25);
+let dprTier = 0;
+renderer.setPixelRatio(baseDpr * DPR_SCALES[dprTier]);
 renderer.setSize(1, 1);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.domElement.setAttribute('aria-label', 'CULL game view');
@@ -57,8 +74,11 @@ const keyLight = new THREE.DirectionalLight('#fffaf2', 1.2);
 keyLight.position.set(-8, 14, 9);
 scene.add(keyLight);
 const urchinBuckets = new UrchinLodBuckets(scene);
+const castBounds = new CastBounds();
+scene.add(castBounds.mesh);
 
-const floor = new THREE.Mesh(new THREE.PlaneGeometry(400, 30), new THREE.MeshLambertMaterial({ color: '#b9ad98' }));
+const floorMaterial = new THREE.MeshLambertMaterial({ color: '#b9ad98' });
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(400, 30), floorMaterial);
 floor.rotation.x = -Math.PI / 2;
 floor.position.y = -0.12;
 scene.add(floor);
@@ -68,6 +88,35 @@ scene.add(grid);
 const path = new THREE.Mesh(new THREE.BoxGeometry(400, 0.05, 2), new THREE.MeshBasicMaterial({ color: '#d2c8b6' }));
 path.position.y = 0.01;
 scene.add(path);
+const terrainGroup = new THREE.Group();
+scene.add(terrainGroup);
+let terrainTiles: SimState['tiles'] | null = null;
+let renderedNightPalette = false;
+function syncTerrain() {
+  if (state.tiles === terrainTiles) return;
+  terrainTiles = state.tiles;
+  for (const child of [...terrainGroup.children]) {
+    terrainGroup.remove(child);
+    if (child instanceof THREE.Mesh || child instanceof THREE.InstancedMesh) {
+      child.geometry.dispose();
+      const materials = Array.isArray(child.material) ? child.material : [child.material];
+      materials.forEach((material) => material.dispose());
+    }
+  }
+  for (const kind of ['path', 'set'] as const) {
+    const tiles = state.tiles.filter((tile) => tile.kind === kind);
+    if (!tiles.length) continue;
+    const isPath = kind === 'path';
+    const mesh = new THREE.InstancedMesh(
+      new THREE.BoxGeometry(isPath ? 1 : 0.65, isPath ? 0.05 : 0.5, isPath ? 1 : 0.65),
+      new THREE.MeshLambertMaterial({ color: isPath ? '#d2c8b6' : '#8d765b' }),
+      tiles.length,
+    );
+    tiles.forEach((tile, index) => mesh.setMatrixAt(index, new THREE.Matrix4().makeTranslation(tile.x, isPath ? -0.02 : 0.25, tile.z)));
+    mesh.instanceMatrix.needsUpdate = true;
+    terrainGroup.add(mesh);
+  }
+}
 
 const talent = new THREE.Group();
 const talentGeometry = [
@@ -145,6 +194,21 @@ function buildEntity(entity: CastEntity) {
     const ropePoints = [new THREE.Vector3(-7, 0.5, -0.8), new THREE.Vector3(7, 0.5, -0.8), new THREE.Vector3(-7, 0.5, 0.8), new THREE.Vector3(7, 0.5, 0.8)];
     const ropes = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(ropePoints), new THREE.LineBasicMaterial({ color: '#554332' }));
     ropes.name = 'bridge-ropes'; group.add(ropes);
+  } else if (kind === 'rumour') {
+    material = new THREE.MeshLambertMaterial({ color: '#8a9290', transparent: true, opacity: 0.62, flatShading: true });
+    group.add(new THREE.Mesh(new THREE.IcosahedronGeometry(0.5, 1), material));
+  } else if (kind === 'monitor' || kind === 'red-monitor') {
+    material = new THREE.MeshLambertMaterial({ color: kind === 'monitor' ? '#424a4a' : '#c72d29', flatShading: true });
+    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.1, 1.2, 5), material);
+    pole.position.y = 0.6; group.add(pole);
+    const lens = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.34, 0.3), material);
+    lens.position.set(0, 1.25, 0); group.add(lens);
+    const cone = new THREE.Mesh(new THREE.ConeGeometry(0.8, 2.3, 4, 1, true), new THREE.MeshBasicMaterial({ color: kind === 'monitor' ? '#43c9d8' : '#e43b33', transparent: true, opacity: 0.22, wireframe: true }));
+    cone.name = 'monitor-cone'; cone.position.set(0, 0.6, 1.2); group.add(cone);
+  } else if (kind === 'continuity') {
+    const propKind = entity.propSequence?.[entity.propIndex ?? 0] ?? entity.propIndex ?? 0;
+    material = new THREE.MeshLambertMaterial({ color: ['#aa7651', '#b43a31', '#9e8a72', '#745b40'][propKind % 4], flatShading: true });
+    group.add(new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.8, 1), material));
   } else {
     material = new THREE.MeshLambertMaterial({ color: '#3fd8ff', flatShading: true });
     group.add(new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.42, 0.7, 8), material));
@@ -159,6 +223,18 @@ function syncEntities() {
     if (!object) { object = buildEntity(entity); entityMeshes.set(entity.id, object); scene.add(object); }
     object.position.set(entity.x, entity.kind === 'glass' ? 0 : entity.kind === 'boulder' ? 0.72 : 0.68, entity.z);
     object.rotation.y = entity.age * 0.015;
+    if (entity.kind === 'rumour') object.scale.setScalar(Math.max(0.1, entity.radius ?? 0.5));
+    if (entity.kind === 'monitor' || entity.kind === 'red-monitor') {
+      object.rotation.y = -(entity.heading ?? 0) + Math.PI / 2;
+      const cone = object.getObjectByName('monitor-cone');
+      if (cone) cone.scale.set(1, 1, Math.min(2, (entity.range ?? 18) / 14));
+    }
+    if (entity.kind === 'continuity') {
+      const mesh = object.children.find((child): child is THREE.Mesh => child instanceof THREE.Mesh);
+      const propKind = entity.propSequence?.[entity.propIndex ?? 0] ?? entity.propIndex ?? 0;
+      if (mesh?.material instanceof THREE.MeshLambertMaterial) mesh.material.color.set(['#aa7651', '#b43a31', '#9e8a72', '#745b40'][propKind % 4]!);
+      object.scale.set(1 + (propKind % 2) * 0.25, 1, 1);
+    }
     if (entity.kind === 'extras') {
       const crowd = object.getObjectByName('extras-crowd') as THREE.InstancedMesh;
       const wall = object.getObjectByName('extras-wall')!;
@@ -190,7 +266,7 @@ function syncEntities() {
   }
   for (const [id, object] of entityMeshes) {
     const found = state.entities.find((entity) => entity.id === id);
-    if (!found || found.cut) object.visible = false;
+    if (!found || found.cut || !found.spawned) object.visible = false;
   }
   urchinBuckets.update(state.entities, state.camera.zoom, state.tick);
 }
@@ -199,14 +275,25 @@ function syncCamera() {
   updateRenderCamera(camera, state.camera);
 }
 function render() {
+  audio.update(state);
+  const nightPalette = state.shoot?.sceneIndex === 2;
+  if (nightPalette !== renderedNightPalette) {
+    renderedNightPalette = nightPalette;
+    scene.background = new THREE.Color(nightPalette ? '#17191d' : '#e8e4da');
+    floorMaterial.color.set(nightPalette ? '#363238' : '#b9ad98');
+    keyLight.intensity = nightPalette ? 0.42 : 1.2;
+  }
   syncCamera();
+  syncTerrain();
   syncTalentLod();
   talent.position.set(state.talent.x, 0, state.talent.z);
   syncEntities();
+  castBounds.update(state.entities);
   renderer.render(scene, camera);
   updateHud();
 }
 function updateHud() {
+  if (state.shoot) $('.slate').innerHTML = `SCENE 0${Math.min(state.shoot.sceneIndex + 1, 3)}<br><strong>${state.shoot.biome}</strong><small>SEED <span>${String(state.seed).padStart(5, '0')}</span></small>`;
   const seconds = Math.max(0, Math.ceil(state.film));
   $('#timecode').textContent = `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
   $('#film').textContent = `${seconds} s`;
@@ -246,7 +333,22 @@ function buildInput(): InputFrame {
   };
 }
 function advanceTick() {
-  if (!paused && !state.failed) state = step(state, buildInput());
+  if (!paused && !state.failed) {
+    const input = bot ? inputForBot(state, bot, botRandom) : buildInput();
+    const previousCuts = state.cuts.length;
+    const previousSpawned = state.entities.filter((entity) => entity.spawned && !entity.cut).length;
+    const previousWrap = state.shoot?.wrapCaught ?? false;
+    const previousScore = state.score;
+    const previousTalentTier = state.talent.lodTier;
+    const previousEntityTiers = new Map(state.entities.map((entity) => [entity.id, entity.lodTier]));
+    state = state.shoot ? stepShoot(state, input) : step(state, input);
+    if (state.score > previousScore) audio.playCue('reel');
+    else if (state.cuts.length > previousCuts) audio.playCue('cut');
+    else if (state.entities.filter((entity) => entity.spawned && !entity.cut).length > previousSpawned) audio.playCue('pop');
+    else if (state.talent.lodTier !== previousTalentTier || state.entities.some((entity) => entity.lodTier !== previousEntityTiers.get(entity.id))) audio.playCue('lod');
+    if (!previousWrap && state.shoot?.wrapCaught) audio.playCue('wrap');
+  }
+  audio.update(state);
   frameInput = { ...NEUTRAL_INPUT };
   zoomPulse = 0;
   rotationPulse = 0;
@@ -257,7 +359,20 @@ function stepFrame() {
 }
 function loop(now: number) {
   if (!previousTime) previousTime = now;
-  simAccumulator += Math.min((now - previousTime) / 1000, 0.1);
+  const frameTime = now - previousTime;
+  if (frameTime > 0 && !document.hidden) frameSamples.push(frameTime);
+  if (frameSamples.length >= 60) {
+    const nextTier = nextDprTier(dprTier, frameSamples.slice(-60));
+    frameSamples = [];
+    if (nextTier > dprTier) {
+      dprTier = nextTier;
+      renderer.setPixelRatio(baseDpr * DPR_SCALES[dprTier]);
+      const rect = mount.getBoundingClientRect();
+      const size = Math.max(1, Math.floor(Math.min(rect.width, rect.height)));
+      renderer.setSize(size, size, true);
+    }
+  }
+  simAccumulator += Math.min(frameTime / 1000, 0.1);
   previousTime = now;
   let ticks = 0;
   while (simAccumulator >= 1 / TUNING.tickRate && ticks < TUNING.maxCatchupTicks) {
@@ -275,6 +390,7 @@ function panFromKeys(): InputFrame {
 }
 let holdButton = false;
 window.addEventListener('keydown', (event) => {
+  unlockAudio();
   if ([' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) event.preventDefault();
   keys.add(event.key.toLowerCase());
   if (!event.repeat && event.key.toLowerCase() === 'q') rotationPulse = -1;
@@ -283,6 +399,7 @@ window.addEventListener('keydown', (event) => {
 });
 window.addEventListener('keyup', (event) => { keys.delete(event.key.toLowerCase()); });
 renderer.domElement.addEventListener('pointerdown', (event) => {
+  unlockAudio();
   pointer = { id: event.pointerId, x: event.clientX, y: event.clientY };
   try { renderer.domElement.setPointerCapture(event.pointerId); } catch { /* synthetic touch events have no browser pointer capture */ }
 });
@@ -304,10 +421,10 @@ $('#zoom-slider').addEventListener('input', (event) => {
   state.camera.zoom = value;
 });
 $('#pause').addEventListener('click', () => { paused = !paused; });
-$('#restart').addEventListener('click', () => { state = createState(state.seed + 1); entityMeshes.clear(); urchinBuckets.reset(); for (const child of [...scene.children]) if (child instanceof THREE.Group && child !== talent) scene.remove(child); $('#end-card').classList.add('hidden'); });
+$('#restart').addEventListener('click', () => { const nextSeed = state.seed + 1; state = createTake(nextSeed); botRandom = mulberry32((nextSeed ^ 0xb07b07) >>> 0); entityMeshes.clear(); urchinBuckets.reset(); for (const child of [...scene.children]) if (child instanceof THREE.Group && child !== talent && child !== terrainGroup) scene.remove(child); terrainTiles = null; $('#end-card').classList.add('hidden'); });
 
 if (query.has('debug')) {
-  Object.assign(window, { __cull: { step: (n = 1) => { for (let i = 0; i < n; i++) advanceTick(); render(); }, input: (input: InputFrame) => { frameInput = input; }, hash: () => stateHash(state), state: () => structuredClone(state), diagnostics: () => ({ paused, keys: [...keys], hidden: document.hidden, focused: document.hasFocus() }), performance: () => ({ drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles }), lod: () => urchinBuckets.diagnostics(), load: (seed: number) => { state = createState(seed); urchinBuckets.reset(); }, loadLodDemo: () => { state = createState(1, [{ id: 'lod-demo-urchin', kind: 'urchin', x: 0, z: 2, vx: 0, vz: 0, spawned: true, cut: false, age: 0 }]); state.talent.x = -4; render(); }, setTier: (tier: number) => { const size = [64, 36, 17, 7, 2][tier] ?? 36; state.camera.zoom = TUNING.urchinRadius * 1000 / size; }, setCamera: (x: number, z: number, zoom: number) => { state.camera.x = x; state.camera.z = z; state.camera.zoom = zoom; } } });
+  Object.assign(window, { __cull: { step: (n = 1) => { for (let i = 0; i < n; i++) advanceTick(); render(); }, input: (input: InputFrame) => { frameInput = input; }, hash: () => stateHash(state), state: () => structuredClone(state), diagnostics: () => ({ paused, keys: [...keys], hidden: document.hidden, focused: document.hasFocus(), dprTier }), performance: () => ({ drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles }), lod: () => urchinBuckets.diagnostics(), load: (seed: number) => { state = createGeneratedState(seed); terrainTiles = null; urchinBuckets.reset(); }, loadShootScene: (sceneIndex: number) => { state = createShootSceneState(state.seed, sceneIndex); terrainTiles = null; urchinBuckets.reset(); render(); }, loadLodDemo: () => { state = createGeneratedState(1, 0, 2); state.entities = [{ id: 'lod-demo-urchin', kind: 'urchin', x: 0, z: 2, vx: 0, vz: 0, spawned: true, cut: false, age: 0 }]; state.talent.x = -4; render(); }, setTier: (tier: number) => { const size = [64, 36, 17, 7, 2][tier] ?? 36; state.camera.zoom = TUNING.urchinRadius * 1000 / size; }, setCamera: (x: number, z: number, zoom: number) => { state.camera.x = x; state.camera.z = z; state.camera.zoom = zoom; } } });
 }
 
 new ResizeObserver(() => {

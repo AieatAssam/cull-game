@@ -1,44 +1,48 @@
 # CULL morning report
 
-## What is ready
+## Milestones
 
-- **M0 scaffold:** pinned Three.js/Vite/TypeScript stack, square gate shell, CI workflows, and the unit/browser tooling.
-- **M1 simulation:** deterministic fixed-tick camera, framing, SET/CAST lifecycle, seeded strips, Talent path and forks, HOLD, film, and failure rules.
-- **M2 greybox:** 90-second Backlot scene, 10 seeded strips, Talent, Urchin, Boulder, Glass, and keyboard, mouse, and touch camera controls.
-- **M3 full LOD:** hysteretic tiers stored in the sim and replay hash, four shared instanced Urchin mesh buckets, sub-pixel culling, Talent tier silhouettes, tier-change rings, and five Urchin tier screenshots.
-- **M4 roster part 1:** deterministic Extras crowds, size-culled Swarm, motion-gated Stagehand, LOD-sensitive Rope Bridge, and Reels that the Talent collects or the Stagehand can steal.
+- **M0–M4:** scaffold, deterministic sim, greybox, hysteretic LOD, and first roster are implemented and tagged.
+- **M5:** 40 authored chunks, deterministic stitcher, validator, generated terrain rendering, and Tracker/Wide/Close/Adaptive/Chaos bots are implemented. Acceptance is still red; see the bot results below.
+- **M6:** Rumour ledger, ally/hostile Monitor cones, seeded Continuity Prop, Wrap, biome ordering, and an opt-in four-part Shoot (`?shoot=1`) are implemented. The 20-seed Shoot gate is still red.
+- **M7:** batched CAST bounds, Night Shoot palette shift, and one-way adaptive DPR are implemented. Mobile/desktop visual checks and the per-frame budgets passed; the full 20-image golden set is unfinished.
+- **M8:** lazy WebAudio, in-frame source tracking, LOD filtering, stereo panning, a 96 BPM pulse, and gameplay cues are implemented. Audio settings and the calm mix are unfinished.
+- **M9–M10:** not started. Human playtest and weak-device sign-off remain pending.
 
-M4 typecheck, lint, all 31 unit/simulation checks, all 5 Chromium browser checks, production build, and bundle-size check passed. The simulation replay tests match hashes across 10,000 ticks for three seeds. M3/M4 draw calls and triangles measured 6/12 and 138/940.
+## Checks and performance
 
-## M2 decision signals
+- `npm run typecheck`, `npm run lint`, `npm test`, `npm run build`, and `npm run size` pass. Unit tests: **62 passed** across 8 files.
+- Chromium E2E: **7 passed**. M5/M6 seeded mobile and desktop screenshots were reviewed; visible mobile gate-label overlap was fixed and the two milestone screenshot tests passed again.
+- Production bundle: **148.92 KB gzip**, under 300 KB; Size Limit reports **122.15 KB brotli**. Simulated slow-3G load is **2.4 s**, above the 2.0 s goal.
+- M5 screenshots: **10 draw calls / 8,014 triangles**. M6 screenshots: **8 draw calls / 5,826 triangles**.
+- Generator p95: **3.55 ms**, under 50 ms. Chaos invariants: **1,000/1,000** runs passed. The Node sim p95 budget still needs a quiet rerun; prior M3/M4 readings were 1.43–1.95 ms under CPU contention.
 
-The automated framing twin missed the specified 1.3× target after one tuning pass. Across 20 seeds it averaged **6.66 distance**, compared with **7.37** for TrackerBot, for a **0.90×** ratio. Under §16, this meets the automated kill criterion and calls for a stop or pivot decision.
+## Bot results and acceptance gates
 
-Assam directed continuation into the next phases despite the automated failure. The human fun test has not been run; Assam and 3–5 cold players still need to play for 10 minutes each, with the five signals and three questions in §16 recorded without coaching.
+M5 validation over 200 seeds: Adaptive completed **88%** (goal ≥95%); Tracker completed **100%** (goal ≤40%); Adaptive/Tracker distance **0.936×** (goal ≥1.3×); Wide/Adaptive **0.489×** (pass); Close/Adaptive **0.831×** (goal ≤0.7×). Adaptive failed by falling 11 times and getting hit 13 times. The report-only CI step keeps these numbers visible without blocking ordinary CI. M2's earlier 20-seed comparison remains **0.90×**, below its 1.3× kill criterion; the human test has not happened.
 
-## Build and performance
+M6 Adaptive Shoot validation: **7/20** seeds completed the 40-second finale. Run times ranged from **85.2 s to 257.8 s**, with a **214.0 s** mean. The 3–8 minute, 20-seed acceptance test is not met.
 
-- `npm run typecheck`, `npm run lint`, `npm test`, `npm run test:e2e`, `npm run build`, and `npm run size` pass.
-- Chromium browser checks: **5 passed** (keyboard/mouse framing, touch pan/zoom, LOD buckets and screenshots, seeded roster render, and scaffold/error check).
-- Production JavaScript: **136.04 KB gzip**; Size Limit measured **112.41 KB brotlied** against a 300 KB limit. The estimated slow-3G load is 2.2 s against the 2.0 s target; optimize when the visual signature/perf work lands.
-- M2 Node benchmark: **250 entities**, 2,000 measured ticks, **0.75 ms p95**. M3 repeats measured **1.43–1.95 ms p95** while Chromium saturated the two available CPUs; rerun on an idle machine to resolve the 1 ms budget.
-- M2/M3/M4 browser scene counters: **9 / 6 / 12 draw calls**, **194 / 138 / 940 triangles**, below the 24 draw call and 60,000 triangle budgets.
+## Screenshots to inspect first
 
-## Screenshots to inspect
+- [M5 mobile, generated scene](../artifacts/screens/m5/390x844.png)
+- [M5 desktop, generated scene](../artifacts/screens/m5/1280x800.png)
+- [M6 mobile, Long Take](../artifacts/screens/m6/390x844.png)
+- [M6 desktop, Long Take](../artifacts/screens/m6/1280x800.png)
 
-- [M2 mobile, default framing](../artifacts/screens/m2/390x844.png)
-- [M2 mobile, close framing](../artifacts/screens/m2/390x844-close.png)
-- [M2 desktop, default framing](../artifacts/screens/m2/1280x800.png)
-- [M2 desktop, wide framing](../artifacts/screens/m2/1280x800-wide.png)
-- [M3 close-up LOD screenshot](../artifacts/screens/m3/urchin-close.png)
-- [M3 proxy LOD screenshot](../artifacts/screens/m3/urchin-proxy.png)
-- [M4 mobile roster](../artifacts/screens/m4/390x844.png)
-- [M4 desktop roster](../artifacts/screens/m4/1280x800.png)
+## Decisions and known gaps
 
-## How to run
+- Assam directed continuation after the M2 bot kill criterion; sign-off is still needed after an uncoached 10-minute test with 3–5 cold players.
+- Normal play uses raw seeded generated scenes. Strict bot-validated generation is opt-in with `?validated` and may throw after its retry limit while bot gates remain red.
+- The full Shoot is opt-in with `?shoot=1`; all four segments can be isolated through the debug URL for scripted inspection.
+- M8 audio settings (master/music/SFX), mono mode, and calm/reduced-motion mix remain open.
+- The slow-3G load target and sim-tick budget need follow-up; the full golden screenshot set and M10 weak-GPU/phone human gate remain outstanding.
+- GitHub repo is public at [AieatAssam/cull-game](https://github.com/AieatAssam/cull-game). Local commits and tags still need a successful push because the current GitHub token rejected Git writes for missing repository scope.
 
-From the repository, run `npm install` and `npm run dev`. The seeded browser checks use Chromium and Playwright via `npm run test:e2e`.
+## How to play
 
-## Sign-off and next step
+Run `npm install && npm run dev`. Add `?shoot=1` for the multi-scene Shoot or `?debug&frozen=1` for deterministic scripted inspection.
 
-Proceed to M5's generator and bot suite. Also rerun `npm run perf` on an idle machine and complete the pending M2 human test with Assam and 3–5 cold players; preserve the automated bot failure when reviewing §16 results.
+## Exact next step
+
+Implement M9 local filmography, stable UTC daily seed, replay URL codec, and a nine-frame contact sheet. Preserve the M5/M6 bot failures in the report, rerun all checks, then finish M10 accessibility and human sign-off.

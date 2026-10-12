@@ -1,4 +1,4 @@
-export type EntityKind = 'urchin' | 'boulder' | 'glass' | 'reel' | 'extras' | 'swarm' | 'stagehand' | 'bridge';
+export type EntityKind = 'urchin' | 'boulder' | 'glass' | 'reel' | 'extras' | 'swarm' | 'stagehand' | 'bridge' | 'rumour' | 'monitor' | 'red-monitor' | 'continuity';
 export type FailReason = 'lost-talent' | 'hit' | 'fell' | 'out-of-film' | 'wrapped';
 export interface InputFrame {
   panX: number;
@@ -10,15 +10,18 @@ export interface InputFrame {
 }
 export interface CrowdMember { dx: number; dz: number; vx: number; vz: number; cut: boolean; }
 export interface SpawnPoint { id: string; kind: EntityKind; x: number; z: number; vx: number; vz: number; members?: CrowdMember[]; }
-export interface CastEntity extends SpawnPoint { spawned: boolean; cut: boolean; age: number; lodTier?: 0 | 1 | 2 | 3 | 4; }
+export interface CastEntity extends SpawnPoint { spawned: boolean; cut: boolean; age: number; lodTier?: 0 | 1 | 2 | 3 | 4; radius?: number; heading?: number; range?: number; halfAngle?: number; propIndex?: number; propSequence?: number[]; }
 export interface Talent { x: number; z: number; offscreenTicks: number; pathIndex: number; lodTier?: 0 | 1 | 2 | 3; }
 export interface PathFork { at: number; options: Array<{ x: number; z: number }>; }
+export interface TerrainTile { x: number; z: number; kind: 'path' | 'set'; }
 export interface SimState {
   seed: number;
   tick: number;
+  travelDistance: number;
   camera: { x: number; z: number; vx: number; vz: number; zoom: number; yaw: number; yawTarget: number; rotationTicksRemaining: number; moving: boolean };
   talent: Talent;
   path: Array<{ x: number; z: number }>;
+  tiles: TerrainTile[];
   forks: PathFork[];
   routeChoices: Record<number, number>;
   entities: CastEntity[];
@@ -28,6 +31,7 @@ export interface SimState {
   failed: FailReason | null;
   score: number;
   cuts: string[];
+  shoot?: { sceneIndex: number; biome: 'BACKLOT' | 'MINIATURE CITY' | 'NIGHT SHOOT' | 'LONG TAKE'; wrapDistance: number | null; wrapCaught: boolean; finaleTicks: number; };
 }
 export interface FrameRect { left: number; right: number; bottom: number; top: number; }
 export interface ProjectedBounds { left: number; right: number; bottom: number; top: number; }

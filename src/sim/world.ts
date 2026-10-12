@@ -1,4 +1,5 @@
 import { seededRange } from './rng';
+import { generateScene } from '../gen/generate';
 import type { CastEntity, EntityKind, SimState, SpawnPoint } from './types';
 import { TUNING } from './tuning';
 
@@ -38,10 +39,11 @@ export function reloadSet(seed: number, x: number, z: number) {
 
 export function createState(seed: number, entities = loadScene(seed)): SimState {
   return {
-    seed: seed >>> 0, tick: 0,
+    seed: seed >>> 0, tick: 0, travelDistance: 0,
     camera: { x: 0, z: 0, vx: 0, vz: 0, zoom: TUNING.startZoom, yaw: 0, yawTarget: 0, rotationTicksRemaining: 0, moving: false },
     talent: { x: 0, z: 0, offscreenTicks: 0, pathIndex: 0, lodTier: 1 },
     path: Array.from({ length: 81 }, (_, i) => ({ x: i * 2, z: 0 })),
+    tiles: [],
     forks: Array.from({ length: 7 }, (_, i) => {
       const at = 4 + i * 10;
       return { at, options: [{ x: (at + 1) * 2, z: -4 }, { x: (at + 1) * 2, z: 4 }] };
@@ -49,4 +51,21 @@ export function createState(seed: number, entities = loadScene(seed)): SimState 
     routeChoices: {},
     entities, consumed: [], film: 90, waiting: false, failed: null, score: 0, cuts: [],
   };
+}
+
+/** Raw seeded generation for simulation and bot validation; callers can use gen/validated for rerolled seeds. */
+export function createGeneratedState(seed: number, difficulty = 0, chunkCount?: number): SimState {
+  const scene = generateScene(seed, difficulty, chunkCount);
+  const state = createState(seed, scene.entities);
+  state.path = scene.path;
+  state.forks = scene.forks;
+  state.tiles = scene.tiles;
+  const start = scene.path[0];
+  if (start) {
+    state.talent.x = start.x;
+    state.talent.z = start.z;
+    state.camera.x = start.x;
+    state.camera.z = start.z;
+  }
+  return state;
 }

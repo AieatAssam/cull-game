@@ -12,6 +12,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test --reporter=line",
     "perf": "tsx src/bots/perf.ts",
+    "validate:m5": "tsx src/bots/m5-validation.ts",
+    "validate:m6": "tsx src/bots/m6-validation.ts",
     "size": "size-limit"
   },
   "dependencies": {

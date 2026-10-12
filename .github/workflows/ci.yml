@@ -18,4 +18,10 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: npm run size
+      - name: M5 generator and bot balance report (non-blocking while gates are red)
+        run: npm run validate:m5
+        continue-on-error: true
+      - name: M6 full Shoot bot duration report (non-blocking while the AdaptiveBot gate is red)
+        run: npm run validate:m6
+        continue-on-error: true
       - run: npm run test:e2e

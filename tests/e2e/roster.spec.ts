@@ -5,7 +5,7 @@ test('renders the M4 roster on mobile and desktop within the frame budgets', asy
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
-  await page.goto('/?debug&seed=17&frozen=1');
+  await page.goto('/?debug&roster=1&seed=17&frozen=1');
   await page.evaluate(() => { window.__cull.setCamera(10, 0, 18); window.__cull.step(3); });
   const state = await page.evaluate(() => window.__cull.state());
   const spawned = new Set(state.entities.filter((entity) => entity.spawned && !entity.cut).map((entity) => entity.kind));

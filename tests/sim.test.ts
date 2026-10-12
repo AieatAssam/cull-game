@@ -67,6 +67,37 @@ describe('frame projection and lifecycle', () => {
     expect(next.routeChoices[4]).toBe(1);
     expect(next.talent.z).toBeGreaterThan(0);
   });
+  it('lets Talent pass an Urchin by taking the selected fork branch without stalling', () => {
+    const state = createState(7, []);
+    state.path = [{ x: 0, z: 0 }, { x: 1, z: 0 }, { x: 2, z: 2 }, { x: 3, z: 2 }, { x: 4, z: 2 }];
+    state.forks = [{ at: 1, options: [{ x: 2, z: -2 }, { x: 2, z: 2 }] }];
+    state.camera.x = 2; state.camera.z = 2; state.camera.zoom = 30;
+    state.entities = [{ id: 'fork-urchin', kind: 'urchin', x: 2, z: -2, vx: -1.5, vz: 0, spawned: true, cut: false, age: 0 }];
+    let next = state;
+    for (let tick = 0; tick < 360 && !next.failed && next.talent.x <= 3; tick++) next = step(next);
+    expect(next.routeChoices[1]).toBe(1);
+    expect(next.failed).toBeNull();
+    expect(next.talent.pathIndex).toBeGreaterThanOrEqual(3);
+    expect(next.talent.x).toBeGreaterThan(3);
+  });
+  it('snaps Talent through a path node when already within the arrival tolerance', () => {
+    const state = createState(1, []);
+    state.path = [{ x: 0, z: 0 }, { x: 1, z: 0 }, { x: 2, z: 0 }];
+    state.talent.x = 1 - 0.01;
+    state.talent.pathIndex = 0;
+    state.camera.x = 1;
+    const next = step(state);
+    expect(next.talent.pathIndex).toBe(1);
+    expect(next.talent.x).toBe(1);
+  });
+  it('checks Glass floor under Talent in both world axes', () => {
+    const state = createState(1, []);
+    state.talent.x = 8; state.talent.z = 0;
+    const glass = entity(state, 'glass', 8, 4); glass.cut = true;
+    expect(step(state).failed).toBeNull();
+    state.talent.z = 4;
+    expect(step(state).failed).toBe('fell');
+  });
   it('waits on missing set and burns film at double rate', () => {
     const state = createState(1, []); state.path = []; state.film = 10;
     const next = step(state);
@@ -187,6 +218,13 @@ describe('fixed step simulation and failure rules', () => {
     const glass = entity(state, 'glass', 8); glass.cut = true;
     expect(step(state).failed).toBe('fell');
   });
+  it('checks every cut glass tile with both world coordinates', () => {
+    const state = createState(1, []);
+    const first = entity(state, 'glass', 20, 20); first.cut = true;
+    const second = { ...first, id: 'second-glass', x: 0, z: 0, cut: true };
+    state.entities = [first, second];
+    expect(step(state).failed).toBe('fell');
+  });
   it('fails when film runs out and burns at double rate on HOLD', () => {
     const state = createState(1, []); state.film = 0.01;
     expect(step(state).failed).toBe('out-of-film');
@@ -195,6 +233,13 @@ describe('fixed step simulation and failure rules', () => {
   });
   it('fails at the end of the path (wrapped)', () => {
     const state = createState(1, []); state.talent.x = 160; state.talent.pathIndex = state.path.length - 2;
+    expect(step(state).failed).toBe('wrapped');
+  });
+  it('wraps once the Talent reaches the terminal path index', () => {
+    const state = createState(1, []);
+    state.talent.pathIndex = state.path.length - 1;
+    state.talent.x = state.path.at(-1)!.x - 0.001;
+    state.camera.x = state.talent.x;
     expect(step(state).failed).toBe('wrapped');
   });
   it('thins an Extras crowd member by member when the frame clips its edges', () => {

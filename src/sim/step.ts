@@ -1,6 +1,7 @@
 import { inFrame } from './frame';
 import { lodTier, type LodTier } from './lod';
 import { TUNING } from './tuning';
+import { advanceRumourRadius, advanceWrap, isDeletedByWrap, isWrapActive, monitorConeContains, redMonitorOverlapsTarget, type MonitorCone } from './m6';
 import type { CastEntity, FailReason, InputFrame, SimState } from './types';
 
 export const NEUTRAL_INPUT: InputFrame = { panX: 0, panZ: 0, zoom: 0, rotate: 0, hold: false, steady: false };
@@ -8,13 +9,21 @@ const dt = 1 / TUNING.tickRate;
 const distance = (ax: number, az: number, bx: number, bz: number) => Math.hypot(ax - bx, az - bz);
 
 function entityInFrame(state: SimState, entity: CastEntity) {
+  if (entity.kind === 'monitor') return true;
+  const inMonitor = state.entities.some((monitor) => monitor.kind === 'monitor' && monitor.spawned && !monitor.cut
+    && monitorConeContains(monitorCone(monitor), { x: entity.x, z: entity.z }));
+  if (inMonitor) return true;
   if (entity.kind === 'extras' && entity.members) {
     return entity.members.some((member) => !member.cut && inFrame(entity.x + member.dx, entity.z + member.dz, TUNING.extrasMemberRadius,
       state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, 0.5));
   }
-  const radius = entity.kind === 'boulder' ? TUNING.boulderRadius : entity.kind === 'urchin' ? TUNING.urchinRadius : entity.kind === 'swarm' ? TUNING.swarmRadius : entity.kind === 'bridge' ? TUNING.bridgeLength / 2 : 0.55;
+  const radius = entity.kind === 'boulder' ? TUNING.boulderRadius : entity.kind === 'urchin' ? TUNING.urchinRadius : entity.kind === 'swarm' ? TUNING.swarmRadius : entity.kind === 'bridge' ? TUNING.bridgeLength / 2 : entity.kind === 'rumour' ? entity.radius ?? 0.5 : 0.55;
   return inFrame(entity.x, entity.z, radius,
     state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, entity.kind === 'boulder' ? 1 : 0.8);
+}
+
+function monitorCone(entity: CastEntity): MonitorCone {
+  return { origin: { x: entity.x, z: entity.z }, heading: entity.heading ?? 0, range: entity.range ?? 0, halfAngle: entity.halfAngle ?? 0 };
 }
 
 function fail(state: SimState, reason: FailReason) {
@@ -26,6 +35,7 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
   const state: SimState = {
     ...previous,
     camera: { ...previous.camera },
+    ...(previous.shoot ? { shoot: { ...previous.shoot } } : {}),
     talent: { ...previous.talent },
     path: previous.path,
     forks: previous.forks,
@@ -60,6 +70,7 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
   }
 
   const talent = state.talent;
+  const talentBeforeMove = { x: talent.x, z: talent.z };
   const fork = state.forks.find((entry) => entry.at === talent.pathIndex);
   let next = state.path[talent.pathIndex + 1];
   if (fork) {
@@ -79,30 +90,48 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
   }
   let headingX = next ? next.x - talent.x : 0;
   let headingZ = next ? next.z - talent.z : 0;
-  const gateHeadingX = cam.x - talent.x;
-  const gateHeadingZ = cam.z - talent.z;
-  // At a fork, frame centre selects the path heading. A forward-only path has one available branch.
-  if (next && Math.hypot(gateHeadingX, gateHeadingZ) > 0.01 && Math.hypot(headingX, headingZ) > 0.01) {
-    const direction = Math.sign(headingX * gateHeadingX + headingZ * gateHeadingZ);
-    if (direction < 0) { headingX = Math.abs(headingX); headingZ = Math.abs(headingZ); }
-  }
   const headingLength = Math.hypot(headingX, headingZ) || 1;
   const talentTier = lodTier(1000 / cam.zoom, talent.lodTier);
   talent.lodTier = Math.min(talentTier, 3) as 0 | 1 | 2 | 3;
   const talentSpeed = TUNING.talentSpeeds[Math.min(talentTier, 3)];
-  const stopped = input.hold || !next || distance(talent.x, talent.z, next.x, next.z) < 0.02;
+  const snappedToNode = Boolean(next && !input.hold && distance(talent.x, talent.z, next.x, next.z) < 0.02);
+  if (snappedToNode && next) {
+    talent.x = next.x;
+    talent.z = next.z;
+    talent.pathIndex++;
+  }
+  const stopped = input.hold || !next || snappedToNode;
   state.waiting = !next;
   if (!stopped) {
     talent.x += (headingX / headingLength) * talentSpeed * dt;
     talent.z += (headingZ / headingLength) * talentSpeed * dt;
-    if (distance(talent.x, talent.z, next.x, next.z) < talentSpeed * dt) talent.pathIndex++;
+    if (distance(talent.x, talent.z, next.x, next.z) < talentSpeed * dt) {
+      talent.x = next.x;
+      talent.z = next.z;
+      talent.pathIndex++;
+    }
   }
-  if (inFrame(talent.x, talent.z, TUNING.talentRadii[Math.min(talentTier, 3)], cam.x, cam.z, cam.zoom, cam.yaw, 1.4)) talent.offscreenTicks = 0;
+  state.travelDistance += distance(talentBeforeMove.x, talentBeforeMove.z, talent.x, talent.z);
+  const talentInMonitor = state.entities.some((monitor) => monitor.kind === 'monitor' && monitor.spawned && !monitor.cut
+    && monitorConeContains(monitorCone(monitor), { x: talent.x, z: talent.z }));
+  if (talentInMonitor || inFrame(talent.x, talent.z, TUNING.talentRadii[Math.min(talentTier, 3)], cam.x, cam.z, cam.zoom, cam.yaw, 1.4)) talent.offscreenTicks = 0;
   else talent.offscreenTicks++;
   if (talent.offscreenTicks >= TUNING.offscreenGrace * TUNING.tickRate) fail(state, 'lost-talent');
 
   for (const entity of state.entities) {
     if (entity.cut) continue;
+    if (entity.kind === 'monitor' || entity.kind === 'red-monitor') { entity.spawned = true; continue; }
+    if (entity.kind === 'continuity' && entity.spawned && !entityInFrame(state, entity)) {
+      entity.spawned = false;
+      entity.propIndex = ((entity.propIndex ?? 0) + 1) % (entity.propSequence?.length ?? 4);
+      continue;
+    }
+    if (entity.kind === 'rumour') {
+      const visible = entityInFrame(state, entity);
+      entity.radius = advanceRumourRadius(entity.radius ?? 0.5, visible, dt);
+      if (visible) entity.spawned = true;
+      if (!entity.spawned) continue;
+    }
     if (!entity.spawned) {
       const nearTalent = entity.kind === 'extras' && entity.members
         ? entity.members.some((member) => !member.cut && distance(entity.x + member.dx, entity.z + member.dz, talent.x, talent.z) < TUNING.popInExclusion)
@@ -111,11 +140,11 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
       if (entityInFrame(state, entity) && !nearTalent && !(entity.kind === 'swarm' && spawnTier === 4)) {
         entity.spawned = true;
         entity.age = 0;
-        state.consumed.push(entity.id);
+        if (entity.kind !== 'continuity') state.consumed.push(entity.id);
       }
     }
     if (!entity.spawned) continue;
-    const radius = entity.kind === 'boulder' ? TUNING.boulderRadius : entity.kind === 'urchin' ? TUNING.urchinRadius : entity.kind === 'swarm' ? TUNING.swarmRadius : entity.kind === 'extras' ? TUNING.extrasRadius : 0.55;
+    const radius = entity.kind === 'boulder' ? TUNING.boulderRadius : entity.kind === 'urchin' ? TUNING.urchinRadius : entity.kind === 'swarm' ? TUNING.swarmRadius : entity.kind === 'extras' ? TUNING.extrasRadius : entity.kind === 'rumour' ? entity.radius ?? 0.5 : 0.55;
     const lodSize = entity.kind === 'bridge' || entity.kind === 'extras' ? 1000 / cam.zoom : radius * 1000 / cam.zoom;
     const tier = lodTier(lodSize, entity.lodTier as LodTier | undefined);
     entity.lodTier = tier;
@@ -139,7 +168,7 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
     entity.x += entity.vx * dt;
     entity.z += entity.vz * dt;
     const visible = entityInFrame(state, entity);
-    if (!visible && entity.kind !== 'swarm') {
+    if (!visible && entity.kind !== 'swarm' && entity.kind !== 'rumour') {
       entity.cut = true;
       state.cuts.push(entity.id);
       continue;
@@ -163,7 +192,7 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
       }
     }
     const close = distance(entity.x, entity.z, talent.x, talent.z) <= radius + TUNING.talentRadii[Math.min(talentTier, 3)];
-    if (entity.kind === 'glass' && entity.cut && talent.x >= entity.x - 0.5 && talent.x <= entity.x + 0.5) fail(state, 'fell');
+    if (entity.kind === 'glass' && entity.cut && Math.abs(talent.x - entity.x) <= 0.5 && Math.abs(talent.z - entity.z) <= 0.5) fail(state, 'fell');
     if (close && ((entity.kind === 'boulder') || (entity.kind === 'urchin' && tier <= 1))) fail(state, 'hit');
     if (close && entity.kind === 'urchin' && tier === 2) {
       const push = (talent.x - entity.x) >= 0 ? 1 : -1;
@@ -171,7 +200,8 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
     }
     if (close && entity.kind === 'swarm') fail(state, 'hit');
     if (close && entity.kind === 'extras' && tier >= 2) fail(state, 'hit');
-    if (entity.kind === 'bridge' && tier >= 2 && talent.x >= entity.x - TUNING.bridgeLength / 2 && talent.x <= entity.x + TUNING.bridgeLength / 2) fail(state, 'fell');
+    if (entity.kind === 'bridge' && tier >= 2 && talent.x >= entity.x - TUNING.bridgeLength / 2 && talent.x <= entity.x + TUNING.bridgeLength / 2
+      && Math.abs(talent.z - entity.z) <= 0.6 + TUNING.talentRadii[Math.min(talentTier, 3)]) fail(state, 'fell');
     if (close && entity.kind === 'reel' && talentTier <= 1) {
       entity.cut = true;
       state.cuts.push(entity.id);
@@ -180,12 +210,48 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
     }
   }
 
-  const glass = state.entities.find((e) => e.kind === 'glass');
-  if (glass?.cut && talent.x >= glass.x - 0.5 && talent.x <= glass.x + 0.5) fail(state, 'fell');
+  for (const hostile of state.entities.filter((entity) => entity.kind === 'red-monitor' && entity.spawned && !entity.cut
+    && inFrame(entity.x, entity.z, 0.8, cam.x, cam.z, cam.zoom, cam.yaw, 1))) {
+    if (redMonitorOverlapsTarget(monitorCone(hostile), { x: talent.x, z: talent.z }, TUNING.talentRadii[Math.min(talentTier, 3)])) fail(state, 'hit');
+    for (const target of state.entities) {
+      if (target === hostile || target.cut || target.kind === 'monitor' || target.kind === 'red-monitor' || target.kind === 'continuity' || target.kind === 'rumour') continue;
+      const radius = target.kind === 'urchin' ? TUNING.urchinRadius : target.kind === 'boulder' ? TUNING.boulderRadius : 0.55;
+      if (redMonitorOverlapsTarget(monitorCone(hostile), { x: target.x, z: target.z }, radius)) {
+        target.cut = true;
+        state.cuts.push(target.id);
+      }
+    }
+  }
+
+  if (state.entities.some((glass) => glass.kind === 'glass' && glass.cut
+    && Math.abs(talent.x - glass.x) <= 0.5 && Math.abs(talent.z - glass.z) <= 0.5)) fail(state, 'fell');
   state.film -= dt * (input.hold || state.waiting ? 2 : 1);
   if (state.film <= 0) { state.film = 0; fail(state, 'out-of-film'); }
+  if (state.shoot) {
+    const startX = state.path[0]?.x ?? 0;
+    const pathLength = state.path.slice(1).reduce((sum, point, index) => sum + distance(point.x, point.z, state.path[index]!.x, state.path[index]!.z), 0);
+    const active = state.shoot.sceneIndex === 3 || isWrapActive(state.travelDistance, pathLength);
+    if (active) {
+      const speed = TUNING.wrapSpeeds[Math.min(state.shoot.sceneIndex, 2)]!;
+      const talentDistance = state.travelDistance;
+      const strike = state.shoot.wrapDistance ?? talentDistance - 12;
+      const advanced = advanceWrap(strike, dt, speed, talentDistance);
+      state.shoot.wrapDistance = advanced.strikeDistance;
+      state.shoot.wrapCaught = advanced.wrapped;
+      const worldPathSpan = (state.path.at(-1)?.x ?? startX) - startX || 1;
+      const pathCoordinate = (x: number) => ((x - startX) / worldPathSpan) * pathLength;
+      state.tiles = state.tiles.filter((tile) => !isDeletedByWrap(pathCoordinate(tile.x), advanced.strikeDistance));
+      for (const entity of state.entities) {
+        if (!entity.cut && pathCoordinate(entity.x) <= advanced.strikeDistance) {
+          entity.cut = true;
+          state.cuts.push(entity.id);
+        }
+      }
+      if (advanced.wrapped) fail(state, 'wrapped');
+    }
+  }
   const pathEnd = state.path[state.path.length - 1];
-  if (pathEnd && talent.x >= pathEnd.x) fail(state, 'wrapped');
+  if (pathEnd && (talent.pathIndex >= state.path.length - 1 || talent.x >= pathEnd.x)) fail(state, 'wrapped');
   state.tick++;
   return state;
 }
