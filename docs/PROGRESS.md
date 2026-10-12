@@ -9,8 +9,8 @@
 - [ ] M6 Roster part 2 and Shoot structure — entity rules and opt-in `?shoot=1` four-part Shoot are implemented; the AdaptiveBot gate remains red.
 - [ ] M7 Visual signature — batched CAST AABBs, Night Shoot palette shift, and one-way adaptive DPR are implemented. M5/M6 phone and desktop screenshots were inspected; draw calls/triangles measured 10/8,014 and 8/5,826. The full ~20-image golden set remains.
 - [ ] M8 Audio — lazy WebAudio sources, stereo pan, LOD filtering, 96 BPM pulse, and cut/pop/reel/LOD/Wrap cues are implemented; settings and calm mix remain.
-- [ ] M9 Meta and share
-- [ ] M10 Polish and human gate
+- [ ] M9 Meta and share — UTC daily seed, local filmography/personal best, RLE base64url replay link with malformed-input checks, text share card, and 1080×1350 PNG export are implemented. The sheet keeps its opening view and latest samples; it does not yet re-simulate and rank all specified best moments. Lens unlocks/grades and WebM remain open.
+- [ ] M10 Polish and human gate — reduced-motion CSS and WebGL ring suppression, accessible control names/focus, hazard hatch marks, left-hand layout toggle, safe-area padding, onboarding controls hint, and labelled 75% wall-time assist are implemented. Physical weak-GPU/phone sign-off and a tuning-only pass remain open.
 
 **KILL-CRITERION WARNING:** the M2 20-seed smart framing bot averaged 6.66 distance versus TrackerBot's 7.37 (0.90×, below the required 1.3×). Assam directed continuation through later phases; the human test is still pending.
 
@@ -20,4 +20,6 @@ M6 latest Adaptive Shoot report: **7/20** seeds reached the complete 40-second f
 
 Performance: M2 recorded 0.75 ms p95; repeated M3/M4 Node runs measured 1.43–1.95 ms p95 while other Chromium processes saturated the 2-core environment, so the current performance gate is unresolved and needs a quieter rerun. M3/M4 browser counters were 6/12 draw calls and 138/940 triangles. The current production JavaScript measures 136.04 KB gzip and 112.41 KB brotli, under the 300 KB cap; simulated slow-3G load is estimated at 2.2 s versus the 2.0 s target.
 
-Next step: implement M9 filmography, daily seed, replay/share and contact sheet; keep the M5/M6 bot acceptance failures visible. The public GitHub repository exists; branch/tag push is pending credential scope repair.
+M9 verification: codec/unit coverage includes deterministic round-trip, malformed and oversized payload rejection; Playwright covers daily seed, history, share URL/PNG, settings and reduced-motion behavior. Contact sheets contain nine panels but do not yet re-simulate and rank the run's moments. M10 human checks are still pending.
+
+Next step: finish the full verification suite, inspect M9/M10 mobile and desktop screenshots, commit and tag the partial M9/M10 work, then push `master` and tags to the public repository after GitHub authorization completes. Preserve the M5/M6 acceptance warnings and request human play/sign-off in the follow-up report.

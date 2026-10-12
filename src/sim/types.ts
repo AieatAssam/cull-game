@@ -18,6 +18,7 @@ export interface SimState {
   seed: number;
   tick: number;
   travelDistance: number;
+  totalDistance: number;
   camera: { x: number; z: number; vx: number; vz: number; zoom: number; yaw: number; yawTarget: number; rotationTicksRemaining: number; moving: boolean };
   talent: Talent;
   path: Array<{ x: number; z: number }>;

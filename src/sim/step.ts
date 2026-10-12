@@ -111,7 +111,9 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
       talent.pathIndex++;
     }
   }
-  state.travelDistance += distance(talentBeforeMove.x, talentBeforeMove.z, talent.x, talent.z);
+  const talentTravel = distance(talentBeforeMove.x, talentBeforeMove.z, talent.x, talent.z);
+  state.travelDistance += talentTravel;
+  state.totalDistance += talentTravel;
   const talentInMonitor = state.entities.some((monitor) => monitor.kind === 'monitor' && monitor.spawned && !monitor.cut
     && monitorConeContains(monitorCone(monitor), { x: talent.x, z: talent.z }));
   if (talentInMonitor || inFrame(talent.x, talent.z, TUNING.talentRadii[Math.min(talentTier, 3)], cam.x, cam.z, cam.zoom, cam.yaw, 1.4)) talent.offscreenTicks = 0;

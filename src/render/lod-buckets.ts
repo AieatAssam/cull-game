@@ -63,7 +63,7 @@ export class UrchinLodBuckets {
     this.meshes.push(null); // Sub-pixel tier has no geometry and never enters a bucket.
   }
 
-  update(entities: CastEntity[], zoom: number, tick: number) {
+  update(entities: CastEntity[], zoom: number, tick: number, showTransientRings = true) {
     for (const mesh of this.meshes) if (mesh) mesh.count = 0;
     for (const entity of entities) {
       if (entity.kind !== 'urchin' || !entity.spawned || entity.cut) continue;
@@ -71,7 +71,7 @@ export class UrchinLodBuckets {
       const oldTier = this.tiers.get(entity.id);
       this.tiers.set(entity.id, tier);
       let ring = this.rings.get(entity.id);
-      if (oldTier !== undefined && oldTier !== tier) {
+      if (oldTier !== undefined && oldTier !== tier && showTransientRings) {
         if (!ring) {
           ring = new THREE.Mesh(this.ringGeometry, this.ringMaterial);
           ring.rotation.x = -Math.PI / 2;
@@ -83,7 +83,7 @@ export class UrchinLodBuckets {
         ring.visible = true;
         ring.userData.expiresAt = tick + 8;
       }
-      if (ring) ring.visible = ring.userData.expiresAt >= tick;
+      if (ring) ring.visible = showTransientRings && ring.userData.expiresAt >= tick;
       const bucket = this.meshes[tier];
       if (!bucket) continue;
       const index = bucket.count++;

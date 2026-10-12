@@ -15,6 +15,10 @@ import { UrchinLodBuckets } from './render/lod-buckets';
 import { CastBounds } from './render/cast-bounds';
 import { DPR_SCALES, nextDprTier } from './render/adaptive-dpr';
 import { AudioDirector } from './audio/director';
+import { dailySeed } from './meta/daily';
+import { personalBest, recordResult } from './meta/filmography';
+import { decodeReplay, encodeReplay } from './replay/codec';
+import { makeContactSheet } from './ui/contact-sheet';
 import type { CastEntity, InputFrame, SimState } from './sim/types';
 
 const app = document.querySelector<HTMLElement>('#app');
@@ -23,17 +27,35 @@ const audio = new AudioDirector();
 const unlockAudio = () => { if (!audio.started) void audio.startFromGesture().catch(() => undefined); };
 const query = new URLSearchParams(location.search);
 const frozen = query.has('frozen');
+const daily = query.has('daily');
+const utcDate = new Date().toISOString().slice(0, 10);
 const urlSeed = Number(query.get('seed') ?? '1');
-const seed = Number.isFinite(urlSeed) ? urlSeed : 1;
+let replayData: ReturnType<typeof decodeReplay> | undefined;
+let invalidReplay = false;
+let overcrank = query.has('assist');
+if (location.hash.length > 1) {
+  try { replayData = decodeReplay(location.hash.slice(1)); } catch { invalidReplay = true; }
+}
+const seed = replayData?.seed ?? (daily ? dailySeed(utcDate) : Number.isFinite(urlSeed) ? urlSeed : 1);
 const botName = query.get('bot');
 const bot = (['tracker', 'wide', 'close', 'adaptive', 'chaos'] as string[]).includes(botName ?? '') ? botName as BotKind : undefined;
 const createTake = (takeSeed: number) => query.has('shoot') ? createShootState(takeSeed) : query.has('roster') ? createState(takeSeed) : query.has('validated') ? createValidatedState(takeSeed) : createGeneratedState(takeSeed);
 let botRandom = mulberry32((seed ^ 0xb07b07) >>> 0);
 let state: SimState = createTake(seed);
+let replayIndex = 0;
+let inputLog: InputFrame[] = [];
+const contactFrames: HTMLCanvasElement[] = [];
+// Tick zero is rendered before the first layout resize on some browsers.
+// Start sampling only after play advances so that frame cannot enter exports.
+let lastContactTick = 0;
+let resultSaved = false;
 let paused = false;
+let leftHanded = false;
+let overcrankUsed = false;
 let pointer: { id: number; x: number; y: number } | null = null;
 const keys = new Set<string>();
 let frameInput: InputFrame = { ...NEUTRAL_INPUT };
+let sliderZoomTarget: number | null = null;
 let pointerPan: Pick<InputFrame, 'panX' | 'panZ'> | null = null;
 let zoomPulse = 0;
 let rotationPulse: -1 | 0 | 1 = 0;
@@ -44,18 +66,39 @@ let frameSamples: number[] = [];
 const shell = document.createElement('section');
 shell.className = 'stage';
 shell.innerHTML = `
-  <header class="topbar"><div class="brand"><span class="rec-dot"></span><strong>CULL</strong><span class="tagline">CAMERA DEPARTMENT</span></div><div class="readout"><span>TAKE 01</span><b id="timecode">01:30</b><span id="lens">35 MM</span><button class="pause-button" id="pause">Ⅱ</button></div></header>
-  <div class="composition"><aside class="margin margin-left"><div class="slate">SCENE 01<br><strong>BACKLOT</strong><small>SEED <span id="seed">00001</span></small></div><div class="hint"><span class="hint-mark">↖</span> WASD / DRAG<br>TO FRAME THE SHOT<div class="preview" id="preview"></div></div></aside>
+  <header class="topbar"><div class="brand"><span class="rec-dot"></span><strong>CULL</strong><span class="tagline">CAMERA DEPARTMENT</span></div><div class="readout"><a class="daily-link" href="?daily=1">DAILY</a><span>TAKE 01</span><b id="timecode">01:30</b><span id="lens">35 MM</span><button class="pause-button" id="pause" aria-label="Pause game">Ⅱ</button></div></header>
+  <div class="composition"><aside class="margin margin-left"><div class="slate">SCENE 01<br><strong>BACKLOT</strong><small>SEED <span id="seed">00001</span></small><small id="best">BEST —</small></div><div class="hint"><span class="hint-mark">↖</span> WASD / DRAG<br>TO FRAME THE SHOT<div class="preview" id="preview"></div></div></aside>
     <div class="gate-wrap"><div class="gate-label"><span>VIEWFINDER · GATE 1:1</span><span id="lod">TALENT · CLOSE</span></div><div class="gate" id="gate"><div class="thirds"></div><div class="gate-corners"></div><div id="mount" class="mount"></div><div class="frame-message" id="message">KEEP THEM IN THE SHOT</div><div class="cut-flash" id="cut-flash"></div></div><div class="gate-foot"><span>55° · ORTHOGRAPHIC</span><span id="status">ROLLING</span></div></div>
     <aside class="margin margin-right"><div class="camera-mark">⌑<small>CAM 01</small></div><div class="call-sheet"><span>CALL SHEET</span><div id="call-sheet">SCANNING FRAME…</div></div></aside>
   </div>
-  <footer class="controlbar"><div class="controls"><span><kbd>WASD</kbd> PAN</span><span><kbd>−</kbd> / <kbd>+</kbd> ZOOM</span><span><kbd>SPACE</kbd> HOLD</span><span><kbd>Q</kbd> / <kbd>E</kbd> ROTATE</span></div><div class="mobile-controls"><button id="hold" aria-label="Hold Talent">HOLD</button><label>ZOOM <input id="zoom-slider" aria-label="Zoom" type="range" min="10" max="48" value="30" /></label></div><div class="film"><span>FILM</span><div class="film-track"><i id="filmbar"></i></div><b id="film">90 s</b></div></footer>
-  <div class="end-card hidden" id="end-card"><div class="end-stamp">TAKE ENDED</div><h1 id="end-title">CUT</h1><p id="end-detail"></p><button id="restart">NEW TAKE ↗</button></div>
+  <footer class="controlbar"><div class="controls"><span><kbd>WASD</kbd> PAN</span><span><kbd>−</kbd> / <kbd>+</kbd> ZOOM</span><span><kbd>SPACE</kbd> HOLD</span><span><kbd>Q</kbd> / <kbd>E</kbd> ROTATE</span></div><div class="mobile-controls"><button id="hold" aria-label="Hold Talent">HOLD</button><label>ZOOM <input id="zoom-slider" aria-label="Zoom" type="range" min="10" max="48" value="30" /></label></div><div class="assist-controls"><button id="left-hand" type="button" aria-pressed="false">LEFT HAND</button><button id="overcrank" type="button" aria-pressed="false">75% SPEED</button></div><div class="film"><span>FILM</span><div class="film-track"><i id="filmbar"></i></div><b id="film">90 s</b></div></footer>
+  <div class="end-card hidden" id="end-card"><div class="end-stamp">TAKE ENDED</div><h1 id="end-title">CUT</h1><p id="end-detail"></p><p id="share-card"></p><div class="end-actions"><a id="download-sheet" download>CONTACT SHEET ↓</a><button id="share">SHARE</button><a id="replay-link" target="_blank" rel="noreferrer">REPLAY ↗</a></div><button id="restart">NEW TAKE ↗</button></div>
 `;
 app.append(shell);
 const $ = <T extends HTMLElement>(selector: string) => shell.querySelector<T>(selector)!;
+try {
+  if (replayData) overcrank = query.get('assist') === '75';
+  else overcrank ||= window.localStorage.getItem('cull.overcrank') === 'true';
+  leftHanded = window.localStorage.getItem('cull.leftHanded') === 'true';
+} catch { /* Storage can be disabled in private browsing modes. */ }
+overcrankUsed = overcrank;
+shell.classList.toggle('left-handed', leftHanded);
+$('#left-hand').setAttribute('aria-pressed', String(leftHanded));
+$('#overcrank').setAttribute('aria-pressed', String(overcrank));
 const mount = $('#mount');
 $('#seed').textContent = String(state.seed).padStart(5, '0');
+
+function locationFor(current: SimState) {
+  return current.shoot?.biome ?? 'BACKLOT';
+}
+let displayedLocation = locationFor(state);
+function refreshPersonalBest() {
+  try {
+    const best = personalBest(window.localStorage, locationFor(state));
+    $('#best').textContent = best ? `BEST ${Math.floor(best.meters)} M` : 'BEST —';
+  } catch { $('#best').textContent = 'BEST —'; }
+}
+refreshPersonalBest();
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color('#e8e4da');
@@ -268,11 +311,44 @@ function syncEntities() {
     const found = state.entities.find((entity) => entity.id === id);
     if (!found || found.cut || !found.spawned) object.visible = false;
   }
-  urchinBuckets.update(state.entities, state.camera.zoom, state.tick);
+  urchinBuckets.update(state.entities, state.camera.zoom, state.tick, !window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 }
 
 function syncCamera() {
   updateRenderCamera(camera, state.camera);
+}
+function captureContactFrame() {
+  if (state.tick === 0 || state.tick === lastContactTick || (contactFrames.length > 0 && !state.failed && state.tick - lastContactTick < 60)) return;
+  const frame = document.createElement('canvas');
+  frame.width = 180; frame.height = 180;
+  const context = frame.getContext('2d');
+  if (!context) return;
+  context.drawImage(renderer.domElement, 0, 0, frame.width, frame.height);
+  contactFrames.push(frame);
+  if (contactFrames.length > 9) contactFrames.splice(1, 1);
+  lastContactTick = state.tick;
+}
+function saveRunSummary() {
+  if (!state.failed || resultSaved) return;
+  resultSaved = true;
+  const entry = {
+    date: utcDate, seed: state.seed, location: locationFor(state), meters: Math.floor(state.totalDistance),
+    cuts: state.cuts.length, score: state.score, cause: state.failed,
+  };
+  try { recordResult(window.localStorage, entry); } catch { /* Local storage may be disabled by the browser. */ }
+  refreshPersonalBest();
+  const sheet = makeContactSheet(contactFrames);
+  const download = $('#download-sheet') as HTMLAnchorElement;
+  download.href = sheet.toDataURL('image/png');
+  download.download = `cull-${state.seed}.png`;
+  const shareCard = `CULL #${state.seed} · ${entry.location} · ${entry.meters} m · ✂ ${entry.cuts} cuts · ${entry.score} pts${overcrankUsed ? ' · 75% SPEED ASSIST' : ''}`;
+  $('#share-card').textContent = shareCard;
+  const replay = new URL(location.href);
+  replay.searchParams.delete('frozen');
+  if (overcrankUsed) replay.searchParams.set('assist', '75');
+  replay.hash = encodeReplay(state.seed, inputLog);
+  const replayLink = $('#replay-link') as HTMLAnchorElement;
+  replayLink.href = replay.toString();
 }
 function render() {
   audio.update(state);
@@ -290,10 +366,12 @@ function render() {
   syncEntities();
   castBounds.update(state.entities);
   renderer.render(scene, camera);
+  captureContactFrame();
   updateHud();
 }
 function updateHud() {
-  if (state.shoot) $('.slate').innerHTML = `SCENE 0${Math.min(state.shoot.sceneIndex + 1, 3)}<br><strong>${state.shoot.biome}</strong><small>SEED <span>${String(state.seed).padStart(5, '0')}</span></small>`;
+  if (state.shoot) $('.slate').innerHTML = `SCENE 0${Math.min(state.shoot.sceneIndex + 1, 3)}<br><strong>${state.shoot.biome}</strong><small>SEED <span>${String(state.seed).padStart(5, '0')}</span></small><small id="best">BEST —</small>`;
+  if (locationFor(state) !== displayedLocation) { displayedLocation = locationFor(state); refreshPersonalBest(); }
   const seconds = Math.max(0, Math.ceil(state.film));
   $('#timecode').textContent = `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
   $('#film').textContent = `${seconds} s`;
@@ -308,7 +386,9 @@ function updateHud() {
   $('#lod').textContent = `TALENT · ${tier} / URCHIN · ${['CLOSE', 'MEDIUM', 'WIDE', 'PROXY', 'GONE'][urchinTier]}`;
   const urchinInShot = state.entities.some((entity) => entity.kind === 'urchin' && entity.spawned && !entity.cut && inFrame(entity.x, entity.z, TUNING.urchinRadius, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, 0.8) && urchinTier < 4);
   $('#message').textContent = urchinInShot ? ['CLOSE-UP · FULL THREAT', 'MEDIUM · lethal', 'WIDE · urchin defanged', 'PROXY · harmless cube', 'SUB-PIXEL · gone'][urchinTier] : 'KEEP THEM IN THE SHOT';
-  ($('#zoom-slider') as HTMLInputElement).value = String(Math.round(state.camera.zoom));
+  if (invalidReplay) $('#message').textContent = 'INVALID REPLAY URL';
+  if (sliderZoomTarget !== null && Math.abs(sliderZoomTarget - state.camera.zoom) < 0.12) sliderZoomTarget = null;
+  ($('#zoom-slider') as HTMLInputElement).value = String(Math.round(sliderZoomTarget ?? state.camera.zoom));
   $('#call-sheet').textContent = state.entities.filter((entity) => !entity.spawned && !entity.cut && Math.abs(entity.x - state.camera.x) < state.camera.zoom * (0.5 + TUNING.callSheetMargin)).map((entity) => `${entity.kind.toUpperCase()} · PREVIEW`).join(' / ') || 'NO CAST IN FRAME';
   const filmBar = shell.querySelector<HTMLElement>('.film-track')!;
   filmBar.style.setProperty('--remaining', `${Math.max(0, state.film / 90 * 100)}%`);
@@ -317,24 +397,31 @@ function updateHud() {
     $('#end-title').textContent = state.failed.toUpperCase().replaceAll('-', ' ');
     $('#end-detail').textContent = `TAKE ${String(state.seed).padStart(5, '0')} · ${Math.floor(state.talent.x)} METRES · ${state.cuts.length} CUT`;
     $('#end-card').classList.remove('hidden');
+    saveRunSummary();
   }
 }
 
 function buildInput(): InputFrame {
   const keyInput = panFromKeys();
-  return {
+  const sliderZoom = sliderZoomTarget === null ? 0 : Math.abs(sliderZoomTarget - state.camera.zoom) < 0.12 ? 0 : sliderZoomTarget > state.camera.zoom ? -127 : 127;
+  return quantizeInput({
     ...frameInput, ...keyInput,
     panX: pointerPan?.panX ?? (keys.size ? keyInput.panX : frameInput.panX),
     panZ: pointerPan?.panZ ?? (keys.size ? keyInput.panZ : frameInput.panZ),
-    zoom: keyInput.zoom || zoomPulse || frameInput.zoom,
+    zoom: keyInput.zoom || zoomPulse || sliderZoom || frameInput.zoom,
     rotate: rotationPulse || frameInput.rotate,
     hold: keyInput.hold || frameInput.hold,
     steady: keyInput.steady || frameInput.steady,
-  };
+  });
+}
+function quantizeInput(input: InputFrame): InputFrame {
+  const axis = (value: number) => Math.max(-127, Math.min(127, Math.round(value)));
+  return { panX: axis(input.panX), panZ: axis(input.panZ), zoom: axis(input.zoom), rotate: input.rotate, hold: Boolean(input.hold), steady: Boolean(input.steady) };
 }
 function advanceTick() {
   if (!paused && !state.failed) {
-    const input = bot ? inputForBot(state, bot, botRandom) : buildInput();
+    const input = replayData ? replayData.frames[replayIndex++] ?? NEUTRAL_INPUT : bot ? inputForBot(state, bot, botRandom) : buildInput();
+    inputLog.push(input);
     const previousCuts = state.cuts.length;
     const previousSpawned = state.entities.filter((entity) => entity.spawned && !entity.cut).length;
     const previousWrap = state.shoot?.wrapCaught ?? false;
@@ -375,8 +462,9 @@ function loop(now: number) {
   simAccumulator += Math.min(frameTime / 1000, 0.1);
   previousTime = now;
   let ticks = 0;
-  while (simAccumulator >= 1 / TUNING.tickRate && ticks < TUNING.maxCatchupTicks) {
-    stepFrame(); simAccumulator -= 1 / TUNING.tickRate; ticks++;
+  const tickInterval = 1 / (TUNING.tickRate * (overcrank ? 0.75 : 1));
+  while (simAccumulator >= tickInterval && ticks < TUNING.maxCatchupTicks) {
+    stepFrame(); simAccumulator -= tickInterval; ticks++;
   }
   requestAnimationFrame(loop);
 }
@@ -416,15 +504,31 @@ renderer.domElement.addEventListener('wheel', (event) => { event.preventDefault(
 document.addEventListener('visibilitychange', () => { if (document.hidden) paused = true; });
 $('#hold').addEventListener('pointerdown', () => { holdButton = true; frameInput.hold = true; });
 for (const type of ['pointerup', 'pointercancel', 'pointerleave']) $('#hold').addEventListener(type, () => { holdButton = false; frameInput.hold = false; });
-$('#zoom-slider').addEventListener('input', (event) => {
-  const value = Number((event.currentTarget as HTMLInputElement).value);
-  state.camera.zoom = value;
-});
+$('#zoom-slider').addEventListener('input', (event) => { sliderZoomTarget = Number((event.currentTarget as HTMLInputElement).value); });
 $('#pause').addEventListener('click', () => { paused = !paused; });
-$('#restart').addEventListener('click', () => { const nextSeed = state.seed + 1; state = createTake(nextSeed); botRandom = mulberry32((nextSeed ^ 0xb07b07) >>> 0); entityMeshes.clear(); urchinBuckets.reset(); for (const child of [...scene.children]) if (child instanceof THREE.Group && child !== talent && child !== terrainGroup) scene.remove(child); terrainTiles = null; $('#end-card').classList.add('hidden'); });
+$('#restart').addEventListener('click', () => { const nextSeed = state.seed + 1; replayData = undefined; invalidReplay = false; state = createTake(nextSeed); botRandom = mulberry32((nextSeed ^ 0xb07b07) >>> 0); inputLog = []; replayIndex = 0; contactFrames.length = 0; lastContactTick = 0; sliderZoomTarget = null; frameInput = { ...NEUTRAL_INPUT }; resultSaved = false; displayedLocation = locationFor(state); refreshPersonalBest(); entityMeshes.clear(); urchinBuckets.reset(); for (const child of [...scene.children]) if (child instanceof THREE.Group && child !== talent && child !== terrainGroup) scene.remove(child); terrainTiles = null; $('#end-card').classList.add('hidden'); });
+$('#left-hand').addEventListener('click', () => {
+  leftHanded = !leftHanded;
+  shell.classList.toggle('left-handed', leftHanded);
+  $('#left-hand').setAttribute('aria-pressed', String(leftHanded));
+  try { window.localStorage.setItem('cull.leftHanded', String(leftHanded)); } catch { /* Settings remain available for this take. */ }
+});
+$('#overcrank').addEventListener('click', () => {
+  overcrank = !overcrank;
+  if (overcrank) overcrankUsed = true;
+  $('#overcrank').setAttribute('aria-pressed', String(overcrank));
+  try { window.localStorage.setItem('cull.overcrank', String(overcrank)); } catch { /* Settings remain available for this take. */ }
+});
+$('#share').addEventListener('click', async () => {
+  const title = $('#share-card').textContent ?? `CULL #${state.seed}`;
+  try {
+    if (navigator.share) await navigator.share({ title: 'CULL Contact Sheet', text: title, url: ($('#replay-link') as HTMLAnchorElement).href });
+    else await navigator.clipboard.writeText(`${title}\n${($('#replay-link') as HTMLAnchorElement).href}`);
+  } catch { /* The user may dismiss the native share sheet. */ }
+});
 
 if (query.has('debug')) {
-  Object.assign(window, { __cull: { step: (n = 1) => { for (let i = 0; i < n; i++) advanceTick(); render(); }, input: (input: InputFrame) => { frameInput = input; }, hash: () => stateHash(state), state: () => structuredClone(state), diagnostics: () => ({ paused, keys: [...keys], hidden: document.hidden, focused: document.hasFocus(), dprTier }), performance: () => ({ drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles }), lod: () => urchinBuckets.diagnostics(), load: (seed: number) => { state = createGeneratedState(seed); terrainTiles = null; urchinBuckets.reset(); }, loadShootScene: (sceneIndex: number) => { state = createShootSceneState(state.seed, sceneIndex); terrainTiles = null; urchinBuckets.reset(); render(); }, loadLodDemo: () => { state = createGeneratedState(1, 0, 2); state.entities = [{ id: 'lod-demo-urchin', kind: 'urchin', x: 0, z: 2, vx: 0, vz: 0, spawned: true, cut: false, age: 0 }]; state.talent.x = -4; render(); }, setTier: (tier: number) => { const size = [64, 36, 17, 7, 2][tier] ?? 36; state.camera.zoom = TUNING.urchinRadius * 1000 / size; }, setCamera: (x: number, z: number, zoom: number) => { state.camera.x = x; state.camera.z = z; state.camera.zoom = zoom; } } });
+  Object.assign(window, { __cull: { step: (n = 1) => { for (let i = 0; i < n; i++) advanceTick(); render(); }, input: (input: InputFrame) => { frameInput = input; }, hash: () => stateHash(state), state: () => structuredClone(state), diagnostics: () => ({ paused, keys: [...keys], hidden: document.hidden, focused: document.hasFocus(), dprTier, pointerPan: pointerPan && { ...pointerPan } }), performance: () => ({ drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles }), lod: () => urchinBuckets.diagnostics(), load: (seed: number) => { state = createGeneratedState(seed); terrainTiles = null; urchinBuckets.reset(); }, loadShootScene: (sceneIndex: number) => { state = createShootSceneState(state.seed, sceneIndex); terrainTiles = null; urchinBuckets.reset(); render(); }, finishForShare: () => { state.failed = 'hit'; render(); }, loadLodDemo: () => { state = createGeneratedState(1, 0, 2); state.entities = [{ id: 'lod-demo-urchin', kind: 'urchin', x: 0, z: 2, vx: 0, vz: 0, spawned: true, cut: false, age: 0 }]; state.talent.x = -4; render(); }, setTier: (tier: number) => { const size = [64, 36, 17, 7, 2][tier] ?? 36; state.camera.zoom = TUNING.urchinRadius * 1000 / size; }, setCamera: (x: number, z: number, zoom: number) => { state.camera.x = x; state.camera.z = z; state.camera.zoom = zoom; } } });
 }
 
 new ResizeObserver(() => {

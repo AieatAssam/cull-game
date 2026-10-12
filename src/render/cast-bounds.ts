@@ -7,13 +7,15 @@ const edgePairs: Array<[number, number]> = [
   [0, 4], [1, 5], [2, 6], [3, 7],
 ];
 const capacity = 250;
-const verticesPerBox = edgePairs.length * 2;
+const hatchPairs = [[-1, -1, 1, 1], [0, -1, 1, 0], [1, -1, -1, 1]] as const;
+const verticesPerBox = edgePairs.length * 2 + hatchPairs.length * 2;
 const colors = {
   danger: new THREE.Color('#ff4b3e'), pickup: new THREE.Color('#3fd8ff'), ledger: new THREE.Color('#a5aaa9'), set: new THREE.Color('#c3c9c5'),
 };
 const positionData = new Float32Array(capacity * verticesPerBox * 3);
 const colorData = new Float32Array(capacity * verticesPerBox * 3);
 const worldCorners = Array.from({ length: 8 }, () => new THREE.Vector3());
+const hatchColor = new THREE.Color('#232323');
 
 function dimensions(entity: CastEntity): [number, number, number] {
   if (entity.kind === 'bridge') return [14, 1.1, 1.8];
@@ -25,10 +27,16 @@ function dimensions(entity: CastEntity): [number, number, number] {
 }
 
 function colorFor(entity: CastEntity): THREE.Color {
-  if (entity.kind === 'boulder' || entity.kind === 'red-monitor' || (entity.kind === 'urchin' && (entity.lodTier ?? 0) <= 1)) return colors.danger;
+  if (isHazard(entity)) return colors.danger;
   if (entity.kind === 'reel' || entity.kind === 'glass' || entity.kind === 'monitor') return colors.pickup;
   if (entity.kind === 'rumour') return colors.ledger;
   return colors.set;
+}
+
+function isHazard(entity: CastEntity) {
+  return entity.kind === 'boulder' || entity.kind === 'red-monitor' || entity.kind === 'swarm'
+    || (entity.kind === 'urchin' && (entity.lodTier ?? 0) <= 1)
+    || (entity.kind === 'extras' && (entity.lodTier ?? 0) >= 2);
 }
 
 /** One low-cost line buffer for every currently existing entity's world AABB. */
@@ -71,6 +79,27 @@ export class CastBounds {
           colorData[offset] = color.r; colorData[offset + 1] = color.g; colorData[offset + 2] = color.b;
           vertex++;
         }
+      }
+      const hazardous = isHazard(entity);
+      for (const [ax, az, bx, bz] of hatchPairs) {
+        const offset = (start + vertex) * 3;
+        const active = hazardous && Math.abs(ax - bx) + Math.abs(az - bz) > 0;
+        const half = Math.min(0.18, halfWidth * 0.3, halfDepth * 0.3);
+        positionData[offset] = active ? entity.x + ax * half : entity.x;
+        positionData[offset + 1] = height + 0.025;
+        positionData[offset + 2] = active ? entity.z + az * half : entity.z;
+        colorData[offset] = active ? hatchColor.r : color.r;
+        colorData[offset + 1] = active ? hatchColor.g : color.g;
+        colorData[offset + 2] = active ? hatchColor.b : color.b;
+        vertex++;
+        const end = (start + vertex) * 3;
+        positionData[end] = active ? entity.x + bx * half : entity.x;
+        positionData[end + 1] = height + 0.025;
+        positionData[end + 2] = active ? entity.z + bz * half : entity.z;
+        colorData[end] = active ? hatchColor.r : color.r;
+        colorData[end + 1] = active ? hatchColor.g : color.g;
+        colorData[end + 2] = active ? hatchColor.b : color.b;
+        vertex++;
       }
       this.count++;
     }

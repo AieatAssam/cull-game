@@ -43,6 +43,7 @@ describe('M6 simulation integration', () => {
 
   it('stitches Backlot, Miniature City, Night Shoot, then a 40-second Long Take', () => {
     let state = createShootState(51);
+    state.totalDistance = 123;
     const names = ['BACKLOT', 'MINIATURE CITY', 'NIGHT SHOOT', 'LONG TAKE'];
     for (let scene = 0; scene < 3; scene++) {
       expect(state.shoot?.biome).toBe(names[scene]);
@@ -51,6 +52,7 @@ describe('M6 simulation integration', () => {
       state = stepShoot(state, NEUTRAL_INPUT);
       expect(state.failed).toBeNull();
       expect(state.shoot?.sceneIndex).toBe(scene + 1);
+      expect(state.totalDistance).toBe(123);
       expect(state.film).toBeCloseTo(90 + 30 * (scene + 1) - 2 * (scene + 1) / 60, 5);
     }
     expect(state.shoot?.biome).toBe('LONG TAKE');

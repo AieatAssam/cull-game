@@ -47,6 +47,7 @@ function makeScene(seed: number, sceneIndex: number, carry: SimState): SimState 
     next.camera.z = start.z;
   }
   next.tick = carry.tick;
+  next.totalDistance = carry.totalDistance;
   next.film = carry.film + (sceneIndex > 0 ? TUNING.sceneFilm : 0);
   next.score = carry.score;
   next.cuts = [...carry.cuts];

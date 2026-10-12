@@ -16,3 +16,7 @@
 - 2026-10-12: Restrict M6 introductions to biome order and activate the Red Monitor's hostile cone only while the monitor itself is in the playable gate; the monitor is unloaded with its SET when off-frame.
 - 2026-10-12: Keep M7 CAST boxes in one dynamic LineSegments buffer and only lower render DPR from the 60-frame median; resolution never climbs mid-run.
 - 2026-10-12: Keep the M4 roster browser fixture available through `?roster=1`; its E2E test must not assume the M5 generated world always contains every later-roster entity in the same opening frame.
+- 2026-10-12: Implement Overcrank as a 75% wall-clock simulation cadence while retaining 60 Hz fixed ticks; preserve the assist flag on shared replay URLs and label it on the share card.
+- 2026-10-12: Start contact-sheet capture after tick zero because the first browser render can precede layout resize; current export uses sampled recent frames, with best-moment replay selection logged as unfinished.
+- 2026-10-12: Keep reduced-motion behavior in CSS and add a top-face hatch to visible hazard bounds so hazard identification does not rely on red alone.
+- 2026-10-12: Carry cumulative `totalDistance` across Shoot scenes and include it in the canonical state hash so filmography summaries describe the complete run and replay checks cover that value.

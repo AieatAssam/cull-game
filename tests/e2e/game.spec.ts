@@ -56,9 +56,11 @@ test('touch emulation pans and zoom control responds', async ({ page }) => {
     canvas.dispatchEvent(new PointerEvent('pointerdown', { pointerId: 7, pointerType: 'touch', isPrimary: true, button: 0, clientX: x, clientY: y, bubbles: true }));
     canvas.dispatchEvent(new PointerEvent('pointermove', { pointerId: 7, pointerType: 'touch', isPrimary: true, button: 0, clientX: x + 35, clientY: y, bubbles: true }));
   }, { x: box.x + 40, y: box.y + 40 });
+  expect(await page.evaluate(() => window.__cull.diagnostics().pointerPan)).not.toBeNull();
   await page.evaluate(() => window.__cull.step(5));
   await page.evaluate(() => document.querySelector('canvas')!.dispatchEvent(new PointerEvent('pointerup', { pointerId: 7, pointerType: 'touch', bubbles: true })));
   await page.locator('#zoom-slider').evaluate((node: HTMLInputElement) => { node.value = '18'; node.dispatchEvent(new Event('input', { bubbles: true })); });
-  await expect.poll(async () => (await debugState(page)).camera.zoom).toBe(18);
+  await page.evaluate(() => window.__cull.step(100));
+  await expect.poll(async () => (await debugState(page)).camera.zoom).toBeCloseTo(18, 0);
   expect((await debugState(page)).camera.x).not.toBe(before);
 });
