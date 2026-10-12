@@ -4,6 +4,7 @@ import { loadFilmography, personalBest, recordResult, type FilmographyEntry, typ
 import { decodeReplay, encodeReplay } from '../src/replay/codec';
 import { stateHash } from '../src/sim/hash';
 import { loadFilmStock, saveFilmStock, unlockedFilmStocks } from '../src/meta/film-stock';
+import { unlockedLenses } from '../src/meta/lenses';
 import { gradeMetrics, smoothnessFromMeanJerk, thirdsDistance } from '../src/meta/grade';
 import { createState } from '../src/sim/world';
 import type { InputFrame } from '../src/sim/types';
@@ -65,6 +66,15 @@ describe('M9 daily seed, filmography, and replay data', () => {
     expect(personalBest(storage, 'BACKLOT')?.meters).toBe(21);
   });
 
+  it('ignores malformed optional progression facts in saved history', () => {
+    const storage = new MemoryStorage();
+    storage.setItem('cull.filmography.v1', JSON.stringify([
+      { date: '2026-10-12', seed: 1, location: 'BACKLOT', meters: 12, cuts: 3, score: 200, cause: 'hit', monitorUses: 'five' },
+      { date: '2026-10-12', seed: 2, location: 'BACKLOT', meters: 20, cuts: 3, score: 200, cause: 'hit', monitorUses: 2 },
+    ]));
+    expect(loadFilmography(storage).map((run) => run.seed)).toEqual([2]);
+  });
+
   it('unlocks cosmetic film stocks from best earned grade and persists only unlocked choices', () => {
     const storage = new MemoryStorage();
     const entry = (grade: FilmographyEntry['grade']): FilmographyEntry => ({ date: '2026-10-12', seed: 1, location: 'BACKLOT', meters: 12, cuts: 3, score: 200, cause: 'hit', grade });
@@ -76,6 +86,18 @@ describe('M9 daily seed, filmography, and replay data', () => {
     saveFilmStock(storage, 'kodachrome', [entry('B')]);
     expect(loadFilmStock(storage, [entry('B')])).toBe('kodachrome');
     expect(loadFilmStock(storage, [entry('C')])).toBe('clean');
+  });
+
+  it('unlocks lens feats from saved Shoot, close-call, Monitor, and daily results', () => {
+    const entry = (overrides: Partial<FilmographyEntry> = {}): FilmographyEntry => ({
+      date: '2026-10-12', seed: 1, location: 'BACKLOT', meters: 12, cuts: 3, score: 200, cause: 'hit', ...overrides,
+    });
+    expect(unlockedLenses([])).toEqual(['35mm']);
+    expect(unlockedLenses([entry({ shootSceneIndex: 2 })])).toEqual(['35mm', 'long-lens']);
+    const fullDaily = entry({ shootSceneIndex: 3, finishedShoot: true, daily: true, monitorUses: 5, closeCalls: 10 });
+    expect(unlockedLenses([fullDaily])).toEqual(['35mm', 'anamorphic', 'tilt-shift', 'fisheye', 'long-lens', 'super8']);
+    expect(unlockedLenses([entry({ shootSceneIndex: 3, daily: false })])).toEqual(['35mm', 'long-lens']);
+    expect(unlockedLenses([entry({ shootSceneIndex: 3, finishedShoot: false, daily: true })])).not.toContain('anamorphic');
   });
 
   it('hashes cumulative run distance used by cross-scene summaries', () => {

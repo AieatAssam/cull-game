@@ -25,7 +25,7 @@ Sound settings and film-stock looks are available in the current build. The scre
 - Deterministic fixed-tick simulation, seeded scene generation, camera pan/zoom/rotation, Talent pathing, hazards, film, and cut lifecycle.
 - Multiple entity behaviors, level-of-detail tiers, adaptive pixel ratio, accessibility controls, reduced-motion support, and optional audio settings.
 - UTC daily seed, local filmography and personal best, transparent run grades, replay URLs, contact-sheet PNGs, native file sharing when supported, and optional WebM director reels.
-- Grade-unlocked cosmetic film stocks: Kodachrome (B), bleach bypass (A), and Ilford black and white (S). Lens unlock mechanics and deterministic replay-based contact-sheet rendering are still in progress.
+- Grade-unlocked cosmetic film stocks: Kodachrome (B), bleach bypass (A), and Ilford black and white (S). Lens feats are tracked in the local filmography and displayed after a run; lens rule behaviors and deterministic replay-based contact-sheet rendering are still in progress.
 
 The M5/M6 automated bot acceptance thresholds remain unmet, and physical weak-GPU/phone sign-off remains open. See [progress and measured gates](docs/PROGRESS.md) for the current results and limitations.
 

@@ -21,6 +21,8 @@ import { gradeMetrics, smoothnessFromMeanJerk, thirdsDistance } from './meta/gra
 import { decodeReplay, encodeReplay } from './replay/codec';
 import { makeContactSheet, type ContactFrame } from './ui/contact-sheet';
 import { filmStocks, loadFilmStock, saveFilmStock, unlockedFilmStocks, type FilmStock } from './meta/film-stock';
+import { lensFeats, unlockedLenses } from './meta/lenses';
+import { monitorConeContains } from './sim/m6';
 import type { CastEntity, InputFrame, SimState } from './sim/types';
 
 const app = document.querySelector<HTMLElement>('#app');
@@ -61,6 +63,8 @@ let jerkTotal = 0;
 let priorVelocityDelta = { x: 0, z: 0 };
 let closeCallCount = 0;
 let reelsCollected = 0;
+let monitorUses = 0;
+let monitorWasActive = false;
 const reelIds = new Set(state.entities.filter((entity) => entity.kind === 'reel').map((entity) => entity.id));
 let pendingCloseCall = false;
 let pendingCloseCallRank = Number.POSITIVE_INFINITY;
@@ -88,7 +92,7 @@ shell.innerHTML = `
     <aside class="margin margin-right"><div class="camera-mark">⌑<small>CAM 01</small></div><div class="call-sheet"><span>CALL SHEET</span><div id="call-sheet">SCANNING FRAME…</div></div></aside>
   </div>
   <footer class="controlbar"><div class="controls"><span><kbd>WASD</kbd> PAN</span><span><kbd>−</kbd> / <kbd>+</kbd> ZOOM</span><span><kbd>SPACE</kbd> HOLD</span><span><kbd>Q</kbd> / <kbd>E</kbd> ROTATE</span></div><div class="mobile-controls"><button id="hold" aria-label="Hold Talent">HOLD</button><label>ZOOM <input id="zoom-slider" aria-label="Zoom" type="range" min="10" max="48" value="30" /></label></div><div class="assist-controls"><button id="left-hand" type="button" aria-pressed="false">LEFT HAND</button><button id="overcrank" type="button" aria-pressed="false">75% SPEED</button></div><div class="film"><span>FILM</span><div class="film-track"><i id="filmbar"></i></div><b id="film">90 s</b></div></footer>
-  <div class="end-card hidden" id="end-card"><div class="end-stamp">TAKE ENDED</div><h1 id="end-title">CUT</h1><p id="end-detail"></p><p id="share-card"></p><div id="grade-detail" class="grade-detail"></div><details class="grade-method"><summary>GRADE MATH</summary><p>Average of thirds time, smoothness (100 ÷ (1 + 8 × mean jerk)), close calls (10 points each, capped at 100), and Reel coverage. S ≥90 · A ≥75 · B ≥60 · otherwise C.</p></details><div class="end-actions"><a id="download-sheet" download>CONTACT SHEET ↓</a><button id="make-reel">DIRECTOR'S REEL</button><a id="download-reel" class="hidden" download>WEBM ↓</a><button id="share">SHARE</button><a id="replay-link" target="_blank" rel="noreferrer">REPLAY ↗</a></div><details class="filmography"><summary>FILMOGRAPHY · LAST 5 TAKES</summary><ol id="filmography-list"></ol></details><button id="restart">NEW TAKE ↗</button></div>
+  <div class="end-card hidden" id="end-card"><div class="end-stamp">TAKE ENDED</div><h1 id="end-title">CUT</h1><p id="end-detail"></p><p id="share-card"></p><div id="grade-detail" class="grade-detail"></div><details class="grade-method"><summary>GRADE MATH</summary><p>Average of thirds time, smoothness (100 ÷ (1 + 8 × mean jerk)), close calls (10 points each, capped at 100), and Reel coverage. S ≥90 · A ≥75 · B ≥60 · otherwise C.</p></details><details class="lens-feats"><summary>LENS FEATS</summary><ul id="lens-feat-list"></ul></details><div class="end-actions"><a id="download-sheet" download>CONTACT SHEET ↓</a><button id="make-reel">DIRECTOR'S REEL</button><a id="download-reel" class="hidden" download>WEBM ↓</a><button id="share">SHARE</button><a id="replay-link" target="_blank" rel="noreferrer">REPLAY ↗</a></div><details class="filmography"><summary>FILMOGRAPHY · LAST 5 TAKES</summary><ol id="filmography-list"></ol></details><button id="restart">NEW TAKE ↗</button></div>
 `;
 app.append(shell);
 const $ = <T extends HTMLElement>(selector: string) => shell.querySelector<T>(selector)!;
@@ -436,9 +440,21 @@ function saveRunSummary() {
   const entry = {
     date: utcDate, seed: state.seed, location: locationFor(state), meters: Math.floor(state.totalDistance),
     cuts: state.cuts.length, score: state.score, cause: state.failed, grade, ...metrics,
+    shootSceneIndex: state.shoot?.sceneIndex ?? -1,
+    finishedShoot: state.shoot?.sceneIndex === 3 && state.failed === 'wrapped' && state.shoot.finaleTicks >= TUNING.finalTakeSeconds * TUNING.tickRate,
+    daily, monitorUses,
   };
   try { recordResult(window.localStorage, entry); } catch { /* Local storage may be disabled by the browser. */ }
   refreshFilmStocks();
+  let history: ReturnType<typeof loadFilmography> = [];
+  try { history = loadFilmography(window.localStorage); } catch { /* Lens feats stay locked when storage is unavailable. */ }
+  const unlocked = new Set(unlockedLenses(history));
+  $('#lens-feat-list').replaceChildren(...lensFeats.map((feat) => {
+    const item = document.createElement('li');
+    item.textContent = `${unlocked.has(feat.id) ? 'UNLOCKED' : 'LOCKED'} · ${feat.name} — ${feat.feat}`;
+    item.classList.toggle('unlocked', unlocked.has(feat.id));
+    return item;
+  }));
   refreshPersonalBest();
   const sheetFrames: ScoredFrame[] = [];
   const addFrame = (frame: ScoredFrame | undefined) => { if (frame && !sheetFrames.includes(frame) && sheetFrames.length < 9) sheetFrames.push(frame); };
@@ -548,6 +564,7 @@ function advanceTick() {
     const previousCuts = state.cuts.length;
     const previousSpawned = state.entities.filter((entity) => entity.spawned && !entity.cut).length;
     const previousWrap = state.shoot?.wrapCaught ?? false;
+    const previousMonitorActive = monitorWasActive;
     const previousScore = state.score;
     const previousTalent = { x: state.talent.x, z: state.talent.z };
     const previousEntities = state.entities.map((entity) => ({ id: entity.id, kind: entity.kind, x: entity.x, z: entity.z, cut: entity.cut }));
@@ -555,6 +572,9 @@ function advanceTick() {
     const previousTalentTier = state.talent.lodTier;
     const previousEntityTiers = new Map(state.entities.map((entity) => [entity.id, entity.lodTier]));
     state = state.shoot ? stepShoot(state, input) : step(state, input);
+    monitorWasActive = state.entities.some((entity) => entity.kind === 'monitor' && entity.spawned && !entity.cut
+      && monitorConeContains({ origin: { x: entity.x, z: entity.z }, heading: entity.heading ?? 0, range: entity.range ?? 0, halfAngle: entity.halfAngle ?? 0 }, state.talent));
+    if (monitorWasActive && !previousMonitorActive) monitorUses++;
     const velocityDelta = { x: state.camera.vx - previousCameraVelocity.x, z: state.camera.vz - previousCameraVelocity.z };
     jerkTotal += Math.hypot(velocityDelta.x - priorVelocityDelta.x, velocityDelta.z - priorVelocityDelta.z);
     priorVelocityDelta = velocityDelta;
@@ -683,7 +703,7 @@ $('#make-reel').addEventListener('click', () => {
   const interval = window.setInterval(() => { frameIndex++; draw(); }, 1000 / 12);
   window.setTimeout(() => { window.clearInterval(interval); if (recorder.state !== 'inactive') recorder.stop(); }, 6000);
 });
-$('#restart').addEventListener('click', () => { const nextSeed = state.seed + 1; replayData = undefined; invalidReplay = false; state = createTake(nextSeed); botRandom = mulberry32((nextSeed ^ 0xb07b07) >>> 0); inputLog = []; replayIndex = 0; contactFrames.length = 0; closeCallFrames.length = 0; lastContactTick = 0; bestThirdsDistance = Number.POSITIVE_INFINITY; thirdsTicks = 0; activeTicks = 0; jerkTotal = 0; priorVelocityDelta = { x: 0, z: 0 }; closeCallCount = 0; reelsCollected = 0; reelIds.clear(); state.entities.filter((entity) => entity.kind === 'reel').forEach((entity) => reelIds.add(entity.id)); pendingCloseCall = false; pendingCloseCallRank = Number.POSITIVE_INFINITY; sliderZoomTarget = null; frameInput = { ...NEUTRAL_INPUT }; resultSaved = false; displayedLocation = locationFor(state); refreshPersonalBest(); entityMeshes.clear(); urchinBuckets.reset(); for (const child of [...scene.children]) if (child instanceof THREE.Group && child !== talent && child !== terrainGroup) scene.remove(child); terrainTiles = null; $('#end-card').classList.add('hidden'); });
+$('#restart').addEventListener('click', () => { const nextSeed = state.seed + 1; replayData = undefined; invalidReplay = false; state = createTake(nextSeed); botRandom = mulberry32((nextSeed ^ 0xb07b07) >>> 0); inputLog = []; replayIndex = 0; contactFrames.length = 0; closeCallFrames.length = 0; lastContactTick = 0; bestThirdsDistance = Number.POSITIVE_INFINITY; thirdsTicks = 0; activeTicks = 0; jerkTotal = 0; priorVelocityDelta = { x: 0, z: 0 }; closeCallCount = 0; reelsCollected = 0; monitorUses = 0; monitorWasActive = false; reelIds.clear(); state.entities.filter((entity) => entity.kind === 'reel').forEach((entity) => reelIds.add(entity.id)); pendingCloseCall = false; pendingCloseCallRank = Number.POSITIVE_INFINITY; sliderZoomTarget = null; frameInput = { ...NEUTRAL_INPUT }; resultSaved = false; displayedLocation = locationFor(state); refreshPersonalBest(); entityMeshes.clear(); urchinBuckets.reset(); for (const child of [...scene.children]) if (child instanceof THREE.Group && child !== talent && child !== terrainGroup) scene.remove(child); terrainTiles = null; $('#end-card').classList.add('hidden'); });
 $('#left-hand').addEventListener('click', () => {
   leftHanded = !leftHanded;
   shell.classList.toggle('left-handed', leftHanded);

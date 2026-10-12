@@ -12,6 +12,10 @@ export interface FilmographyEntry {
   closeCalls?: number;
   reelsCollected?: number;
   reelsAvailable?: number;
+  shootSceneIndex?: number;
+  finishedShoot?: boolean;
+  daily?: boolean;
+  monitorUses?: number;
 }
 export interface StorageLike { getItem(key: string): string | null; setItem(key: string, value: string): void; }
 const storageKey = 'cull.filmography.v1';
@@ -19,9 +23,15 @@ const storageKey = 'cull.filmography.v1';
 function isEntry(value: unknown): value is FilmographyEntry {
   if (!value || typeof value !== 'object') return false;
   const entry = value as Partial<FilmographyEntry>;
+  const optionalCounts = [entry.thirdsPercent, entry.smoothness, entry.closeCalls, entry.reelsCollected, entry.reelsAvailable, entry.monitorUses];
   return typeof entry.date === 'string' && Number.isInteger(entry.seed) && typeof entry.location === 'string'
     && [entry.meters, entry.cuts, entry.score].every((number) => typeof number === 'number' && Number.isFinite(number))
-    && typeof entry.cause === 'string';
+    && typeof entry.cause === 'string'
+    && (entry.grade === undefined || ['S', 'A', 'B', 'C'].includes(entry.grade))
+    && optionalCounts.every((number) => number === undefined || (typeof number === 'number' && Number.isFinite(number) && number >= 0))
+    && (entry.shootSceneIndex === undefined || (Number.isInteger(entry.shootSceneIndex) && entry.shootSceneIndex >= -1 && entry.shootSceneIndex <= 3))
+    && (entry.finishedShoot === undefined || typeof entry.finishedShoot === 'boolean')
+    && (entry.daily === undefined || typeof entry.daily === 'boolean');
 }
 
 export function loadFilmography(storage: StorageLike): FilmographyEntry[] {
