@@ -3,6 +3,7 @@ import { dailySeed } from '../src/meta/daily';
 import { loadFilmography, personalBest, recordResult, type FilmographyEntry, type StorageLike } from '../src/meta/filmography';
 import { decodeReplay, encodeReplay } from '../src/replay/codec';
 import { stateHash } from '../src/sim/hash';
+import { loadFilmStock, saveFilmStock, unlockedFilmStocks } from '../src/meta/film-stock';
 import { gradeMetrics, smoothnessFromMeanJerk, thirdsDistance } from '../src/meta/grade';
 import { createState } from '../src/sim/world';
 import type { InputFrame } from '../src/sim/types';
@@ -62,6 +63,19 @@ describe('M9 daily seed, filmography, and replay data', () => {
     recordResult(storage, entry(3, 18));
     expect(loadFilmography(storage).map((run) => run.seed)).toEqual([3, 2, 1]);
     expect(personalBest(storage, 'BACKLOT')?.meters).toBe(21);
+  });
+
+  it('unlocks cosmetic film stocks from best earned grade and persists only unlocked choices', () => {
+    const storage = new MemoryStorage();
+    const entry = (grade: FilmographyEntry['grade']): FilmographyEntry => ({ date: '2026-10-12', seed: 1, location: 'BACKLOT', meters: 12, cuts: 3, score: 200, cause: 'hit', grade });
+    expect(unlockedFilmStocks([entry('C')])).toEqual(['clean']);
+    expect(unlockedFilmStocks([entry('B')])).toEqual(['clean', 'kodachrome']);
+    expect(unlockedFilmStocks([entry('A')])).toEqual(['clean', 'kodachrome', 'bleach']);
+    expect(unlockedFilmStocks([entry('S')])).toEqual(['clean', 'kodachrome', 'bleach', 'ilford']);
+    expect(() => saveFilmStock(storage, 'ilford', [entry('B')])).toThrow();
+    saveFilmStock(storage, 'kodachrome', [entry('B')]);
+    expect(loadFilmStock(storage, [entry('B')])).toBe('kodachrome');
+    expect(loadFilmStock(storage, [entry('C')])).toBe('clean');
   });
 
   it('hashes cumulative run distance used by cross-scene summaries', () => {

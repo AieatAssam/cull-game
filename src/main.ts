@@ -20,6 +20,7 @@ import { loadFilmography, personalBest, recordResult } from './meta/filmography'
 import { gradeMetrics, smoothnessFromMeanJerk, thirdsDistance } from './meta/grade';
 import { decodeReplay, encodeReplay } from './replay/codec';
 import { makeContactSheet, type ContactFrame } from './ui/contact-sheet';
+import { filmStocks, loadFilmStock, saveFilmStock, unlockedFilmStocks, type FilmStock } from './meta/film-stock';
 import type { CastEntity, InputFrame, SimState } from './sim/types';
 
 const app = document.querySelector<HTMLElement>('#app');
@@ -81,7 +82,7 @@ let frameSamples: number[] = [];
 const shell = document.createElement('section');
 shell.className = 'stage';
 shell.innerHTML = `
-  <header class="topbar"><div class="brand"><span class="rec-dot"></span><strong>CULL</strong><span class="tagline">CAMERA DEPARTMENT</span></div><details class="sound-settings" id="sound-settings"><summary>SOUND</summary><div class="sound-panel"><label>MASTER <input id="volume-master" aria-label="Master volume" type="range" min="0" max="100" value="100" /></label><label>MUSIC <input id="volume-music" aria-label="Music volume" type="range" min="0" max="100" value="80" /></label><label>EFFECTS <input id="volume-sfx" aria-label="Effects volume" type="range" min="0" max="100" value="80" /></label><label><input id="mono-audio" type="checkbox" /> MONO</label><label><input id="calm-audio" type="checkbox" /> CALM MIX</label></div></details><div class="readout"><a class="daily-link" href="?daily=1">DAILY</a><span>TAKE 01</span><b id="timecode">01:30</b><span id="lens">35 MM</span><button class="pause-button" id="pause" aria-label="Pause game">Ⅱ</button></div></header>
+  <header class="topbar"><div class="brand"><span class="rec-dot"></span><strong>CULL</strong><span class="tagline">CAMERA DEPARTMENT</span></div><label class="stock-control">STOCK <select id="film-stock" aria-label="Film stock"><option value="clean">35 MM · CLEAN</option><option value="kodachrome">KODACHROME · B</option><option value="bleach">BLEACH BYPASS · A</option><option value="ilford">ILFORD B&W · S</option></select></label><details class="sound-settings" id="sound-settings"><summary>SOUND</summary><div class="sound-panel"><label>MASTER <input id="volume-master" aria-label="Master volume" type="range" min="0" max="100" value="100" /></label><label>MUSIC <input id="volume-music" aria-label="Music volume" type="range" min="0" max="100" value="80" /></label><label>EFFECTS <input id="volume-sfx" aria-label="Effects volume" type="range" min="0" max="100" value="80" /></label><label><input id="mono-audio" type="checkbox" /> MONO</label><label><input id="calm-audio" type="checkbox" /> CALM MIX</label></div></details><div class="readout"><a class="daily-link" href="?daily=1">DAILY</a><span>TAKE 01</span><b id="timecode">01:30</b><span id="lens">35 MM</span><button class="pause-button" id="pause" aria-label="Pause game">Ⅱ</button></div></header>
   <div class="composition"><aside class="margin margin-left"><div class="slate">SCENE 01<br><strong>BACKLOT</strong><small>SEED <span id="seed">00001</span></small><small id="best">BEST —</small></div><div class="hint"><span class="hint-mark">↖</span> WASD / DRAG<br>TO FRAME THE SHOT<div class="preview" id="preview"></div></div></aside>
     <div class="gate-wrap"><div class="gate-label"><span>VIEWFINDER · GATE 1:1</span><span id="lod">TALENT · CLOSE</span></div><div class="gate" id="gate"><div class="thirds"></div><div class="gate-corners"></div><div id="mount" class="mount"></div><div class="frame-message" id="message">KEEP THEM IN THE SHOT</div><div class="cut-flash" id="cut-flash"></div></div><div class="gate-foot"><span>55° · ORTHOGRAPHIC</span><span id="status">ROLLING</span></div></div>
     <aside class="margin margin-right"><div class="camera-mark">⌑<small>CAM 01</small></div><div class="call-sheet"><span>CALL SHEET</span><div id="call-sheet">SCANNING FRAME…</div></div></aside>
@@ -91,6 +92,35 @@ shell.innerHTML = `
 `;
 app.append(shell);
 const $ = <T extends HTMLElement>(selector: string) => shell.querySelector<T>(selector)!;
+const stockFilters: Record<FilmStock, string> = {
+  clean: 'none', kodachrome: 'sepia(.18) saturate(1.32) contrast(1.06)',
+  bleach: 'saturate(.68) contrast(1.3) brightness(1.03)', ilford: 'grayscale(1) contrast(1.15)',
+};
+let currentStock: FilmStock = 'clean';
+function refreshFilmStocks() {
+  let entries: ReturnType<typeof loadFilmography> = [];
+  try { entries = loadFilmography(window.localStorage); } catch { /* Keep the clean stock when storage is unavailable. */ }
+  const unlocked = unlockedFilmStocks(entries);
+  const select = $('#film-stock') as HTMLSelectElement;
+  for (const option of [...select.options]) {
+    if (option.value === 'clean') continue;
+    option.disabled = !unlocked.includes(option.value as FilmStock);
+    const stock = filmStocks.find((item) => item.id === option.value);
+    if (stock) option.textContent = `${stock.label} · ${stock.minimum}${option.disabled ? ' · LOCKED' : ''}`;
+  }
+  currentStock = loadFilmStock(window.localStorage, entries);
+  select.value = currentStock;
+  renderer.domElement.style.filter = stockFilters[currentStock];
+}
+$('#film-stock').addEventListener('change', () => {
+  const selected = ($('#film-stock') as HTMLSelectElement).value as FilmStock;
+  try {
+    const entries = loadFilmography(window.localStorage);
+    saveFilmStock(window.localStorage, selected, entries);
+    currentStock = selected;
+    renderer.domElement.style.filter = stockFilters[currentStock];
+  } catch { refreshFilmStocks(); }
+});
 const directorReelMimeType = typeof MediaRecorder === 'undefined' ? undefined
   : ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'].find((candidate) => MediaRecorder.isTypeSupported(candidate));
 $('#make-reel').hidden = !directorReelMimeType || typeof HTMLCanvasElement.prototype.captureStream !== 'function';
@@ -151,6 +181,7 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.domElement.setAttribute('aria-label', 'CULL game view');
 renderer.domElement.setAttribute('tabindex', '0');
 mount.append(renderer.domElement);
+refreshFilmStocks();
 scene.add(new THREE.HemisphereLight('#fff9ec', '#716a60', 2.1));
 const keyLight = new THREE.DirectionalLight('#fffaf2', 1.2);
 keyLight.position.set(-8, 14, 9);
@@ -367,7 +398,9 @@ function captureContactFrame() {
   frame.width = 180; frame.height = 180;
   const context = frame.getContext('2d');
   if (!context) return;
+  context.filter = stockFilters[currentStock];
   context.drawImage(renderer.domElement, 0, 0, frame.width, frame.height);
+  context.filter = 'none';
   const label = state.tick === 1 ? 'Opening' : state.failed ? 'Final frame' : pendingCloseCall ? 'Close call' : isBestThirds ? 'Thirds' : `Take · ${Math.floor(state.totalDistance)} m`;
   const candidate = { image: frame, label, tick: state.tick, rank: pendingCloseCall ? pendingCloseCallRank : thirds };
   if (state.tick === 1) contactFrames.unshift(candidate);
@@ -405,6 +438,7 @@ function saveRunSummary() {
     cuts: state.cuts.length, score: state.score, cause: state.failed, grade, ...metrics,
   };
   try { recordResult(window.localStorage, entry); } catch { /* Local storage may be disabled by the browser. */ }
+  refreshFilmStocks();
   refreshPersonalBest();
   const sheetFrames: ScoredFrame[] = [];
   const addFrame = (frame: ScoredFrame | undefined) => { if (frame && !sheetFrames.includes(frame) && sheetFrames.length < 9) sheetFrames.push(frame); };
