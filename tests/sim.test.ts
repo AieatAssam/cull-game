@@ -5,8 +5,9 @@ import fc from 'fast-check';
 import { inFrame, projectedAabb, overlapsFrame } from '../src/sim/frame';
 import { stateHash } from '../src/sim/hash';
 import { lodTier } from '../src/sim/lod';
+import { shotListForPath } from '../src/sim/framing';
 import { step, NEUTRAL_INPUT } from '../src/sim/step';
-import { createState, loadWorld, reloadSet } from '../src/sim/world';
+import { createGeneratedState, createState, loadWorld, reloadSet } from '../src/sim/world';
 import { TUNING } from '../src/sim/tuning';
 import { lensLodFactor, lensRenderTicks } from '../src/sim/lenses';
 import type { CastEntity, SimState } from '../src/sim/types';
@@ -235,7 +236,9 @@ describe('fixed step simulation and failure rules', () => {
     let state = createState(1, []);
     const initialX = state.camera.x;
     for (let i = 0; i < 60; i++) state = step(state, { ...NEUTRAL_INPUT, panX: 127 });
-    expect(state.camera.x - initialX).toBeLessThanOrEqual(30 * 1.2 + 1e-6);
+    const travelled = state.camera.x - initialX;
+    expect(travelled).toBeLessThanOrEqual(30 * TUNING.panSpeed + 1e-6);
+    expect(travelled).toBeGreaterThan(30 * TUNING.panSpeed * 0.7);
     state = createState(1, []);
     for (let i = 0; i < 60; i++) state = step(state, { ...NEUTRAL_INPUT, zoom: 127 });
     expect(state.camera.zoom).toBeCloseTo(30 / 1.6, 5);
@@ -361,6 +364,60 @@ describe('fixed step simulation and failure rules', () => {
     state.talent.lodTier = 2;
     expect(step(state, { ...NEUTRAL_INPUT, hold: true }).entities[0]?.cut).toBe(false);
     expect(reel.kind).toBe('reel');
+  });
+  it('scores a hazard cut inside the close-call radius', () => {
+    const state = createState(1, []);
+    entity(state, 'urchin', 1.2);
+    state.camera.x = 30;
+    const next = step(state, { ...NEUTRAL_INPUT, hold: true });
+    expect(next.cuts).toContain('urchin-test');
+    expect(next.closeCalls).toBe(1);
+    expect(next.score).toBe(TUNING.closeCallScore);
+  });
+  it('holds the Talent for a wide shot, then for a medium portrait', () => {
+    const state = createGeneratedState(3, 0, 4);
+    state.talent.x = state.shots![0]!.at;
+    state.camera.x = state.talent.x;
+    state.camera.zoom = 24;
+    const held = step(state, { ...NEUTRAL_INPUT, hold: false });
+    expect(held.waiting).toBe(true);
+    expect(held.talent.x).toBeCloseTo(state.talent.x);
+    held.camera.zoom = 40;
+    const wide = step(held);
+    expect(wide.shots?.find((shot) => shot.kind === 'defang')?.done).toBe(true);
+    const portrait = wide.shots!.find((shot) => shot.kind === 'portrait')!;
+    wide.talent.x = portrait.at;
+    wide.camera.zoom = 48;
+    const stillWide = step(wide);
+    expect(stillWide.waiting).toBe(true);
+    stillWide.camera.zoom = 24;
+    const released = step(stillWide);
+    expect(released.shots?.every((shot) => shot.done)).toBe(true);
+    expect(released.waiting).toBe(false);
+  });
+  it('keeps a fragile floor that is only just outside the gate', () => {
+    const state = createState(1, []);
+    state.camera.zoom = 30;
+    entity(state, 'glass', 16.2);
+    const next = step(state, { ...NEUTRAL_INPUT, hold: true });
+    expect(next.entities[0]?.cut).toBe(false);
+    next.camera.x = -20;
+    expect(step(next, { ...NEUTRAL_INPUT, hold: true }).entities[0]?.cut).toBe(true);
+  });
+  it('crushes the Talent with a close boulder and lets a medium boulder pass', () => {
+    const close = createState(1, []);
+    close.camera.zoom = 10;
+    entity(close, 'boulder', 0.2);
+    expect(step(close, { ...NEUTRAL_INPUT, hold: true }).failed).toBe('hit');
+    const medium = createState(1, []);
+    medium.camera.zoom = 24;
+    entity(medium, 'boulder', 0.2);
+    expect(step(medium, { ...NEUTRAL_INPUT, hold: true }).failed).toBeNull();
+  });
+  it('places a defang gate before the portrait gate', () => {
+    const shots = shotListForPath([{ x: 0 }, { x: 100 }]);
+    expect(shots[0]?.kind).toBe('defang');
+    expect(shots[1]!.at).toBeGreaterThan(shots[0]!.at);
   });
   it('preserves projected frame invariants for arbitrary nearby bounds', () => {
     fc.assert(fc.property(fc.double({ min: -10, max: 10, noNaN: true }), fc.double({ min: -10, max: 10, noNaN: true }), (x, z) => {

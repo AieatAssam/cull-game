@@ -1,3 +1,4 @@
+import { shotListForPath } from './framing';
 import { generateScene } from '../gen/generate';
 import { createContinuitySequence } from './m6';
 import { TUNING } from './tuning';
@@ -54,6 +55,8 @@ function makeScene(seed: number, sceneIndex: number, carry: SimState): SimState 
   next.score = carry.score;
   next.cuts = [...carry.cuts];
   next.shoot = { sceneIndex, biome: biomes[sceneIndex]!, wrapDistance: null, wrapCaught: false, finaleTicks: 0 };
+  next.closeCalls = 0;
+  next.shots = sceneIndex < 3 ? shotListForPath(generated.path) : undefined;
   return next;
 }
 

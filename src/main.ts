@@ -13,8 +13,7 @@ import { createShootState, createShootSceneState, stepShoot } from './sim/shoot'
 import { inputForBot, type BotKind } from './bots/players';
 import { mulberry32 } from './sim/rng';
 import { UrchinLodBuckets } from './render/lod-buckets';
-import { loadSpriteAssets } from './render/sprite-assets';
-import { CastBounds } from './render/cast-bounds';
+import { createDailiesCast, SCENE_LOOKS } from './render/dailies';
 import { DPR_SCALES, nextDprTier } from './render/adaptive-dpr';
 import { AudioDirector, type AudioSettings } from './audio/director';
 import { dailySeed } from './meta/daily';
@@ -29,7 +28,7 @@ import { monitorConeContains } from './sim/m6';
 import { lensAspect, lensLodFactor, lensRenderTicks, type LensId } from './sim/lenses';
 import type { CastEntity, InputFrame, SimState } from './sim/types';
 
-const spriteAssets = await loadSpriteAssets(import.meta.env.BASE_URL);
+const spriteAssets = createDailiesCast();
 
 const app = document.querySelector<HTMLElement>('#app');
 if (!app) throw new Error('Missing app root');
@@ -50,7 +49,7 @@ const seed = replayData?.seed ?? (daily ? dailySeed(utcDate) : Number.isFinite(u
 let dailyRun = daily && seed === dailySeed(utcDate);
 const botName = query.get('bot');
 const bot = (['tracker', 'wide', 'close', 'adaptive', 'chaos'] as string[]).includes(botName ?? '') ? botName as BotKind : undefined;
-const createTake = (takeSeed: number) => query.has('shoot') ? createShootState(takeSeed) : query.has('roster') ? createState(takeSeed) : query.has('validated') ? createValidatedState(takeSeed) : createGeneratedState(takeSeed);
+const createTake = (takeSeed: number) => query.has('roster') ? createState(takeSeed) : query.has('validated') ? createValidatedState(takeSeed) : query.has('scene') && !query.has('shoot') ? createGeneratedState(takeSeed) : createShootState(takeSeed);
 function initialLens(): LensId {
   if (replayData) return replayData.lens;
   let requested = query.get('lens');
@@ -101,17 +100,19 @@ let rotationPulse: -1 | 0 | 1 = 0;
 let simAccumulator = 0;
 let previousTime = 0;
 let frameSamples: number[] = [];
+let hitStopUntil = 0;
+let coachStarted = 0;
 
 const shell = document.createElement('section');
 shell.className = 'stage';
 shell.innerHTML = `
   <header class="topbar"><div class="brand"><span class="rec-dot"></span><strong>CULL</strong><span class="tagline">CAMERA DEPARTMENT</span></div><label class="stock-control">STOCK <select id="film-stock" aria-label="Film stock"><option value="clean">35 MM · CLEAN</option><option value="kodachrome">KODACHROME · B</option><option value="bleach">BLEACH BYPASS · A</option><option value="ilford">ILFORD B&W · S</option></select></label><details class="sound-settings" id="sound-settings"><summary>SOUND</summary><div class="sound-panel"><label>MASTER <input id="volume-master" aria-label="Master volume" type="range" min="0" max="100" value="100" /></label><label>MUSIC <input id="volume-music" aria-label="Music volume" type="range" min="0" max="100" value="80" /></label><label>EFFECTS <input id="volume-sfx" aria-label="Effects volume" type="range" min="0" max="100" value="80" /></label><label><input id="mono-audio" type="checkbox" /> MONO</label><label><input id="calm-audio" type="checkbox" /> CALM MIX</label></div></details><div class="readout"><a class="daily-link" href="?daily=1">DAILY</a><span>TAKE 01</span><b id="timecode">01:30</b><span id="lens">35 MM</span><button class="pause-button" id="pause" aria-label="Pause game">Ⅱ</button></div></header>
   <div class="composition"><aside class="margin margin-left"><div class="slate">SCENE 01<br><strong>BACKLOT</strong><small>SEED <span id="seed">00001</span></small><small id="best">BEST —</small></div><div class="hint"><span class="hint-mark">↖</span> WASD / DRAG<br>TO FRAME THE SHOT<div class="preview" id="preview"></div></div></aside>
-    <div class="gate-wrap"><div class="gate-label"><span id="gate-ratio">VIEWFINDER · GATE 1:1</span><span id="lod">TALENT · CLOSE</span></div><div class="gate" id="gate"><div class="thirds"></div><div class="focus-band" id="focus-band" hidden></div><div class="gate-corners"></div><div id="mount" class="mount"></div><div class="frame-message" id="message">KEEP THEM IN THE SHOT</div><div class="cut-flash" id="cut-flash"></div></div><div class="gate-foot"><span>55° · ORTHOGRAPHIC</span><span id="status">ROLLING</span></div></div>
-    <aside class="margin margin-right"><div class="camera-mark">⌑<small>CAM 01</small></div><div class="call-sheet"><span>CALL SHEET</span><div id="call-sheet">SCANNING FRAME…</div></div></aside>
+    <div class="gate-wrap"><div class="gate-label"><span id="gate-ratio">VIEWFINDER · GATE 1:1</span><span id="lod">SHE IS IN A MEDIUM SHOT</span></div><div class="gate" id="gate"><div class="thirds"></div><div class="focus-band" id="focus-band" hidden></div><div class="gate-corners"></div><div class="sprockets left"></div><div class="sprockets right"></div><div id="mount" class="mount"></div><div class="frame-message" id="message">Keep her in the shot.</div><p class="coach hidden" id="coach"></p><div class="title-card hidden" id="title-card"><p class="title-kicker">SCENE 01 · TAKE 01</p><h1>CULL</h1><p>Nothing exists unless it is in the shot. You hold the camera. She walks.</p></div><div class="cut-flash" id="cut-flash"></div><div class="slice" id="slice"></div><div class="peel" id="peel"></div><div class="cut-stamp" id="cut-stamp">CUT</div><i class="spark" style="--dx:-18px;--dy:-24px;left:70%;top:40%"></i><i class="spark" style="--dx:16px;--dy:-20px;left:72%;top:46%"></i><i class="spark" style="--dx:8px;--dy:18px;left:68%;top:50%"></i><i class="spark" style="--dx:-22px;--dy:8px;left:74%;top:42%"></i></div><div class="gate-foot"><span>55° TABLETOP</span><span id="status">ROLLING</span></div></div>
+    <aside class="margin margin-right"><div class="camera-mark">Slate<small>CAM 01</small></div><div class="call-sheet"><span>CALL SHEET</span><div id="call-sheet">Looking outside the frame…</div></div></aside>
   </div>
-  <footer class="controlbar"><div class="controls"><span><kbd>WASD</kbd> PAN</span><span><kbd>−</kbd> / <kbd>+</kbd> ZOOM</span><span><kbd>SPACE</kbd> HOLD</span><span><kbd>Q</kbd> / <kbd>E</kbd> ROTATE</span></div><div class="mobile-controls"><button id="hold" aria-label="Hold Talent">HOLD</button><label>ZOOM <input id="zoom-slider" aria-label="Zoom" type="range" min="10" max="48" value="30" /></label></div><div class="assist-controls"><button id="left-hand" type="button" aria-pressed="false">LEFT HAND</button><button id="overcrank" type="button" aria-pressed="false">75% SPEED</button></div><div class="film"><span>FILM</span><div class="film-track"><i id="filmbar"></i></div><b id="film">90 s</b></div></footer>
-  <div class="end-card hidden" id="end-card"><div class="end-stamp">TAKE ENDED</div><h1 id="end-title">CUT</h1><p id="end-detail"></p><p id="share-card"></p><div id="grade-detail" class="grade-detail"></div><details class="grade-method"><summary>GRADE MATH</summary><p>Average of thirds time, smoothness (100 ÷ (1 + 8 × mean jerk)), close calls (10 points each, capped at 100), and Reel coverage. S ≥90 · A ≥75 · B ≥60 · otherwise C.</p></details><details class="lens-feats"><summary>LENS FEATS</summary><ul id="lens-feat-list"></ul></details><label class="next-lens">NEXT TAKE LENS <select id="lens-select" aria-label="Lens for next take"></select></label><div class="end-actions"><a id="download-sheet" download>CONTACT SHEET ↓</a><button id="make-reel">DIRECTOR'S REEL</button><a id="download-reel" class="hidden" download>WEBM ↓</a><button id="share">SHARE</button><a id="replay-link" target="_blank" rel="noreferrer">REPLAY ↗</a></div><details class="filmography"><summary>FILMOGRAPHY · LAST 5 TAKES</summary><ol id="filmography-list"></ol></details><button id="restart">NEW TAKE ↗</button></div>
+  <footer class="controlbar"><div class="controls"><span><kbd>WASD</kbd> PAN</span><span><kbd>−</kbd> / <kbd>+</kbd> ZOOM</span><span><kbd>SPACE</kbd> HOLD</span><span><kbd>Q</kbd> / <kbd>E</kbd> ROTATE</span></div><div class="mobile-controls"><button id="hold" aria-label="Hold Talent">HOLD</button><label>ZOOM <input id="zoom-slider" aria-label="Zoom" type="range" min="10" max="48" value="30" /></label></div><div class="assist-controls"><button id="left-hand" type="button" aria-pressed="false">LEFT HAND</button><button id="overcrank" type="button" aria-pressed="false">75% SPEED</button></div><div class="film"><span>FILM</span><div class="film-track"><i id="filmbar"></i></div><b id="film">90s</b></div></footer>
+  <div class="end-card hidden" id="end-card"><div class="end-stamp">TAKE ENDED</div><h1 id="end-title">CUT</h1><p id="end-detail"></p><p id="share-card"></p><div id="grade-detail" class="grade-detail"></div><details class="grade-method"><summary>How the grade works</summary><p>The grade averages four things: how often she sits on a thirds mark, how smooth the camera was, close cuts (10 points each, up to 100), and how many film reels you kept. S is 90 or above, A is 75, B is 60, and the rest is C.</p></details><details class="lens-feats"><summary>LENS FEATS</summary><ul id="lens-feat-list"></ul></details><label class="next-lens">NEXT TAKE LENS <select id="lens-select" aria-label="Lens for next take"></select></label><div class="end-actions"><a id="download-sheet" download>CONTACT SHEET ↓</a><button id="make-reel">DIRECTOR'S REEL</button><a id="download-reel" class="hidden" download>WEBM ↓</a><button id="share">SHARE</button><a id="replay-link" target="_blank" rel="noreferrer">REPLAY ↗</a></div><details class="filmography"><summary>FILMOGRAPHY · LAST 5 TAKES</summary><ol id="filmography-list"></ol></details><button id="restart">NEW TAKE ↗</button></div>
 `;
 app.append(shell);
 const $ = <T extends HTMLElement>(selector: string) => shell.querySelector<T>(selector)!;
@@ -222,8 +223,9 @@ renderer.domElement.setAttribute('tabindex', '0');
 mount.append(renderer.domElement);
 refreshFilmStocks();
 refreshLensSelector();
-scene.add(new THREE.HemisphereLight('#fff9ec', '#716a60', 2.1));
-const keyLight = new THREE.DirectionalLight('#fffaf2', 1.2);
+const hemi = new THREE.HemisphereLight('#fff1dc', '#8d6b4a', 2.2);
+scene.add(hemi);
+const keyLight = new THREE.DirectionalLight('#ffd9a0', 1.35);
 keyLight.position.set(-8, 14, 9);
 scene.add(keyLight);
 const urchinBuckets = new UrchinLodBuckets(scene, spriteAssets.urchinTiers);
@@ -241,27 +243,28 @@ function detailFactor(x: number, z: number) {
   const projected = projectPoint(x, z, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw);
   return lensLodFactor(state.lens, projected.x, projected.y);
 }
-const castBounds = new CastBounds();
-scene.add(castBounds.mesh);
-
-const floorMaterial = new THREE.MeshLambertMaterial({ color: '#b9ad98' });
+const floorMaterial = new THREE.MeshLambertMaterial({ map: spriteAssets.plywood, color: '#c9a46b' });
 const floor = new THREE.Mesh(new THREE.PlaneGeometry(400, 30), floorMaterial);
 floor.rotation.x = -Math.PI / 2;
 floor.position.y = -0.12;
 scene.add(floor);
-const grid = new THREE.GridHelper(400, 80, '#8a7f6e', '#c6b9a3');
-grid.position.y = -0.1;
-scene.add(grid);
-const path = new THREE.Mesh(new THREE.BoxGeometry(400, 0.05, 2), new THREE.MeshBasicMaterial({ color: '#d2c8b6' }));
+const pathMaterial = new THREE.MeshLambertMaterial({ color: '#3f6b4f' });
+const path = new THREE.Mesh(new THREE.BoxGeometry(400, 0.05, 2), pathMaterial);
 path.position.y = 0.01;
 scene.add(path);
 const terrainGroup = new THREE.Group();
 scene.add(terrainGroup);
 let terrainTiles: SimState['tiles'] | null = null;
-let renderedNightPalette = false;
+let renderedLook = -1;
+function sceneLookIndex() {
+  return state.shoot?.sceneIndex ?? 0;
+}
 function syncTerrain() {
-  if (state.tiles === terrainTiles) return;
+  const lookIndex = sceneLookIndex();
+  if (state.tiles === terrainTiles && lookIndex === renderedLook) return;
   terrainTiles = state.tiles;
+  renderedLook = lookIndex;
+  const look = SCENE_LOOKS[Math.min(lookIndex, SCENE_LOOKS.length - 1)]!;
   for (const child of [...terrainGroup.children]) {
     terrainGroup.remove(child);
     if (child instanceof THREE.Mesh || child instanceof THREE.InstancedMesh) {
@@ -275,29 +278,34 @@ function syncTerrain() {
     if (!tiles.length) continue;
     const isPath = kind === 'path';
     const mesh = new THREE.InstancedMesh(
-      new THREE.BoxGeometry(isPath ? 1 : 0.65, isPath ? 0.05 : 0.5, isPath ? 1 : 0.65),
-      new THREE.MeshLambertMaterial({ color: isPath ? '#d2c8b6' : '#8d765b' }),
+      new THREE.BoxGeometry(isPath ? 1 : 0.72, isPath ? 0.08 : 1.15, isPath ? 1 : 0.72),
+      new THREE.MeshLambertMaterial({ color: isPath ? look.path : look.block }),
       tiles.length,
     );
-    tiles.forEach((tile, index) => mesh.setMatrixAt(index, new THREE.Matrix4().makeTranslation(tile.x, isPath ? -0.02 : 0.25, tile.z)));
+    tiles.forEach((tile, index) => mesh.setMatrixAt(index, new THREE.Matrix4().makeTranslation(tile.x, isPath ? -0.02 : 0.55, tile.z)));
     mesh.instanceMatrix.needsUpdate = true;
     terrainGroup.add(mesh);
   }
 }
 
 const talent = new THREE.Group();
-const talentSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: spriteAssets.talent, transparent: true, alphaTest: 0.02, depthWrite: false }));
+const talentSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: spriteAssets.walk[0], transparent: true, alphaTest: 0.04, depthWrite: false }));
 talentSprite.center.set(0.5, 0);
-talentSprite.scale.set(1.05, 1.55, 1);
+talentSprite.scale.set(2.3, 3.5, 1);
 talent.add(talentSprite);
 scene.add(talent);
 let renderedTalentTier = -1;
 function syncTalentLod() {
   const tier = state.talent.lodTier ?? Math.min(lodTier(1000 / state.camera.zoom * detailFactor(state.talent.x, state.talent.z)), 3);
-  if (tier === renderedTalentTier) return;
-  renderedTalentTier = tier;
-  talent.visible = tier < 4;
-  talentSprite.scale.set(tier <= 1 ? 1.05 : 0.9, tier <= 1 ? 1.55 : 1.3, 1);
+  if (tier !== renderedTalentTier) {
+    renderedTalentTier = tier;
+    talent.visible = tier < 4;
+    const height = tier <= 1 ? 3.5 : tier === 2 ? 2.8 : 2;
+    talentSprite.scale.set(height * 0.66, height, 1);
+  }
+  const frame = state.waiting ? 0 : Math.floor(state.tick / 8) % spriteAssets.walk.length;
+  const map = spriteAssets.walk[frame]!;
+  if (talentSprite.material.map !== map) talentSprite.material.map = map;
 }
 
 const entityMeshes = new Map<string, THREE.Object3D>();
@@ -380,7 +388,7 @@ function buildEntity(entity: CastEntity) {
     const texture = kind === 'monitor' ? spriteAssets.monitorTeal : spriteAssets.monitorRed;
     const monitor = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, alphaTest: 0.02, depthWrite: false }));
     monitor.center.set(0.5, 0); monitor.scale.set(1.55, 1.8, 1); group.add(monitor);
-    const cone = new THREE.Mesh(new THREE.ConeGeometry(0.8, 2.3, 4, 1, true), new THREE.MeshBasicMaterial({ color: kind === 'monitor' ? '#43c9d8' : '#e43b33', transparent: true, opacity: 0.22, wireframe: true }));
+    const cone = new THREE.Mesh(new THREE.ConeGeometry(0.8, 2.3, 4, 1, true), new THREE.MeshBasicMaterial({ color: kind === 'monitor' ? '#e2b04a' : '#c8322a', transparent: true, opacity: 0.28, side: THREE.DoubleSide, depthWrite: false }));
     cone.name = 'monitor-cone'; cone.position.set(0, 0.6, 1.2); group.add(cone);
   } else if (kind === 'continuity') {
     const propKind = entity.propSequence?.[entity.propIndex ?? 0] ?? entity.propIndex ?? 0;
@@ -390,7 +398,7 @@ function buildEntity(entity: CastEntity) {
     const reel = new THREE.Sprite(new THREE.SpriteMaterial({ map: spriteAssets.reel, transparent: true, alphaTest: 0.02, depthWrite: false }));
     reel.center.set(0.5, 0); reel.scale.set(1.05, 1.05, 1); group.add(reel);
   } else {
-    material = new THREE.MeshLambertMaterial({ color: '#3fd8ff', flatShading: true });
+    material = new THREE.MeshLambertMaterial({ color: '#e2b04a', flatShading: true });
     group.add(new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.42, 0.7, 8), material));
   }
   batchStaticMeshes(group);
@@ -577,20 +585,21 @@ async function saveRunSummary() {
   replayLink.href = replay.toString();
 }
 function renderViewfinder(showTransientRings = true) {
-  const nightPalette = state.shoot?.sceneIndex === 2;
-  if (nightPalette !== renderedNightPalette) {
-    renderedNightPalette = nightPalette;
-    scene.background = new THREE.Color(nightPalette ? '#17191d' : '#e8e4da');
-    floorMaterial.color.set(nightPalette ? '#363238' : '#b9ad98');
-    keyLight.intensity = nightPalette ? 0.42 : 1.2;
-  }
+  const look = SCENE_LOOKS[Math.min(sceneLookIndex(), SCENE_LOOKS.length - 1)]!;
+  if (scene.background instanceof THREE.Color) scene.background.set(look.sky);
+  floorMaterial.color.set(look.ground);
+  path.visible = state.tiles.length === 0;
+  pathMaterial.color.set(look.path);
+  keyLight.color.set(look.key);
+  keyLight.intensity = sceneLookIndex() === 2 ? 1.6 : 1.25;
+  hemi.color.set(look.hemi);
+  hemi.groundColor.set(look.fill);
   syncCamera();
   syncTerrain();
   syncTalentLod();
   const talentPoint = displayPoint(state.talent.x, state.talent.z);
   talent.position.set(talentPoint.x, 0, talentPoint.z);
   syncEntities(showTransientRings);
-  castBounds.update(state.entities);
   renderer.render(scene, camera);
 }
 async function renderReplayContactFrames(): Promise<ScoredFrame[]> {
@@ -635,14 +644,40 @@ function render() {
   captureContactFrame();
   updateHud();
 }
+const CAST_NAMES: Record<string, string> = {
+  urchin: 'spiny ball', boulder: 'rolling rock', glass: 'glass floor', reel: 'film reel', extras: 'crowd',
+  swarm: 'moths', stagehand: 'stagehand', bridge: 'rope bridge', rumour: 'growing smoke', monitor: 'friendly camera',
+  'red-monitor': 'hostile camera', continuity: 'swappable prop',
+};
+function coachMessage(): string | null {
+  if (!coachStarted) return null;
+  const elapsed = performance.now() - coachStarted;
+  if (elapsed < 0 || elapsed > 20_000) return null;
+  if (elapsed < 7_000) return 'She walks on her own. Keep her in the shot.';
+  if (elapsed < 14_000) return 'Zoom out and the spikes go dull. Zoom in to grab a film reel.';
+  return 'Push a hazard past the frame edge to cut it. A close cut scores more.';
+}
+function callSheetLines() {
+  const aspect = lensAspect(state.lens);
+  const lines: string[] = [];
+  for (const entity of state.entities) {
+    if (entity.cut) continue;
+    const projected = projectPoint(entity.x, entity.z, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, aspect);
+    const outside = Math.max(Math.abs(projected.x), Math.abs(projected.y)) - 0.5;
+    const name = CAST_NAMES[entity.kind] ?? entity.kind;
+    if (!entity.spawned && outside >= 0 && outside <= TUNING.callSheetMargin) lines.push(`Coming in · ${name}`);
+    else if (entity.spawned && outside <= 0 && entity.kind !== 'reel') lines.push(`In the shot · ${name}`);
+  }
+  return lines.slice(0, 4).join('\n') || 'Nothing waiting just outside the frame.';
+}
 function updateHud() {
   if (state.shoot) $('.slate').innerHTML = `SCENE 0${Math.min(state.shoot.sceneIndex + 1, 3)}<br><strong>${state.shoot.biome}</strong><small>SEED <span>${String(state.seed).padStart(5, '0')}</span></small><small id="best">BEST —</small>`;
   if (locationFor(state) !== displayedLocation) { displayedLocation = locationFor(state); refreshPersonalBest(); }
   const seconds = Math.max(0, Math.ceil(state.film));
   $('#timecode').textContent = `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
-  $('#film').textContent = `${seconds} s`;
-  $('#filmbar').style.width = `${Math.max(0, state.film / 90 * 100)}%`;
-  $('#filmbar').style.background = state.film < 20 ? '#ff4b3e' : '#ff7a1a';
+  $('#film').textContent = `${seconds}s`;
+  $('#filmbar').style.width = `${Math.max(0, Math.min(100, state.film / 180 * 100))}%`;
+  $('#filmbar').style.background = state.film < 20 ? '#c8322a' : '#ff7a1a';
   $('#lens').textContent = state.lens === 'long-lens' ? '85 MM' : `${Math.round(Math.max(24, Math.min(85, 85 - (state.camera.zoom - 10) * 61 / 38)))} MM`;
   shell.classList.toggle('anamorphic', state.lens === 'anamorphic');
   shell.classList.toggle('fisheye', state.lens === 'fisheye');
@@ -657,24 +692,37 @@ function updateHud() {
   focusBand.style.top = `${(0.5 - state.camera.focusOffset - 0.2) * 100}%`;
   $('#status').textContent = state.waiting ? 'HOLDING FOR SET…' : paused ? 'PAUSED' : state.camera.moving ? 'IN MOTION' : 'ROLLING';
   const tierIndex = state.talent.lodTier ?? lodTier(1000 / state.camera.zoom);
-  const tier = ['CLOSE', 'MEDIUM', 'WIDE', 'PROXY', 'SUB-PIXEL'][tierIndex];
+  const tierName = ['Close-up', 'Medium shot', 'Wide shot', 'Stand-in', 'Gone'][tierIndex] ?? 'Medium shot';
   const urchin = state.entities.find((entity) => entity.kind === 'urchin' && entity.spawned && !entity.cut);
   const urchinTier = urchin?.lodTier ?? lodTier(TUNING.urchinRadius * 1000 / state.camera.zoom);
-  $('#lod').textContent = `TALENT · ${tier} / URCHIN · ${['CLOSE', 'MEDIUM', 'WIDE', 'PROXY', 'GONE'][urchinTier]}`;
+  const spikeName = ['spikes will hit her', 'spikes still hurt', 'spikes are gone', 'just a block', 'gone'][urchinTier] ?? 'in shot';
+  $('#lod').textContent = `${tierName} · ${spikeName}`;
   const urchinInShot = state.entities.some((entity) => entity.kind === 'urchin' && entity.spawned && !entity.cut && inFrame(entity.x, entity.z, TUNING.urchinRadius, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, 0.8, lensAspect(state.lens), state.lens === 'tilt-shift' ? state.camera.focusOffset : null, state.lens === 'fisheye') && urchinTier < 4);
-  $('#message').textContent = urchinInShot ? ['CLOSE-UP · FULL THREAT', 'MEDIUM · lethal', 'WIDE · urchin defanged', 'PROXY · harmless cube', 'SUB-PIXEL · gone'][urchinTier] : 'KEEP THEM IN THE SHOT';
+  const blockedShot = state.shots?.find((shot) => !shot.done && state.talent.x >= shot.at - 0.35);
+  $('#message').textContent = blockedShot?.kind === 'defang'
+    ? 'Shot list: zoom out until the spikes go dull, or cut one close.'
+    : blockedShot?.kind === 'portrait'
+      ? 'Shot list: come back to a medium shot of her.'
+      : urchinInShot
+        ? ['Very close. That spiny ball will hit her.', 'Medium shot. The spikes still hurt.', 'Wide shot. The spikes are gone.', 'So wide it is only a harmless block.', 'The spiny ball is gone.'][urchinTier]
+        : 'Keep her in the shot.';
+  const lesson = coachMessage();
+  const coach = $('#coach');
+  coach.textContent = lesson ?? '';
+  coach.classList.toggle('hidden', !lesson);
   if (invalidReplay) $('#message').textContent = 'INVALID REPLAY URL';
   if (sliderZoomTarget !== null && Math.abs(sliderZoomTarget - state.camera.zoom) < 0.12) sliderZoomTarget = null;
   const zoomSlider = $('#zoom-slider') as HTMLInputElement;
   zoomSlider.value = String(Math.round(sliderZoomTarget ?? state.camera.zoom));
   zoomSlider.disabled = state.lens === 'long-lens';
-  $('#call-sheet').textContent = state.entities.filter((entity) => !entity.spawned && !entity.cut && Math.abs(entity.x - state.camera.x) < state.camera.zoom * (lensAspect(state.lens) / 2 + TUNING.callSheetMargin)).map((entity) => `${entity.kind.toUpperCase()} · PREVIEW`).join(' / ') || 'NO CAST IN FRAME';
+  $('#call-sheet').textContent = callSheetLines();
   const filmBar = shell.querySelector<HTMLElement>('.film-track')!;
   filmBar.style.setProperty('--remaining', `${Math.max(0, state.film / 90 * 100)}%`);
   if (state.failed) {
-    $('#message').textContent = 'THAT’S A WRAP';
-    $('#end-title').textContent = state.failed.toUpperCase().replaceAll('-', ' ');
-    $('#end-detail').textContent = `TAKE ${String(state.seed).padStart(5, '0')} · ${Math.floor(state.talent.x)} METRES · ${state.cuts.length} CUT`;
+    $('#message').textContent = state.failed === 'wrapped' ? "That's a wrap." : 'The take is over.';
+    const endings: Record<string, string> = { 'lost-talent': 'LOST HER', hit: 'HIT', fell: 'SHE FELL', 'out-of-film': 'OUT OF FILM', wrapped: "THAT'S A WRAP" };
+    $('#end-title').textContent = endings[state.failed] ?? 'CUT';
+    $('#end-detail').textContent = `Take ${String(state.seed).padStart(5, '0')} · ${Math.floor(state.totalDistance)} metres · ${state.cuts.length} cuts`;
     $('#end-card').classList.remove('hidden');
     void saveRunSummary();
   }
@@ -683,7 +731,7 @@ function updateHud() {
 function buildInput(): InputFrame {
   const keyInput = panFromKeys();
   const sliderZoom = sliderZoomTarget === null ? 0 : Math.abs(sliderZoomTarget - state.camera.zoom) < 0.12 ? 0 : sliderZoomTarget > state.camera.zoom ? -127 : 127;
-  return quantizeInput({
+  return leashInput(quantizeInput({
     ...frameInput, ...keyInput,
     panX: pointerPan?.panX ?? (keys.size ? keyInput.panX : frameInput.panX),
     panZ: pointerPan?.panZ ?? (keys.size ? keyInput.panZ : frameInput.panZ),
@@ -691,6 +739,19 @@ function buildInput(): InputFrame {
     rotate: rotationPulse || frameInput.rotate,
     hold: keyInput.hold || frameInput.hold,
     steady: keyInput.steady || frameInput.steady,
+  }));
+}
+function leashInput(input: InputFrame): InputFrame {
+  const dx = state.talent.x - state.camera.x;
+  const dz = state.talent.z - state.camera.z;
+  const reach = Math.max(1, state.camera.zoom * 0.5);
+  const edge = Math.max(Math.abs(dx), Math.abs(dz) * TUNING.projectionPitchScale) / reach;
+  if (edge < 0.34) return input;
+  const blend = Math.min(1, (edge - 0.34) / 0.22) * 0.9;
+  return quantizeInput({
+    ...input,
+    panX: input.panX * (1 - blend) + Math.sign(dx || 1) * 100 * blend,
+    panZ: input.panZ * (1 - blend) + Math.sign(dz || 1) * 100 * blend,
   });
 }
 function quantizeInput(input: InputFrame): InputFrame {
@@ -734,8 +795,12 @@ function advanceTick(forcedInput?: InputFrame) {
         pendingCloseCallRank = Math.min(pendingCloseCallRank, Math.hypot(entity.x - previousTalent.x, entity.z - previousTalent.z));
       }
     }
-    if (state.score > previousScore) audio.playCue('reel');
-    else if (state.cuts.length > previousCuts) audio.playCue('cut');
+    const cutHazard = newlyCut.find((entity) => !['reel', 'monitor', 'red-monitor', 'continuity'].includes(entity.kind));
+    if (state.score > previousScore && !cutHazard) audio.playCue('reel');
+    else if (cutHazard) {
+      audio.playCue('cut');
+      showCut(cutHazard);
+    } else if (state.cuts.length > previousCuts) audio.playCue('cut');
     else if (state.entities.filter((entity) => entity.spawned && !entity.cut).length > previousSpawned) audio.playCue('pop');
     else if (state.talent.lodTier !== previousTalentTier || state.entities.some((entity) => entity.lodTier !== previousEntityTiers.get(entity.id))) audio.playCue('lod');
     if (!previousWrap && state.shoot?.wrapCaught) audio.playCue('wrap');
@@ -745,12 +810,23 @@ function advanceTick(forcedInput?: InputFrame) {
   zoomPulse = 0;
   rotationPulse = 0;
 }
+function showCut(entity: { x: number; z: number }) {
+  const projected = projectPoint(entity.x, entity.z, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, lensAspect(state.lens));
+  const edge = Math.abs(projected.x) > Math.abs(projected.y) ? (projected.x < 0 ? 'left' : 'right') : (projected.y > 0 ? 'top' : 'bottom');
+  const gate = $('#gate');
+  gate.dataset.edge = edge;
+  gate.classList.remove('cutting');
+  void gate.offsetWidth;
+  gate.classList.add('cutting');
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) hitStopUntil = performance.now() + 70;
+}
 function stepFrame() {
   advanceTick();
   render();
 }
 function loop(now: number) {
   if (!previousTime) previousTime = now;
+  if (now < hitStopUntil) { previousTime = now; requestAnimationFrame(loop); return; }
   const frameTime = now - previousTime;
   if (frameTime > 0 && !document.hidden) frameSamples.push(frameTime);
   if (frameSamples.length >= 60) {
@@ -902,4 +978,17 @@ new ResizeObserver(() => {
   render();
 }).observe(mount);
 render();
+if (!frozen && !bot && !replayData) {
+  paused = true;
+  $('#title-card').classList.remove('hidden');
+  const beginTake = () => {
+    if (coachStarted) return;
+    paused = false;
+    coachStarted = performance.now();
+    $('#title-card').classList.add('hidden');
+  };
+  window.setTimeout(beginTake, 3800);
+  window.addEventListener('pointerdown', beginTake, { once: true });
+  window.addEventListener('keydown', beginTake, { once: true });
+}
 if (!frozen) requestAnimationFrame(loop);

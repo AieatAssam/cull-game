@@ -1,3 +1,4 @@
+import { shotListForPath } from './framing';
 import { seededRange } from './rng';
 import { generateScene } from '../gen/generate';
 import type { CastEntity, EntityKind, SimState, SpawnPoint } from './types';
@@ -49,7 +50,7 @@ export function createState(seed: number, entities = loadScene(seed)): SimState 
       return { at, options: [{ x: (at + 1) * 2, z: -4 }, { x: (at + 1) * 2, z: 4 }] };
     }),
     routeChoices: {},
-    entities, consumed: [], film: 90, waiting: false, failed: null, score: 0, cuts: [],
+    entities, consumed: [], film: 90, waiting: false, failed: null, score: 0, cuts: [], closeCalls: 0,
   };
 }
 
@@ -60,6 +61,7 @@ export function createGeneratedState(seed: number, difficulty = 0, chunkCount?: 
   state.path = scene.path;
   state.forks = scene.forks;
   state.tiles = scene.tiles;
+  state.shots = shotListForPath(scene.path);
   const start = scene.path[0];
   if (start) {
     state.talent.x = start.x;

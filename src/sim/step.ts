@@ -1,4 +1,5 @@
-import { inFrame, projectPoint } from './frame';
+import { inFrame, projectPoint, projectedAabb } from './frame';
+import { markShots, shotBlocksTalent } from './framing';
 import { lodTier, type LodTier } from './lod';
 import { lensAspect, lensLodFactor } from './lenses';
 import { TUNING } from './tuning';
@@ -36,6 +37,24 @@ function monitorCone(entity: CastEntity): MonitorCone {
 
 function fail(state: SimState, reason: FailReason) {
   if (!state.failed) state.failed = reason;
+}
+
+function outsideFrame(state: SimState, x: number, z: number, radius: number, height: number) {
+  const aspect = lensAspect(state.lens);
+  const bounds = projectedAabb(x, z, radius, height, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw);
+  const halfBand = state.lens === 'tilt-shift' ? 0.2 : 0.5;
+  const center = state.lens === 'tilt-shift' ? state.camera.focusOffset : 0;
+  const dx = Math.max(-aspect / 2 - bounds.right, bounds.left - aspect / 2);
+  const dy = Math.max(center - halfBand - bounds.top, bounds.bottom - (center + halfBand));
+  return Math.max(dx, dy);
+}
+
+function noteFrameCut(state: SimState, entity: CastEntity) {
+  state.cuts.push(entity.id);
+  if (entity.kind === 'reel' || entity.kind === 'monitor' || entity.kind === 'red-monitor' || entity.kind === 'continuity') return;
+  if (distance(entity.x, entity.z, state.talent.x, state.talent.z) > TUNING.closeCallRadius) return;
+  state.closeCalls += 1;
+  state.score += TUNING.closeCallScore;
 }
 
 export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): SimState {
@@ -81,6 +100,8 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
     if (cam.rotationTicksRemaining === 0) cam.yaw = cam.yawTarget;
   }
 
+  markShots(state);
+  const blocked = shotBlocksTalent(state);
   const talent = state.talent;
   const talentBeforeMove = { x: talent.x, z: talent.z };
   const fork = state.forks.find((entry) => entry.at === talent.pathIndex);
@@ -106,14 +127,14 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
   const talentTier = lodTier(1000 / cam.zoom * detailFactor(state, talent.x, talent.z), talent.lodTier);
   talent.lodTier = Math.min(talentTier, 3) as 0 | 1 | 2 | 3;
   const talentSpeed = TUNING.talentSpeeds[Math.min(talentTier, 3)];
-  const snappedToNode = Boolean(next && !input.hold && distance(talent.x, talent.z, next.x, next.z) < 0.02);
+  const snappedToNode = Boolean(next && !input.hold && !blocked && distance(talent.x, talent.z, next.x, next.z) < 0.02);
   if (snappedToNode && next) {
     talent.x = next.x;
     talent.z = next.z;
     talent.pathIndex++;
   }
-  const stopped = input.hold || !next || snappedToNode;
-  state.waiting = !next;
+  const stopped = input.hold || !next || snappedToNode || blocked;
+  state.waiting = !next || blocked;
   if (!stopped) {
     talent.x += (headingX / headingLength) * talentSpeed * dt;
     talent.z += (headingZ / headingLength) * talentSpeed * dt;
@@ -182,9 +203,11 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
     entity.x += entity.vx * dt;
     entity.z += entity.vz * dt;
     const visible = entityInFrame(state, entity);
-    if (!visible && entity.kind !== 'swarm' && entity.kind !== 'rumour') {
+    const fragileHold = (entity.kind === 'glass' || entity.kind === 'bridge')
+      && outsideFrame(state, entity.x, entity.z, radius, 0.8) < TUNING.fragileKeepMargin;
+    if (!visible && !fragileHold && entity.kind !== 'swarm' && entity.kind !== 'rumour') {
       entity.cut = true;
-      state.cuts.push(entity.id);
+      noteFrameCut(state, entity);
       continue;
     }
     if (!visible) continue;
@@ -207,7 +230,8 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
     }
     const close = distance(entity.x, entity.z, talent.x, talent.z) <= radius + TUNING.talentRadii[Math.min(talentTier, 3)];
     if (entity.kind === 'glass' && entity.cut && Math.abs(talent.x - entity.x) <= 0.5 && Math.abs(talent.z - entity.z) <= 0.5) fail(state, 'fell');
-    if (close && ((entity.kind === 'boulder') || (entity.kind === 'urchin' && tier <= 1))) fail(state, 'hit');
+    if (close && entity.kind === 'boulder' && tier <= 0) fail(state, 'hit');
+    if (close && entity.kind === 'urchin' && tier <= 1) fail(state, 'hit');
     if (close && entity.kind === 'urchin' && tier === 2) {
       const push = (talent.x - entity.x) >= 0 ? 1 : -1;
       talent.x += push * dt;
