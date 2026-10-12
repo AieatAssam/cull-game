@@ -48,6 +48,8 @@ let inputLog: InputFrame[] = [];
 interface ScoredFrame extends ContactFrame { tick: number; rank: number; }
 const contactFrames: ScoredFrame[] = [];
 const closeCallFrames: ScoredFrame[] = [];
+let directorReelFrames: CanvasImageSource[] = [];
+let directorReelUrl: string | null = null;
 // Tick zero is rendered before the first layout resize on some browsers.
 // Start sampling only after play advances so that frame cannot enter exports.
 let lastContactTick = 0;
@@ -85,10 +87,13 @@ shell.innerHTML = `
     <aside class="margin margin-right"><div class="camera-mark">⌑<small>CAM 01</small></div><div class="call-sheet"><span>CALL SHEET</span><div id="call-sheet">SCANNING FRAME…</div></div></aside>
   </div>
   <footer class="controlbar"><div class="controls"><span><kbd>WASD</kbd> PAN</span><span><kbd>−</kbd> / <kbd>+</kbd> ZOOM</span><span><kbd>SPACE</kbd> HOLD</span><span><kbd>Q</kbd> / <kbd>E</kbd> ROTATE</span></div><div class="mobile-controls"><button id="hold" aria-label="Hold Talent">HOLD</button><label>ZOOM <input id="zoom-slider" aria-label="Zoom" type="range" min="10" max="48" value="30" /></label></div><div class="assist-controls"><button id="left-hand" type="button" aria-pressed="false">LEFT HAND</button><button id="overcrank" type="button" aria-pressed="false">75% SPEED</button></div><div class="film"><span>FILM</span><div class="film-track"><i id="filmbar"></i></div><b id="film">90 s</b></div></footer>
-  <div class="end-card hidden" id="end-card"><div class="end-stamp">TAKE ENDED</div><h1 id="end-title">CUT</h1><p id="end-detail"></p><p id="share-card"></p><div id="grade-detail" class="grade-detail"></div><details class="grade-method"><summary>GRADE MATH</summary><p>Average of thirds time, smoothness (100 ÷ (1 + 8 × mean jerk)), close calls (10 points each, capped at 100), and Reel coverage. S ≥90 · A ≥75 · B ≥60 · otherwise C.</p></details><div class="end-actions"><a id="download-sheet" download>CONTACT SHEET ↓</a><button id="share">SHARE</button><a id="replay-link" target="_blank" rel="noreferrer">REPLAY ↗</a></div><details class="filmography"><summary>FILMOGRAPHY · LAST 5 TAKES</summary><ol id="filmography-list"></ol></details><button id="restart">NEW TAKE ↗</button></div>
+  <div class="end-card hidden" id="end-card"><div class="end-stamp">TAKE ENDED</div><h1 id="end-title">CUT</h1><p id="end-detail"></p><p id="share-card"></p><div id="grade-detail" class="grade-detail"></div><details class="grade-method"><summary>GRADE MATH</summary><p>Average of thirds time, smoothness (100 ÷ (1 + 8 × mean jerk)), close calls (10 points each, capped at 100), and Reel coverage. S ≥90 · A ≥75 · B ≥60 · otherwise C.</p></details><div class="end-actions"><a id="download-sheet" download>CONTACT SHEET ↓</a><button id="make-reel">DIRECTOR'S REEL</button><a id="download-reel" class="hidden" download>WEBM ↓</a><button id="share">SHARE</button><a id="replay-link" target="_blank" rel="noreferrer">REPLAY ↗</a></div><details class="filmography"><summary>FILMOGRAPHY · LAST 5 TAKES</summary><ol id="filmography-list"></ol></details><button id="restart">NEW TAKE ↗</button></div>
 `;
 app.append(shell);
 const $ = <T extends HTMLElement>(selector: string) => shell.querySelector<T>(selector)!;
+const directorReelMimeType = typeof MediaRecorder === 'undefined' ? undefined
+  : ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'].find((candidate) => MediaRecorder.isTypeSupported(candidate));
+$('#make-reel').hidden = !directorReelMimeType || typeof HTMLCanvasElement.prototype.captureStream !== 'function';
 try {
   if (replayData) overcrank = query.get('assist') === '75';
   else overcrank ||= window.localStorage.getItem('cull.overcrank') === 'true';
@@ -411,6 +416,7 @@ function saveRunSummary() {
   for (const index of [0, Math.floor(samples.length / 2), samples.length - 1]) addFrame(samples[index]);
   for (const frame of contactFrames) addFrame(frame);
   const sheet = makeContactSheet(sheetFrames);
+  directorReelFrames = sheetFrames.map((frame) => frame.image);
   const download = $('#download-sheet') as HTMLAnchorElement;
   download.href = sheet.toDataURL('image/png');
   download.download = `cull-${state.seed}.png`;
@@ -611,6 +617,38 @@ $('#hold').addEventListener('pointerdown', () => { holdButton = true; frameInput
 for (const type of ['pointerup', 'pointercancel', 'pointerleave']) $('#hold').addEventListener(type, () => { holdButton = false; frameInput.hold = false; });
 $('#zoom-slider').addEventListener('input', (event) => { sliderZoomTarget = Number((event.currentTarget as HTMLInputElement).value); });
 $('#pause').addEventListener('click', () => { paused = !paused; });
+$('#make-reel').addEventListener('click', () => {
+  if (typeof MediaRecorder === 'undefined' || !directorReelMimeType || typeof HTMLCanvasElement.prototype.captureStream !== 'function' || directorReelFrames.length === 0) return;
+  const mimeType = directorReelMimeType;
+  if (!mimeType) return;
+  const canvas = document.createElement('canvas'); canvas.width = 720; canvas.height = 720;
+  const context = canvas.getContext('2d');
+  if (!context) return;
+  const frames = directorReelFrames;
+  const stream = canvas.captureStream(12);
+  const recorder = new MediaRecorder(stream, { mimeType });
+  const chunks: BlobPart[] = [];
+  let frameIndex = 0;
+  const draw = () => {
+    context.fillStyle = '#1b1e24'; context.fillRect(0, 0, 720, 720);
+    context.drawImage(frames[frameIndex % frames.length]!, 0, 0, 720, 720);
+    context.fillStyle = '#ff4b3e'; context.font = 'bold 24px monospace'; context.fillText(`CULL · ${String(state.seed).padStart(5, '0')}`, 24, 690);
+  };
+  draw();
+  recorder.addEventListener('dataavailable', (event) => { if (event.data.size > 0) chunks.push(event.data); });
+  recorder.addEventListener('stop', () => {
+    stream.getTracks().forEach((track) => track.stop());
+    if (directorReelUrl) URL.revokeObjectURL(directorReelUrl);
+    directorReelUrl = URL.createObjectURL(new Blob(chunks, { type: mimeType }));
+    const link = $('#download-reel') as HTMLAnchorElement;
+    link.href = directorReelUrl; link.download = `cull-${state.seed}-reel.webm`; link.classList.remove('hidden');
+    ($('#make-reel') as HTMLButtonElement).textContent = "MAKE REEL AGAIN";
+  }, { once: true });
+  recorder.start();
+  ($('#make-reel') as HTMLButtonElement).textContent = 'RECORDING…';
+  const interval = window.setInterval(() => { frameIndex++; draw(); }, 1000 / 12);
+  window.setTimeout(() => { window.clearInterval(interval); if (recorder.state !== 'inactive') recorder.stop(); }, 6000);
+});
 $('#restart').addEventListener('click', () => { const nextSeed = state.seed + 1; replayData = undefined; invalidReplay = false; state = createTake(nextSeed); botRandom = mulberry32((nextSeed ^ 0xb07b07) >>> 0); inputLog = []; replayIndex = 0; contactFrames.length = 0; closeCallFrames.length = 0; lastContactTick = 0; bestThirdsDistance = Number.POSITIVE_INFINITY; thirdsTicks = 0; activeTicks = 0; jerkTotal = 0; priorVelocityDelta = { x: 0, z: 0 }; closeCallCount = 0; reelsCollected = 0; reelIds.clear(); state.entities.filter((entity) => entity.kind === 'reel').forEach((entity) => reelIds.add(entity.id)); pendingCloseCall = false; pendingCloseCallRank = Number.POSITIVE_INFINITY; sliderZoomTarget = null; frameInput = { ...NEUTRAL_INPUT }; resultSaved = false; displayedLocation = locationFor(state); refreshPersonalBest(); entityMeshes.clear(); urchinBuckets.reset(); for (const child of [...scene.children]) if (child instanceof THREE.Group && child !== talent && child !== terrainGroup) scene.remove(child); terrainTiles = null; $('#end-card').classList.add('hidden'); });
 $('#left-hand').addEventListener('click', () => {
   leftHanded = !leftHanded;

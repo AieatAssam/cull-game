@@ -16,6 +16,14 @@ test('records a local result and exports a 1080x1350 contact sheet with a replay
   await expect(page.locator('#end-card')).toBeVisible();
   await expect(page.locator('#grade-detail')).toContainText('GRADE');
   await expect(page.locator('#filmography-list li').first()).toContainText('BACKLOT');
+  const reelButton = page.locator('#make-reel');
+  if (await reelButton.isVisible()) {
+    await reelButton.click();
+    await expect(page.locator('#download-reel')).toBeVisible({ timeout: 20_000 });
+    await expect(page.locator('#download-reel')).toHaveAttribute('download', /\.webm$/);
+    const reelBytes = await page.locator('#download-reel').evaluate(async (node: HTMLAnchorElement) => (await fetch(node.href).then((response) => response.blob())).size);
+    expect(reelBytes).toBeGreaterThan(0);
+  }
   const contactHref = await page.locator('#download-sheet').getAttribute('href');
   expect(contactHref).toMatch(/^data:image\/png;base64,/);
   const contactSize = await page.evaluate(async () => {
