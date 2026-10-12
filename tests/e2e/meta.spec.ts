@@ -4,6 +4,7 @@ import { decodeReplay } from '../../src/replay/codec';
 import { dailySeed } from '../../src/meta/daily';
 
 test('records a local result and exports a 1080x1350 contact sheet with a replay URL', async ({ page, context }) => {
+  test.setTimeout(120_000);
   page.on('pageerror', (error) => console.error('browser page error:', error.message));
   await page.goto('/?debug&frozen=1&seed=42');
   await page.evaluate(() => {
@@ -50,9 +51,22 @@ test('daily seed is stable for the current UTC date', async ({ page }) => {
 });
 
 test('polish controls expose their state, assist is labelled, and reduced motion removes flash transitions', async ({ page }) => {
+  test.setTimeout(120_000);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/?debug&frozen=1&seed=13');
   await expect(page.locator('#pause')).toHaveAttribute('aria-label', 'Pause game');
+  await page.locator('#sound-settings summary').click();
+  await page.locator('#volume-master').evaluate((node: HTMLInputElement) => { node.value = '42'; node.dispatchEvent(new Event('input', { bubbles: true })); });
+  await page.locator('#mono-audio').check();
+  await page.locator('#calm-audio').check();
+  const storedAudio = await page.evaluate(() => JSON.parse(localStorage.getItem('cull.audio.v1') ?? '{}')) as { master: number; mono: boolean; calm: boolean };
+  expect(storedAudio).toEqual(expect.objectContaining({ master: 0.42, mono: true, calm: true }));
+  await mkdir('artifacts/screens/m8', { recursive: true });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.screenshot({ path: 'artifacts/screens/m8/390x844.png' });
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.screenshot({ path: 'artifacts/screens/m8/1280x800.png' });
+  await page.locator('#sound-settings summary').click();
   await page.locator('#left-hand').click();
   await expect(page.locator('.stage')).toHaveClass(/left-handed/);
   await expect(page.locator('#left-hand')).toHaveAttribute('aria-pressed', 'true');

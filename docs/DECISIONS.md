@@ -20,3 +20,4 @@
 - 2026-10-12: Start contact-sheet capture after tick zero because the first browser render can precede layout resize; current export uses sampled recent frames, with best-moment replay selection logged as unfinished.
 - 2026-10-12: Keep reduced-motion behavior in CSS and add a top-face hatch to visible hazard bounds so hazard identification does not rely on red alone.
 - 2026-10-12: Carry cumulative `totalDistance` across Shoot scenes and include it in the canonical state hash so filmography summaries describe the complete run and replay checks cover that value.
+- 2026-10-12: Separate audio into master, music, and effects buses; expose persisted volume, mono, and calm-mix controls while retaining gesture-gated AudioContext creation.

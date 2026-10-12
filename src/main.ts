@@ -14,7 +14,7 @@ import { mulberry32 } from './sim/rng';
 import { UrchinLodBuckets } from './render/lod-buckets';
 import { CastBounds } from './render/cast-bounds';
 import { DPR_SCALES, nextDprTier } from './render/adaptive-dpr';
-import { AudioDirector } from './audio/director';
+import { AudioDirector, type AudioSettings } from './audio/director';
 import { dailySeed } from './meta/daily';
 import { loadFilmography, personalBest, recordResult } from './meta/filmography';
 import { gradeMetrics, smoothnessFromMeanJerk, thirdsDistance } from './meta/grade';
@@ -79,7 +79,7 @@ let frameSamples: number[] = [];
 const shell = document.createElement('section');
 shell.className = 'stage';
 shell.innerHTML = `
-  <header class="topbar"><div class="brand"><span class="rec-dot"></span><strong>CULL</strong><span class="tagline">CAMERA DEPARTMENT</span></div><div class="readout"><a class="daily-link" href="?daily=1">DAILY</a><span>TAKE 01</span><b id="timecode">01:30</b><span id="lens">35 MM</span><button class="pause-button" id="pause" aria-label="Pause game">Ⅱ</button></div></header>
+  <header class="topbar"><div class="brand"><span class="rec-dot"></span><strong>CULL</strong><span class="tagline">CAMERA DEPARTMENT</span></div><details class="sound-settings" id="sound-settings"><summary>SOUND</summary><div class="sound-panel"><label>MASTER <input id="volume-master" aria-label="Master volume" type="range" min="0" max="100" value="100" /></label><label>MUSIC <input id="volume-music" aria-label="Music volume" type="range" min="0" max="100" value="80" /></label><label>EFFECTS <input id="volume-sfx" aria-label="Effects volume" type="range" min="0" max="100" value="80" /></label><label><input id="mono-audio" type="checkbox" /> MONO</label><label><input id="calm-audio" type="checkbox" /> CALM MIX</label></div></details><div class="readout"><a class="daily-link" href="?daily=1">DAILY</a><span>TAKE 01</span><b id="timecode">01:30</b><span id="lens">35 MM</span><button class="pause-button" id="pause" aria-label="Pause game">Ⅱ</button></div></header>
   <div class="composition"><aside class="margin margin-left"><div class="slate">SCENE 01<br><strong>BACKLOT</strong><small>SEED <span id="seed">00001</span></small><small id="best">BEST —</small></div><div class="hint"><span class="hint-mark">↖</span> WASD / DRAG<br>TO FRAME THE SHOT<div class="preview" id="preview"></div></div></aside>
     <div class="gate-wrap"><div class="gate-label"><span>VIEWFINDER · GATE 1:1</span><span id="lod">TALENT · CLOSE</span></div><div class="gate" id="gate"><div class="thirds"></div><div class="gate-corners"></div><div id="mount" class="mount"></div><div class="frame-message" id="message">KEEP THEM IN THE SHOT</div><div class="cut-flash" id="cut-flash"></div></div><div class="gate-foot"><span>55° · ORTHOGRAPHIC</span><span id="status">ROLLING</span></div></div>
     <aside class="margin margin-right"><div class="camera-mark">⌑<small>CAM 01</small></div><div class="call-sheet"><span>CALL SHEET</span><div id="call-sheet">SCANNING FRAME…</div></div></aside>
@@ -94,6 +94,27 @@ try {
   else overcrank ||= window.localStorage.getItem('cull.overcrank') === 'true';
   leftHanded = window.localStorage.getItem('cull.leftHanded') === 'true';
 } catch { /* Storage can be disabled in private browsing modes. */ }
+let audioSettings: AudioSettings = audio.settings;
+try {
+  const saved = JSON.parse(window.localStorage.getItem('cull.audio.v1') ?? 'null') as Partial<AudioSettings> | null;
+  if (saved) { audio.setSettings(saved); audioSettings = audio.settings; }
+} catch { /* Keep the default mix when storage is unavailable or malformed. */ }
+for (const [id, key] of [['volume-master', 'master'], ['volume-music', 'music'], ['volume-sfx', 'sfx']] as const) {
+  const input = $(`#${id}`) as HTMLInputElement;
+  input.value = String(Math.round(audioSettings[key] * 100));
+  input.addEventListener('input', () => {
+    audio.setSettings({ [key]: Number(input.value) / 100 });
+    try { window.localStorage.setItem('cull.audio.v1', JSON.stringify(audio.settings)); } catch { /* Setting remains active for this visit. */ }
+  });
+}
+for (const [id, key] of [['mono-audio', 'mono'], ['calm-audio', 'calm']] as const) {
+  const input = $(`#${id}`) as HTMLInputElement;
+  input.checked = audioSettings[key];
+  input.addEventListener('change', () => {
+    audio.setSettings({ [key]: input.checked });
+    try { window.localStorage.setItem('cull.audio.v1', JSON.stringify(audio.settings)); } catch { /* Setting remains active for this visit. */ }
+  });
+}
 overcrankUsed = overcrank;
 shell.classList.toggle('left-handed', leftHanded);
 $('#left-hand').setAttribute('aria-pressed', String(leftHanded));
