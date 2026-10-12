@@ -36,6 +36,7 @@ function makeScene(seed: number, sceneIndex: number, carry: SimState): SimState 
     : sceneIndex === 1 ? new Set(['urchin', 'glass', 'extras', 'reel', 'boulder', 'bridge', 'stagehand']) : undefined;
   const generatedEntities = sceneKinds ? generated.entities.filter((entity) => sceneKinds.has(entity.kind)) : generated.entities;
   const next = createState(seed, [...generatedEntities, ...addM6Cast({ ...carry, path: generated.path }, seed, sceneIndex)]);
+  next.lens = carry.lens;
   next.path = generated.path;
   next.forks = generated.forks;
   next.tiles = generated.tiles;
@@ -46,6 +47,7 @@ function makeScene(seed: number, sceneIndex: number, carry: SimState): SimState 
     next.camera.x = start.x;
     next.camera.z = start.z;
   }
+  if (next.lens === 'long-lens') next.camera.zoom = TUNING.minZoom;
   next.tick = carry.tick;
   next.totalDistance = carry.totalDistance;
   next.film = carry.film + (sceneIndex > 0 ? TUNING.sceneFilm : 0);

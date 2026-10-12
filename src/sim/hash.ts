@@ -2,10 +2,11 @@ import type { SimState } from './types';
 
 export function stateHash(state: SimState): string {
   const normalized = JSON.stringify({
+    lens: state.lens,
     tick: state.tick,
     travelDistance: q(state.travelDistance),
     totalDistance: q(state.totalDistance),
-    camera: [state.camera.x, state.camera.z, state.camera.vx, state.camera.vz, state.camera.zoom, state.camera.yaw, state.camera.yawTarget, state.camera.rotationTicksRemaining].map(q),
+    camera: [state.camera.x, state.camera.z, state.camera.vx, state.camera.vz, state.camera.zoom, state.camera.yaw, state.camera.yawTarget, state.camera.rotationTicksRemaining, state.camera.focusOffset].map(q),
     talent: [state.talent.x, state.talent.z, state.talent.offscreenTicks, state.talent.pathIndex, state.talent.lodTier].map((n) => n === undefined ? -1 : q(n)),
     path: state.path.map((point) => [q(point.x), q(point.z)]),
     tiles: state.tiles.map((tile) => [q(tile.x), q(tile.z), tile.kind]),

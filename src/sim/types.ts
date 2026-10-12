@@ -16,10 +16,11 @@ export interface PathFork { at: number; options: Array<{ x: number; z: number }>
 export interface TerrainTile { x: number; z: number; kind: 'path' | 'set'; }
 export interface SimState {
   seed: number;
+  lens: import('./lenses').LensId;
   tick: number;
   travelDistance: number;
   totalDistance: number;
-  camera: { x: number; z: number; vx: number; vz: number; zoom: number; yaw: number; yawTarget: number; rotationTicksRemaining: number; moving: boolean };
+  camera: { x: number; z: number; vx: number; vz: number; zoom: number; yaw: number; yawTarget: number; rotationTicksRemaining: number; moving: boolean; focusOffset: number };
   talent: Talent;
   path: Array<{ x: number; z: number }>;
   tiles: TerrainTile[];

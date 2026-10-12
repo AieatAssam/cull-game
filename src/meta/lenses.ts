@@ -1,6 +1,6 @@
 import type { FilmographyEntry } from './filmography';
-
-export type LensId = '35mm' | 'anamorphic' | 'tilt-shift' | 'fisheye' | 'long-lens' | 'super8';
+import type { LensId } from '../sim/lenses';
+export type { LensId } from '../sim/lenses';
 export const lensFeats: readonly { id: LensId; name: string; feat: string }[] = [
   { id: 'anamorphic', name: 'ANAMORPHIC', feat: 'Finish a Shoot' },
   { id: 'tilt-shift', name: 'TILT-SHIFT', feat: 'Cull 10 hazards within 1.5 u' },

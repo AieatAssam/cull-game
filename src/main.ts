@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import './style.css';
 import { stateHash } from './sim/hash';
 import { updateRenderCamera } from './render/camera';
-import { inFrame } from './sim/frame';
+import { cameraBasis, inFrame, projectPoint } from './sim/frame';
 import { NEUTRAL_INPUT, step } from './sim/step';
 import { lodTier } from './sim/lod';
 import { TUNING } from './sim/tuning';
@@ -23,6 +23,7 @@ import { makeContactSheet, type ContactFrame } from './ui/contact-sheet';
 import { filmStocks, loadFilmStock, saveFilmStock, unlockedFilmStocks, type FilmStock } from './meta/film-stock';
 import { lensFeats, unlockedLenses } from './meta/lenses';
 import { monitorConeContains } from './sim/m6';
+import { lensAspect, lensLodFactor, lensRenderTicks, type LensId } from './sim/lenses';
 import type { CastEntity, InputFrame, SimState } from './sim/types';
 
 const app = document.querySelector<HTMLElement>('#app');
@@ -41,11 +42,24 @@ if (location.hash.length > 1) {
   try { replayData = decodeReplay(location.hash.slice(1)); } catch { invalidReplay = true; }
 }
 const seed = replayData?.seed ?? (daily ? dailySeed(utcDate) : Number.isFinite(urlSeed) ? urlSeed : 1);
+let dailyRun = daily && seed === dailySeed(utcDate);
 const botName = query.get('bot');
 const bot = (['tracker', 'wide', 'close', 'adaptive', 'chaos'] as string[]).includes(botName ?? '') ? botName as BotKind : undefined;
 const createTake = (takeSeed: number) => query.has('shoot') ? createShootState(takeSeed) : query.has('roster') ? createState(takeSeed) : query.has('validated') ? createValidatedState(takeSeed) : createGeneratedState(takeSeed);
+function initialLens(): LensId {
+  if (replayData) return replayData.lens;
+  let requested = query.get('lens');
+  try {
+    requested ??= window.localStorage.getItem('cull.lens.v1');
+    const unlocked = unlockedLenses(loadFilmography(window.localStorage));
+    return requested && unlocked.includes(requested as LensId) ? requested as LensId : '35mm';
+  } catch { return '35mm'; }
+}
+let pendingLens = initialLens();
 let botRandom = mulberry32((seed ^ 0xb07b07) >>> 0);
 let state: SimState = createTake(seed);
+state.lens = pendingLens;
+if (state.lens === 'long-lens') state.camera.zoom = TUNING.minZoom;
 let replayIndex = 0;
 let inputLog: InputFrame[] = [];
 interface ScoredFrame extends ContactFrame { tick: number; rank: number; }
@@ -88,11 +102,11 @@ shell.className = 'stage';
 shell.innerHTML = `
   <header class="topbar"><div class="brand"><span class="rec-dot"></span><strong>CULL</strong><span class="tagline">CAMERA DEPARTMENT</span></div><label class="stock-control">STOCK <select id="film-stock" aria-label="Film stock"><option value="clean">35 MM · CLEAN</option><option value="kodachrome">KODACHROME · B</option><option value="bleach">BLEACH BYPASS · A</option><option value="ilford">ILFORD B&W · S</option></select></label><details class="sound-settings" id="sound-settings"><summary>SOUND</summary><div class="sound-panel"><label>MASTER <input id="volume-master" aria-label="Master volume" type="range" min="0" max="100" value="100" /></label><label>MUSIC <input id="volume-music" aria-label="Music volume" type="range" min="0" max="100" value="80" /></label><label>EFFECTS <input id="volume-sfx" aria-label="Effects volume" type="range" min="0" max="100" value="80" /></label><label><input id="mono-audio" type="checkbox" /> MONO</label><label><input id="calm-audio" type="checkbox" /> CALM MIX</label></div></details><div class="readout"><a class="daily-link" href="?daily=1">DAILY</a><span>TAKE 01</span><b id="timecode">01:30</b><span id="lens">35 MM</span><button class="pause-button" id="pause" aria-label="Pause game">Ⅱ</button></div></header>
   <div class="composition"><aside class="margin margin-left"><div class="slate">SCENE 01<br><strong>BACKLOT</strong><small>SEED <span id="seed">00001</span></small><small id="best">BEST —</small></div><div class="hint"><span class="hint-mark">↖</span> WASD / DRAG<br>TO FRAME THE SHOT<div class="preview" id="preview"></div></div></aside>
-    <div class="gate-wrap"><div class="gate-label"><span>VIEWFINDER · GATE 1:1</span><span id="lod">TALENT · CLOSE</span></div><div class="gate" id="gate"><div class="thirds"></div><div class="gate-corners"></div><div id="mount" class="mount"></div><div class="frame-message" id="message">KEEP THEM IN THE SHOT</div><div class="cut-flash" id="cut-flash"></div></div><div class="gate-foot"><span>55° · ORTHOGRAPHIC</span><span id="status">ROLLING</span></div></div>
+    <div class="gate-wrap"><div class="gate-label"><span id="gate-ratio">VIEWFINDER · GATE 1:1</span><span id="lod">TALENT · CLOSE</span></div><div class="gate" id="gate"><div class="thirds"></div><div class="focus-band" id="focus-band" hidden></div><div class="gate-corners"></div><div id="mount" class="mount"></div><div class="frame-message" id="message">KEEP THEM IN THE SHOT</div><div class="cut-flash" id="cut-flash"></div></div><div class="gate-foot"><span>55° · ORTHOGRAPHIC</span><span id="status">ROLLING</span></div></div>
     <aside class="margin margin-right"><div class="camera-mark">⌑<small>CAM 01</small></div><div class="call-sheet"><span>CALL SHEET</span><div id="call-sheet">SCANNING FRAME…</div></div></aside>
   </div>
   <footer class="controlbar"><div class="controls"><span><kbd>WASD</kbd> PAN</span><span><kbd>−</kbd> / <kbd>+</kbd> ZOOM</span><span><kbd>SPACE</kbd> HOLD</span><span><kbd>Q</kbd> / <kbd>E</kbd> ROTATE</span></div><div class="mobile-controls"><button id="hold" aria-label="Hold Talent">HOLD</button><label>ZOOM <input id="zoom-slider" aria-label="Zoom" type="range" min="10" max="48" value="30" /></label></div><div class="assist-controls"><button id="left-hand" type="button" aria-pressed="false">LEFT HAND</button><button id="overcrank" type="button" aria-pressed="false">75% SPEED</button></div><div class="film"><span>FILM</span><div class="film-track"><i id="filmbar"></i></div><b id="film">90 s</b></div></footer>
-  <div class="end-card hidden" id="end-card"><div class="end-stamp">TAKE ENDED</div><h1 id="end-title">CUT</h1><p id="end-detail"></p><p id="share-card"></p><div id="grade-detail" class="grade-detail"></div><details class="grade-method"><summary>GRADE MATH</summary><p>Average of thirds time, smoothness (100 ÷ (1 + 8 × mean jerk)), close calls (10 points each, capped at 100), and Reel coverage. S ≥90 · A ≥75 · B ≥60 · otherwise C.</p></details><details class="lens-feats"><summary>LENS FEATS</summary><ul id="lens-feat-list"></ul></details><div class="end-actions"><a id="download-sheet" download>CONTACT SHEET ↓</a><button id="make-reel">DIRECTOR'S REEL</button><a id="download-reel" class="hidden" download>WEBM ↓</a><button id="share">SHARE</button><a id="replay-link" target="_blank" rel="noreferrer">REPLAY ↗</a></div><details class="filmography"><summary>FILMOGRAPHY · LAST 5 TAKES</summary><ol id="filmography-list"></ol></details><button id="restart">NEW TAKE ↗</button></div>
+  <div class="end-card hidden" id="end-card"><div class="end-stamp">TAKE ENDED</div><h1 id="end-title">CUT</h1><p id="end-detail"></p><p id="share-card"></p><div id="grade-detail" class="grade-detail"></div><details class="grade-method"><summary>GRADE MATH</summary><p>Average of thirds time, smoothness (100 ÷ (1 + 8 × mean jerk)), close calls (10 points each, capped at 100), and Reel coverage. S ≥90 · A ≥75 · B ≥60 · otherwise C.</p></details><details class="lens-feats"><summary>LENS FEATS</summary><ul id="lens-feat-list"></ul></details><label class="next-lens">NEXT TAKE LENS <select id="lens-select" aria-label="Lens for next take"></select></label><div class="end-actions"><a id="download-sheet" download>CONTACT SHEET ↓</a><button id="make-reel">DIRECTOR'S REEL</button><a id="download-reel" class="hidden" download>WEBM ↓</a><button id="share">SHARE</button><a id="replay-link" target="_blank" rel="noreferrer">REPLAY ↗</a></div><details class="filmography"><summary>FILMOGRAPHY · LAST 5 TAKES</summary><ol id="filmography-list"></ol></details><button id="restart">NEW TAKE ↗</button></div>
 `;
 app.append(shell);
 const $ = <T extends HTMLElement>(selector: string) => shell.querySelector<T>(selector)!;
@@ -116,6 +130,22 @@ function refreshFilmStocks() {
   select.value = currentStock;
   renderer.domElement.style.filter = stockFilters[currentStock];
 }
+function refreshLensSelector() {
+  let entries: ReturnType<typeof loadFilmography> = [];
+  try { entries = loadFilmography(window.localStorage); } catch { /* Keep only the default lens available. */ }
+  const unlocked = new Set(unlockedLenses(entries));
+  const select = $('#lens-select') as HTMLSelectElement;
+  const options = [Object.assign(document.createElement('option'), { value: '35mm', textContent: '35 MM · STANDARD' }),
+    ...lensFeats.map((feat) => Object.assign(document.createElement('option'), { value: feat.id, textContent: `${feat.name}${unlocked.has(feat.id) ? '' : ' · LOCKED'}`, disabled: !unlocked.has(feat.id) }))];
+  select.replaceChildren(...options);
+  if (!unlocked.has(pendingLens)) pendingLens = '35mm';
+  select.value = pendingLens;
+  select.disabled = !state.failed;
+}
+$('#lens-select').addEventListener('change', () => {
+  pendingLens = ($('#lens-select') as HTMLSelectElement).value as LensId;
+  try { window.localStorage.setItem('cull.lens.v1', pendingLens); } catch { /* Lens remains selected for the next take in this page. */ }
+});
 $('#film-stock').addEventListener('change', () => {
   const selected = ($('#film-stock') as HTMLSelectElement).value as FilmStock;
   try {
@@ -167,7 +197,7 @@ function locationFor(current: SimState) {
 let displayedLocation = locationFor(state);
 function refreshPersonalBest() {
   try {
-    const best = personalBest(window.localStorage, locationFor(state));
+    const best = personalBest(window.localStorage, locationFor(state), state.lens);
     $('#best').textContent = best ? `BEST ${Math.floor(best.meters)} M` : 'BEST —';
   } catch { $('#best').textContent = 'BEST —'; }
 }
@@ -186,11 +216,26 @@ renderer.domElement.setAttribute('aria-label', 'CULL game view');
 renderer.domElement.setAttribute('tabindex', '0');
 mount.append(renderer.domElement);
 refreshFilmStocks();
+refreshLensSelector();
 scene.add(new THREE.HemisphereLight('#fff9ec', '#716a60', 2.1));
 const keyLight = new THREE.DirectionalLight('#fffaf2', 1.2);
 keyLight.position.set(-8, 14, 9);
 scene.add(keyLight);
 const urchinBuckets = new UrchinLodBuckets(scene);
+function displayPoint(x: number, z: number) {
+  if (state.lens !== 'fisheye') return { x, z };
+  const basis = cameraBasis(state.camera.yaw);
+  const dx = x - state.camera.x; const dz = z - state.camera.z;
+  const width = state.camera.zoom * lensAspect(state.lens);
+  const localX = dx * basis.cos - dz * basis.sin;
+  const wrappedX = ((localX + width / 2) % width + width) % width - width / 2;
+  const shift = wrappedX - localX;
+  return { x: x + basis.cos * shift, z: z - basis.sin * shift };
+}
+function detailFactor(x: number, z: number) {
+  const projected = projectPoint(x, z, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw);
+  return lensLodFactor(state.lens, projected.x, projected.y);
+}
 const castBounds = new CastBounds();
 scene.add(castBounds.mesh);
 
@@ -236,40 +281,81 @@ function syncTerrain() {
 }
 
 const talent = new THREE.Group();
-const talentGeometry = [
-  new THREE.CylinderGeometry(0.24, 0.36, 0.8, 7),
-  new THREE.CylinderGeometry(0.24, 0.36, 0.8, 5),
-  new THREE.OctahedronGeometry(0.65, 0),
-  new THREE.BoxGeometry(0.9, 0.9, 0.9),
-];
-const coat = new THREE.Mesh(talentGeometry[1], new THREE.MeshLambertMaterial({ color: '#d23a2a', flatShading: true }));
-coat.position.y = 0.5;
-talent.add(coat);
-const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 8, 6), new THREE.MeshLambertMaterial({ color: '#dfc3a1', flatShading: true }));
-head.position.y = 1.05;
-talent.add(head);
+const actorDetail = new THREE.Group();
+const coatMaterial = new THREE.MeshLambertMaterial({ color: '#bf382d', flatShading: true });
+const trimMaterial = new THREE.MeshLambertMaterial({ color: '#e8a85e', flatShading: true });
+const darkMaterial = new THREE.MeshLambertMaterial({ color: '#292a30', flatShading: true });
+const skinMaterial = new THREE.MeshLambertMaterial({ color: '#e0b894', flatShading: true });
+const coatBody = new THREE.Mesh(new THREE.CapsuleGeometry(0.29, 0.25, 3, 6), coatMaterial);
+coatBody.position.y = 0.72;
+actorDetail.add(coatBody);
+const coatTail = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.31, 0.42, 7), coatMaterial);
+coatTail.position.y = 0.43; coatTail.rotation.x = Math.PI;
+actorDetail.add(coatTail);
+const collar = new THREE.Mesh(new THREE.ConeGeometry(0.31, 0.2, 5), trimMaterial);
+collar.position.y = 0.98; collar.rotation.x = Math.PI;
+actorDetail.add(collar);
+const scarf = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.36, 0.08), trimMaterial);
+scarf.position.set(0, 0.82, 0.245);
+actorDetail.add(scarf);
+for (const side of [-1, 1]) {
+  const arm = new THREE.Mesh(new THREE.CapsuleGeometry(0.09, 0.28, 2, 5), coatMaterial);
+  arm.position.set(side * 0.3, 0.69, 0.015); arm.rotation.z = side * -0.2;
+  actorDetail.add(arm);
+  const hand = new THREE.Mesh(new THREE.SphereGeometry(0.085, 6, 5), skinMaterial);
+  hand.position.set(side * 0.34, 0.47, 0.03); actorDetail.add(hand);
+  const boot = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.19, 0.3), darkMaterial);
+  boot.position.set(side * 0.15, 0.12, 0.06); actorDetail.add(boot);
+  const trouser = new THREE.Mesh(new THREE.CylinderGeometry(0.105, 0.09, 0.25, 5), darkMaterial);
+  trouser.position.set(side * 0.15, 0.27, 0); actorDetail.add(trouser);
+}
+const belt = new THREE.Mesh(new THREE.TorusGeometry(0.24, 0.035, 4, 8), trimMaterial);
+belt.rotation.x = Math.PI / 2; belt.position.y = 0.56; actorDetail.add(belt);
+const head = new THREE.Mesh(new THREE.SphereGeometry(0.2, 9, 7), skinMaterial);
+head.position.set(0, 1.13, 0.045); actorDetail.add(head);
+const hair = new THREE.Mesh(new THREE.SphereGeometry(0.205, 8, 5, 0, Math.PI * 2, 0, Math.PI * 0.55), darkMaterial);
+hair.position.set(0, 1.19, 0.02); actorDetail.add(hair);
+const beret = new THREE.Mesh(new THREE.SphereGeometry(0.2, 8, 5, 0, Math.PI * 2, 0, Math.PI * 0.48), coatMaterial);
+beret.scale.set(1.12, 0.42, 1.05); beret.position.set(0.01, 1.34, 0.005); actorDetail.add(beret);
+const brim = new THREE.Mesh(new THREE.CylinderGeometry(0.19, 0.2, 0.04, 8), darkMaterial);
+brim.position.y = 1.31; actorDetail.add(brim);
+const eyeMaterial = new THREE.MeshBasicMaterial({ color: '#242329' });
+for (const side of [-1, 1]) {
+  const eye = new THREE.Mesh(new THREE.SphereGeometry(0.025, 5, 4), eyeMaterial);
+  eye.position.set(side * 0.07, 1.15, 0.222); actorDetail.add(eye);
+}
+const satchel = new THREE.Mesh(new THREE.BoxGeometry(0.23, 0.22, 0.16), darkMaterial);
+satchel.position.set(-0.27, 0.52, -0.03); actorDetail.add(satchel);
+const satchelFlap = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.08, 0.17), trimMaterial);
+satchelFlap.position.set(-0.27, 0.63, -0.02); actorDetail.add(satchelFlap);
+talent.add(actorDetail);
+const talentProxy = new THREE.Mesh(new THREE.DodecahedronGeometry(0.58, 0), coatMaterial);
+talentProxy.position.y = 0.63; talent.add(talentProxy); talentProxy.visible = false;
 scene.add(talent);
 let renderedTalentTier = -1;
 function syncTalentLod() {
-  const tier = state.talent.lodTier ?? Math.min(lodTier(1000 / state.camera.zoom), 3);
+  const tier = state.talent.lodTier ?? Math.min(lodTier(1000 / state.camera.zoom * detailFactor(state.talent.x, state.talent.z)), 3);
   if (tier === renderedTalentTier) return;
   renderedTalentTier = tier;
   talent.visible = tier < 4;
-  if (tier < 4) coat.geometry = talentGeometry[tier]!;
-  head.visible = tier <= 1;
+  actorDetail.visible = tier <= 1;
+  talentProxy.visible = tier >= 2 && tier < 4;
 }
 
 const entityMeshes = new Map<string, THREE.Object3D>();
+const extraCostumes = ['#547b7b', '#a9684d', '#756f91', '#b49359'].map((color) => new THREE.Color(color));
 function buildEntity(entity: CastEntity) {
   const kind = entity.kind;
   const group = new THREE.Group();
   let material: THREE.Material;
   if (kind === 'glass') {
-    material = new THREE.MeshBasicMaterial({ color: '#3fd8ff', transparent: true, opacity: 0.54, wireframe: true });
-    const mesh = new THREE.BoxGeometry(1.5, 0.08, 1.5);
-    const pad = new THREE.Mesh(mesh, material);
-    pad.position.y = 0.1;
-    group.add(pad);
+    material = new THREE.MeshLambertMaterial({ color: '#74dce0', transparent: true, opacity: 0.42, side: THREE.DoubleSide });
+    const pad = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.08, 1.5), material);
+    pad.name = 'glass-surface'; pad.position.y = 0.08; group.add(pad);
+    const edge = new THREE.Mesh(new THREE.EdgesGeometry(new THREE.BoxGeometry(1.54, 0.1, 1.54)), new THREE.LineBasicMaterial({ color: '#d2ffff' }));
+    edge.position.y = 0.08; group.add(edge);
+    const seam = new THREE.Mesh(new THREE.BoxGeometry(1.34, 0.015, 0.025), new THREE.MeshBasicMaterial({ color: '#d2ffff', transparent: true, opacity: 0.65 }));
+    seam.position.set(0, 0.13, 0); group.add(seam);
   } else if (kind === 'urchin') {
     material = new THREE.MeshLambertMaterial({ color: '#ff4b3e', flatShading: true });
     const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.62, 0), material);
@@ -286,11 +372,19 @@ function buildEntity(entity: CastEntity) {
       group.add(spike);
     }
   } else if (kind === 'boulder') {
-    material = new THREE.MeshLambertMaterial({ color: '#ff4b3e', flatShading: true });
-    group.add(new THREE.Mesh(new THREE.DodecahedronGeometry(0.72, 0), material));
+    material = new THREE.MeshLambertMaterial({ color: '#b84b3b', flatShading: true });
+    const rock = new THREE.Mesh(new THREE.DodecahedronGeometry(0.72, 1), material);
+    rock.name = 'boulder-body'; rock.scale.set(1.12, 0.88, 0.96); group.add(rock);
+    const facets = new THREE.Mesh(new THREE.DodecahedronGeometry(0.43, 0), new THREE.MeshLambertMaterial({ color: '#d08052', flatShading: true }));
+    facets.position.set(-0.12, 0.29, 0.28); facets.scale.set(1.2, 0.45, 0.38); group.add(facets);
+    const scar = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.34, 0.035), new THREE.MeshBasicMaterial({ color: '#633a35' }));
+    scar.position.set(0.28, 0.22, 0.41); scar.rotation.z = -0.55; group.add(scar);
   } else if (kind === 'extras') {
-    const crowd = new THREE.InstancedMesh(new THREE.ConeGeometry(0.16, 0.48, 4), new THREE.MeshLambertMaterial({ color: '#9b6041', flatShading: true }), Math.max(12, entity.members?.length ?? 0));
+    const capacity = Math.max(12, entity.members?.length ?? 0);
+    const crowd = new THREE.InstancedMesh(new THREE.CapsuleGeometry(0.105, 0.2, 2, 5), new THREE.MeshLambertMaterial({ color: '#547b7b', flatShading: true }), capacity);
     crowd.name = 'extras-crowd'; crowd.count = 0; group.add(crowd);
+    const heads = new THREE.InstancedMesh(new THREE.SphereGeometry(0.09, 5, 4), new THREE.MeshLambertMaterial({ color: '#d6a47e', flatShading: true }), capacity);
+    heads.name = 'extras-heads'; heads.count = 0; group.add(heads);
     const wall = new THREE.Mesh(new THREE.BoxGeometry(4, 1.2, 0.45), new THREE.MeshLambertMaterial({ color: '#9b6041', flatShading: true }));
     wall.name = 'extras-wall'; wall.position.y = 0.6; wall.visible = false; group.add(wall);
   } else if (kind === 'swarm') {
@@ -298,8 +392,16 @@ function buildEntity(entity: CastEntity) {
     swarm.name = 'swarm-cloud'; swarm.count = 0; group.add(swarm);
   } else if (kind === 'stagehand') {
     material = new THREE.MeshLambertMaterial({ color: '#232323', flatShading: true });
-    const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.24, 0.42, 3, 5), material);
-    body.position.y = 0.45; group.add(body);
+    const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.22, 0.35, 3, 6), material);
+    body.name = 'stagehand-body'; body.position.y = 0.46; group.add(body);
+    const hood = new THREE.Mesh(new THREE.SphereGeometry(0.2, 7, 5), material);
+    hood.scale.set(1, 0.9, 0.94); hood.position.set(0, 0.84, 0.015); group.add(hood);
+    const face = new THREE.Mesh(new THREE.SphereGeometry(0.115, 7, 5), new THREE.MeshLambertMaterial({ color: '#b68c66' }));
+    face.position.set(0, 0.82, 0.16); group.add(face);
+    const hat = new THREE.Mesh(new THREE.CylinderGeometry(0.27, 0.2, 0.07, 7), new THREE.MeshLambertMaterial({ color: '#34343a', flatShading: true }));
+    hat.position.y = 0.99; group.add(hat);
+    const belt = new THREE.Mesh(new THREE.BoxGeometry(0.43, 0.08, 0.34), new THREE.MeshLambertMaterial({ color: '#d19a4c', flatShading: true }));
+    belt.position.set(0, 0.36, 0); group.add(belt);
   } else if (kind === 'bridge') {
     const planks = new THREE.InstancedMesh(new THREE.BoxGeometry(0.48, 0.1, 1.8), new THREE.MeshLambertMaterial({ color: '#8d6040', flatShading: true }), 28);
     planks.name = 'bridge-planks'; planks.count = 28;
@@ -312,8 +414,12 @@ function buildEntity(entity: CastEntity) {
     const ropes = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(ropePoints), new THREE.LineBasicMaterial({ color: '#554332' }));
     ropes.name = 'bridge-ropes'; group.add(ropes);
   } else if (kind === 'rumour') {
-    material = new THREE.MeshLambertMaterial({ color: '#8a9290', transparent: true, opacity: 0.62, flatShading: true });
-    group.add(new THREE.Mesh(new THREE.IcosahedronGeometry(0.5, 1), material));
+    material = new THREE.MeshLambertMaterial({ color: '#899b9a', transparent: true, opacity: 0.34, flatShading: true, depthWrite: false });
+    for (let i = 0; i < 4; i++) {
+      const puff = new THREE.Mesh(new THREE.IcosahedronGeometry(0.36 + (i % 2) * 0.06, 1), material);
+      puff.position.set(Math.cos(i * Math.PI / 2) * 0.24, 0.35 + (i % 2) * 0.16, Math.sin(i * Math.PI / 2) * 0.22);
+      puff.scale.set(1.1, 0.76, 1); group.add(puff);
+    }
   } else if (kind === 'monitor' || kind === 'red-monitor') {
     material = new THREE.MeshLambertMaterial({ color: kind === 'monitor' ? '#424a4a' : '#c72d29', flatShading: true });
     const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.1, 1.2, 5), material);
@@ -325,7 +431,19 @@ function buildEntity(entity: CastEntity) {
   } else if (kind === 'continuity') {
     const propKind = entity.propSequence?.[entity.propIndex ?? 0] ?? entity.propIndex ?? 0;
     material = new THREE.MeshLambertMaterial({ color: ['#aa7651', '#b43a31', '#9e8a72', '#745b40'][propKind % 4], flatShading: true });
-    group.add(new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.8, 1), material));
+    const prop = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.8, 1), material);
+    prop.name = 'continuity-prop'; group.add(prop);
+    const propBand = new THREE.Mesh(new THREE.BoxGeometry(1.23, 0.11, 1.03), new THREE.MeshLambertMaterial({ color: '#d6ad73', flatShading: true }));
+    propBand.name = 'continuity-band'; propBand.position.y = 0.08; group.add(propBand);
+  } else if (kind === 'reel') {
+    const can = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.36, 0.3, 10), new THREE.MeshLambertMaterial({ color: '#168fa4', flatShading: true }));
+    can.name = 'reel-can'; group.add(can);
+    const rim = new THREE.Mesh(new THREE.TorusGeometry(0.34, 0.055, 5, 10), new THREE.MeshLambertMaterial({ color: '#d1a85f', flatShading: true }));
+    rim.position.y = 0.17; group.add(rim);
+    const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.035, 8), new THREE.MeshBasicMaterial({ color: '#e8d3a8' }));
+    hub.position.y = 0.18; group.add(hub);
+    const spindle = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.045, 6), new THREE.MeshBasicMaterial({ color: '#34343a' }));
+    spindle.position.y = 0.21; group.add(spindle);
   } else {
     material = new THREE.MeshLambertMaterial({ color: '#3fd8ff', flatShading: true });
     group.add(new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.42, 0.7, 8), material));
@@ -338,7 +456,8 @@ function syncEntities() {
     if (entity.cut || !entity.spawned) continue;
     let object = entityMeshes.get(entity.id);
     if (!object) { object = buildEntity(entity); entityMeshes.set(entity.id, object); scene.add(object); }
-    object.position.set(entity.x, entity.kind === 'glass' ? 0 : entity.kind === 'boulder' ? 0.72 : 0.68, entity.z);
+    const point = displayPoint(entity.x, entity.z);
+    object.position.set(point.x, entity.kind === 'glass' ? 0 : entity.kind === 'boulder' ? 0.72 : 0.68, point.z);
     object.rotation.y = entity.age * 0.015;
     if (entity.kind === 'rumour') object.scale.setScalar(Math.max(0.1, entity.radius ?? 0.5));
     if (entity.kind === 'monitor' || entity.kind === 'red-monitor') {
@@ -347,26 +466,32 @@ function syncEntities() {
       if (cone) cone.scale.set(1, 1, Math.min(2, (entity.range ?? 18) / 14));
     }
     if (entity.kind === 'continuity') {
-      const mesh = object.children.find((child): child is THREE.Mesh => child instanceof THREE.Mesh);
+      const mesh = object.getObjectByName('continuity-prop') as THREE.Mesh | undefined;
       const propKind = entity.propSequence?.[entity.propIndex ?? 0] ?? entity.propIndex ?? 0;
       if (mesh?.material instanceof THREE.MeshLambertMaterial) mesh.material.color.set(['#aa7651', '#b43a31', '#9e8a72', '#745b40'][propKind % 4]!);
       object.scale.set(1 + (propKind % 2) * 0.25, 1, 1);
     }
     if (entity.kind === 'extras') {
       const crowd = object.getObjectByName('extras-crowd') as THREE.InstancedMesh;
+      const heads = object.getObjectByName('extras-heads') as THREE.InstancedMesh;
       const wall = object.getObjectByName('extras-wall')!;
-      const tier = lodTier(1000 / state.camera.zoom, entity.lodTier as 0 | 1 | 2 | 3 | 4 | undefined);
+      const tier = entity.lodTier ?? lodTier(1000 / state.camera.zoom * detailFactor(entity.x, entity.z));
       let count = 0;
       for (const member of entity.members ?? []) {
         if (member.cut || tier >= 2) continue;
-        const matrix = new THREE.Matrix4().makeTranslation(member.dx, 0.3, member.dz);
-        crowd.setMatrixAt(count++, matrix);
+        const bodyMatrix = new THREE.Matrix4().makeTranslation(member.dx, 0.31, member.dz);
+        const headMatrix = new THREE.Matrix4().makeTranslation(member.dx, 0.59, member.dz + 0.015);
+        const costume = extraCostumes[Math.abs(Math.floor(member.dx * 11 + member.dz * 17)) % extraCostumes.length]!;
+        crowd.setMatrixAt(count, bodyMatrix); crowd.setColorAt(count, costume);
+        heads.setMatrixAt(count, headMatrix); count++;
       }
-      crowd.count = count; crowd.instanceMatrix.needsUpdate = true; wall.visible = tier >= 2;
+      crowd.count = count; heads.count = count;
+      crowd.instanceMatrix.needsUpdate = true; if (crowd.instanceColor) crowd.instanceColor.needsUpdate = true; heads.instanceMatrix.needsUpdate = true;
+      wall.visible = tier >= 2;
     }
     if (entity.kind === 'swarm') {
       const swarm = object.getObjectByName('swarm-cloud') as THREE.InstancedMesh;
-      const tier = lodTier(TUNING.swarmRadius * 1000 / state.camera.zoom, entity.lodTier as 0 | 1 | 2 | 3 | 4 | undefined);
+      const tier = entity.lodTier ?? lodTier(TUNING.swarmRadius * 1000 / state.camera.zoom * detailFactor(entity.x, entity.z));
       object.visible = tier < 4; swarm.count = tier < 4 ? 12 : 0;
       for (let i = 0; i < swarm.count; i++) {
         const angle = i * Math.PI * 2 / 12;
@@ -376,7 +501,7 @@ function syncEntities() {
     }
     if (entity.kind === 'bridge') {
       const planks = object.getObjectByName('bridge-planks')!;
-      const tier = lodTier(1000 / state.camera.zoom, entity.lodTier as 0 | 1 | 2 | 3 | 4 | undefined);
+      const tier = entity.lodTier ?? lodTier(1000 / state.camera.zoom * detailFactor(entity.x, entity.z));
       planks.visible = tier <= 1;
     }
     object.visible = true;
@@ -385,15 +510,15 @@ function syncEntities() {
     const found = state.entities.find((entity) => entity.id === id);
     if (!found || found.cut || !found.spawned) object.visible = false;
   }
-  urchinBuckets.update(state.entities, state.camera.zoom, state.tick, !window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  urchinBuckets.update(state.entities, state.camera.zoom, state.tick, !window.matchMedia('(prefers-reduced-motion: reduce)').matches, detailFactor, displayPoint);
 }
 
 function syncCamera() {
-  updateRenderCamera(camera, state.camera);
+  updateRenderCamera(camera, { ...state.camera, lens: state.lens });
 }
 function captureContactFrame() {
   if (state.tick === 0) return;
-  const thirds = thirdsDistance(state.talent.x, state.talent.z, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw);
+  const thirds = thirdsDistance(state.talent.x, state.talent.z, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, lensAspect(state.lens));
   const isBestThirds = thirds < bestThirdsDistance;
   if (isBestThirds) bestThirdsDistance = thirds;
   const sampled = state.tick === 1 || state.tick % 300 === 0 || state.failed !== null || pendingCloseCall || isBestThirds;
@@ -402,10 +527,16 @@ function captureContactFrame() {
   frame.width = 180; frame.height = 180;
   const context = frame.getContext('2d');
   if (!context) return;
+  context.fillStyle = '#1b1e24'; context.fillRect(0, 0, frame.width, frame.height);
   context.filter = stockFilters[currentStock];
-  context.drawImage(renderer.domElement, 0, 0, frame.width, frame.height);
+  const source = renderer.domElement;
+  const sourceAspect = source.width / source.height;
+  const drawWidth = sourceAspect >= 1 ? frame.width : frame.height * sourceAspect;
+  const drawHeight = sourceAspect >= 1 ? frame.width / sourceAspect : frame.height;
+  context.drawImage(source, (frame.width - drawWidth) / 2, (frame.height - drawHeight) / 2, drawWidth, drawHeight);
   context.filter = 'none';
-  const label = state.tick === 1 ? 'Opening' : state.failed ? 'Final frame' : pendingCloseCall ? 'Close call' : isBestThirds ? 'Thirds' : `Take · ${Math.floor(state.totalDistance)} m`;
+  const opening = state.tick === 1 || !contactFrames.some((item) => item.label === 'Opening');
+  const label = opening ? 'Opening' : state.failed ? 'Final frame' : pendingCloseCall ? 'Close call' : isBestThirds ? 'Thirds' : `Take · ${Math.floor(state.totalDistance)} m`;
   const candidate = { image: frame, label, tick: state.tick, rank: pendingCloseCall ? pendingCloseCallRank : thirds };
   if (state.tick === 1) contactFrames.unshift(candidate);
   else if (pendingCloseCall) {
@@ -442,10 +573,11 @@ function saveRunSummary() {
     cuts: state.cuts.length, score: state.score, cause: state.failed, grade, ...metrics,
     shootSceneIndex: state.shoot?.sceneIndex ?? -1,
     finishedShoot: state.shoot?.sceneIndex === 3 && state.failed === 'wrapped' && state.shoot.finaleTicks >= TUNING.finalTakeSeconds * TUNING.tickRate,
-    daily, monitorUses,
+    daily: dailyRun, monitorUses, lens: state.lens,
   };
   try { recordResult(window.localStorage, entry); } catch { /* Local storage may be disabled by the browser. */ }
   refreshFilmStocks();
+  refreshLensSelector();
   let history: ReturnType<typeof loadFilmography> = [];
   try { history = loadFilmography(window.localStorage); } catch { /* Lens feats stay locked when storage is unavailable. */ }
   const unlocked = new Set(unlockedLenses(history));
@@ -470,7 +602,7 @@ function saveRunSummary() {
   const download = $('#download-sheet') as HTMLAnchorElement;
   download.href = sheet.toDataURL('image/png');
   download.download = `cull-${state.seed}.png`;
-  const shareCard = `CULL #${state.seed} · ${entry.location} · ${entry.meters} m · ✂ ${entry.cuts} cuts · ${entry.score} pts · ${grade} grade${overcrankUsed ? ' · 75% SPEED ASSIST' : ''}`;
+  const shareCard = `CULL #${state.seed} · ${entry.location} · ${state.lens} · ${entry.meters} m · ✂ ${entry.cuts} cuts · ${entry.score} pts · ${grade} grade${overcrankUsed ? ' · 75% SPEED ASSIST' : ''}`;
   $('#share-card').textContent = shareCard;
   $('#grade-detail').textContent = `GRADE ${grade} · THIRDS ${metrics.thirdsPercent}% · SMOOTH ${Math.round(metrics.smoothness)} · CLOSE CALLS ${metrics.closeCalls} · REELS ${metrics.reelsCollected}/${metrics.reelsAvailable}`;
   const historyList = $('#filmography-list');
@@ -478,14 +610,15 @@ function saveRunSummary() {
     const history = loadFilmography(window.localStorage).slice(0, 5);
     historyList.replaceChildren(...history.map((run) => {
       const item = document.createElement('li');
-      item.textContent = `${run.date} · ${run.location} · ${Math.floor(run.meters)} m · ${run.grade ?? '—'} · ${run.cause}`;
+      item.textContent = `${run.date} · ${run.location} · ${run.lens ?? '35mm'} · ${Math.floor(run.meters)} m · ${run.grade ?? '—'} · ${run.cause}`;
       return item;
     }));
   } catch { historyList.replaceChildren(); }
   const replay = new URL(location.href);
   replay.searchParams.delete('frozen');
+  if (!dailyRun) replay.searchParams.delete('daily');
   if (overcrankUsed) replay.searchParams.set('assist', '75');
-  replay.hash = encodeReplay(state.seed, inputLog);
+  replay.hash = encodeReplay(state.seed, inputLog, state.lens);
   const replayLink = $('#replay-link') as HTMLAnchorElement;
   replayLink.href = replay.toString();
 }
@@ -501,7 +634,8 @@ function render() {
   syncCamera();
   syncTerrain();
   syncTalentLod();
-  talent.position.set(state.talent.x, 0, state.talent.z);
+  const talentPoint = displayPoint(state.talent.x, state.talent.z);
+  talent.position.set(talentPoint.x, 0, talentPoint.z);
   syncEntities();
   castBounds.update(state.entities);
   renderer.render(scene, camera);
@@ -516,19 +650,32 @@ function updateHud() {
   $('#film').textContent = `${seconds} s`;
   $('#filmbar').style.width = `${Math.max(0, state.film / 90 * 100)}%`;
   $('#filmbar').style.background = state.film < 20 ? '#ff4b3e' : '#ff7a1a';
-  $('#lens').textContent = `${Math.round(Math.max(24, Math.min(85, 85 - (state.camera.zoom - 10) * 61 / 38)))} MM`;
+  $('#lens').textContent = state.lens === 'long-lens' ? '85 MM' : `${Math.round(Math.max(24, Math.min(85, 85 - (state.camera.zoom - 10) * 61 / 38)))} MM`;
+  shell.classList.toggle('anamorphic', state.lens === 'anamorphic');
+  shell.classList.toggle('fisheye', state.lens === 'fisheye');
+  $('#gate-ratio').textContent = state.lens === 'anamorphic' ? 'VIEWFINDER · GATE 2.39:1'
+    : state.lens === 'tilt-shift' ? 'VIEWFINDER · FOCUS BAND 40% · W/S MOVE'
+      : state.lens === 'fisheye' ? 'FISHEYE · WRAP GATE EDGES'
+        : state.lens === 'super8' ? 'SUPER 8 · 12 FPS' : 'VIEWFINDER · GATE 1:1';
+  const panHint = $('.controls span');
+  panHint.innerHTML = state.lens === 'tilt-shift' ? '<kbd>A</kbd> / <kbd>D</kbd> PAN · <kbd>W</kbd> / <kbd>S</kbd> FOCUS' : '<kbd>WASD</kbd> PAN';
+  const focusBand = $('#focus-band');
+  focusBand.hidden = state.lens !== 'tilt-shift';
+  focusBand.style.top = `${(0.5 - state.camera.focusOffset - 0.2) * 100}%`;
   $('#status').textContent = state.waiting ? 'HOLDING FOR SET…' : paused ? 'PAUSED' : state.camera.moving ? 'IN MOTION' : 'ROLLING';
   const tierIndex = state.talent.lodTier ?? lodTier(1000 / state.camera.zoom);
   const tier = ['CLOSE', 'MEDIUM', 'WIDE', 'PROXY', 'SUB-PIXEL'][tierIndex];
   const urchin = state.entities.find((entity) => entity.kind === 'urchin' && entity.spawned && !entity.cut);
   const urchinTier = urchin?.lodTier ?? lodTier(TUNING.urchinRadius * 1000 / state.camera.zoom);
   $('#lod').textContent = `TALENT · ${tier} / URCHIN · ${['CLOSE', 'MEDIUM', 'WIDE', 'PROXY', 'GONE'][urchinTier]}`;
-  const urchinInShot = state.entities.some((entity) => entity.kind === 'urchin' && entity.spawned && !entity.cut && inFrame(entity.x, entity.z, TUNING.urchinRadius, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, 0.8) && urchinTier < 4);
+  const urchinInShot = state.entities.some((entity) => entity.kind === 'urchin' && entity.spawned && !entity.cut && inFrame(entity.x, entity.z, TUNING.urchinRadius, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, 0.8, lensAspect(state.lens), state.lens === 'tilt-shift' ? state.camera.focusOffset : null, state.lens === 'fisheye') && urchinTier < 4);
   $('#message').textContent = urchinInShot ? ['CLOSE-UP · FULL THREAT', 'MEDIUM · lethal', 'WIDE · urchin defanged', 'PROXY · harmless cube', 'SUB-PIXEL · gone'][urchinTier] : 'KEEP THEM IN THE SHOT';
   if (invalidReplay) $('#message').textContent = 'INVALID REPLAY URL';
   if (sliderZoomTarget !== null && Math.abs(sliderZoomTarget - state.camera.zoom) < 0.12) sliderZoomTarget = null;
-  ($('#zoom-slider') as HTMLInputElement).value = String(Math.round(sliderZoomTarget ?? state.camera.zoom));
-  $('#call-sheet').textContent = state.entities.filter((entity) => !entity.spawned && !entity.cut && Math.abs(entity.x - state.camera.x) < state.camera.zoom * (0.5 + TUNING.callSheetMargin)).map((entity) => `${entity.kind.toUpperCase()} · PREVIEW`).join(' / ') || 'NO CAST IN FRAME';
+  const zoomSlider = $('#zoom-slider') as HTMLInputElement;
+  zoomSlider.value = String(Math.round(sliderZoomTarget ?? state.camera.zoom));
+  zoomSlider.disabled = state.lens === 'long-lens';
+  $('#call-sheet').textContent = state.entities.filter((entity) => !entity.spawned && !entity.cut && Math.abs(entity.x - state.camera.x) < state.camera.zoom * (lensAspect(state.lens) / 2 + TUNING.callSheetMargin)).map((entity) => `${entity.kind.toUpperCase()} · PREVIEW`).join(' / ') || 'NO CAST IN FRAME';
   const filmBar = shell.querySelector<HTMLElement>('.film-track')!;
   filmBar.style.setProperty('--remaining', `${Math.max(0, state.film / 90 * 100)}%`);
   if (state.failed) {
@@ -557,9 +704,9 @@ function quantizeInput(input: InputFrame): InputFrame {
   const axis = (value: number) => Math.max(-127, Math.min(127, Math.round(value)));
   return { panX: axis(input.panX), panZ: axis(input.panZ), zoom: axis(input.zoom), rotate: input.rotate, hold: Boolean(input.hold), steady: Boolean(input.steady) };
 }
-function advanceTick() {
+function advanceTick(forcedInput?: InputFrame) {
   if (!paused && !state.failed) {
-    const input = replayData ? replayData.frames[replayIndex++] ?? NEUTRAL_INPUT : bot ? inputForBot(state, bot, botRandom) : buildInput();
+    const input = replayData ? replayData.frames[replayIndex++] ?? NEUTRAL_INPUT : bot ? inputForBot(state, bot, botRandom) : forcedInput ?? buildInput();
     inputLog.push(input);
     const previousCuts = state.cuts.length;
     const previousSpawned = state.entities.filter((entity) => entity.spawned && !entity.cut).length;
@@ -620,16 +767,22 @@ function loop(now: number) {
       dprTier = nextTier;
       renderer.setPixelRatio(baseDpr * DPR_SCALES[dprTier]);
       const rect = mount.getBoundingClientRect();
-      const size = Math.max(1, Math.floor(Math.min(rect.width, rect.height)));
-      renderer.setSize(size, size, true);
+      renderer.setSize(Math.max(1, rect.width), Math.max(1, rect.height), true);
     }
   }
   simAccumulator += Math.min(frameTime / 1000, 0.1);
   previousTime = now;
   let ticks = 0;
-  const tickInterval = 1 / (TUNING.tickRate * (overcrank ? 0.75 : 1));
+  const ticksPerRender = lensRenderTicks(state.lens);
+  const tickInterval = ticksPerRender / (TUNING.tickRate * (overcrank ? 0.75 : 1));
   while (simAccumulator >= tickInterval && ticks < TUNING.maxCatchupTicks) {
-    stepFrame(); simAccumulator -= tickInterval; ticks++;
+    if (ticksPerRender === 1) stepFrame();
+    else {
+      const sampledInput = replayData || bot ? undefined : buildInput();
+      for (let tick = 0; tick < ticksPerRender; tick++) advanceTick(sampledInput);
+      render();
+    }
+    simAccumulator -= tickInterval; ticks++;
   }
   requestAnimationFrame(loop);
 }
@@ -703,7 +856,22 @@ $('#make-reel').addEventListener('click', () => {
   const interval = window.setInterval(() => { frameIndex++; draw(); }, 1000 / 12);
   window.setTimeout(() => { window.clearInterval(interval); if (recorder.state !== 'inactive') recorder.stop(); }, 6000);
 });
-$('#restart').addEventListener('click', () => { const nextSeed = state.seed + 1; replayData = undefined; invalidReplay = false; state = createTake(nextSeed); botRandom = mulberry32((nextSeed ^ 0xb07b07) >>> 0); inputLog = []; replayIndex = 0; contactFrames.length = 0; closeCallFrames.length = 0; lastContactTick = 0; bestThirdsDistance = Number.POSITIVE_INFINITY; thirdsTicks = 0; activeTicks = 0; jerkTotal = 0; priorVelocityDelta = { x: 0, z: 0 }; closeCallCount = 0; reelsCollected = 0; monitorUses = 0; monitorWasActive = false; reelIds.clear(); state.entities.filter((entity) => entity.kind === 'reel').forEach((entity) => reelIds.add(entity.id)); pendingCloseCall = false; pendingCloseCallRank = Number.POSITIVE_INFINITY; sliderZoomTarget = null; frameInput = { ...NEUTRAL_INPUT }; resultSaved = false; displayedLocation = locationFor(state); refreshPersonalBest(); entityMeshes.clear(); urchinBuckets.reset(); for (const child of [...scene.children]) if (child instanceof THREE.Group && child !== talent && child !== terrainGroup) scene.remove(child); terrainTiles = null; $('#end-card').classList.add('hidden'); });
+$('#restart').addEventListener('click', () => {
+  const nextSeed = state.seed + 1;
+  dailyRun = false;
+  replayData = undefined; invalidReplay = false; state = createTake(nextSeed); state.lens = pendingLens;
+  if (state.lens === 'long-lens') state.camera.zoom = TUNING.minZoom;
+  botRandom = mulberry32((nextSeed ^ 0xb07b07) >>> 0); inputLog = []; replayIndex = 0;
+  contactFrames.length = 0; closeCallFrames.length = 0; lastContactTick = 0; bestThirdsDistance = Number.POSITIVE_INFINITY;
+  thirdsTicks = 0; activeTicks = 0; jerkTotal = 0; priorVelocityDelta = { x: 0, z: 0 };
+  closeCallCount = 0; reelsCollected = 0; monitorUses = 0; monitorWasActive = false; reelIds.clear();
+  state.entities.filter((entity) => entity.kind === 'reel').forEach((entity) => reelIds.add(entity.id));
+  pendingCloseCall = false; pendingCloseCallRank = Number.POSITIVE_INFINITY; sliderZoomTarget = null;
+  frameInput = { ...NEUTRAL_INPUT }; resultSaved = false; displayedLocation = locationFor(state); refreshPersonalBest();
+  entityMeshes.clear(); urchinBuckets.reset();
+  for (const child of [...scene.children]) if (child instanceof THREE.Group && child !== talent && child !== terrainGroup) scene.remove(child);
+  terrainTiles = null; $('#end-card').classList.add('hidden'); refreshLensSelector();
+});
 $('#left-hand').addEventListener('click', () => {
   leftHanded = !leftHanded;
   shell.classList.toggle('left-handed', leftHanded);
@@ -737,8 +905,7 @@ if (query.has('debug')) {
 
 new ResizeObserver(() => {
   const rect = mount.getBoundingClientRect();
-  const size = Math.max(1, Math.floor(Math.min(rect.width, rect.height)));
-  renderer.setSize(size, size, true);
+  renderer.setSize(Math.max(1, rect.width), Math.max(1, rect.height), true);
   render();
 }).observe(mount);
 render();

@@ -66,6 +66,39 @@ test('daily seed is stable for the current UTC date', async ({ page }) => {
   expect(seed).toBe(dailySeed(today));
 });
 
+test('unlocked lens rules and lens identity carry through the replay URL', async ({ page, context }) => {
+  await page.addInitScript(() => localStorage.setItem('cull.filmography.v1', JSON.stringify([{
+    date: '2026-10-12', seed: 9, location: 'LONG TAKE', meters: 300, cuts: 20, score: 500, cause: 'wrapped',
+    grade: 'S', closeCalls: 10, monitorUses: 5, shootSceneIndex: 3, finishedShoot: true, daily: true,
+  }])));
+  await page.goto('/?debug&frozen=1&seed=42&lens=anamorphic');
+  expect(await page.evaluate(() => window.__cull.state().lens)).toBe('anamorphic');
+  await expect(page.locator('#gate-ratio')).toContainText('2.39:1');
+  const gateRatio = await page.locator('#gate').evaluate((gate) => {
+    const rect = gate.getBoundingClientRect(); return rect.width / rect.height;
+  });
+  expect(gateRatio).toBeCloseTo(2.39, 1);
+  await page.evaluate(() => { window.__cull.step(3); });
+  const expectedHash = await page.evaluate(() => window.__cull.hash());
+  await page.evaluate(() => window.__cull.finishForShare());
+  const replayHref = await page.locator('#replay-link').getAttribute('href');
+  expect(replayHref).toBeTruthy();
+  expect(decodeReplay(new URL(replayHref!).hash.slice(1)).lens).toBe('anamorphic');
+  const replay = await context.newPage();
+  const replayUrl = new URL(replayHref!);
+  replayUrl.searchParams.set('frozen', '1');
+  await replay.goto(replayUrl.toString());
+  expect(await replay.evaluate(() => window.__cull.state().lens)).toBe('anamorphic');
+  await replay.evaluate(() => window.__cull.step(3));
+  expect(await replay.evaluate(() => window.__cull.hash())).toBe(expectedHash);
+  await replay.close();
+  await page.selectOption('#lens-select', 'long-lens');
+  await page.locator('#restart').click();
+  const longLens = await page.evaluate(() => window.__cull.state());
+  expect(longLens.lens).toBe('long-lens');
+  expect(longLens.camera.zoom).toBe(10);
+});
+
 test('polish controls expose their state, assist is labelled, and reduced motion removes flash transitions', async ({ page }) => {
   test.setTimeout(120_000);
   await page.emulateMedia({ reducedMotion: 'reduce' });

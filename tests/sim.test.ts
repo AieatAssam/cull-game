@@ -7,6 +7,8 @@ import { stateHash } from '../src/sim/hash';
 import { lodTier } from '../src/sim/lod';
 import { step, NEUTRAL_INPUT } from '../src/sim/step';
 import { createState, loadWorld, reloadSet } from '../src/sim/world';
+import { TUNING } from '../src/sim/tuning';
+import { lensLodFactor, lensRenderTicks } from '../src/sim/lenses';
 import type { CastEntity, SimState } from '../src/sim/types';
 
 function entity(state: SimState, kind: CastEntity['kind'], x: number, y = 0): CastEntity {
@@ -27,11 +29,46 @@ describe('frame projection and lifecycle', () => {
       expect(rendered.y).toBeCloseTo(simulated.y, 6);
     }
   });
+  it('matches the anamorphic wide-gate projection', () => {
+    const state = { x: -2, z: 3, zoom: 24, yaw: 2.5, lens: 'anamorphic' as const };
+    const camera = new THREE.OrthographicCamera(-12, 12, 12, -12, 0.1, 200);
+    updateRenderCamera(camera, state);
+    const simulated = projectWithSimulation(5, -1, state);
+    const rendered = projectWithRenderer(camera, 5, -1);
+    expect(rendered.x).toBeCloseTo(simulated.x, 6);
+    expect(rendered.y).toBeCloseTo(simulated.y, 6);
+  });
   it('counts partial projected AABB overlap as in frame', () => {
     const bounds = projectedAabb(15.1, 0, 1, 1, 0, 0, 30, 0);
     expect(overlapsFrame(bounds)).toBe(true);
     expect(inFrame(15.1, 0, 1, 0, 0, 30)).toBe(true);
     expect(inFrame(18, 0, 0.2, 0, 0, 30)).toBe(false);
+  });
+  it('applies anamorphic, tilt-shift, and fisheye gate rules', () => {
+    expect(inFrame(11.5, 0, 0, 0, 0, 10, 0, 0)).toBe(false);
+    expect(inFrame(11.5, 0, 0, 0, 0, 10, 0, 0, 2.39)).toBe(true);
+    expect(inFrame(0, 6, 0, 0, 0, 10, 0, 0)).toBe(true);
+    expect(inFrame(0, 6, 0, 0, 0, 10, 0, 0, 1, 0)).toBe(false);
+    expect(inFrame(6, 0, 0, 0, 0, 10, 0, 0)).toBe(false);
+    expect(inFrame(6, 0, 0, 0, 0, 10, 0, 0, 1, null, true)).toBe(true);
+    expect(inFrame(36, 0, 0, 0, 0, 10, 0, 0, 1, null, true)).toBe(true);
+  });
+  it('fixes Long Lens focal length, doubles pan speed, and maps Tilt-shift vertical input to the band', () => {
+    const long = createState(1, []); long.lens = 'long-lens'; long.camera.zoom = TUNING.minZoom;
+    const normal = createState(1, []); normal.camera.zoom = TUNING.minZoom;
+    const input = { ...NEUTRAL_INPUT, panX: 127, zoom: -127 };
+    const longNext = step(long, input); const normalNext = step(normal, input);
+    expect(longNext.camera.zoom).toBe(TUNING.minZoom);
+    expect(longNext.camera.vx).toBeCloseTo(normalNext.camera.vx * 2);
+    const tilt = createState(1, []); tilt.lens = 'tilt-shift';
+    const shifted = step(tilt, { ...NEUTRAL_INPUT, panZ: 127 });
+    expect(shifted.camera.focusOffset).toBeLessThan(0);
+    expect(shifted.camera.z).toBe(0);
+  });
+  it('keeps the Fisheye center more detailed and advances Super 8 in five fixed ticks per render', () => {
+    expect(lensLodFactor('fisheye', 0, 0)).toBeGreaterThan(lensLodFactor('fisheye', 0.5, 0.5));
+    expect(lensRenderTicks('super8')).toBe(5);
+    expect(lensRenderTicks('35mm')).toBe(1);
   });
   it('cuts a spawned CAST entity after leaving frame permanently', () => {
     const state = createState(1, []);

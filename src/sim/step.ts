@@ -1,5 +1,6 @@
-import { inFrame } from './frame';
+import { inFrame, projectPoint } from './frame';
 import { lodTier, type LodTier } from './lod';
+import { lensAspect, lensLodFactor } from './lenses';
 import { TUNING } from './tuning';
 import { advanceRumourRadius, advanceWrap, isDeletedByWrap, isWrapActive, monitorConeContains, redMonitorOverlapsTarget, type MonitorCone } from './m6';
 import type { CastEntity, FailReason, InputFrame, SimState } from './types';
@@ -8,18 +9,25 @@ export const NEUTRAL_INPUT: InputFrame = { panX: 0, panZ: 0, zoom: 0, rotate: 0,
 const dt = 1 / TUNING.tickRate;
 const distance = (ax: number, az: number, bx: number, bz: number) => Math.hypot(ax - bx, az - bz);
 
+function framed(state: SimState, x: number, z: number, radius: number, height: number) {
+  return inFrame(x, z, radius, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, height,
+    lensAspect(state.lens), state.lens === 'tilt-shift' ? state.camera.focusOffset : null, state.lens === 'fisheye');
+}
+function detailFactor(state: SimState, x: number, z: number) {
+  const projected = projectPoint(x, z, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw);
+  return lensLodFactor(state.lens, projected.x, projected.y);
+}
+
 function entityInFrame(state: SimState, entity: CastEntity) {
   if (entity.kind === 'monitor') return true;
   const inMonitor = state.entities.some((monitor) => monitor.kind === 'monitor' && monitor.spawned && !monitor.cut
     && monitorConeContains(monitorCone(monitor), { x: entity.x, z: entity.z }));
   if (inMonitor) return true;
   if (entity.kind === 'extras' && entity.members) {
-    return entity.members.some((member) => !member.cut && inFrame(entity.x + member.dx, entity.z + member.dz, TUNING.extrasMemberRadius,
-      state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, 0.5));
+    return entity.members.some((member) => !member.cut && framed(state, entity.x + member.dx, entity.z + member.dz, TUNING.extrasMemberRadius, 0.5));
   }
   const radius = entity.kind === 'boulder' ? TUNING.boulderRadius : entity.kind === 'urchin' ? TUNING.urchinRadius : entity.kind === 'swarm' ? TUNING.swarmRadius : entity.kind === 'bridge' ? TUNING.bridgeLength / 2 : entity.kind === 'rumour' ? entity.radius ?? 0.5 : 0.55;
-  return inFrame(entity.x, entity.z, radius,
-    state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, entity.kind === 'boulder' ? 1 : 0.8);
+  return framed(state, entity.x, entity.z, radius, entity.kind === 'boulder' ? 1 : 0.8);
 }
 
 function monitorCone(entity: CastEntity): MonitorCone {
@@ -45,17 +53,21 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
     cuts: [...previous.cuts],
   };
   const cam = state.camera;
-  const maxVelocity = cam.zoom * TUNING.panSpeed;
+  if (state.lens === 'long-lens') cam.zoom = TUNING.minZoom;
+  if (state.lens === 'tilt-shift') cam.focusOffset = Math.max(-0.3, Math.min(0.3, cam.focusOffset - input.panZ / 127 * 0.012));
+  const panZ = state.lens === 'tilt-shift' ? 0 : input.panZ;
+  const panMultiplier = state.lens === 'long-lens' ? 2 : 1;
+  const maxVelocity = cam.zoom * TUNING.panSpeed * panMultiplier;
   const steady = input.steady ? TUNING.steadyFactor : 1;
   const targetVX = Math.max(-1, Math.min(1, input.panX / 127)) * maxVelocity * steady;
-  const targetVZ = Math.max(-1, Math.min(1, input.panZ / 127)) * maxVelocity * steady;
-  const dv = TUNING.panAcceleration * cam.zoom * dt;
+  const targetVZ = Math.max(-1, Math.min(1, panZ / 127)) * maxVelocity * steady;
+  const dv = TUNING.panAcceleration * cam.zoom * dt * panMultiplier;
   cam.vx += Math.max(-dv, Math.min(dv, targetVX - cam.vx));
   cam.vz += Math.max(-dv, Math.min(dv, targetVZ - cam.vz));
   cam.x += cam.vx * dt;
   cam.z += cam.vz * dt;
   cam.moving = Math.hypot(cam.vx, cam.vz) / cam.zoom > TUNING.motionThreshold;
-  if (input.zoom) cam.zoom = Math.max(TUNING.minZoom, Math.min(TUNING.maxZoom, cam.zoom * Math.exp(-(input.zoom / 127) * Math.log(TUNING.zoomRate) * dt)));
+  if (input.zoom && state.lens !== 'long-lens') cam.zoom = Math.max(TUNING.minZoom, Math.min(TUNING.maxZoom, cam.zoom * Math.exp(-(input.zoom / 127) * Math.log(TUNING.zoomRate) * dt)));
   if (input.rotate && cam.rotationTicksRemaining === 0) {
     cam.yawTarget = (cam.yawTarget + input.rotate + 8) % 8;
     cam.rotationTicksRemaining = Math.round(TUNING.rotationSeconds * TUNING.tickRate);
@@ -91,7 +103,7 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
   let headingX = next ? next.x - talent.x : 0;
   let headingZ = next ? next.z - talent.z : 0;
   const headingLength = Math.hypot(headingX, headingZ) || 1;
-  const talentTier = lodTier(1000 / cam.zoom, talent.lodTier);
+  const talentTier = lodTier(1000 / cam.zoom * detailFactor(state, talent.x, talent.z), talent.lodTier);
   talent.lodTier = Math.min(talentTier, 3) as 0 | 1 | 2 | 3;
   const talentSpeed = TUNING.talentSpeeds[Math.min(talentTier, 3)];
   const snappedToNode = Boolean(next && !input.hold && distance(talent.x, talent.z, next.x, next.z) < 0.02);
@@ -116,7 +128,7 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
   state.totalDistance += talentTravel;
   const talentInMonitor = state.entities.some((monitor) => monitor.kind === 'monitor' && monitor.spawned && !monitor.cut
     && monitorConeContains(monitorCone(monitor), { x: talent.x, z: talent.z }));
-  if (talentInMonitor || inFrame(talent.x, talent.z, TUNING.talentRadii[Math.min(talentTier, 3)], cam.x, cam.z, cam.zoom, cam.yaw, 1.4)) talent.offscreenTicks = 0;
+  if (talentInMonitor || framed(state, talent.x, talent.z, TUNING.talentRadii[Math.min(talentTier, 3)], 1.4)) talent.offscreenTicks = 0;
   else talent.offscreenTicks++;
   if (talent.offscreenTicks >= TUNING.offscreenGrace * TUNING.tickRate) fail(state, 'lost-talent');
 
@@ -138,7 +150,7 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
       const nearTalent = entity.kind === 'extras' && entity.members
         ? entity.members.some((member) => !member.cut && distance(entity.x + member.dx, entity.z + member.dz, talent.x, talent.z) < TUNING.popInExclusion)
         : distance(entity.x, entity.z, talent.x, talent.z) < TUNING.popInExclusion;
-      const spawnTier = lodTier((entity.kind === 'bridge' || entity.kind === 'extras' ? 1 : entity.kind === 'swarm' ? TUNING.swarmRadius : entity.kind === 'urchin' ? TUNING.urchinRadius : 0.55) * 1000 / cam.zoom, entity.lodTier as LodTier | undefined);
+      const spawnTier = lodTier((entity.kind === 'bridge' || entity.kind === 'extras' ? 1 : entity.kind === 'swarm' ? TUNING.swarmRadius : entity.kind === 'urchin' ? TUNING.urchinRadius : 0.55) * 1000 / cam.zoom * detailFactor(state, entity.x, entity.z), entity.lodTier as LodTier | undefined);
       if (entityInFrame(state, entity) && !nearTalent && !(entity.kind === 'swarm' && spawnTier === 4)) {
         entity.spawned = true;
         entity.age = 0;
@@ -148,7 +160,7 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
     if (!entity.spawned) continue;
     const radius = entity.kind === 'boulder' ? TUNING.boulderRadius : entity.kind === 'urchin' ? TUNING.urchinRadius : entity.kind === 'swarm' ? TUNING.swarmRadius : entity.kind === 'extras' ? TUNING.extrasRadius : entity.kind === 'rumour' ? entity.radius ?? 0.5 : 0.55;
     const lodSize = entity.kind === 'bridge' || entity.kind === 'extras' ? 1000 / cam.zoom : radius * 1000 / cam.zoom;
-    const tier = lodTier(lodSize, entity.lodTier as LodTier | undefined);
+    const tier = lodTier(lodSize * detailFactor(state, entity.x, entity.z), entity.lodTier as LodTier | undefined);
     entity.lodTier = tier;
     if (entity.kind === 'swarm' && tier === 4) continue;
     if (entity.kind === 'stagehand' && cam.moving) {
@@ -185,7 +197,7 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
         if (member.dz < -0.8 || member.dz > 0.8) member.vz *= -1;
         member.dx = Math.max(-1.8, Math.min(1.8, member.dx));
         member.dz = Math.max(-0.8, Math.min(0.8, member.dz));
-        if (!inFrame(entity.x + member.dx, entity.z + member.dz, TUNING.extrasMemberRadius, cam.x, cam.z, cam.zoom, cam.yaw, 0.5)) member.cut = true;
+        if (!framed(state, entity.x + member.dx, entity.z + member.dz, TUNING.extrasMemberRadius, 0.5)) member.cut = true;
       }
       if (entity.members.every((member) => member.cut)) {
         entity.cut = true;
@@ -213,7 +225,7 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
   }
 
   for (const hostile of state.entities.filter((entity) => entity.kind === 'red-monitor' && entity.spawned && !entity.cut
-    && inFrame(entity.x, entity.z, 0.8, cam.x, cam.z, cam.zoom, cam.yaw, 1))) {
+    && framed(state, entity.x, entity.z, 0.8, 1))) {
     if (redMonitorOverlapsTarget(monitorCone(hostile), { x: talent.x, z: talent.z }, TUNING.talentRadii[Math.min(talentTier, 3)])) fail(state, 'hit');
     for (const target of state.entities) {
       if (target === hostile || target.cut || target.kind === 'monitor' || target.kind === 'red-monitor' || target.kind === 'continuity' || target.kind === 'rumour') continue;

@@ -1,3 +1,5 @@
+import type { LensId } from '../sim/lenses';
+
 export interface FilmographyEntry {
   date: string;
   seed: number;
@@ -16,6 +18,7 @@ export interface FilmographyEntry {
   finishedShoot?: boolean;
   daily?: boolean;
   monitorUses?: number;
+  lens?: LensId;
 }
 export interface StorageLike { getItem(key: string): string | null; setItem(key: string, value: string): void; }
 const storageKey = 'cull.filmography.v1';
@@ -31,7 +34,8 @@ function isEntry(value: unknown): value is FilmographyEntry {
     && optionalCounts.every((number) => number === undefined || (typeof number === 'number' && Number.isFinite(number) && number >= 0))
     && (entry.shootSceneIndex === undefined || (Number.isInteger(entry.shootSceneIndex) && entry.shootSceneIndex >= -1 && entry.shootSceneIndex <= 3))
     && (entry.finishedShoot === undefined || typeof entry.finishedShoot === 'boolean')
-    && (entry.daily === undefined || typeof entry.daily === 'boolean');
+    && (entry.daily === undefined || typeof entry.daily === 'boolean')
+    && (entry.lens === undefined || ['35mm', 'anamorphic', 'tilt-shift', 'fisheye', 'long-lens', 'super8'].includes(entry.lens));
 }
 
 export function loadFilmography(storage: StorageLike): FilmographyEntry[] {
@@ -41,8 +45,8 @@ export function loadFilmography(storage: StorageLike): FilmographyEntry[] {
   } catch { return []; }
 }
 
-export function personalBest(storage: StorageLike, location: string): FilmographyEntry | undefined {
-  return loadFilmography(storage).filter((entry) => entry.location === location).sort((a, b) => b.meters - a.meters)[0];
+export function personalBest(storage: StorageLike, location: string, lens: LensId = '35mm'): FilmographyEntry | undefined {
+  return loadFilmography(storage).filter((entry) => entry.location === location && (entry.lens ?? '35mm') === lens).sort((a, b) => b.meters - a.meters)[0];
 }
 
 export function recordResult(storage: StorageLike, entry: FilmographyEntry) {

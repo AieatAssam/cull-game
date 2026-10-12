@@ -63,11 +63,11 @@ export class UrchinLodBuckets {
     this.meshes.push(null); // Sub-pixel tier has no geometry and never enters a bucket.
   }
 
-  update(entities: CastEntity[], zoom: number, tick: number, showTransientRings = true) {
+  update(entities: CastEntity[], zoom: number, tick: number, showTransientRings = true, detailFactor: (x: number, z: number) => number = () => 1, displayPoint: (x: number, z: number) => { x: number; z: number } = (x, z) => ({ x, z })) {
     for (const mesh of this.meshes) if (mesh) mesh.count = 0;
     for (const entity of entities) {
       if (entity.kind !== 'urchin' || !entity.spawned || entity.cut) continue;
-      const tier = lodTier(TUNING.urchinRadius * 1000 / zoom, this.tiers.get(entity.id));
+      const tier = lodTier(TUNING.urchinRadius * 1000 / zoom * detailFactor(entity.x, entity.z), this.tiers.get(entity.id));
       const oldTier = this.tiers.get(entity.id);
       this.tiers.set(entity.id, tier);
       let ring = this.rings.get(entity.id);
@@ -79,7 +79,8 @@ export class UrchinLodBuckets {
           this.rings.set(entity.id, ring);
           this.scene.add(ring);
         }
-        ring.position.set(entity.x, 0.025, entity.z);
+        const point = displayPoint(entity.x, entity.z);
+        ring.position.set(point.x, 0.025, point.z);
         ring.visible = true;
         ring.userData.expiresAt = tick + 8;
       }
@@ -87,7 +88,8 @@ export class UrchinLodBuckets {
       const bucket = this.meshes[tier];
       if (!bucket) continue;
       const index = bucket.count++;
-      this.transform.position.set(entity.x, 0.68, entity.z);
+      const point = displayPoint(entity.x, entity.z);
+      this.transform.position.set(point.x, 0.68, point.z);
       this.transform.rotation.set(0, entity.age * 0.015, 0);
       this.transform.scale.setScalar(1);
       this.transform.updateMatrix();

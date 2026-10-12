@@ -13,12 +13,12 @@ export function gradeMetrics(metrics: GradeMetrics): 'S' | 'A' | 'B' | 'C' {
   return overall >= 90 ? 'S' : overall >= 75 ? 'A' : overall >= 60 ? 'B' : 'C';
 }
 
-export function thirdsDistance(x: number, z: number, cameraX: number, cameraZ: number, zoom: number, yaw: number): number {
+export function thirdsDistance(x: number, z: number, cameraX: number, cameraZ: number, zoom: number, yaw: number, aspect = 1): number {
   const dx = x - cameraX;
   const dz = z - cameraZ;
   const localX = Math.cos(yaw) * dx - Math.sin(yaw) * dz;
   const localZ = Math.sin(yaw) * dx + Math.cos(yaw) * dz;
-  const nx = localX / zoom;
+  const nx = localX / (zoom * aspect);
   const nz = localZ / zoom;
   let nearest = Number.POSITIVE_INFINITY;
   for (const tx of [-1 / 6, 1 / 6]) for (const tz of [-1 / 6, 1 / 6]) {

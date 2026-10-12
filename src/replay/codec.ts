@@ -1,6 +1,7 @@
 import type { InputFrame } from '../sim/types';
+import type { LensId } from '../sim/lenses';
 
-export interface ReplayData { seed: number; frames: InputFrame[]; }
+export interface ReplayData { seed: number; frames: InputFrame[]; lens: LensId; }
 type InputTuple = [number, number, number, -1 | 0 | 1, 0 | 1, 0 | 1];
 const maxFrames = 8 * 60 * 60;
 // Base64url of the worst-case eight-minute stream fits under this bound.
@@ -28,7 +29,7 @@ function decodeBase64Url(value: string): string {
   return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
 }
 
-export function encodeReplay(seed: number, frames: readonly InputFrame[]): string {
+export function encodeReplay(seed: number, frames: readonly InputFrame[], lens: LensId = '35mm'): string {
   if (!Number.isInteger(seed) || seed < 0 || seed > 0xffffffff) throw new RangeError('Replay seed must be uint32');
   if (frames.length > maxFrames) throw new RangeError('Replay exceeds the eight-minute input limit');
   const runs: Array<[number, ...InputTuple]> = [];
@@ -38,15 +39,19 @@ export function encodeReplay(seed: number, frames: readonly InputFrame[]): strin
     if (previous && previous.slice(1).every((value, index) => value === current[index]) && previous[0] < maxFrames) previous[0]++;
     else runs.push([1, ...current]);
   }
-  return encodeBase64Url(JSON.stringify({ v: 1, seed: seed >>> 0, runs }));
+  return encodeBase64Url(JSON.stringify(lens === '35mm'
+    ? { v: 1, seed: seed >>> 0, runs }
+    : { v: 2, seed: seed >>> 0, lens, runs }));
 }
 
 export function decodeReplay(encoded: string): ReplayData {
   if (!encoded || encoded.length > maxEncodedLength) throw new RangeError('Replay URL is empty or too large');
   const payload: unknown = JSON.parse(decodeBase64Url(encoded));
   if (!payload || typeof payload !== 'object') throw new TypeError('Malformed replay payload');
-  const value = payload as { v?: unknown; seed?: unknown; runs?: unknown };
-  if (value.v !== 1 || !Number.isInteger(value.seed) || (value.seed as number) < 0 || (value.seed as number) > 0xffffffff || !Array.isArray(value.runs)) throw new TypeError('Unsupported replay payload');
+  const value = payload as { v?: unknown; seed?: unknown; lens?: unknown; runs?: unknown };
+  const validLens = ['35mm', 'anamorphic', 'tilt-shift', 'fisheye', 'long-lens', 'super8'].includes(value.lens as string);
+  if (![1, 2].includes(value.v as number) || (value.v === 1 && value.lens !== undefined)
+    || (value.v === 2 && !validLens) || !Number.isInteger(value.seed) || (value.seed as number) < 0 || (value.seed as number) > 0xffffffff || !Array.isArray(value.runs)) throw new TypeError('Unsupported replay payload');
   const frames: InputFrame[] = [];
   for (const run of value.runs) {
     if (!Array.isArray(run) || run.length !== 7 || !Number.isInteger(run[0]) || run[0] < 1 || run[0] > maxFrames) throw new TypeError('Malformed replay run');
@@ -56,5 +61,5 @@ export function decodeReplay(encoded: string): ReplayData {
     if (frames.length + run[0] > maxFrames) throw new RangeError('Replay exceeds the eight-minute input limit');
     for (let i = 0; i < run[0]; i++) frames.push({ panX: decoded[0], panZ: decoded[1], zoom: decoded[2], rotate: decoded[3], hold: decoded[4] === 1, steady: decoded[5] === 1 });
   }
-  return { seed: value.seed as number, frames };
+  return { seed: value.seed as number, frames, lens: value.v === 1 ? '35mm' : value.lens as LensId };
 }

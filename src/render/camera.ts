@@ -1,8 +1,9 @@
 import * as THREE from 'three';
 import { cameraBasis, projectPoint } from '../sim/frame';
 import { TUNING } from '../sim/tuning';
+import { lensAspect, type LensId } from '../sim/lenses';
 
-export interface RenderCameraState { x: number; z: number; zoom: number; yaw: number; }
+export interface RenderCameraState { x: number; z: number; zoom: number; yaw: number; lens?: LensId; }
 export function updateRenderCamera(camera: THREE.OrthographicCamera, state: RenderCameraState) {
   const distance = 30;
   const basis = cameraBasis(state.yaw);
@@ -14,8 +15,9 @@ export function updateRenderCamera(camera: THREE.OrthographicCamera, state: Rend
   );
   camera.up.set(0, 1, 0);
   camera.lookAt(target);
-  camera.left = -state.zoom / 2;
-  camera.right = state.zoom / 2;
+  const aspect = lensAspect(state.lens ?? '35mm');
+  camera.left = -state.zoom * aspect / 2;
+  camera.right = state.zoom * aspect / 2;
   camera.top = state.zoom / 2;
   camera.bottom = -state.zoom / 2;
   camera.updateProjectionMatrix();
@@ -28,6 +30,6 @@ export function projectWithRenderer(camera: THREE.OrthographicCamera, x: number,
 }
 
 export function projectWithSimulation(x: number, z: number, state: RenderCameraState) {
-  const point = projectPoint(x, z, state.x, state.z, state.zoom, state.yaw);
+  const point = projectPoint(x, z, state.x, state.z, state.zoom, state.yaw, lensAspect(state.lens ?? '35mm'));
   return { x: point.x * 2, y: point.y * 2 };
 }

@@ -1,4 +1,4 @@
-interface DebugState { seed: number; tick: number; path: Array<{ x: number; z: number }>; tiles: Array<unknown>; camera: { x: number; zoom: number }; entities: Array<{ kind: string; spawned: boolean; cut: boolean }>; shoot?: { sceneIndex: number; biome: string }; }
+interface DebugState { seed: number; tick: number; lens: string; path: Array<{ x: number; z: number }>; tiles: Array<unknown>; camera: { x: number; zoom: number }; entities: Array<{ kind: string; spawned: boolean; cut: boolean }>; shoot?: { sceneIndex: number; biome: string }; }
 interface RenderMetrics { drawCalls: number; triangles: number; }
 interface LodDiagnostics { bucketCounts: number[]; tiers: Record<string, number>; visibleRings: number; }
 interface DebugDiagnostics { paused: boolean; keys: string[]; hidden: boolean; focused: boolean; dprTier: number; pointerPan: { panX: number; panZ: number } | null; }

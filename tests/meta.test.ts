@@ -36,7 +36,7 @@ describe('M9 daily seed, filmography, and replay data', () => {
     const frames = [neutral, neutral, { ...neutral, panX: 42, zoom: -13 }, { ...neutral, panX: 42, zoom: -13, hold: true }];
     const encoded = encodeReplay(2026, frames);
     expect(encoded).not.toMatch(/[+/=]/);
-    expect(decodeReplay(encoded)).toEqual({ seed: 2026, frames });
+    expect(decodeReplay(encoded)).toEqual({ seed: 2026, frames, lens: '35mm' });
     expect(encodeReplay(2026, frames)).toBe(encoded);
   });
 
@@ -46,7 +46,14 @@ describe('M9 daily seed, filmography, and replay data', () => {
       zoom: Math.floor(i / (255 * 255)) % 255 - 127,
       rotate: ([0, 1, -1] as const)[i % 3]!, hold: i % 2 === 1, steady: i % 5 === 1,
     }));
-    expect(decodeReplay(encodeReplay(7, frames))).toEqual({ seed: 7, frames });
+    expect(decodeReplay(encodeReplay(7, frames))).toEqual({ seed: 7, frames, lens: '35mm' });
+  });
+
+  it('encodes the active lens into replay identity while retaining v1 default-lens links', () => {
+    const frames = [neutral, { ...neutral, panX: 20 }];
+    const encoded = encodeReplay(42, frames, 'anamorphic');
+    expect(decodeReplay(encoded)).toEqual({ seed: 42, frames, lens: 'anamorphic' });
+    expect(encodeReplay(42, frames)).not.toBe(encoded);
   });
 
   it('rejects malformed, oversized, and invalid-frame replay URLs', () => {
@@ -62,8 +69,10 @@ describe('M9 daily seed, filmography, and replay data', () => {
     recordResult(storage, entry(1, 12));
     recordResult(storage, entry(2, 21));
     recordResult(storage, entry(3, 18));
-    expect(loadFilmography(storage).map((run) => run.seed)).toEqual([3, 2, 1]);
+    recordResult(storage, { ...entry(4, 30), lens: 'anamorphic' });
+    expect(loadFilmography(storage).map((run) => run.seed)).toEqual([4, 3, 2, 1]);
     expect(personalBest(storage, 'BACKLOT')?.meters).toBe(21);
+    expect(personalBest(storage, 'BACKLOT', 'anamorphic')?.meters).toBe(30);
   });
 
   it('ignores malformed optional progression facts in saved history', () => {
@@ -105,5 +114,7 @@ describe('M9 daily seed, filmography, and replay data', () => {
     const before = stateHash(state);
     state.totalDistance += 1;
     expect(stateHash(state)).not.toBe(before);
+    const otherLens = createState(12); otherLens.lens = 'fisheye';
+    expect(stateHash(otherLens)).not.toBe(stateHash(createState(12)));
   });
 });
