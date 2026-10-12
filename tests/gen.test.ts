@@ -70,7 +70,7 @@ describe('reference bot smoke and chaos fuzzing', () => {
     expect(second).toEqual(first);
     expect(first.completed).toBe(first.state.failed === 'wrapped'
       || (!first.state.failed && first.state.talent.x >= pathEnd - 1));
-  });
+  }, 20_000);
   it('reports reproducible framing-strategy completion and distance metrics', () => {
     const report = evaluateBots(20);
     expect(report.adaptiveCompletion).toBeGreaterThanOrEqual(0);

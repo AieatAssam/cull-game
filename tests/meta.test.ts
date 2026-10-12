@@ -3,6 +3,7 @@ import { dailySeed } from '../src/meta/daily';
 import { loadFilmography, personalBest, recordResult, type FilmographyEntry, type StorageLike } from '../src/meta/filmography';
 import { decodeReplay, encodeReplay } from '../src/replay/codec';
 import { stateHash } from '../src/sim/hash';
+import { gradeMetrics, smoothnessFromMeanJerk, thirdsDistance } from '../src/meta/grade';
 import { createState } from '../src/sim/world';
 import type { InputFrame } from '../src/sim/types';
 
@@ -15,6 +16,14 @@ class MemoryStorage implements StorageLike {
 const neutral: InputFrame = { panX: 0, panZ: 0, zoom: 0, rotate: 0, hold: false, steady: false };
 
 describe('M9 daily seed, filmography, and replay data', () => {
+  it('scores transparent cinematography metrics and detects thirds intersections', () => {
+    const atIntersection = thirdsDistance(-5, -5, 0, 0, 30, 0);
+    expect(atIntersection).toBeCloseTo(0);
+    expect(smoothnessFromMeanJerk(0)).toBe(100);
+    expect(smoothnessFromMeanJerk(1)).toBeLessThan(15);
+    expect(gradeMetrics({ thirdsPercent: 100, smoothness: 100, closeCalls: 10, reelsCollected: 6, reelsAvailable: 6 })).toBe('S');
+    expect(gradeMetrics({ thirdsPercent: 0, smoothness: 0, closeCalls: 0, reelsCollected: 0, reelsAvailable: 6 })).toBe('C');
+  });
   it('uses a stable UTC date key for the daily seed', () => {
     expect(dailySeed('2026-10-12')).toBe(dailySeed('2026-10-12'));
     expect(dailySeed('2026-10-12')).not.toBe(dailySeed('2026-10-13'));

@@ -4,14 +4,17 @@ import { decodeReplay } from '../../src/replay/codec';
 import { dailySeed } from '../../src/meta/daily';
 
 test('records a local result and exports a 1080x1350 contact sheet with a replay URL', async ({ page, context }) => {
+  page.on('pageerror', (error) => console.error('browser page error:', error.message));
   await page.goto('/?debug&frozen=1&seed=42');
   await page.evaluate(() => {
     window.__cull.input({ panX: 12.5, panZ: -4.4, zoom: 0, rotate: 0, hold: false, steady: false });
-    window.__cull.step(3);
+    window.__cull.step(); window.__cull.step(); window.__cull.step();
   });
   const expectedHash = await page.evaluate(() => window.__cull.hash());
   await page.evaluate(() => window.__cull.finishForShare());
   await expect(page.locator('#end-card')).toBeVisible();
+  await expect(page.locator('#grade-detail')).toContainText('GRADE');
+  await expect(page.locator('#filmography-list li').first()).toContainText('BACKLOT');
   const contactHref = await page.locator('#download-sheet').getAttribute('href');
   expect(contactHref).toMatch(/^data:image\/png;base64,/);
   const contactSize = await page.evaluate(async () => {
@@ -28,8 +31,8 @@ test('records a local result and exports a 1080x1350 contact sheet with a replay
   await replayPage.evaluate(() => window.__cull.step(3));
   expect(await replayPage.evaluate(() => window.__cull.hash())).toBe(expectedHash);
   await replayPage.close();
-  const history = await page.evaluate(() => JSON.parse(localStorage.getItem('cull.filmography.v1') ?? '[]')) as Array<{ seed: number; cause: string }>;
-  expect(history[0]).toEqual(expect.objectContaining({ seed: 42, cause: 'hit' }));
+  const history = await page.evaluate(() => JSON.parse(localStorage.getItem('cull.filmography.v1') ?? '[]')) as Array<{ seed: number; cause: string; grade: string; thirdsPercent: number }>;
+  expect(history[0]).toEqual(expect.objectContaining({ seed: 42, cause: 'hit', grade: expect.any(String), thirdsPercent: expect.any(Number) }));
   const base64 = await page.locator('#download-sheet').getAttribute('href').then((href) => href!.split(',')[1]!);
   await mkdir('artifacts/screens/m9', { recursive: true });
   await writeFile('artifacts/screens/m9/contact-sheet.png', Buffer.from(base64, 'base64'));

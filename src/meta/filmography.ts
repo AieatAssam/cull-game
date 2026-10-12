@@ -6,6 +6,12 @@ export interface FilmographyEntry {
   cuts: number;
   score: number;
   cause: string;
+  grade?: 'S' | 'A' | 'B' | 'C';
+  thirdsPercent?: number;
+  smoothness?: number;
+  closeCalls?: number;
+  reelsCollected?: number;
+  reelsAvailable?: number;
 }
 export interface StorageLike { getItem(key: string): string | null; setItem(key: string, value: string): void; }
 const storageKey = 'cull.filmography.v1';
