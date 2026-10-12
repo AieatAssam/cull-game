@@ -1,0 +1,41 @@
+{
+  "name": "cull-game",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc -b && vite build",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src tests",
+    "test": "vitest run --reporter=dot",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test --reporter=line",
+    "perf": "tsx src/bots/perf.ts",
+    "size": "size-limit"
+  },
+  "dependencies": {
+    "three": "0.174.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.51.1",
+    "@size-limit/preset-app": "11.1.6",
+    "@types/node": "22.13.10",
+    "@types/three": "0.174.0",
+    "@typescript-eslint/eslint-plugin": "8.26.0",
+    "@typescript-eslint/parser": "8.26.0",
+    "eslint": "9.22.0",
+    "fast-check": "3.23.2",
+    "size-limit": "11.1.6",
+    "tsx": "4.19.3",
+    "typescript": "5.8.2",
+    "vite": "6.2.0",
+    "vitest": "3.0.8"
+  },
+  "size-limit": [
+    {
+      "path": "dist/assets/*.js",
+      "limit": "300 KB"
+    }
+  ]
+}
