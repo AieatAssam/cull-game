@@ -8,7 +8,12 @@ const dt = 1 / TUNING.tickRate;
 const distance = (ax: number, az: number, bx: number, bz: number) => Math.hypot(ax - bx, az - bz);
 
 function entityInFrame(state: SimState, entity: CastEntity) {
-  return inFrame(entity.x, entity.z, entity.kind === 'boulder' ? TUNING.boulderRadius : entity.kind === 'urchin' ? TUNING.urchinRadius : 0.55,
+  if (entity.kind === 'extras' && entity.members) {
+    return entity.members.some((member) => !member.cut && inFrame(entity.x + member.dx, entity.z + member.dz, TUNING.extrasMemberRadius,
+      state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, 0.5));
+  }
+  const radius = entity.kind === 'boulder' ? TUNING.boulderRadius : entity.kind === 'urchin' ? TUNING.urchinRadius : entity.kind === 'swarm' ? TUNING.swarmRadius : entity.kind === 'bridge' ? TUNING.bridgeLength / 2 : 0.55;
+  return inFrame(entity.x, entity.z, radius,
     state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, entity.kind === 'boulder' ? 1 : 0.8);
 }
 
@@ -25,7 +30,7 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
     path: previous.path,
     forks: previous.forks,
     routeChoices: { ...previous.routeChoices },
-    entities: previous.entities.map((entity) => ({ ...entity })),
+    entities: previous.entities.map((entity) => ({ ...entity, members: entity.members?.map((member) => ({ ...member })) })),
     consumed: [...previous.consumed],
     cuts: [...previous.cuts],
   };
@@ -99,26 +104,64 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
   for (const entity of state.entities) {
     if (entity.cut) continue;
     if (!entity.spawned) {
-      const nearTalent = distance(entity.x, entity.z, talent.x, talent.z) < TUNING.popInExclusion;
-      if (entityInFrame(state, entity) && !nearTalent) {
+      const nearTalent = entity.kind === 'extras' && entity.members
+        ? entity.members.some((member) => !member.cut && distance(entity.x + member.dx, entity.z + member.dz, talent.x, talent.z) < TUNING.popInExclusion)
+        : distance(entity.x, entity.z, talent.x, talent.z) < TUNING.popInExclusion;
+      const spawnTier = lodTier((entity.kind === 'bridge' || entity.kind === 'extras' ? 1 : entity.kind === 'swarm' ? TUNING.swarmRadius : entity.kind === 'urchin' ? TUNING.urchinRadius : 0.55) * 1000 / cam.zoom, entity.lodTier as LodTier | undefined);
+      if (entityInFrame(state, entity) && !nearTalent && !(entity.kind === 'swarm' && spawnTier === 4)) {
         entity.spawned = true;
         entity.age = 0;
         state.consumed.push(entity.id);
       }
     }
     if (!entity.spawned) continue;
+    const radius = entity.kind === 'boulder' ? TUNING.boulderRadius : entity.kind === 'urchin' ? TUNING.urchinRadius : entity.kind === 'swarm' ? TUNING.swarmRadius : entity.kind === 'extras' ? TUNING.extrasRadius : 0.55;
+    const lodSize = entity.kind === 'bridge' || entity.kind === 'extras' ? 1000 / cam.zoom : radius * 1000 / cam.zoom;
+    const tier = lodTier(lodSize, entity.lodTier as LodTier | undefined);
+    entity.lodTier = tier;
+    if (entity.kind === 'swarm' && tier === 4) continue;
+    if (entity.kind === 'stagehand' && cam.moving) {
+      const reel = state.entities.filter((candidate) => candidate.kind === 'reel' && candidate.spawned && !candidate.cut).sort((a, b) => distance(a.x, a.z, entity.x, entity.z) - distance(b.x, b.z, entity.x, entity.z))[0];
+      const target = reel ?? state.path[Math.min(talent.pathIndex + 1, state.path.length - 1)];
+      if (target) {
+        const dx = target.x - entity.x;
+        const dz = target.z - entity.z;
+        const length = Math.hypot(dx, dz) || 1;
+        entity.x += dx / length * TUNING.stagehandSpeed * dt;
+        entity.z += dz / length * TUNING.stagehandSpeed * dt;
+        if (reel && distance(entity.x, entity.z, reel.x, reel.z) < 0.45) {
+          reel.cut = true;
+          state.cuts.push(reel.id);
+        }
+      }
+    }
     entity.age++;
     entity.x += entity.vx * dt;
     entity.z += entity.vz * dt;
     const visible = entityInFrame(state, entity);
-    if (!visible) {
+    if (!visible && entity.kind !== 'swarm') {
       entity.cut = true;
       state.cuts.push(entity.id);
       continue;
     }
-    const radius = entity.kind === 'boulder' ? TUNING.boulderRadius : entity.kind === 'urchin' ? TUNING.urchinRadius : 0.55;
-    const tier = lodTier(radius * 1000 / cam.zoom, entity.lodTier as LodTier | undefined);
-    entity.lodTier = tier;
+    if (!visible) continue;
+    if (entity.kind === 'extras' && entity.members) {
+      for (const member of entity.members) {
+        if (member.cut) continue;
+        member.dx += member.vx * dt;
+        member.dz += member.vz * dt;
+        if (member.dx < -1.8 || member.dx > 1.8) member.vx *= -1;
+        if (member.dz < -0.8 || member.dz > 0.8) member.vz *= -1;
+        member.dx = Math.max(-1.8, Math.min(1.8, member.dx));
+        member.dz = Math.max(-0.8, Math.min(0.8, member.dz));
+        if (!inFrame(entity.x + member.dx, entity.z + member.dz, TUNING.extrasMemberRadius, cam.x, cam.z, cam.zoom, cam.yaw, 0.5)) member.cut = true;
+      }
+      if (entity.members.every((member) => member.cut)) {
+        entity.cut = true;
+        state.cuts.push(entity.id);
+        continue;
+      }
+    }
     const close = distance(entity.x, entity.z, talent.x, talent.z) <= radius + TUNING.talentRadii[Math.min(talentTier, 3)];
     if (entity.kind === 'glass' && entity.cut && talent.x >= entity.x - 0.5 && talent.x <= entity.x + 0.5) fail(state, 'fell');
     if (close && ((entity.kind === 'boulder') || (entity.kind === 'urchin' && tier <= 1))) fail(state, 'hit');
@@ -126,6 +169,9 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
       const push = (talent.x - entity.x) >= 0 ? 1 : -1;
       talent.x += push * dt;
     }
+    if (close && entity.kind === 'swarm') fail(state, 'hit');
+    if (close && entity.kind === 'extras' && tier >= 2) fail(state, 'hit');
+    if (entity.kind === 'bridge' && tier >= 2 && talent.x >= entity.x - TUNING.bridgeLength / 2 && talent.x <= entity.x + TUNING.bridgeLength / 2) fail(state, 'fell');
     if (close && entity.kind === 'reel' && talentTier <= 1) {
       entity.cut = true;
       state.cuts.push(entity.id);

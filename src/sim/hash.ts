@@ -5,7 +5,7 @@ export function stateHash(state: SimState): string {
     tick: state.tick,
     camera: [state.camera.x, state.camera.z, state.camera.vx, state.camera.vz, state.camera.zoom, state.camera.yaw, state.camera.yawTarget, state.camera.rotationTicksRemaining].map(q),
     talent: [state.talent.x, state.talent.z, state.talent.offscreenTicks, state.talent.pathIndex, state.talent.lodTier].map((n) => n === undefined ? -1 : q(n)),
-    entities: state.entities.map((e) => [e.id, q(e.x), q(e.z), e.spawned, e.cut, e.age, e.lodTier]),
+    entities: state.entities.map((e) => [e.id, q(e.x), q(e.z), e.spawned, e.cut, e.age, e.lodTier, e.members?.map((member) => [q(member.dx), q(member.dz), q(member.vx), q(member.vz), member.cut])]),
     routeChoices: state.routeChoices,
     consumed: state.consumed,
     film: q(state.film), failed: state.failed, score: state.score, cuts: state.cuts,

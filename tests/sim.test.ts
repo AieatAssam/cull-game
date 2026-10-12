@@ -48,6 +48,17 @@ describe('frame projection and lifecycle', () => {
       expect(JSON.stringify(reloadSet(seed, x, z))).toBe(JSON.stringify(reloadSet(seed, x, z)));
     }));
   });
+  it('generates a deterministic Extras crowd with four to twelve individually tracked members', () => {
+    for (const seed of [1, 17, 2026]) {
+      const first = loadWorld(seed);
+      const second = loadWorld(seed);
+      const crowd = first.find((item) => item.kind === 'extras');
+      expect(first).toEqual(second);
+      expect(crowd?.members?.length).toBeGreaterThanOrEqual(4);
+      expect(crowd?.members?.length).toBeLessThanOrEqual(12);
+      expect(Math.hypot(crowd?.members?.[0]?.vx ?? 0, crowd?.members?.[0]?.vz ?? 0)).toBeCloseTo(0.8, 6);
+    }
+  });
   it('chooses the fork branch that points toward the gate centre', () => {
     const state = createState(1, []);
     state.talent.x = 8; state.talent.pathIndex = 4;
@@ -185,6 +196,89 @@ describe('fixed step simulation and failure rules', () => {
   it('fails at the end of the path (wrapped)', () => {
     const state = createState(1, []); state.talent.x = 160; state.talent.pathIndex = state.path.length - 2;
     expect(step(state).failed).toBe('wrapped');
+  });
+  it('thins an Extras crowd member by member when the frame clips its edges', () => {
+    const state = createState(1, []);
+    state.camera.zoom = 10;
+    const extras = entity(state, 'extras', 5.5);
+    extras.members = [-1.2, 0, 1.8].map((dx) => ({ dx, dz: 0, vx: 0, vz: 0, cut: false }));
+    const next = step(state, { ...NEUTRAL_INPUT, hold: true });
+    expect(next.entities[0]?.members?.map((member) => member.cut)).toEqual([false, true, true]);
+  });
+  it('turns Extras into a wall at wide zoom while close framing leaves walkable gaps', () => {
+    const state = createState(1, []);
+    const extras = entity(state, 'extras' as never, 0.2);
+    extras.members = Array.from({ length: 6 }, (_, i) => ({ dx: (i % 3) * 0.25, dz: (Math.floor(i / 3) - 0.5) * 0.4, vx: 0, vz: 0, cut: false }));
+    state.camera.zoom = 10;
+    expect(step(state, { ...NEUTRAL_INPUT, hold: true }).failed).toBeNull();
+    state.camera.zoom = 48;
+    state.talent.lodTier = 2;
+    expect(step(state, { ...NEUTRAL_INPUT, hold: true }).failed).toBe('hit');
+  });
+  it('size-culls Swarm below four logical pixels without consuming or cutting the cloud', () => {
+    const state = createState(1, []);
+    const swarm = entity(state, 'swarm', 4);
+    swarm.spawned = false;
+    state.camera.zoom = 21;
+    const tooSmall = step(state, { ...NEUTRAL_INPUT, hold: true });
+    expect(tooSmall.entities[0]?.spawned).toBe(false);
+    expect(tooSmall.consumed).toEqual([]);
+    tooSmall.camera.zoom = 18;
+    const visible = step(tooSmall, { ...NEUTRAL_INPUT, hold: true });
+    expect(visible.entities[0]?.spawned).toBe(true);
+    visible.camera.zoom = 48;
+    const hidden = step(visible, { ...NEUTRAL_INPUT, hold: true });
+    expect(hidden.entities[0]?.cut).toBe(false);
+    hidden.camera.zoom = 18;
+    expect(step(hidden, { ...NEUTRAL_INPUT, hold: true }).entities[0]?.cut).toBe(false);
+  });
+  it('keeps visible Swarm lethal at every visible tier', () => {
+    const state = createState(1, []);
+    entity(state, 'swarm', 0.05);
+    state.camera.zoom = 10;
+    expect(step(state, { ...NEUTRAL_INPUT, hold: true }).failed).toBe('hit');
+  });
+  it('moves Stagehand only while the camera is in motion', () => {
+    const state = createState(1, []);
+    const stagehand = entity(state, 'stagehand', 5);
+    let frozen = state;
+    for (let i = 0; i < 12; i++) frozen = step(frozen, { ...NEUTRAL_INPUT, hold: true });
+    expect(frozen.entities[0]?.x).toBe(5);
+    let moving = state;
+    for (let i = 0; i < 12; i++) moving = step(moving, { ...NEUTRAL_INPUT, panX: 127, hold: true });
+    expect(moving.entities[0]?.x).toBeLessThan(stagehand.x);
+  });
+  it('lets a moving Stagehand steal a nearby Reel', () => {
+    const state = createState(1, []);
+    state.entities = [
+      { id: 'stagehand-test', kind: 'stagehand', x: 2.2, z: 0, vx: 0, vz: 0, spawned: true, cut: false, age: 0 },
+      { id: 'reel-test', kind: 'reel', x: 2.4, z: 0, vx: 0, vz: 0, spawned: true, cut: false, age: 0 },
+    ];
+    let moving = state;
+    for (let i = 0; i < 12; i++) moving = step(moving, { ...NEUTRAL_INPUT, panX: 127, hold: true });
+    expect(moving.entities.find((item) => item.kind === 'reel')?.cut).toBe(true);
+    expect(moving.cuts).toContain('reel-test');
+  });
+  it('removes Rope bridge planks at wide zoom and fails on the unsupported span', () => {
+    const state = createState(1, []);
+    entity(state, 'bridge', 0.2);
+    state.camera.zoom = 30;
+    expect(step(state, { ...NEUTRAL_INPUT, hold: true }).failed).toBeNull();
+    state.camera.zoom = 48;
+    expect(step(state, { ...NEUTRAL_INPUT, hold: true }).failed).toBe('fell');
+  });
+  it('collects Reels at Talent Close or Medium tier only', () => {
+    const state = createState(1, []);
+    const reel = entity(state, 'reel', 0.8);
+    state.camera.zoom = 30;
+    const collected = step(state, { ...NEUTRAL_INPUT, hold: true });
+    expect(collected.entities[0]?.cut).toBe(true);
+    expect(collected.film).toBeCloseTo(90 + 15 - 2 / 60);
+    expect(collected.score).toBe(100);
+    state.camera.zoom = 48;
+    state.talent.lodTier = 2;
+    expect(step(state, { ...NEUTRAL_INPUT, hold: true }).entities[0]?.cut).toBe(false);
+    expect(reel.kind).toBe('reel');
   });
   it('preserves projected frame invariants for arbitrary nearby bounds', () => {
     fc.assert(fc.property(fc.double({ min: -10, max: 10, noNaN: true }), fc.double({ min: -10, max: 10, noNaN: true }), (x, z) => {

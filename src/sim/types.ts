@@ -1,4 +1,4 @@
-export type EntityKind = 'urchin' | 'boulder' | 'glass' | 'reel';
+export type EntityKind = 'urchin' | 'boulder' | 'glass' | 'reel' | 'extras' | 'swarm' | 'stagehand' | 'bridge';
 export type FailReason = 'lost-talent' | 'hit' | 'fell' | 'out-of-film' | 'wrapped';
 export interface InputFrame {
   panX: number;
@@ -8,7 +8,8 @@ export interface InputFrame {
   hold: boolean;
   steady: boolean;
 }
-export interface SpawnPoint { id: string; kind: EntityKind; x: number; z: number; vx: number; vz: number; }
+export interface CrowdMember { dx: number; dz: number; vx: number; vz: number; cut: boolean; }
+export interface SpawnPoint { id: string; kind: EntityKind; x: number; z: number; vx: number; vz: number; members?: CrowdMember[]; }
 export interface CastEntity extends SpawnPoint { spawned: boolean; cut: boolean; age: number; lodTier?: 0 | 1 | 2 | 3 | 4; }
 export interface Talent { x: number; z: number; offscreenTicks: number; pathIndex: number; lodTier?: 0 | 1 | 2 | 3; }
 export interface PathFork { at: number; options: Array<{ x: number; z: number }>; }

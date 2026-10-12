@@ -31,6 +31,8 @@ export const TUNING = {
   boulderSpeed: 4,
   boulderRadius: 0.8,
   extrasSpeed: 0.8,
+  extrasMemberRadius: 0.18,
+  extrasRadius: 2,
   swarmRadius: 0.08,
   stagehandSpeed: 3,
   rumourGrowRate: 0.3,

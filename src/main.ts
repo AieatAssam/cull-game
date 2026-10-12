@@ -8,7 +8,7 @@ import { lodTier } from './sim/lod';
 import { TUNING } from './sim/tuning';
 import { createState } from './sim/world';
 import { UrchinLodBuckets } from './render/lod-buckets';
-import type { InputFrame, SimState } from './sim/types';
+import type { CastEntity, InputFrame, SimState } from './sim/types';
 
 const app = document.querySelector<HTMLElement>('#app');
 if (!app) throw new Error('Missing app root');
@@ -94,7 +94,8 @@ function syncTalentLod() {
 }
 
 const entityMeshes = new Map<string, THREE.Object3D>();
-function buildEntity(kind: string) {
+function buildEntity(entity: CastEntity) {
+  const kind = entity.kind;
   const group = new THREE.Group();
   let material: THREE.Material;
   if (kind === 'glass') {
@@ -121,6 +122,29 @@ function buildEntity(kind: string) {
   } else if (kind === 'boulder') {
     material = new THREE.MeshLambertMaterial({ color: '#ff4b3e', flatShading: true });
     group.add(new THREE.Mesh(new THREE.DodecahedronGeometry(0.72, 0), material));
+  } else if (kind === 'extras') {
+    const crowd = new THREE.InstancedMesh(new THREE.ConeGeometry(0.16, 0.48, 4), new THREE.MeshLambertMaterial({ color: '#9b6041', flatShading: true }), Math.max(12, entity.members?.length ?? 0));
+    crowd.name = 'extras-crowd'; crowd.count = 0; group.add(crowd);
+    const wall = new THREE.Mesh(new THREE.BoxGeometry(4, 1.2, 0.45), new THREE.MeshLambertMaterial({ color: '#9b6041', flatShading: true }));
+    wall.name = 'extras-wall'; wall.position.y = 0.6; wall.visible = false; group.add(wall);
+  } else if (kind === 'swarm') {
+    const swarm = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.08, 0), new THREE.MeshBasicMaterial({ color: '#ff4b3e' }), 12);
+    swarm.name = 'swarm-cloud'; swarm.count = 0; group.add(swarm);
+  } else if (kind === 'stagehand') {
+    material = new THREE.MeshLambertMaterial({ color: '#232323', flatShading: true });
+    const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.24, 0.42, 3, 5), material);
+    body.position.y = 0.45; group.add(body);
+  } else if (kind === 'bridge') {
+    const planks = new THREE.InstancedMesh(new THREE.BoxGeometry(0.48, 0.1, 1.8), new THREE.MeshLambertMaterial({ color: '#8d6040', flatShading: true }), 28);
+    planks.name = 'bridge-planks'; planks.count = 28;
+    for (let i = 0; i < 28; i++) {
+      const matrix = new THREE.Matrix4().makeTranslation(-6.75 + i * 0.5, 0, 0);
+      planks.setMatrixAt(i, matrix);
+    }
+    group.add(planks);
+    const ropePoints = [new THREE.Vector3(-7, 0.5, -0.8), new THREE.Vector3(7, 0.5, -0.8), new THREE.Vector3(-7, 0.5, 0.8), new THREE.Vector3(7, 0.5, 0.8)];
+    const ropes = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(ropePoints), new THREE.LineBasicMaterial({ color: '#554332' }));
+    ropes.name = 'bridge-ropes'; group.add(ropes);
   } else {
     material = new THREE.MeshLambertMaterial({ color: '#3fd8ff', flatShading: true });
     group.add(new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.42, 0.7, 8), material));
@@ -132,9 +156,36 @@ function syncEntities() {
     if (entity.kind === 'urchin') continue;
     if (entity.cut || !entity.spawned) continue;
     let object = entityMeshes.get(entity.id);
-    if (!object) { object = buildEntity(entity.kind); entityMeshes.set(entity.id, object); scene.add(object); }
+    if (!object) { object = buildEntity(entity); entityMeshes.set(entity.id, object); scene.add(object); }
     object.position.set(entity.x, entity.kind === 'glass' ? 0 : entity.kind === 'boulder' ? 0.72 : 0.68, entity.z);
     object.rotation.y = entity.age * 0.015;
+    if (entity.kind === 'extras') {
+      const crowd = object.getObjectByName('extras-crowd') as THREE.InstancedMesh;
+      const wall = object.getObjectByName('extras-wall')!;
+      const tier = lodTier(1000 / state.camera.zoom, entity.lodTier as 0 | 1 | 2 | 3 | 4 | undefined);
+      let count = 0;
+      for (const member of entity.members ?? []) {
+        if (member.cut || tier >= 2) continue;
+        const matrix = new THREE.Matrix4().makeTranslation(member.dx, 0.3, member.dz);
+        crowd.setMatrixAt(count++, matrix);
+      }
+      crowd.count = count; crowd.instanceMatrix.needsUpdate = true; wall.visible = tier >= 2;
+    }
+    if (entity.kind === 'swarm') {
+      const swarm = object.getObjectByName('swarm-cloud') as THREE.InstancedMesh;
+      const tier = lodTier(TUNING.swarmRadius * 1000 / state.camera.zoom, entity.lodTier as 0 | 1 | 2 | 3 | 4 | undefined);
+      object.visible = tier < 4; swarm.count = tier < 4 ? 12 : 0;
+      for (let i = 0; i < swarm.count; i++) {
+        const angle = i * Math.PI * 2 / 12;
+        swarm.setMatrixAt(i, new THREE.Matrix4().makeTranslation(Math.cos(angle) * 0.55, 0.35 + Math.sin(i * 1.7) * 0.16, Math.sin(angle) * 0.55));
+      }
+      swarm.instanceMatrix.needsUpdate = true;
+    }
+    if (entity.kind === 'bridge') {
+      const planks = object.getObjectByName('bridge-planks')!;
+      const tier = lodTier(1000 / state.camera.zoom, entity.lodTier as 0 | 1 | 2 | 3 | 4 | undefined);
+      planks.visible = tier <= 1;
+    }
     object.visible = true;
   }
   for (const [id, object] of entityMeshes) {
@@ -256,7 +307,7 @@ $('#pause').addEventListener('click', () => { paused = !paused; });
 $('#restart').addEventListener('click', () => { state = createState(state.seed + 1); entityMeshes.clear(); urchinBuckets.reset(); for (const child of [...scene.children]) if (child instanceof THREE.Group && child !== talent) scene.remove(child); $('#end-card').classList.add('hidden'); });
 
 if (query.has('debug')) {
-  Object.assign(window, { __cull: { step: (n = 1) => { for (let i = 0; i < n; i++) advanceTick(); render(); }, input: (input: InputFrame) => { frameInput = input; }, hash: () => stateHash(state), state: () => structuredClone(state), diagnostics: () => ({ paused, keys: [...keys], hidden: document.hidden, focused: document.hasFocus() }), performance: () => ({ drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles }), lod: () => urchinBuckets.diagnostics(), load: (seed: number) => { state = createState(seed); urchinBuckets.reset(); }, loadLodDemo: () => { state = createState(1, [{ id: 'lod-demo-urchin', kind: 'urchin', x: 0, z: 2, vx: 0, vz: 0, spawned: true, cut: false, age: 0 }]); state.talent.x = -4; render(); }, setTier: (tier: number) => { const size = [64, 36, 17, 7, 2][tier] ?? 36; state.camera.zoom = TUNING.urchinRadius * 1000 / size; } } });
+  Object.assign(window, { __cull: { step: (n = 1) => { for (let i = 0; i < n; i++) advanceTick(); render(); }, input: (input: InputFrame) => { frameInput = input; }, hash: () => stateHash(state), state: () => structuredClone(state), diagnostics: () => ({ paused, keys: [...keys], hidden: document.hidden, focused: document.hasFocus() }), performance: () => ({ drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles }), lod: () => urchinBuckets.diagnostics(), load: (seed: number) => { state = createState(seed); urchinBuckets.reset(); }, loadLodDemo: () => { state = createState(1, [{ id: 'lod-demo-urchin', kind: 'urchin', x: 0, z: 2, vx: 0, vz: 0, spawned: true, cut: false, age: 0 }]); state.talent.x = -4; render(); }, setTier: (tier: number) => { const size = [64, 36, 17, 7, 2][tier] ?? 36; state.camera.zoom = TUNING.urchinRadius * 1000 / size; }, setCamera: (x: number, z: number, zoom: number) => { state.camera.x = x; state.camera.z = z; state.camera.zoom = zoom; } } });
 }
 
 new ResizeObserver(() => {

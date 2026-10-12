@@ -4,17 +4,28 @@ import { TUNING } from './tuning';
 
 export function spawnPoints(seed: number, strip = 0): SpawnPoint[] {
   const offset = strip * 48;
-  const kinds: EntityKind[] = ['urchin', 'boulder', 'glass', 'reel'];
+  const kinds: EntityKind[] = ['urchin', 'boulder', 'glass', 'reel', 'extras', 'swarm', 'stagehand', 'bridge'];
   return kinds.map((kind, i) => {
     const index = offset + i;
-    const x = kind === 'glass' ? 8 + strip * 16 : seededRange(seed, index, 5, 14) + strip * 16;
-    const z = kind === 'glass' ? 0 : seededRange(seed ^ 0xabc, index, -3, 3);
-    return { id: `${strip}-${kind}-${i}`, kind, x, z, vx: kind === 'boulder' ? -4 : kind === 'urchin' ? -1.5 : 0, vz: 0 };
+    const x = kind === 'glass' || kind === 'bridge' ? 8 + strip * 16 : seededRange(seed, index, 5, 14) + strip * 16;
+    const z = kind === 'glass' || kind === 'bridge' ? 0 : seededRange(seed ^ 0xabc, index, -3, 3);
+    const members = kind === 'extras'
+      ? Array.from({ length: 4 + Math.floor(seededRange(seed, index + 1024, 0, 9)) }, (_, member) => {
+          const memberIndex = index * 16 + member;
+          const dx = seededRange(seed, memberIndex, -1.8, 1.8);
+          const dz = seededRange(seed ^ 0x51a7, memberIndex, -0.8, 0.8);
+          const vx = seededRange(seed ^ 0x919, memberIndex, -1, 1);
+          const vz = seededRange(seed ^ 0x712, memberIndex, -1, 1);
+          const speed = Math.hypot(vx, vz) || 1;
+          return { dx, dz, vx: vx / speed * TUNING.extrasSpeed, vz: vz / speed * TUNING.extrasSpeed, cut: false };
+        })
+      : undefined;
+    return { id: `${strip}-${kind}-${i}`, kind, x, z, vx: kind === 'boulder' ? -4 : kind === 'urchin' ? -1.5 : 0, vz: 0, ...(members ? { members } : {}) };
   });
 }
 
 export function loadWorld(seed: number, strip = 0): CastEntity[] {
-  return spawnPoints(seed, strip).map((point) => ({ ...point, spawned: false, cut: false, age: 0 }));
+  return spawnPoints(seed, strip).map((point) => ({ ...point, members: point.members?.map((member) => ({ ...member })), spawned: false, cut: false, age: 0 }));
 }
 
 export function loadScene(seed: number, stripCount = 10): CastEntity[] {
