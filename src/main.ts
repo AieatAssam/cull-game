@@ -7,6 +7,7 @@ import { NEUTRAL_INPUT, step } from './sim/step';
 import { lodTier } from './sim/lod';
 import { TUNING } from './sim/tuning';
 import { createState } from './sim/world';
+import { UrchinLodBuckets } from './render/lod-buckets';
 import type { InputFrame, SimState } from './sim/types';
 
 const app = document.querySelector<HTMLElement>('#app');
@@ -55,6 +56,7 @@ scene.add(new THREE.HemisphereLight('#fff9ec', '#716a60', 2.1));
 const keyLight = new THREE.DirectionalLight('#fffaf2', 1.2);
 keyLight.position.set(-8, 14, 9);
 scene.add(keyLight);
+const urchinBuckets = new UrchinLodBuckets(scene);
 
 const floor = new THREE.Mesh(new THREE.PlaneGeometry(400, 30), new THREE.MeshLambertMaterial({ color: '#b9ad98' }));
 floor.rotation.x = -Math.PI / 2;
@@ -68,13 +70,28 @@ path.position.y = 0.01;
 scene.add(path);
 
 const talent = new THREE.Group();
-const coat = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.36, 0.8, 6), new THREE.MeshLambertMaterial({ color: '#d23a2a', flatShading: true }));
+const talentGeometry = [
+  new THREE.CylinderGeometry(0.24, 0.36, 0.8, 7),
+  new THREE.CylinderGeometry(0.24, 0.36, 0.8, 5),
+  new THREE.OctahedronGeometry(0.65, 0),
+  new THREE.BoxGeometry(0.9, 0.9, 0.9),
+];
+const coat = new THREE.Mesh(talentGeometry[1], new THREE.MeshLambertMaterial({ color: '#d23a2a', flatShading: true }));
 coat.position.y = 0.5;
 talent.add(coat);
 const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 8, 6), new THREE.MeshLambertMaterial({ color: '#dfc3a1', flatShading: true }));
 head.position.y = 1.05;
 talent.add(head);
 scene.add(talent);
+let renderedTalentTier = -1;
+function syncTalentLod() {
+  const tier = state.talent.lodTier ?? Math.min(lodTier(1000 / state.camera.zoom), 3);
+  if (tier === renderedTalentTier) return;
+  renderedTalentTier = tier;
+  talent.visible = tier < 4;
+  if (tier < 4) coat.geometry = talentGeometry[tier]!;
+  head.visible = tier <= 1;
+}
 
 const entityMeshes = new Map<string, THREE.Object3D>();
 function buildEntity(kind: string) {
@@ -112,28 +129,19 @@ function buildEntity(kind: string) {
 }
 function syncEntities() {
   for (const entity of state.entities) {
+    if (entity.kind === 'urchin') continue;
     if (entity.cut || !entity.spawned) continue;
     let object = entityMeshes.get(entity.id);
     if (!object) { object = buildEntity(entity.kind); entityMeshes.set(entity.id, object); scene.add(object); }
     object.position.set(entity.x, entity.kind === 'glass' ? 0 : entity.kind === 'boulder' ? 0.72 : 0.68, entity.z);
     object.rotation.y = entity.age * 0.015;
-    if (entity.kind === 'urchin') {
-      const tier = lodTier(TUNING.urchinRadius * 1000 / state.camera.zoom);
-      const core = object.getObjectByName('urchin-core') as THREE.Mesh;
-      const detailKey = tier <= 1 ? 'spiked' : tier === 2 ? 'wide' : 'proxy';
-      if (object.userData.detail !== detailKey) {
-        object.userData.detail = detailKey;
-        core.geometry = tier <= 1 ? new THREE.IcosahedronGeometry(0.62, 0) : tier === 2 ? new THREE.OctahedronGeometry(0.62, 0) : new THREE.BoxGeometry(0.9, 0.9, 0.9);
-        for (const child of object.children) if (child.name === 'urchin-spike') child.visible = tier <= 1;
-        $('#message').textContent = tier <= 1 ? 'CLOSE-UP · FULL THREAT' : tier === 2 ? 'WIDE · urchin defanged' : 'PROXY · harmless cube';
-      }
-    }
     object.visible = true;
   }
   for (const [id, object] of entityMeshes) {
     const found = state.entities.find((entity) => entity.id === id);
     if (!found || found.cut) object.visible = false;
   }
+  urchinBuckets.update(state.entities, state.camera.zoom, state.tick);
 }
 
 function syncCamera() {
@@ -141,6 +149,7 @@ function syncCamera() {
 }
 function render() {
   syncCamera();
+  syncTalentLod();
   talent.position.set(state.talent.x, 0, state.talent.z);
   syncEntities();
   renderer.render(scene, camera);
@@ -152,13 +161,14 @@ function updateHud() {
   $('#film').textContent = `${seconds} s`;
   $('#filmbar').style.width = `${Math.max(0, state.film / 90 * 100)}%`;
   $('#filmbar').style.background = state.film < 20 ? '#ff4b3e' : '#ff7a1a';
-  $('#lens').textContent = `${Math.round(85 - (state.camera.zoom - 10) * 61 / 38)} MM`;
+  $('#lens').textContent = `${Math.round(Math.max(24, Math.min(85, 85 - (state.camera.zoom - 10) * 61 / 38)))} MM`;
   $('#status').textContent = state.waiting ? 'HOLDING FOR SET…' : paused ? 'PAUSED' : state.camera.moving ? 'IN MOTION' : 'ROLLING';
-  const tierIndex = lodTier(1000 / state.camera.zoom);
+  const tierIndex = state.talent.lodTier ?? lodTier(1000 / state.camera.zoom);
   const tier = ['CLOSE', 'MEDIUM', 'WIDE', 'PROXY', 'SUB-PIXEL'][tierIndex];
-  const urchinTier = lodTier(TUNING.urchinRadius * 1000 / state.camera.zoom);
+  const urchin = state.entities.find((entity) => entity.kind === 'urchin' && entity.spawned && !entity.cut);
+  const urchinTier = urchin?.lodTier ?? lodTier(TUNING.urchinRadius * 1000 / state.camera.zoom);
   $('#lod').textContent = `TALENT · ${tier} / URCHIN · ${['CLOSE', 'MEDIUM', 'WIDE', 'PROXY', 'GONE'][urchinTier]}`;
-  const urchinInShot = state.entities.some((entity) => entity.kind === 'urchin' && entity.spawned && !entity.cut && inFrame(entity.x, entity.z, TUNING.urchinRadius, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, 0.8));
+  const urchinInShot = state.entities.some((entity) => entity.kind === 'urchin' && entity.spawned && !entity.cut && inFrame(entity.x, entity.z, TUNING.urchinRadius, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, 0.8) && urchinTier < 4);
   $('#message').textContent = urchinInShot ? ['CLOSE-UP · FULL THREAT', 'MEDIUM · lethal', 'WIDE · urchin defanged', 'PROXY · harmless cube', 'SUB-PIXEL · gone'][urchinTier] : 'KEEP THEM IN THE SHOT';
   ($('#zoom-slider') as HTMLInputElement).value = String(Math.round(state.camera.zoom));
   $('#call-sheet').textContent = state.entities.filter((entity) => !entity.spawned && !entity.cut && Math.abs(entity.x - state.camera.x) < state.camera.zoom * (0.5 + TUNING.callSheetMargin)).map((entity) => `${entity.kind.toUpperCase()} · PREVIEW`).join(' / ') || 'NO CAST IN FRAME';
@@ -243,10 +253,10 @@ $('#zoom-slider').addEventListener('input', (event) => {
   state.camera.zoom = value;
 });
 $('#pause').addEventListener('click', () => { paused = !paused; });
-$('#restart').addEventListener('click', () => { state = createState(state.seed + 1); entityMeshes.clear(); for (const child of [...scene.children]) if (child instanceof THREE.Group && child !== talent) scene.remove(child); $('#end-card').classList.add('hidden'); });
+$('#restart').addEventListener('click', () => { state = createState(state.seed + 1); entityMeshes.clear(); urchinBuckets.reset(); for (const child of [...scene.children]) if (child instanceof THREE.Group && child !== talent) scene.remove(child); $('#end-card').classList.add('hidden'); });
 
 if (query.has('debug')) {
-  Object.assign(window, { __cull: { step: (n = 1) => { for (let i = 0; i < n; i++) advanceTick(); render(); }, input: (input: InputFrame) => { frameInput = input; }, hash: () => stateHash(state), state: () => structuredClone(state), diagnostics: () => ({ paused, keys: [...keys], hidden: document.hidden, focused: document.hasFocus() }), performance: () => ({ drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles }), load: (seed: number) => { state = createState(seed); }, setTier: (tier: number) => { state.camera.zoom = [10, 20, 34, 48][tier] ?? 30; } } });
+  Object.assign(window, { __cull: { step: (n = 1) => { for (let i = 0; i < n; i++) advanceTick(); render(); }, input: (input: InputFrame) => { frameInput = input; }, hash: () => stateHash(state), state: () => structuredClone(state), diagnostics: () => ({ paused, keys: [...keys], hidden: document.hidden, focused: document.hasFocus() }), performance: () => ({ drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles }), lod: () => urchinBuckets.diagnostics(), load: (seed: number) => { state = createState(seed); urchinBuckets.reset(); }, loadLodDemo: () => { state = createState(1, [{ id: 'lod-demo-urchin', kind: 'urchin', x: 0, z: 2, vx: 0, vz: 0, spawned: true, cut: false, age: 0 }]); state.talent.x = -4; render(); }, setTier: (tier: number) => { const size = [64, 36, 17, 7, 2][tier] ?? 36; state.camera.zoom = TUNING.urchinRadius * 1000 / size; } } });
 }
 
 new ResizeObserver(() => {

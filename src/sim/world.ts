@@ -29,7 +29,7 @@ export function createState(seed: number, entities = loadScene(seed)): SimState 
   return {
     seed: seed >>> 0, tick: 0,
     camera: { x: 0, z: 0, vx: 0, vz: 0, zoom: TUNING.startZoom, yaw: 0, yawTarget: 0, rotationTicksRemaining: 0, moving: false },
-    talent: { x: 0, z: 0, offscreenTicks: 0, pathIndex: 0 },
+    talent: { x: 0, z: 0, offscreenTicks: 0, pathIndex: 0, lodTier: 1 },
     path: Array.from({ length: 81 }, (_, i) => ({ x: i * 2, z: 0 })),
     forks: Array.from({ length: 7 }, (_, i) => {
       const at = 4 + i * 10;

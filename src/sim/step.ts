@@ -1,5 +1,5 @@
 import { inFrame } from './frame';
-import { lodTier } from './lod';
+import { lodTier, type LodTier } from './lod';
 import { TUNING } from './tuning';
 import type { CastEntity, FailReason, InputFrame, SimState } from './types';
 
@@ -82,7 +82,8 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
     if (direction < 0) { headingX = Math.abs(headingX); headingZ = Math.abs(headingZ); }
   }
   const headingLength = Math.hypot(headingX, headingZ) || 1;
-  const talentTier = lodTier(1000 / cam.zoom);
+  const talentTier = lodTier(1000 / cam.zoom, talent.lodTier);
+  talent.lodTier = Math.min(talentTier, 3) as 0 | 1 | 2 | 3;
   const talentSpeed = TUNING.talentSpeeds[Math.min(talentTier, 3)];
   const stopped = input.hold || !next || distance(talent.x, talent.z, next.x, next.z) < 0.02;
   state.waiting = !next;
@@ -116,7 +117,8 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
       continue;
     }
     const radius = entity.kind === 'boulder' ? TUNING.boulderRadius : entity.kind === 'urchin' ? TUNING.urchinRadius : 0.55;
-    const tier = lodTier(radius * 1000 / cam.zoom);
+    const tier = lodTier(radius * 1000 / cam.zoom, entity.lodTier as LodTier | undefined);
+    entity.lodTier = tier;
     const close = distance(entity.x, entity.z, talent.x, talent.z) <= radius + TUNING.talentRadii[Math.min(talentTier, 3)];
     if (entity.kind === 'glass' && entity.cut && talent.x >= entity.x - 0.5 && talent.x <= entity.x + 0.5) fail(state, 'fell');
     if (close && ((entity.kind === 'boulder') || (entity.kind === 'urchin' && tier <= 1))) fail(state, 'hit');

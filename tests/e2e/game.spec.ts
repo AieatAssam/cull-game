@@ -1,9 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
 
-interface DebugState { camera: { x: number; zoom: number }; }
-interface RenderMetrics { drawCalls: number; triangles: number; }
-declare global { interface Window { __cull: { state: () => DebugState; step: (ticks?: number) => void; performance: () => RenderMetrics; setTier: (tier: number) => void }; } }
 async function debugState(page: Page) {
   return page.evaluate(() => window.__cull.state());
 }

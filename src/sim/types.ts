@@ -9,8 +9,8 @@ export interface InputFrame {
   steady: boolean;
 }
 export interface SpawnPoint { id: string; kind: EntityKind; x: number; z: number; vx: number; vz: number; }
-export interface CastEntity extends SpawnPoint { spawned: boolean; cut: boolean; age: number; }
-export interface Talent { x: number; z: number; offscreenTicks: number; pathIndex: number; }
+export interface CastEntity extends SpawnPoint { spawned: boolean; cut: boolean; age: number; lodTier?: 0 | 1 | 2 | 3 | 4; }
+export interface Talent { x: number; z: number; offscreenTicks: number; pathIndex: number; lodTier?: 0 | 1 | 2 | 3; }
 export interface PathFork { at: number; options: Array<{ x: number; z: number }>; }
 export interface SimState {
   seed: number;

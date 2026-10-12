@@ -71,6 +71,41 @@ describe('frame projection and lifecycle', () => {
     expect(lodTier(42, 1)).toBe(1);
     expect(lodTier(19, 1)).toBe(2);
   });
+  it('limits tier changes to two while zoom oscillates across a boundary', () => {
+    let tier = lodTier(25);
+    const changes: number[] = [];
+    for (const size of Array.from({ length: 600 }, (_, i) => 24 + Math.sin(i * Math.PI / 30) * 2)) {
+      const next = lodTier(size, tier);
+      if (next !== tier) changes.push(next);
+      tier = next;
+    }
+    expect(changes.length).toBeLessThanOrEqual(2);
+  });
+  it('keeps Talent tier and speed stable while zoom oscillates inside hysteresis', () => {
+    let state = createState(1, []);
+    const tiers = new Set<number>();
+    for (const zoom of Array.from({ length: 120 }, (_, i) => 1000 / (24 + Math.sin(i * Math.PI / 20) * 2))) {
+      state.camera.zoom = zoom;
+      state = step(state, { ...NEUTRAL_INPUT, hold: true });
+      tiers.add(state.talent.lodTier ?? -1);
+    }
+    expect(tiers.size).toBe(1);
+  });
+  it('keeps an Urchin to at most two tier flips during ten seconds of oscillating zoom', () => {
+    let state = createState(1, []);
+    state.entities = [{ id: 'oscillating-urchin', kind: 'urchin', x: 0, z: 4, vx: 0, vz: 0, spawned: true, cut: false, age: 0 }];
+    let previousTier: number | undefined;
+    let flips = 0;
+    for (let tick = 0; tick < 600; tick++) {
+      const screenSize = 24 + Math.sin(tick * Math.PI / 30) * 2;
+      state.camera.zoom = 700 / screenSize;
+      state = step(state, { ...NEUTRAL_INPUT, hold: true });
+      const tier = state.entities[0]?.lodTier;
+      if (previousTier !== undefined && tier !== previousTier) flips++;
+      previousTier = tier;
+    }
+    expect(flips).toBeLessThanOrEqual(2);
+  });
   it('consumes each spawn once and preserves seeded spawns', () => {
     expect(loadWorld(17)).toEqual(loadWorld(17));
     fc.assert(fc.property(fc.integer(), (seed) => {
