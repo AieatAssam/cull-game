@@ -15,7 +15,8 @@
     "validate:m5": "tsx src/bots/m5-validation.ts",
     "validate:m6": "tsx src/bots/m6-validation.ts",
     "balance": "tsx src/bots/balance.ts",
-    "size": "size-limit"
+    "size": "size-limit",
+    "silhouettes": "node scripts/silhouettes.mjs"
   },
   "dependencies": {
     "three": "0.174.0"

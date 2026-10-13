@@ -22,7 +22,8 @@ Performance: M2 recorded 0.75 ms p95; repeated M3/M4 Node runs measured 1.43–1
 
 M9 verification: codec/unit coverage includes deterministic round-trip, malformed and oversized payload rejection, grade metric boundaries, grade-based stock unlocks, lens feat thresholds, each lens rule boundary, replay lens identity, deterministic replay-frame selection, and malformed stored facts. Playwright verifies anamorphic gate geometry, v2 replay round-trip, and next-run Long Lens selection; other checks cover daily seed, history/grade persistence, share URL/PNG dimensions, settings, and reduced motion. Contact sheets contain nine panels and re-render the selected opening/close-call/thirds/fatal/run states from simulation snapshots. M10 physical human checks are still pending.
 
-Next step: re-run the M6 full-Shoot duration gate on the new default flow, then complete physical phone/weak-GPU play sign-off. The Dailies look, shot list, and M5 bot gates are in. Human play sign-off is still open.
+Bible M4 (set dressing, render only): the path is a rounded hand-cut felt strip, each scene has its own dressing, and the floor textures are cork, felt and paper. Hazard silhouettes are checked by `npm run silhouettes`. Simulation hashes and bot metrics are unchanged. Night Shoot shows practical pools, a wet sheen and a moonlight rim; the exposure rule is still bible M10.
+
 
 ## Bible M1: balance harness baseline (Stage 0)
 

@@ -14,6 +14,8 @@ import { inputForBot, type BotKind } from './bots/players';
 import { mulberry32 } from './sim/rng';
 import { UrchinLodBuckets } from './render/lod-buckets';
 import { createDailiesCast, SCENE_LOOKS } from './render/dailies';
+import { measureSilhouettes } from './render/silhouettes';
+import { PATH_RISE, SPRITE_SIZE, createSetDressing, createTableTextures, raisedPathGeometry } from './render/set-dressing';
 import { DPR_SCALES, nextDprTier } from './render/adaptive-dpr';
 import { AudioDirector, type AudioSettings } from './audio/director';
 import { dailySeed } from './meta/daily';
@@ -108,7 +110,7 @@ shell.className = 'stage';
 shell.innerHTML = `
   <header class="topbar"><div class="brand"><span class="rec-dot"></span><strong>CULL</strong><span class="tagline">CAMERA DEPARTMENT</span></div><label class="stock-control">STOCK <select id="film-stock" aria-label="Film stock"><option value="clean">35 MM · CLEAN</option><option value="kodachrome">KODACHROME · B</option><option value="bleach">BLEACH BYPASS · A</option><option value="ilford">ILFORD B&W · S</option></select></label><details class="sound-settings" id="sound-settings"><summary>SOUND</summary><div class="sound-panel"><label>MASTER <input id="volume-master" aria-label="Master volume" type="range" min="0" max="100" value="100" /></label><label>MUSIC <input id="volume-music" aria-label="Music volume" type="range" min="0" max="100" value="80" /></label><label>EFFECTS <input id="volume-sfx" aria-label="Effects volume" type="range" min="0" max="100" value="80" /></label><label><input id="mono-audio" type="checkbox" /> MONO</label><label><input id="calm-audio" type="checkbox" /> CALM MIX</label></div></details><div class="readout"><a class="daily-link" href="?daily=1">DAILY</a><span>TAKE 01</span><b id="timecode">01:30</b><span id="lens">35 MM</span><button class="pause-button" id="pause" aria-label="Pause game">Ⅱ</button></div></header>
   <div class="composition"><aside class="margin margin-left"><div class="slate">SCENE 01<br><strong>BACKLOT</strong><small>SEED <span id="seed">00001</span></small><small id="best">BEST —</small></div><div class="hint"><span class="hint-mark">↖</span> WASD / DRAG<br>TO FRAME THE SHOT<div class="preview" id="preview"></div></div></aside>
-    <div class="gate-wrap"><div class="gate-label"><span id="gate-ratio">VIEWFINDER · GATE 1:1</span><span id="lod">SHE IS IN A MEDIUM SHOT</span></div><div class="gate" id="gate"><div class="thirds"></div><div class="focus-band" id="focus-band" hidden></div><div class="gate-corners"></div><div class="sprockets left"></div><div class="sprockets right"></div><div id="mount" class="mount"></div><div class="frame-message" id="message">Keep her in the shot.</div><p class="coach hidden" id="coach"></p><div class="title-card hidden" id="title-card"><p class="title-kicker">SCENE 01 · TAKE 01</p><h1>CULL</h1><p>Nothing exists unless it is in the shot. You hold the camera. She walks.</p></div><div class="cut-flash" id="cut-flash"></div><div class="slice" id="slice"></div><div class="peel" id="peel"></div><div class="cut-stamp" id="cut-stamp">CUT</div><i class="spark" style="--dx:-18px;--dy:-24px;left:70%;top:40%"></i><i class="spark" style="--dx:16px;--dy:-20px;left:72%;top:46%"></i><i class="spark" style="--dx:8px;--dy:18px;left:68%;top:50%"></i><i class="spark" style="--dx:-22px;--dy:8px;left:74%;top:42%"></i></div><div class="gate-foot"><span>55° TABLETOP</span><span id="status">ROLLING</span></div></div>
+    <div class="gate-wrap"><div class="gate-label"><span id="gate-ratio">VIEWFINDER · GATE 1:1</span><span id="lod">SHE IS IN A MEDIUM SHOT</span></div><div class="gate" id="gate"><div class="thirds"></div><div class="focus-band" id="focus-band" hidden></div><div class="gate-corners"></div><div class="sprockets left"></div><div class="sprockets right"></div><div id="mount" class="mount"></div><div class="depth-blur top"></div><div class="depth-blur bottom"></div><div class="frame-message" id="message">Keep her in the shot.</div><p class="coach hidden" id="coach"></p><div class="title-card hidden" id="title-card"><p class="title-kicker">SCENE 01 · TAKE 01</p><h1>CULL</h1><p>Nothing exists unless it is in the shot. You hold the camera. She walks.</p></div><div class="cut-flash" id="cut-flash"></div><div class="slice" id="slice"></div><div class="peel" id="peel"></div><div class="cut-stamp" id="cut-stamp">CUT</div><i class="spark" style="--dx:-18px;--dy:-24px;left:70%;top:40%"></i><i class="spark" style="--dx:16px;--dy:-20px;left:72%;top:46%"></i><i class="spark" style="--dx:8px;--dy:18px;left:68%;top:50%"></i><i class="spark" style="--dx:-22px;--dy:8px;left:74%;top:42%"></i></div><div class="gate-foot"><span>55° TABLETOP</span><span id="status">ROLLING</span></div></div>
     <aside class="margin margin-right"><div class="camera-mark">Slate<small>CAM 01</small></div><div class="call-sheet"><span>CALL SHEET</span><div id="call-sheet">Looking outside the frame…</div></div></aside>
   </div>
   <footer class="controlbar"><div class="controls"><span><kbd>WASD</kbd> PAN</span><span><kbd>−</kbd> / <kbd>+</kbd> ZOOM</span><span><kbd>SPACE</kbd> HOLD</span><span><kbd>Q</kbd> / <kbd>E</kbd> ROTATE</span></div><div class="mobile-controls"><button id="hold" aria-label="Hold Talent">HOLD</button><label>ZOOM <input id="zoom-slider" aria-label="Zoom" type="range" min="10" max="48" value="30" /></label></div><div class="assist-controls"><button id="left-hand" type="button" aria-pressed="false">LEFT HAND</button><button id="overcrank" type="button" aria-pressed="false">75% SPEED</button></div><div class="film"><span>FILM</span><div class="film-track"><i id="filmbar"></i></div><b id="film">90s</b></div></footer>
@@ -223,11 +225,17 @@ renderer.domElement.setAttribute('tabindex', '0');
 mount.append(renderer.domElement);
 refreshFilmStocks();
 refreshLensSelector();
-const hemi = new THREE.HemisphereLight('#fff1dc', '#8d6b4a', 2.2);
+const hemi = new THREE.HemisphereLight('#fff1dc', '#8d6b4a', 0.7);
 scene.add(hemi);
-const keyLight = new THREE.DirectionalLight('#ffd9a0', 1.35);
-keyLight.position.set(-8, 14, 9);
+const keyLight = new THREE.DirectionalLight('#ffd9a0', 0.45);
+keyLight.position.set(-14, 18, 6);
 scene.add(keyLight);
+const keySpot = new THREE.SpotLight('#ffd9a0', 28, 52, 1.05, 0.88, 1);
+keySpot.position.set(-10, 18, 7);
+scene.add(keySpot, keySpot.target);
+const moon = new THREE.DirectionalLight('#d5e4f5', 0);
+moon.position.set(16, 12, -9);
+scene.add(moon);
 const urchinBuckets = new UrchinLodBuckets(scene, spriteAssets.urchinTiers);
 function displayPoint(x: number, z: number) {
   if (state.lens !== 'fisheye') return { x, z };
@@ -243,14 +251,15 @@ function detailFactor(x: number, z: number) {
   const projected = projectPoint(x, z, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw);
   return lensLodFactor(state.lens, projected.x, projected.y);
 }
-const floorMaterial = new THREE.MeshLambertMaterial({ map: spriteAssets.plywood, color: '#c9a46b' });
+const tableTextures = createTableTextures();
+const floorMaterial = new THREE.MeshPhongMaterial({ map: tableTextures.cork, color: '#c9a46b', emissive: '#000000', shininess: 2, specular: '#000000' });
 const floor = new THREE.Mesh(new THREE.PlaneGeometry(400, 30), floorMaterial);
 floor.rotation.x = -Math.PI / 2;
 floor.position.y = -0.12;
 scene.add(floor);
-const pathMaterial = new THREE.MeshLambertMaterial({ color: '#3f6b4f' });
-const path = new THREE.Mesh(new THREE.BoxGeometry(400, 0.05, 2), pathMaterial);
-path.position.y = 0.01;
+const pathMaterial = new THREE.MeshLambertMaterial({ map: tableTextures.felt, color: '#3f6b4f' });
+const path = new THREE.Mesh(new THREE.BoxGeometry(400, PATH_RISE, 2.4), pathMaterial);
+path.position.y = PATH_RISE / 2;
 scene.add(path);
 const terrainGroup = new THREE.Group();
 scene.add(terrainGroup);
@@ -265,29 +274,48 @@ function syncTerrain() {
   terrainTiles = state.tiles;
   renderedLook = lookIndex;
   const look = SCENE_LOOKS[Math.min(lookIndex, SCENE_LOOKS.length - 1)]!;
-  for (const child of [...terrainGroup.children]) {
-    terrainGroup.remove(child);
-    if (child instanceof THREE.Mesh || child instanceof THREE.InstancedMesh) {
+  const disposeObject = (child: THREE.Object3D) => {
+    if (child instanceof THREE.Mesh) {
       child.geometry.dispose();
       const materials = Array.isArray(child.material) ? child.material : [child.material];
       materials.forEach((material) => material.dispose());
     }
+    child.children.forEach(disposeObject);
+  };
+  for (const child of [...terrainGroup.children]) {
+    terrainGroup.remove(child);
+    disposeObject(child);
   }
-  for (const kind of ['path', 'set'] as const) {
-    const tiles = state.tiles.filter((tile) => tile.kind === kind);
-    if (!tiles.length) continue;
-    const isPath = kind === 'path';
-    const mesh = new THREE.InstancedMesh(
-      new THREE.BoxGeometry(isPath ? 1 : 0.72, isPath ? 0.08 : 1.15, isPath ? 1 : 0.72),
-      new THREE.MeshLambertMaterial({ color: isPath ? look.path : look.block }),
-      tiles.length,
+  const pathTiles = state.tiles.filter((tile) => tile.kind === 'path');
+  const setTiles = state.tiles.filter((tile) => tile.kind === 'set');
+  if (pathTiles.length) {
+    const night = lookIndex === 2;
+    const mesh = new THREE.Mesh(
+      raisedPathGeometry(pathTiles),
+      night
+        ? new THREE.MeshPhongMaterial({
+          map: tableTextures.felt, color: look.path, vertexColors: true, side: THREE.DoubleSide,
+          emissive: '#3a2a16', shininess: 26, specular: '#9bb4d0',
+        })
+        : new THREE.MeshLambertMaterial({
+          map: lookIndex === 1 ? tableTextures.paper : tableTextures.felt,
+          color: look.path, vertexColors: true, side: THREE.DoubleSide,
+        }),
     );
-    tiles.forEach((tile, index) => mesh.setMatrixAt(index, new THREE.Matrix4().makeTranslation(tile.x, isPath ? -0.02 : 0.55, tile.z)));
-    mesh.instanceMatrix.needsUpdate = true;
+    mesh.name = 'felt-path';
     terrainGroup.add(mesh);
   }
+  terrainGroup.add(createSetDressing(lookIndex, pathTiles, setTiles, tableTextures));
 }
 
+const castShadows = new THREE.InstancedMesh(
+  new THREE.PlaneGeometry(1, 1),
+  new THREE.MeshBasicMaterial({ map: tableTextures.shadow, transparent: true, depthWrite: false }),
+  512,
+);
+castShadows.frustumCulled = false;
+castShadows.renderOrder = 2;
+scene.add(castShadows);
 const talent = new THREE.Group();
 const talentSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: spriteAssets.walk[0], transparent: true, alphaTest: 0.04, depthWrite: false }));
 talentSprite.center.set(0.5, 0);
@@ -338,10 +366,10 @@ function buildEntity(entity: CastEntity) {
   const group = new THREE.Group();
   let material: THREE.Material;
   if (kind === 'glass') {
-    const glass = new THREE.Mesh(new THREE.PlaneGeometry(1.54, 1.54), new THREE.MeshBasicMaterial({
+    const glass = new THREE.Mesh(new THREE.PlaneGeometry(SPRITE_SIZE.glass[0], SPRITE_SIZE.glass[1]), new THREE.MeshBasicMaterial({
       map: spriteAssets.glass, transparent: true, alphaTest: 0.015, side: THREE.DoubleSide, depthWrite: false,
     }));
-    glass.name = 'glass-surface'; glass.rotation.x = -Math.PI / 2; glass.position.y = 0.08; group.add(glass);
+    glass.name = 'glass-surface'; glass.rotation.x = -Math.PI / 2; glass.position.y = 0.04; group.add(glass);
   } else if (kind === 'urchin') {
     material = new THREE.MeshLambertMaterial({ color: '#ff4b3e', flatShading: true });
     const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.62, 0), material);
@@ -359,7 +387,7 @@ function buildEntity(entity: CastEntity) {
     }
   } else if (kind === 'boulder') {
     const rock = new THREE.Sprite(new THREE.SpriteMaterial({ map: spriteAssets.boulder, transparent: true, alphaTest: 0.02, depthWrite: false }));
-    rock.center.set(0.5, 0); rock.scale.set(1.85, 1.55, 1); group.add(rock);
+    rock.center.set(0.5, 0); rock.scale.set(SPRITE_SIZE.boulder[0], SPRITE_SIZE.boulder[1], 1); group.add(rock);
   } else if (kind === 'extras') {
     const capacity = Math.max(12, entity.members?.length ?? 0);
     spriteAssets.extras.forEach((texture, index) => {
@@ -369,34 +397,34 @@ function buildEntity(entity: CastEntity) {
       crowd.name = `extras-crowd-${index}`; crowd.count = 0; group.add(crowd);
     });
   } else if (kind === 'swarm') {
-    const swarm = new THREE.InstancedMesh(new THREE.PlaneGeometry(0.34, 0.34), new THREE.MeshBasicMaterial({
+    const swarm = new THREE.InstancedMesh(new THREE.PlaneGeometry(SPRITE_SIZE.swarm, SPRITE_SIZE.swarm), new THREE.MeshBasicMaterial({
       map: spriteAssets.swarmMoth, transparent: true, alphaTest: 0.02, side: THREE.DoubleSide, depthWrite: false,
     }), 12);
     swarm.name = 'swarm-cloud'; swarm.count = 0; group.add(swarm);
   } else if (kind === 'stagehand') {
     const stagehand = new THREE.Sprite(new THREE.SpriteMaterial({ map: spriteAssets.stagehand, transparent: true, alphaTest: 0.02, depthWrite: false }));
-    stagehand.center.set(0.5, 0); stagehand.scale.set(1.05, 1.75, 1); group.add(stagehand);
+    stagehand.center.set(0.5, 0); stagehand.scale.set(SPRITE_SIZE.stagehand[0], SPRITE_SIZE.stagehand[1], 1); group.add(stagehand);
   } else if (kind === 'bridge') {
     const bridge = new THREE.Mesh(new THREE.PlaneGeometry(14, 1.8), new THREE.MeshBasicMaterial({
       map: spriteAssets.bridge, transparent: true, alphaTest: 0.015, side: THREE.DoubleSide, depthWrite: false,
     }));
-    bridge.name = 'bridge-planks'; bridge.rotation.x = -Math.PI / 2; bridge.position.y = 0.05; group.add(bridge);
+    bridge.name = 'bridge-planks'; bridge.rotation.x = -Math.PI / 2; bridge.position.y = 0.04; group.add(bridge);
   } else if (kind === 'rumour') {
     const smoke = new THREE.Sprite(new THREE.SpriteMaterial({ map: spriteAssets.rumour, transparent: true, alphaTest: 0.015, depthWrite: false }));
-    smoke.center.set(0.5, 0.1); smoke.scale.set(1.55, 1.4, 1); group.add(smoke);
+    smoke.center.set(0.5, 0.1); smoke.scale.set(SPRITE_SIZE.rumour[0], SPRITE_SIZE.rumour[1], 1); group.add(smoke);
   } else if (kind === 'monitor' || kind === 'red-monitor') {
     const texture = kind === 'monitor' ? spriteAssets.monitorTeal : spriteAssets.monitorRed;
     const monitor = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, alphaTest: 0.02, depthWrite: false }));
-    monitor.center.set(0.5, 0); monitor.scale.set(1.55, 1.8, 1); group.add(monitor);
+    monitor.center.set(0.5, 0); monitor.scale.set(SPRITE_SIZE.monitor[0], SPRITE_SIZE.monitor[1], 1); group.add(monitor);
     const cone = new THREE.Mesh(new THREE.ConeGeometry(0.8, 2.3, 4, 1, true), new THREE.MeshBasicMaterial({ color: kind === 'monitor' ? '#e2b04a' : '#c8322a', transparent: true, opacity: 0.28, side: THREE.DoubleSide, depthWrite: false }));
     cone.name = 'monitor-cone'; cone.position.set(0, 0.6, 1.2); group.add(cone);
   } else if (kind === 'continuity') {
     const propKind = entity.propSequence?.[entity.propIndex ?? 0] ?? entity.propIndex ?? 0;
     const prop = new THREE.Sprite(new THREE.SpriteMaterial({ map: spriteAssets.continuity[propKind % 4], transparent: true, alphaTest: 0.02, depthWrite: false }));
-    prop.name = 'continuity-prop'; prop.center.set(0.5, 0); prop.scale.set(1.45, 1.25, 1); group.add(prop);
+    prop.name = 'continuity-prop'; prop.center.set(0.5, 0); prop.scale.set(SPRITE_SIZE.continuity[0], SPRITE_SIZE.continuity[1], 1); group.add(prop);
   } else if (kind === 'reel') {
     const reel = new THREE.Sprite(new THREE.SpriteMaterial({ map: spriteAssets.reel, transparent: true, alphaTest: 0.02, depthWrite: false }));
-    reel.center.set(0.5, 0); reel.scale.set(1.05, 1.05, 1); group.add(reel);
+    reel.center.set(0.5, 0); reel.scale.set(SPRITE_SIZE.reel[0], SPRITE_SIZE.reel[1], 1); group.add(reel);
   } else {
     material = new THREE.MeshLambertMaterial({ color: '#e2b04a', flatShading: true });
     group.add(new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.42, 0.7, 8), material));
@@ -412,7 +440,7 @@ function syncEntities(showTransientRings = true) {
     if (!object) { object = buildEntity(entity); entityMeshes.set(entity.id, object); scene.add(object); }
     const point = displayPoint(entity.x, entity.z);
     const spriteEntity = entity.kind === 'boulder' || entity.kind === 'stagehand' || entity.kind === 'reel' || entity.kind === 'extras' || entity.kind === 'continuity';
-    object.position.set(point.x, entity.kind === 'glass' || spriteEntity ? 0 : 0.68, point.z);
+    object.position.set(point.x, entity.kind === 'swarm' ? 0.55 : PATH_RISE, point.z);
     object.rotation.y = spriteEntity ? 0 : entity.age * 0.015;
     if (entity.kind === 'rumour') object.scale.setScalar(Math.max(0.1, entity.radius ?? 0.5));
     if (entity.kind === 'monitor' || entity.kind === 'red-monitor') {
@@ -439,9 +467,10 @@ function syncEntities(showTransientRings = true) {
         const crowd = crowds[costume]!;
         const index = crowd.count++;
         const isWide = tier >= 2;
-        transform.position.set(member.dx, isWide ? 0.48 : 0.78, member.dz);
+        const fitted = isWide ? SPRITE_SIZE.extrasWide : SPRITE_SIZE.extrasClose;
+        transform.position.set(member.dx, fitted[1] / 2, member.dz);
         transform.quaternion.copy(camera.quaternion);
-        transform.scale.set(isWide ? 0.56 : 0.8, isWide ? 0.86 : 1.36, 1);
+        transform.scale.set(fitted[0], fitted[1], 1);
         transform.updateMatrix();
         crowd.setMatrixAt(index, transform.matrix);
       }
@@ -453,10 +482,10 @@ function syncEntities(showTransientRings = true) {
       object.visible = tier < 4; swarm.count = tier < 4 ? 12 : 0;
       for (let i = 0; i < swarm.count; i++) {
         const angle = i * Math.PI * 2 / 12;
-        transform.position.set(Math.cos(angle) * 0.55, 0.35 + Math.sin(i * 1.7) * 0.16, Math.sin(angle) * 0.55);
+        transform.position.set(Math.cos(angle) * 0.42, 0.2 + Math.sin(i * 1.7) * 0.12, Math.sin(angle) * 0.42);
         transform.quaternion.copy(camera.quaternion);
         transform.rotation.z = angle + Math.sin(state.tick * 0.07 + i) * 0.2;
-        transform.scale.setScalar(0.65 + (i % 3) * 0.12);
+        transform.scale.setScalar(1);
         transform.updateMatrix();
         swarm.setMatrixAt(i, transform.matrix);
       }
@@ -474,6 +503,35 @@ function syncEntities(showTransientRings = true) {
     if (!found || found.cut || !found.spawned) object.visible = false;
   }
   urchinBuckets.update(state.entities, state.camera.zoom, state.tick, showTransientRings && !window.matchMedia('(prefers-reduced-motion: reduce)').matches, detailFactor, displayPoint, camera.quaternion);
+  let shade = 0;
+  const putShade = (x: number, z: number, width: number, depth: number) => {
+    if (shade >= 512) return;
+    transform.position.set(x + 0.46, PATH_RISE + 0.04, z + 0.32);
+    transform.rotation.set(-Math.PI / 2, 0.4, 0);
+    transform.scale.set(width * 1.35, depth * 0.85, 1);
+    transform.updateMatrix();
+    castShadows.setMatrixAt(shade++, transform.matrix);
+  };
+  if (talent.visible) {
+    const foot = displayPoint(state.talent.x, state.talent.z);
+    putShade(foot.x, foot.z, 1.2, 0.75);
+  }
+  for (const entity of state.entities) {
+    if (!entity.spawned || entity.cut) continue;
+    const point = displayPoint(entity.x, entity.z);
+    if (entity.kind === 'urchin') putShade(point.x, point.z, 1.35, 0.9);
+    else if (entity.kind === 'boulder') putShade(point.x, point.z, 1.9, 1.05);
+    else if (entity.kind === 'stagehand') putShade(point.x, point.z, 2.1, 0.95);
+    else if (entity.kind === 'monitor' || entity.kind === 'red-monitor') putShade(point.x, point.z, 1.25, 0.8);
+    else if (entity.kind === 'continuity' || entity.kind === 'reel') putShade(point.x, point.z, 1.15, 0.75);
+    else if (entity.kind === 'rumour') putShade(point.x, point.z, 1.6, 1);
+    else if (entity.kind === 'swarm') putShade(point.x, point.z, 2.2, 1.4);
+    else if (entity.kind === 'extras') {
+      for (const member of entity.members ?? []) if (!member.cut) putShade(point.x + member.dx, point.z + member.dz, 0.85, 0.5);
+    }
+  }
+  castShadows.count = shade;
+  castShadows.instanceMatrix.needsUpdate = true;
 }
 
 function syncCamera() {
@@ -591,14 +649,26 @@ function renderViewfinder(showTransientRings = true) {
   path.visible = state.tiles.length === 0;
   pathMaterial.color.set(look.path);
   keyLight.color.set(look.key);
-  keyLight.intensity = sceneLookIndex() === 2 ? 1.6 : 1.25;
+  const night = sceneLookIndex() === 2;
+  const city = sceneLookIndex() === 1;
+  keyLight.intensity = night ? 0.25 : 0.4;
+  keySpot.color.set(look.key);
+  keySpot.intensity = night ? 16 : 34;
+  keySpot.position.set(state.camera.x - 9, 18, state.camera.z + 6);
+  keySpot.target.position.set(state.camera.x + 6, 0, state.camera.z - 4);
+  moon.intensity = night ? 0.9 : 0;
+  hemi.intensity = night ? 1.35 : 0.55;
   hemi.color.set(look.hemi);
   hemi.groundColor.set(look.fill);
+  floorMaterial.emissive.set(night ? '#152033' : '#000000');
+  floorMaterial.shininess = night ? 22 : 2;
+  floorMaterial.specular.set(night ? '#8aa4c0' : '#000000');
+  $('#gate').classList.toggle('tilt-shift', city);
   syncCamera();
   syncTerrain();
   syncTalentLod();
   const talentPoint = displayPoint(state.talent.x, state.talent.z);
-  talent.position.set(talentPoint.x, 0, talentPoint.z);
+  talent.position.set(talentPoint.x, PATH_RISE, talentPoint.z);
   syncEntities(showTransientRings);
   renderer.render(scene, camera);
 }
@@ -969,7 +1039,7 @@ $('#share').addEventListener('click', async () => {
 });
 
 if (query.has('debug')) {
-  Object.assign(window, { __cull: { step: (n = 1) => { for (let i = 0; i < n; i++) advanceTick(); render(); }, input: (input: InputFrame) => { frameInput = input; }, hash: () => stateHash(state), state: () => structuredClone(state), diagnostics: () => ({ paused, keys: [...keys], hidden: document.hidden, focused: document.hasFocus(), dprTier, pointerPan: pointerPan && { ...pointerPan } }), performance: () => ({ drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles }), lod: () => urchinBuckets.diagnostics(), load: (seed: number) => { state = createGeneratedState(seed); terrainTiles = null; urchinBuckets.reset(); }, loadShootScene: (sceneIndex: number) => { state = createShootSceneState(state.seed, sceneIndex); terrainTiles = null; urchinBuckets.reset(); render(); }, finishForShare: () => { state.failed = 'hit'; render(); }, loadLodDemo: () => { state = createGeneratedState(1, 0, 2); state.entities = [{ id: 'lod-demo-urchin', kind: 'urchin', x: 0, z: 2, vx: 0, vz: 0, spawned: true, cut: false, age: 0 }]; state.talent.x = -4; render(); }, setTier: (tier: number) => { const size = [64, 36, 17, 7, 2][tier] ?? 36; state.camera.zoom = TUNING.urchinRadius * 1000 / size; }, setCamera: (x: number, z: number, zoom: number) => { state.camera.x = x; state.camera.z = z; state.camera.zoom = zoom; } } });
+  Object.assign(window, { __cull: { step: (n = 1) => { for (let i = 0; i < n; i++) advanceTick(); render(); }, input: (input: InputFrame) => { frameInput = input; }, hash: () => stateHash(state), state: () => structuredClone(state), diagnostics: () => ({ paused, keys: [...keys], hidden: document.hidden, focused: document.hasFocus(), dprTier, pointerPan: pointerPan && { ...pointerPan } }), performance: () => ({ drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles }), lod: () => urchinBuckets.diagnostics(), load: (seed: number) => { state = createGeneratedState(seed); terrainTiles = null; urchinBuckets.reset(); }, loadShootScene: (sceneIndex: number) => { state = createShootSceneState(state.seed, sceneIndex); terrainTiles = null; urchinBuckets.reset(); render(); }, finishForShare: () => { state.failed = 'hit'; render(); }, loadLodDemo: () => { state = createGeneratedState(1, 0, 2); state.entities = [{ id: 'lod-demo-urchin', kind: 'urchin', x: 0, z: 2, vx: 0, vz: 0, spawned: true, cut: false, age: 0 }]; state.talent.x = -4; render(); }, setTier: (tier: number) => { const size = [64, 36, 17, 7, 2][tier] ?? 36; state.camera.zoom = TUNING.urchinRadius * 1000 / size; }, setCamera: (x: number, z: number, zoom: number) => { state.camera.x = x; state.camera.z = z; state.camera.zoom = zoom; }, silhouettes: () => measureSilhouettes({ urchin: spriteAssets.urchinTiers[2]!, boulder: spriteAssets.boulder, glass: spriteAssets.glass, extras: spriteAssets.extras[0]!, swarm: spriteAssets.swarmMoth, rumour: spriteAssets.rumour, stagehand: spriteAssets.stagehand, monitor: spriteAssets.monitorTeal, redMonitor: spriteAssets.monitorRed, continuity: spriteAssets.continuity[2]!, talent: spriteAssets.walk[0]! }) } });
 }
 
 new ResizeObserver(() => {
