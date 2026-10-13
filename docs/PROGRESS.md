@@ -96,3 +96,65 @@ On the strip, Gatekeeper beats Adaptive: 100% vs 94.5%, distance ratio 0.975×. 
 1. The zoom-only `defang` branch lets Gatekeeper clear every strip gate. Its Shoot deaths are almost all the Night Shoot hostile camera or glass.
 2. The jitter histograms are almost all 0/8 or 8/8. A 150–300 ms delay and ±5% aim barely change outcomes because deaths are set by the layout. For example, the hostile camera kills at the same path point whatever the bot does.
 3. These are the M2 targets. Harness: `src/bots/balance.ts` (CLI, report, killer inference, luck checks), `src/bots/balance-bots.ts` (Metronome, Gatekeeper, jitter) and `src/bots/observe.ts`. `tests/balance.test.ts` runs the 20-seed direction smoke. CI runs the full report with `continue-on-error` and uploads the JSON as an artifact.
+
+
+## Bible M2: Stage 0 balance fix
+
+Command: `npm run balance -- --stage=0 --mode=both --seeds=200 --jitter=8`. Raw seeds 1..200, fair observe view (`src/bots/observe.ts`). Reports: [`reports/balance/stage-0-strip.json`](../reports/balance/stage-0-strip.json) and [`reports/balance/stage-0-shoot.json`](../reports/balance/stage-0-shoot.json). Wall time was ~5 min on 8 cores.
+
+**Before (bible M1) → after (M2), Shoot:**
+
+| Gate / check | M1 | M2 | Target |
+|---|---|---|---|
+| Adaptive | 43% | **100%** | ≥ 85% |
+| Gatekeeper | 69.5% | **0%** (urchin 140, film 60) | ≤ 25% |
+| Tracker | 0% (film 200) | 0% (urchin 145, film 55) | ≤ 25% |
+| Metronome | 0% | 0% | ≤ 5% |
+| Adaptive − passive | −26.5 pp | 100 pp | ≥ 55 pp |
+| Adaptive / passive distance | 0.932× | 32.7× | ≥ 1.5× |
+| Wide / Adaptive, Close / Adaptive | 0.129×, 0.068× | 0.061×, 0.031× | ≤ 0.7× |
+| Top scene's share of Adaptive deaths | NIGHT SHOOT 51.8% | no Adaptive deaths | ≤ 50% |
+| Adaptive deaths by killer | red-monitor 49, extras 35, glass 23, bridge 7 | none | — |
+| jitter(gatekeeper, 8) seeds ≥ 4/8; seeds at 8/8 | 69.5%; 139 | 0%; none | ≤ 2%; none |
+| jitter(adaptive, 8) seeds ≥ 6/8 | 43.5% | 100% | ≥ 85% |
+| jitter(adaptive, 8) histogram [0/8 … 8/8] | almost all 0/8 or 8/8 | [0 0 0 0 0 0 1 0 199] | mixed (see open items) |
+| Adaptive SD over 10 buckets; passive worst bucket | 13.3 pp; 90% | 0 pp; 0% | ≤ 8 pp; ≤ 40% |
+| Adaptive clear time (min / mean / max) | 248.8 / 255.7 / 262.5 s | 253.7 / 262.1 / 270.8 s | 180–480 s |
+| Passive FailReasons | 2, `hit` 82% | 2, `hit` 70% | ≥ 3, none > 60% (**still fails**) |
+| Roster kinds per scene (min) | BACKLOT 2 | BACKLOT 2 | ≥ 3 (**still fails**) |
+| Chaos | 0 | 0 | 0 |
+
+**Strip:** Adaptive 94.5% → **100%** (target ≥ 95%). Gatekeeper 100% → 0%, Tracker 0% → 0%, Metronome 0% → 0%. jitter(gatekeeper) has no seed at ≥ 4/8. jitter(adaptive) has 100% of seeds at ≥ 6/8.
+
+**Other checks:**
+- `validate:m6`, now on the fair driver: **20/20**, 255.9 / 261.9 / 267.4 s.
+- `validate:m5`, legacy full-state strip: all gates pass.
+- `npm run perf`: sim p95 0.61 ms.
+
+**What changed.** Rules are listed in `DECISIONS.md` (2026-10-13). In short:
+- Rules (`src/sim`):
+  - Defang needs a close cut since the gate opened, against a stand-in Urchin waiting on its mark.
+  - Gates are seeded per scene.
+  - Far Glass unloads intact instead of leaving an unseen hole.
+  - The hostile camera has a 1 s tally that you can avoid by framing it out. It never cuts unseen cast or the floor.
+  - Crowds trample only on contact with a visible member.
+  - The Wrap strike line stays behind the Talent on winding paths. This was a bug that killed Adaptive on Glass in Night Shoot.
+- Generator data (`src/gen`): ≥ 50% of Urchins enter ahead on the path. This is a bible M2 lever, and it is why passive deaths now include `urchin`.
+- Tests: `tests/m2.test.ts` is new and pins fixed replay hashes. One pre-existing property test ("keeps every live CAST AABB overlapping the gate") already failed on the M1 branch: fast-check finds Glass held by the documented keep margin. It now asserts that documented margin.
+
+**Adaptive policy changes** (`src/bots/players.ts`). Each one uses only what the fair view shows and mirrors what a reasonable player does:
+1. **Medium-wide (38) instead of Wide (48)** near Urchins and throughout the finale. 48 makes crowds trample and bridges drop, which the HUD shot size shows. 38 is past an Urchin's lethal tier and short of Wide. This removed the 35 crowd and 7 bridge deaths in LONG TAKE that the old "park at 48" policy caused.
+2. **React to an Urchin when it comes on screen** (14 u instead of 8 u). Urchins now roll in ahead on the path. A human sees one at the frame edge about 2.7 s before contact. With an 8 u trigger and a half-rate zoom the bot was slower than a person: jittered Adaptive fell to 61%.
+3. **Make the defang cut.** With the HUD gate text up, it frames the nearest visible hazard within the close-call radius out of shot, with the frame edge between it and the Talent. Without this, no bot can pass a gate. That is the point of the rule.
+4. **Keep a visible hostile camera out of the frame.** It remembers a monitor it has seen (position and facing are drawn) while the Talent is within reach. It prefers framings off the side or behind, not ahead of the Talent's walk. It keeps the framing in use unless another is clearly better, and only widens (never tightens) while holding the edge.
+
+`validate:m6` and the balance harness now use the same fair driver.
+
+**Open items (not fixed here):**
+- **Jitter histograms are not mixed.** Adaptive no longer has layout-determined deaths: no seed sits at 0/8, against 112 suspect seeds in M1. But Stage 0 now rarely kills a competent player, so the histograms are 8/8 for Adaptive and 0/8 for passive. Jitter now separates skill from no skill, not seed from seed. I did not raise difficulty to manufacture deaths. If S0 should pressure skilled play, the bible's "Night/finale hazard density and speed" lever is the place to do it.
+- Passive "never samey" fails (2 reasons). Every passive death is an urchin hit or the film running out at the first defang gate. That is the bible's passive signature, not a variety of failures.
+- BACKLOT roster minimum is 2 on some seeds (unchanged from M1). It needs generator content.
+- **For other owners:**
+  - The HUD defang copy (`main.ts`, "zoom out until the spikes go dull, or cut one close") is now half wrong.
+  - The hostile camera's tally (`lockTicks`) should be drawn so the 1 s telegraph is visible.
+  - CI still runs `validate:m6` with `continue-on-error`. The bible makes it blocking from M2.

@@ -11,7 +11,6 @@ import { availableParallelism } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { fork } from 'node:child_process';
-import { redMonitorOverlapsTarget } from '../sim/m6';
 import { createShootSceneState, createShootState, stepShoot } from '../sim/shoot';
 import { step } from '../sim/step';
 import { TUNING } from '../sim/tuning';
@@ -90,12 +89,12 @@ export function inferKiller(state: SimState): Killer | null {
     }
     if (entity.cut || !entity.spawned) continue;
     const close = Math.hypot(entity.x - talent.x, entity.z - talent.z) <= radiusOf(entity) + talentRadius;
-    if (close && ((entity.kind === 'boulder' && tier <= 0) || (entity.kind === 'urchin' && tier <= 1) || entity.kind === 'swarm'
-      || (entity.kind === 'extras' && tier >= 2))) return entity.kind;
+    if (close && ((entity.kind === 'boulder' && tier <= 0) || (entity.kind === 'urchin' && tier <= 1) || entity.kind === 'swarm')) return entity.kind;
+    if (entity.kind === 'extras' && tier >= 2 && entity.members?.some((member) => !member.cut
+      && Math.hypot(entity.x + member.dx - talent.x, entity.z + member.dz - talent.z) <= TUNING.extrasContactRadius + talentRadius)) return 'extras';
   }
-  if (failed === 'hit' && state.entities.some((entity) => entity.kind === 'red-monitor' && !entity.cut && redMonitorOverlapsTarget(
-    { origin: { x: entity.x, z: entity.z }, heading: entity.heading ?? 0, range: entity.range ?? 0, halfAngle: entity.halfAngle ?? 0 },
-    { x: talent.x, z: talent.z }, talentRadius))) return 'red-monitor';
+  if (failed === 'hit' && state.entities.some((entity) => entity.kind === 'red-monitor' && !entity.cut
+    && (entity.lockTicks ?? 0) >= TUNING.hostileLockSeconds * TUNING.tickRate)) return 'red-monitor';
   return 'unknown';
 }
 

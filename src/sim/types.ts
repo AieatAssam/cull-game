@@ -10,7 +10,7 @@ export interface InputFrame {
 }
 export interface CrowdMember { dx: number; dz: number; vx: number; vz: number; cut: boolean; }
 export interface SpawnPoint { id: string; kind: EntityKind; x: number; z: number; vx: number; vz: number; members?: CrowdMember[]; }
-export interface CastEntity extends SpawnPoint { spawned: boolean; cut: boolean; age: number; lodTier?: 0 | 1 | 2 | 3 | 4; radius?: number; heading?: number; range?: number; halfAngle?: number; propIndex?: number; propSequence?: number[]; }
+export interface CastEntity extends SpawnPoint { spawned: boolean; cut: boolean; age: number; lodTier?: 0 | 1 | 2 | 3 | 4; radius?: number; heading?: number; range?: number; halfAngle?: number; propIndex?: number; propSequence?: number[]; lockTicks?: number; gate?: number; pathBound?: boolean; }
 export interface Talent { x: number; z: number; offscreenTicks: number; pathIndex: number; lodTier?: 0 | 1 | 2 | 3; }
 export interface PathFork { at: number; options: Array<{ x: number; z: number }>; }
 export interface TerrainTile { x: number; z: number; kind: 'path' | 'set'; }
@@ -34,7 +34,7 @@ export interface SimState {
   score: number;
   cuts: string[];
   closeCalls: number;
-  shots?: Array<{ at: number; kind: 'defang' | 'portrait'; done: boolean }>;
+  shots?: Array<{ at: number; kind: 'defang' | 'portrait'; done: boolean; opened?: number }>;
   shoot?: { sceneIndex: number; biome: 'BACKLOT' | 'MINIATURE CITY' | 'NIGHT SHOOT' | 'LONG TAKE'; wrapDistance: number | null; wrapCaught: boolean; finaleTicks: number; };
 }
 export interface FrameRect { left: number; right: number; bottom: number; top: number; }

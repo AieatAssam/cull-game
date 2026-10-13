@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createShootState, stepShoot } from '../src/sim/shoot';
 import { NEUTRAL_INPUT, step } from '../src/sim/step';
 import { createState } from '../src/sim/world';
+import { TUNING } from '../src/sim/tuning';
 import type { CastEntity } from '../src/sim/types';
 
 describe('M6 simulation integration', () => {
@@ -13,12 +14,32 @@ describe('M6 simulation integration', () => {
     expect(step(state).entities.find((entity) => entity.id === glass.id)?.spawned).toBe(true);
   });
 
-  it('lets an in-frame Red Monitor cut Talent through its cone', () => {
+  it('lets an in-frame Red Monitor fail the take once its tally has held the Talent for the lock time', () => {
     const hostile: CastEntity = { id: 'red', kind: 'red-monitor', x: 0, z: 0, vx: 0, vz: 0, spawned: true, cut: false, age: 0, heading: 0, range: 5, halfAngle: 0.4 };
-    const state = createState(1, [hostile]);
-    expect(step(state).failed).toBe('hit');
-    state.camera.x = 100;
-    expect(step(state).failed).toBeNull();
+    const lock = TUNING.hostileLockSeconds * TUNING.tickRate;
+    let state = createState(1, [hostile]);
+    for (let i = 1; i < lock; i++) state = step(state, { ...NEUTRAL_INPUT, hold: true });
+    expect(state.failed).toBeNull();
+    expect(state.entities[0]?.lockTicks).toBe(lock - 1);
+    expect(step(state, { ...NEUTRAL_INPUT, hold: true }).failed).toBe('hit');
+    // Framing it out resets the tally: the telegraph is avoidable.
+    const framedOut = { ...state, camera: { ...state.camera, x: 100 } };
+    const reset = step(framedOut, { ...NEUTRAL_INPUT, hold: true });
+    expect(reset.failed).toBeNull();
+    expect(reset.entities[0]?.lockTicks).toBe(0);
+  });
+
+  it('never lets the Red Monitor cut the floor or cast nobody has seen', () => {
+    const hostile: CastEntity = { id: 'red', kind: 'red-monitor', x: 0, z: 3, vx: 0, vz: 0, spawned: true, cut: false, age: 0, heading: 0, range: 8, halfAngle: 0.4 };
+    const glass: CastEntity = { id: 'glass', kind: 'glass', x: 4, z: 3, vx: 0, vz: 0, spawned: true, cut: false, age: 0 };
+    const unseen: CastEntity = { id: 'unseen', kind: 'reel', x: 7, z: 3, vx: 0, vz: 0, spawned: false, cut: false, age: 0 };
+    const seen: CastEntity = { id: 'seen', kind: 'reel', x: 3, z: 3, vx: 0, vz: 0, spawned: true, cut: false, age: 0 };
+    const state = createState(1, [hostile, glass, unseen, seen]);
+    state.camera.zoom = 10;
+    const next = step(state, { ...NEUTRAL_INPUT, hold: true });
+    expect(next.entities.find((cast) => cast.id === 'glass')?.cut).toBe(false);
+    expect(next.entities.find((cast) => cast.id === 'unseen')?.cut).toBe(false);
+    expect(next.entities.find((cast) => cast.id === 'seen')?.cut).toBe(true);
   });
 
   it('grows an unseen Rumour ledger without cutting the entity', () => {

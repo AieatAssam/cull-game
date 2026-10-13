@@ -3,7 +3,7 @@ import { NEUTRAL_INPUT } from '../sim/step';
 import { TUNING } from '../sim/tuning';
 import type { InputFrame, SimState } from '../sim/types';
 import { createObserver, type PlayerView } from './observe';
-import { inputForBot } from './players';
+import { inputForBot, type AdaptiveMemory } from './players';
 
 /** Bots the balance harness runs. Every one of them sees the world only through `PlayerView`. */
 export type BalanceBot = 'adaptive' | 'tracker' | 'gatekeeper' | 'metronome' | 'wide' | 'close' | 'chaos';
@@ -69,7 +69,8 @@ function gatekeeper(tuning: BotTuning): Policy {
 
 function legacy(bot: 'adaptive' | 'tracker' | 'wide' | 'close' | 'chaos', seed: number, tuning: BotTuning): Policy {
   const random = mulberry32((seed ^ 0xb07b07) >>> 0);
-  return { act: ({ state }) => inputForBot(state, bot, random, tuning.aim) };
+  const memory: AdaptiveMemory = {};
+  return { act: ({ state, gate }) => inputForBot(state, bot, random, tuning.aim, gate, memory) };
 }
 
 /**

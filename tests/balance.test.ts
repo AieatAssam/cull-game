@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { createPolicy, jitterTuning } from '../src/bots/balance-bots';
 import { balanceTasks, inferKiller, luckChecks, parseArgs, runBalance, runTask, STAGES, summarize, type RunResult } from '../src/bots/balance';
 import { createObserver } from '../src/bots/observe';
@@ -124,8 +124,11 @@ describe('balance report', () => {
 
 // The 20-seed smoke per shipped stage: checks the direction of each gate, not its threshold.
 describe.each(Object.keys(STAGES).map(Number))('stage %i balance smoke (strip, 20 seeds)', (stage) => {
-  it('orders the bots the way the gates expect', async () => {
-    const report = await runBalance({ stage, mode: 'strip', seeds: 20, jitter: 0, workers: 1, bots: ['adaptive', 'tracker', 'gatekeeper', 'metronome', 'wide', 'close', 'chaos'] });
+  let report: Awaited<ReturnType<typeof runBalance>>;
+  beforeAll(async () => {
+    report = await runBalance({ stage, mode: 'strip', seeds: 20, jitter: 0, workers: 1, bots: ['adaptive', 'tracker', 'gatekeeper', 'metronome', 'wide', 'close', 'chaos'] });
+  }, 120_000);
+  it('orders the bots the way the gates expect', () => {
     const { adaptive, tracker, metronome, wide, close, chaos } = report.bots;
     expect(adaptive!.completion).toBeGreaterThan(metronome!.completion);
     expect(adaptive!.completion).toBeGreaterThan(tracker!.completion);
@@ -138,8 +141,10 @@ describe.each(Object.keys(STAGES).map(Number))('stage %i balance smoke (strip, 2
       const deaths = Object.values(summary.killers).reduce((sum, count) => sum + count, 0);
       expect(deaths).toBe(summary.runs - summary.completed);
     }
-  }, 120_000);
-  // Bible M2 makes "adaptive beats passive" blocking for S0. Today Gatekeeper out-scores Adaptive on the strip,
-  // which is exactly the defect M2 fixes, so this direction is reported, not asserted, until then.
-  it.todo('adaptive beats the passive gate (best of tracker, gatekeeper): blocking from bible M2');
+  });
+  // Bible M2: "adaptive beats passive" is blocking for S0.
+  it('adaptive beats the passive gate (best of tracker, gatekeeper)', () => {
+    expect(report.bots.adaptive!.completion).toBeGreaterThan(report.passive.completion);
+    expect(report.bots.adaptive!.meanDistance).toBeGreaterThan(report.bots[report.passive.bot]!.meanDistance);
+  });
 });

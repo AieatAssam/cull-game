@@ -1,5 +1,5 @@
 import { TUNING } from '../sim/tuning';
-import { mulberry32 } from '../sim/rng';
+import { mulberry32, seededRange } from '../sim/rng';
 import type { CastEntity, PathFork } from '../sim/types';
 import { CHUNKS, validateCatalog } from './chunks';
 import type { ChunkSocket, ChunkTemplate, GeneratedScene } from './types';
@@ -54,6 +54,16 @@ function projectPathForks(selected: ChunkTemplate[], offsets: number[]): { path:
   return { path, forks };
 }
 
+/** z of the set path at world x (path x is strictly increasing). */
+export function pathZAt(path: Array<{ x: number; z: number }>, x: number): number {
+  for (let i = 1; i < path.length; i++) {
+    const a = path[i - 1]!;
+    const b = path[i]!;
+    if (x <= b.x) return a.z + (b.z - a.z) * Math.max(0, Math.min(1, b.x === a.x ? 1 : (x - a.x) / (b.x - a.x)));
+  }
+  return path.at(-1)?.z ?? 0;
+}
+
 export function generateScene(seed: number, difficulty = 0, chunkCount?: number): GeneratedScene {
   if (CHUNKS.length < 2) throw new Error(`Expected authored chunk data, found ${CHUNKS.length}`);
   const invalid = validateCatalog();
@@ -103,6 +113,13 @@ export function generateScene(seed: number, difficulty = 0, chunkCount?: number)
       reelCount++;
     }
   }
+  // Bible M2: threats come from ahead. At least half the Urchins (seeded) are set on the walked path and roll down it
+  // toward the Talent, so panning behind them does not remove them; the rest keep their socket rows.
+  entities.forEach((entity, index) => {
+    if (entity.kind !== 'urchin' || seededRange(seed, 0x0a11 + index, 0, 1) >= TUNING.aheadEntryShare) return;
+    entity.z = pathZAt(path, entity.x);
+    entity.pathBound = true;
+  });
   if (forks.length === 0) {
     const at = Math.min(8, path.length - 2);
     const point = path[at]!;
