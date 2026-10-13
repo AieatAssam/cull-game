@@ -185,8 +185,14 @@ export function raisedPathGeometry(tiles: Array<{ x: number; z: number }>): THRE
     const top = new THREE.ShapeGeometry(shape);
     top.rotateX(-Math.PI / 2);
     top.translate(0, PATH_RISE, 0);
+    // ShapeGeometry is indexed; walk its index so the felt top comes out as whole triangles.
     const position = top.getAttribute('position');
-    for (let index = 0; index < position.count; index++) push(position.getX(index), position.getY(index), position.getZ(index), 1);
+    const order = top.getIndex();
+    const count = order ? order.count : position.count;
+    for (let corner = 0; corner < count; corner++) {
+      const index = order ? order.getX(corner) : corner;
+      push(position.getX(index), position.getY(index), position.getZ(index), 1);
+    }
     top.dispose();
   }
   const key = { x: -0.92, z: 0.38 };

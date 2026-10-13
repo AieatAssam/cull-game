@@ -17,6 +17,8 @@ import { createDailiesCast, SCENE_LOOKS, TALENT_ASPECT } from './render/dailies'
 import { measureSilhouettes } from './render/silhouettes';
 import { PATH_RISE, SPRITE_SIZE, createSetDressing, createTableTextures, raisedPathGeometry } from './render/set-dressing';
 import { DPR_SCALES, nextDprTier } from './render/adaptive-dpr';
+import { LockOverlay, lockFan, updateLockFan, type LockMark } from './render/hostile-lock';
+import { createDustPuff, createShockMark, flinchPlay, restPlay, walkPlay } from './render/talent-fx';
 import { AudioDirector, type AudioSettings } from './audio/director';
 import { dailySeed } from './meta/daily';
 import { loadFilmography, personalBest, recordResult } from './meta/filmography';
@@ -108,7 +110,7 @@ let coachStarted = 0;
 const shell = document.createElement('section');
 shell.className = 'stage';
 shell.innerHTML = `
-  <header class="topbar"><div class="brand"><span class="rec-dot"></span><strong>CULL</strong><span class="tagline">CAMERA DEPARTMENT</span></div><label class="stock-control">STOCK <select id="film-stock" aria-label="Film stock"><option value="clean">35 MM · CLEAN</option><option value="kodachrome">KODACHROME · B</option><option value="bleach">BLEACH BYPASS · A</option><option value="ilford">ILFORD B&W · S</option></select></label><details class="sound-settings" id="sound-settings"><summary>SOUND</summary><div class="sound-panel"><label>MASTER <input id="volume-master" aria-label="Master volume" type="range" min="0" max="100" value="100" /></label><label>MUSIC <input id="volume-music" aria-label="Music volume" type="range" min="0" max="100" value="80" /></label><label>EFFECTS <input id="volume-sfx" aria-label="Effects volume" type="range" min="0" max="100" value="80" /></label><label><input id="mono-audio" type="checkbox" /> MONO</label><label><input id="calm-audio" type="checkbox" /> CALM MIX</label></div></details><div class="readout"><a class="daily-link" href="?daily=1">DAILY</a><span>TAKE 01</span><b id="timecode">01:30</b><span id="lens">35 MM</span><button class="pause-button" id="pause" aria-label="Pause game">Ⅱ</button></div></header>
+  <header class="topbar"><div class="brand"><span class="rec-dot"></span><strong>CULL</strong><span class="tagline">CAMERA DEPARTMENT</span></div><label class="stock-control">STOCK <select id="film-stock" aria-label="Film stock"><option value="clean">35 MM · CLEAN</option><option value="kodachrome">KODACHROME · B</option><option value="bleach">BLEACH BYPASS · A</option><option value="ilford">ILFORD B&W · S</option></select></label><details class="sound-settings" id="sound-settings"><summary id="sound-summary">SOUND</summary><div class="sound-panel"><button id="mute-audio" type="button" aria-pressed="false">MUTE ALL</button><label>MASTER <input id="volume-master" aria-label="Master volume" type="range" min="0" max="100" value="100" /></label><label>MUSIC <input id="volume-music" aria-label="Music volume" type="range" min="0" max="100" value="80" /></label><label>EFFECTS <input id="volume-sfx" aria-label="Effects volume" type="range" min="0" max="100" value="80" /></label><label><input id="mono-audio" type="checkbox" /> MONO</label><label><input id="calm-audio" type="checkbox" /> CALM MIX</label></div></details><div class="readout"><a class="daily-link" href="?daily=1">DAILY</a><span>TAKE 01</span><b id="timecode">01:30</b><span id="lens">35 MM</span><button class="pause-button" id="pause" aria-label="Pause game">Ⅱ</button></div></header>
   <div class="composition"><aside class="margin margin-left"><div class="slate">SCENE 01<br><strong>BACKLOT</strong><small>SEED <span id="seed">00001</span></small><small id="best">BEST —</small></div><div class="hint"><span class="hint-mark">↖</span> WASD / DRAG<br>TO FRAME THE SHOT<div class="preview" id="preview"></div></div></aside>
     <div class="gate-wrap"><div class="gate-label"><span id="gate-ratio">VIEWFINDER · GATE 1:1</span><span id="lod">SHE IS IN A MEDIUM SHOT</span></div><div class="gate" id="gate"><div class="thirds"></div><div class="focus-band" id="focus-band" hidden></div><div class="gate-corners"></div><div class="sprockets left"></div><div class="sprockets right"></div><div id="mount" class="mount"></div><div class="depth-blur top"></div><div class="depth-blur bottom"></div><div class="frame-message" id="message">Keep her in the shot.</div><p class="coach hidden" id="coach"></p><div class="title-card hidden" id="title-card"><p class="title-kicker">SCENE 01 · TAKE 01</p><h1>CULL</h1><p>Nothing exists unless it is in the shot. You hold the camera. She walks.</p></div><div class="cut-flash" id="cut-flash"></div><div class="slice" id="slice"></div><div class="peel" id="peel"></div><div class="cut-stamp" id="cut-stamp">CUT</div><i class="spark" style="--dx:-18px;--dy:-24px;left:70%;top:40%"></i><i class="spark" style="--dx:16px;--dy:-20px;left:72%;top:46%"></i><i class="spark" style="--dx:8px;--dy:18px;left:68%;top:50%"></i><i class="spark" style="--dx:-22px;--dy:8px;left:74%;top:42%"></i></div><div class="gate-foot"><span>55° TABLETOP</span><span id="status">ROLLING</span></div></div>
     <aside class="margin margin-right"><div class="camera-mark">Slate<small>CAM 01</small></div><div class="call-sheet"><span>CALL SHEET</span><div id="call-sheet">Looking outside the frame…</div></div></aside>
@@ -184,6 +186,18 @@ for (const [id, key] of [['volume-master', 'master'], ['volume-music', 'music'],
     try { window.localStorage.setItem('cull.audio.v1', JSON.stringify(audio.settings)); } catch { /* Setting remains active for this visit. */ }
   });
 }
+const muteButton = $('#mute-audio');
+const showMute = () => {
+  muteButton.setAttribute('aria-pressed', String(audio.settings.muted));
+  muteButton.textContent = audio.settings.muted ? 'UNMUTE' : 'MUTE ALL';
+  $('#sound-summary').textContent = audio.settings.muted ? 'SOUND OFF' : 'SOUND';
+};
+showMute();
+muteButton.addEventListener('click', () => {
+  audio.setSettings({ muted: !audio.settings.muted });
+  showMute();
+  try { window.localStorage.setItem('cull.audio.v1', JSON.stringify(audio.settings)); } catch { /* Setting remains active for this visit. */ }
+});
 for (const [id, key] of [['mono-audio', 'mono'], ['calm-audio', 'calm']] as const) {
   const input = $(`#${id}`) as HTMLInputElement;
   input.checked = audioSettings[key];
@@ -320,8 +334,14 @@ const talent = new THREE.Group();
 const talentSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: spriteAssets.walk[0], transparent: true, alphaTest: 0.04, depthWrite: false }));
 talentSprite.center.set(0.5, 0);
 talentSprite.scale.set(2.3, 3.5, 1);
-talent.add(talentSprite);
+talentSprite.renderOrder = 4;
+const shockMark = createShockMark();
+const dustPuff = createDustPuff();
+talent.add(talentSprite, shockMark, dustPuff);
 scene.add(talent);
+/** Render frames spent in the current pose kind, so a flinch pops once on entry and the dust settles. */
+let talentPoseKind = '';
+let talentPoseAge = 0;
 let renderedTalentTier = -1;
 let renderedTalentHeight = 3.5;
 function syncTalentLod() {
@@ -333,13 +353,39 @@ function syncTalentLod() {
   }
   const map = talentPose();
   if (talentSprite.material.map !== map) talentSprite.material.map = map;
+  const height = renderedTalentHeight;
+  const facing = talentFacing();
+  const walkFrame = spriteAssets.walk.indexOf(map);
+  const kind = map === spriteAssets.fall ? 'fall' : map === spriteAssets.flinch ? 'flinch' : walkFrame >= 0 ? 'walk' : 'idle';
+  if (kind !== talentPoseKind) { talentPoseKind = kind; talentPoseAge = 0; } else talentPoseAge++;
+  // The debug pose stills show the flinch at the top of its hop and the dust fully out.
+  const age = poseDemo ? (kind === 'flinch' ? 4 : 12) : talentPoseAge;
+  // Squash, stretch, bob and recoil are applied here, on the sprite transform, so the drawn frames stay as authored.
+  const play = kind === 'walk' ? walkPlay(state.tick / 8, height) : kind === 'flinch' ? flinchPlay(age, height, facing) : restPlay();
   // The fall pose is drawn square; every other pose uses the usual 0.66 sprite. Flip to face her next path point on screen.
-  const width = renderedTalentHeight * (map === spriteAssets.fall ? 1 : TALENT_ASPECT);
-  talentSprite.scale.set(width * talentFacing(), renderedTalentHeight, 1);
+  const width = height * (kind === 'fall' ? 1 : TALENT_ASPECT);
+  talentSprite.scale.set(width * facing * play.sx, height * play.sy, 1);
+  talentSprite.position.y = play.lift;
+  talentSprite.material.rotation = play.lean;
+  shockMark.visible = kind === 'flinch';
+  if (shockMark.visible) {
+    const jitter = age % 6 < 3 ? 1 : 0.92;
+    shockMark.scale.set(height * 0.5 * jitter, height * 0.5 * jitter, 1);
+    // Follow her head through the lean, then float clear above it and a touch behind, away from what she's recoiling from.
+    const headX = -Math.sin(play.lean) * height * 0.9;
+    // Sprites stand in the camera plane, so the offset is built in view space too.
+    shockMark.position.set(headX - facing * height * 0.1, play.lift + Math.cos(play.lean) * height * 0.88, 0).applyQuaternion(camera.quaternion);
+  }
+  dustPuff.visible = kind === 'fall';
+  if (dustPuff.visible) {
+    const spread = 0.75 + 0.25 * Math.min(age / 12, 1);
+    dustPuff.scale.set(width * 1.75 * spread, width * 0.42 * spread, 1);
+  }
 }
 
 /** Read-only pose pick: fall on a failed take, flinch when a hazard is within the close-call radius, idle while waiting. */
 function talentPose(): THREE.Texture {
+  if (poseDemo) return spriteAssets[poseDemo];
   if (state.failed === 'hit' || state.failed === 'fell') return spriteAssets.fall;
   const danger = state.entities.some((entity) => entity.spawned && !entity.cut
     && entity.kind !== 'reel' && entity.kind !== 'monitor' && entity.kind !== 'continuity'
@@ -369,7 +415,7 @@ const transform = new THREE.Object3D();
 function batchStaticMeshes(group: THREE.Group) {
   group.updateMatrixWorld(true);
   const materialGeometries = new Map<THREE.Material, Array<{ mesh: THREE.Mesh; geometry: THREE.BufferGeometry }>>();
-  const dynamicParts = new Set(['monitor-cone', 'continuity-prop', 'extras-crowd-0', 'extras-crowd-1', 'extras-crowd-2', 'extras-crowd-3', 'swarm-cloud', 'bridge-planks']);
+  const dynamicParts = new Set(['monitor-cone', 'lock-fan-fill', 'lock-fan-rim', 'continuity-prop', 'extras-crowd-0', 'extras-crowd-1', 'extras-crowd-2', 'extras-crowd-3', 'swarm-cloud', 'bridge-planks']);
   for (const child of [...group.children]) {
     if (!(child instanceof THREE.Mesh) || child instanceof THREE.InstancedMesh || dynamicParts.has(child.name) || Array.isArray(child.material)) continue;
     const transformed = child.geometry.clone();
@@ -444,8 +490,11 @@ function buildEntity(entity: CastEntity) {
     const texture = kind === 'monitor' ? spriteAssets.monitorTeal : spriteAssets.monitorRed;
     const monitor = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, alphaTest: 0.02, depthWrite: false }));
     monitor.center.set(0.5, 0); monitor.scale.set(SPRITE_SIZE.monitor[0], SPRITE_SIZE.monitor[1], 1); group.add(monitor);
+    if (kind === 'red-monitor') group.add(lockFan(entity.range ?? 14, entity.halfAngle ?? 0.5));
+    else {
     const cone = new THREE.Mesh(new THREE.ConeGeometry(0.8, 2.3, 4, 1, true), new THREE.MeshBasicMaterial({ color: kind === 'monitor' ? '#e2b04a' : '#c8322a', transparent: true, opacity: 0.28, side: THREE.DoubleSide, depthWrite: false }));
     cone.name = 'monitor-cone'; cone.position.set(0, 0.6, 1.2); group.add(cone);
+    }
   } else if (kind === 'continuity') {
     const propKind = entity.propSequence?.[entity.propIndex ?? 0] ?? entity.propIndex ?? 0;
     const prop = new THREE.Sprite(new THREE.SpriteMaterial({ map: spriteAssets.continuity[propKind % 4], transparent: true, alphaTest: 0.02, depthWrite: false }));
@@ -460,8 +509,36 @@ function buildEntity(entity: CastEntity) {
   batchStaticMeshes(group);
   return group;
 }
+/** Render-only debug overrides (window.__cull.poseDemo / lockDemo). They never enter the sim or its hash. */
+let poseDemo: 'flinch' | 'fall' | null = null;
+let lockDemo: number | null = null;
+let demoMonitor: CastEntity | null = null;
+function renderEntities(): CastEntity[] {
+  return demoMonitor ? [...state.entities, demoMonitor] : state.entities;
+}
+function lockProgress(entity: CastEntity) {
+  if (entity === demoMonitor && lockDemo !== null) return lockDemo;
+  return Math.min(1, (entity.lockTicks ?? 0) / (TUNING.hostileLockSeconds * TUNING.tickRate));
+}
+const lockMarkPoint = new THREE.Vector3();
+const lockOverlay = new LockOverlay($('#gate'), mount);
+// The tally blinks faster as the lock builds: ~2.5 Hz at first, ~14 Hz just before it fails the take.
+let tallyPhase = 0;
+let tallyOn = false;
+let tallyTime = 0;
+function advanceTally(now: number) {
+  const progress = renderEntities().reduce((max, entity) => entity.kind === 'red-monitor' && entity.spawned && !entity.cut ? Math.max(max, lockProgress(entity)) : max, 0);
+  const dt = tallyTime ? Math.min(0.1, (now - tallyTime) / 1000) : 0;
+  tallyTime = now;
+  if (progress <= 0 || state.failed) { tallyPhase = 0; tallyOn = false; return; }
+  const wasOn = tallyOn;
+  tallyPhase = (tallyPhase + dt * (2.5 + 11.5 * progress * progress)) % 1;
+  tallyOn = lockDemo !== null && demoMonitor ? true : tallyPhase < 0.5;
+  if (tallyOn && !wasOn && lockDemo === null) audio.playLockBeep(progress);
+}
 function syncEntities(showTransientRings = true) {
-  for (const entity of state.entities) {
+  const marks: LockMark[] = [];
+  for (const entity of renderEntities()) {
     if (entity.kind === 'urchin') continue;
     if (entity.cut || !entity.spawned) continue;
     let object = entityMeshes.get(entity.id);
@@ -475,6 +552,18 @@ function syncEntities(showTransientRings = true) {
       object.rotation.y = -(entity.heading ?? 0) + Math.PI / 2;
       const cone = object.getObjectByName('monitor-cone');
       if (cone) cone.scale.set(1, 1, Math.min(2, (entity.range ?? 18) / 14));
+      const fan = object.getObjectByName('lock-fan');
+      if (fan) {
+        const progress = lockProgress(entity);
+        const on = progress > 0 && tallyOn;
+        updateLockFan(fan, progress, on);
+        if (!state.failed || entity === demoMonitor) {
+          lockMarkPoint.set(point.x, PATH_RISE + SPRITE_SIZE.monitor[1] + 0.9, point.z).project(camera);
+          if (Math.abs(lockMarkPoint.x) <= 1.1 && Math.abs(lockMarkPoint.y) <= 1.1) {
+            marks.push({ x: (lockMarkPoint.x + 1) / 2 * mount.clientWidth, y: (1 - lockMarkPoint.y) / 2 * mount.clientHeight, progress, on: progress > 0 ? on : false });
+          }
+        }
+      }
     }
     if (entity.kind === 'continuity') {
       const prop = object.getObjectByName('continuity-prop') as THREE.Sprite | undefined;
@@ -526,8 +615,9 @@ function syncEntities(showTransientRings = true) {
     }
     object.visible = true;
   }
+  lockOverlay.update(marks);
   for (const [id, object] of entityMeshes) {
-    const found = state.entities.find((entity) => entity.id === id);
+    const found = renderEntities().find((entity) => entity.id === id);
     if (!found || found.cut || !found.spawned) object.visible = false;
   }
   urchinBuckets.update(state.entities, state.camera.zoom, state.tick, showTransientRings && !window.matchMedia('(prefers-reduced-motion: reduce)').matches, detailFactor, displayPoint, camera.quaternion);
@@ -544,7 +634,7 @@ function syncEntities(showTransientRings = true) {
     const foot = displayPoint(state.talent.x, state.talent.z);
     putShade(foot.x, foot.z, 1.2, 0.75);
   }
-  for (const entity of state.entities) {
+  for (const entity of renderEntities()) {
     if (!entity.spawned || entity.cut) continue;
     const point = displayPoint(entity.x, entity.z);
     if (entity.kind === 'urchin') putShade(point.x, point.z, 1.35, 0.9);
@@ -738,6 +828,7 @@ async function renderReplayContactFrames(): Promise<ScoredFrame[]> {
 }
 function render() {
   audio.update(state);
+  advanceTally(performance.now());
   renderViewfinder();
   captureContactFrame();
   updateHud();
@@ -1046,7 +1137,11 @@ $('#share').addEventListener('click', async () => {
 });
 
 if (query.has('debug')) {
-  Object.assign(window, { __cull: { step: (n = 1) => { for (let i = 0; i < n; i++) advanceTick(); render(); }, input: (input: InputFrame) => { frameInput = input; }, hash: () => stateHash(state), state: () => structuredClone(state), diagnostics: () => ({ paused, keys: [...keys], hidden: document.hidden, focused: document.hasFocus(), dprTier, pointerPan: pointerPan && { ...pointerPan } }), performance: () => ({ drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles }), lod: () => urchinBuckets.diagnostics(), load: (seed: number) => { state = createGeneratedState(seed); terrainTiles = null; urchinBuckets.reset(); }, loadShootScene: (sceneIndex: number) => { state = createShootSceneState(state.seed, sceneIndex); terrainTiles = null; urchinBuckets.reset(); render(); }, finishForShare: () => { state.failed = 'hit'; render(); }, loadLodDemo: () => { state = createGeneratedState(1, 0, 2); state.entities = [{ id: 'lod-demo-urchin', kind: 'urchin', x: 0, z: 2, vx: 0, vz: 0, spawned: true, cut: false, age: 0 }]; state.talent.x = -4; render(); }, setTier: (tier: number) => { const size = [64, 36, 17, 7, 2][tier] ?? 36; state.camera.zoom = TUNING.urchinRadius * 1000 / size; }, setCamera: (x: number, z: number, zoom: number) => { state.camera.x = x; state.camera.z = z; state.camera.zoom = zoom; }, silhouettes: () => measureSilhouettes({ urchin: spriteAssets.urchinTiers[2]!, boulder: spriteAssets.boulder, glass: spriteAssets.glass, extras: spriteAssets.extras[0]!, swarm: spriteAssets.swarmMoth, rumour: spriteAssets.rumour, stagehand: spriteAssets.stagehand, monitor: spriteAssets.monitorTeal, redMonitor: spriteAssets.monitorRed, continuity: spriteAssets.continuity[2]!, talent: spriteAssets.walk[0]! }) } });
+  Object.assign(window, { __cull: { step: (n = 1) => { for (let i = 0; i < n; i++) advanceTick(); render(); }, input: (input: InputFrame) => { frameInput = input; }, hash: () => stateHash(state), state: () => structuredClone(state), diagnostics: () => ({ paused, keys: [...keys], hidden: document.hidden, focused: document.hasFocus(), dprTier, pointerPan: pointerPan && { ...pointerPan } }), performance: () => ({ drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles }), lod: () => urchinBuckets.diagnostics(), load: (seed: number) => { state = createGeneratedState(seed); terrainTiles = null; urchinBuckets.reset(); }, loadShootScene: (sceneIndex: number) => { state = createShootSceneState(state.seed, sceneIndex); terrainTiles = null; urchinBuckets.reset(); render(); }, finishForShare: () => { state.failed = 'hit'; render(); }, loadLodDemo: () => { state = createGeneratedState(1, 0, 2); state.entities = [{ id: 'lod-demo-urchin', kind: 'urchin', x: 0, z: 2, vx: 0, vz: 0, spawned: true, cut: false, age: 0 }]; state.talent.x = -4; render(); }, setTier: (tier: number) => { const size = [64, 36, 17, 7, 2][tier] ?? 36; state.camera.zoom = TUNING.urchinRadius * 1000 / size; }, setCamera: (x: number, z: number, zoom: number) => { state.camera.x = x; state.camera.z = z; state.camera.zoom = zoom; }, poseDemo: (kind: 'flinch' | 'fall' | null = null) => { poseDemo = kind; render(); }, talentScreen: () => { const rect = renderer.domElement.getBoundingClientRect(); const at = (v: THREE.Vector3) => { const p = v.clone().project(camera); return { x: rect.left + (p.x + 1) / 2 * rect.width, y: rect.top + (1 - p.y) / 2 * rect.height }; }; const foot = at(talent.getWorldPosition(new THREE.Vector3())); const head = at(talent.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0, renderedTalentHeight, 0))); return { foot, head, mark: at(shockMark.getWorldPosition(new THREE.Vector3())), lean: talentSprite.material.rotation, flip: talentSprite.scale.x < 0 }; }, lockDemo: (progress: number | null = null) => {
+    lockDemo = progress === null ? null : Math.max(0, Math.min(1, progress));
+    demoMonitor = lockDemo === null ? null : { id: 'demo-red-monitor', kind: 'red-monitor', x: state.talent.x + 5, z: state.talent.z - 3.5, vx: 0, vz: 0, spawned: true, cut: false, age: 0, heading: Math.atan2(3.5, -5), range: 8, halfAngle: 0.45 };
+    render();
+  }, silhouettes: () => measureSilhouettes({ urchin: spriteAssets.urchinTiers[2]!, boulder: spriteAssets.boulder, glass: spriteAssets.glass, extras: spriteAssets.extras[0]!, swarm: spriteAssets.swarmMoth, rumour: spriteAssets.rumour, stagehand: spriteAssets.stagehand, monitor: spriteAssets.monitorTeal, redMonitor: spriteAssets.monitorRed, continuity: spriteAssets.continuity[2]!, talent: spriteAssets.walk[0]! }) } });
 }
 
 new ResizeObserver(() => {

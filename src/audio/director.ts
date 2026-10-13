@@ -1,10 +1,11 @@
+import { Ambience } from './ambience';
 import { audibleSourceIds } from './sources';
 import { lodTier } from '../sim/lod';
 import { TUNING } from '../sim/tuning';
 import type { SimState } from '../sim/types';
 
 type Voice = { oscillator: OscillatorNode; gain: GainNode; panner: StereoPannerNode; filter: BiquadFilterNode; };
-export interface AudioSettings { master: number; music: number; sfx: number; mono: boolean; calm: boolean; }
+export interface AudioSettings { master: number; music: number; sfx: number; mono: boolean; calm: boolean; muted: boolean; }
 const frequencies: Record<string, number> = { talent: 220, urchin: 82, boulder: 54, glass: 660, reel: 1320, extras: 174, swarm: 940, stagehand: 112, bridge: 330, rumour: 63, monitor: 460, 'red-monitor': 780, continuity: 250 };
 
 /** Lazily starts WebAudio on a user gesture and mirrors the sim's current audible source set. */
@@ -13,7 +14,9 @@ export class AudioDirector {
   private master: GainNode | null = null;
   private musicBus: GainNode | null = null;
   private sfxBus: GainNode | null = null;
-  private currentSettings: AudioSettings = { master: 1, music: 0.8, sfx: 0.8, mono: false, calm: false };
+  private currentSettings: AudioSettings = { master: 1, music: 0.8, sfx: 0.8, mono: false, calm: false, muted: false };
+  private ambience: Ambience | null = null;
+  private lastLockBeep = 0;
   private readonly voices = new Map<string, Voice>();
   private readonly active = new Set<string>();
   private lastUpdate = 0;
@@ -33,9 +36,10 @@ export class AudioDirector {
       sfx: settings.sfx === undefined ? this.currentSettings.sfx : volume(settings.sfx),
       mono: settings.mono ?? this.currentSettings.mono,
       calm: settings.calm ?? this.currentSettings.calm,
+      muted: settings.muted ?? this.currentSettings.muted,
     };
     const now = this.context?.currentTime ?? 0;
-    if (this.master) this.master.gain.setTargetAtTime(0.15 * this.currentSettings.master, now, 0.04);
+    if (this.master) this.master.gain.setTargetAtTime(this.masterLevel(), now, 0.04);
     if (this.musicBus) this.musicBus.gain.setTargetAtTime(this.currentSettings.music, now, 0.04);
     if (this.sfxBus) this.sfxBus.gain.setTargetAtTime(this.currentSettings.sfx, now, 0.04);
   }
@@ -46,7 +50,7 @@ export class AudioDirector {
     this.master = this.context.createGain();
     this.musicBus = this.context.createGain();
     this.sfxBus = this.context.createGain();
-    this.master.gain.value = 0.15 * this.currentSettings.master;
+    this.master.gain.value = this.masterLevel();
     this.musicBus.gain.value = this.currentSettings.music;
     this.sfxBus.gain.value = this.currentSettings.sfx;
     this.master.connect(this.context.destination);
@@ -56,6 +60,7 @@ export class AudioDirector {
     oscillator.type = 'sine'; oscillator.frequency.value = 64; gain.gain.value = 0;
     oscillator.connect(gain); gain.connect(this.musicBus!); oscillator.start();
     this.pulse = { oscillator, gain };
+    this.ambience = new Ambience(this.context, this.musicBus);
     await this.context.resume();
   }
 
@@ -64,6 +69,8 @@ export class AudioDirector {
     this.active.clear(); ids.forEach((id) => this.active.add(id));
     if (!this.context || !this.master) return;
     const now = this.context.currentTime;
+    this.ambience?.setScene(state.shoot?.sceneIndex ?? 0);
+    this.ambience?.tick();
     const beat = Math.floor(state.tick * 96 / (TUNING.tickRate * 60));
     if (beat > this.lastBeat && this.pulse) {
       this.lastBeat = beat;
@@ -116,6 +123,7 @@ export class AudioDirector {
 
   playCue(name: 'cut' | 'pop' | 'reel' | 'lod' | 'wrap') {
     if (!this.context || !this.master || !this.sfxBus) return;
+    this.ambience?.duckFor();
     if (name === 'cut') { this.playSplice(); return; }
     const frequenciesByCue = { pop: [220, 880], reel: [520, 1040], lod: [900, 240], wrap: [90, 440] };
     const [from, to] = frequenciesByCue[name];
@@ -129,6 +137,30 @@ export class AudioDirector {
     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.24);
     oscillator.connect(gain); gain.connect(this.sfxBus);
     oscillator.start(now); oscillator.stop(now + 0.25);
+    oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
+  }
+
+  private masterLevel() { return this.currentSettings.muted ? 0 : 0.15 * this.currentSettings.master; }
+
+  /** Hostile-camera tally beep: a short rising chirp whose pitch climbs with lock progress (0..1). Rate-limited by the caller's blink. */
+  playLockBeep(progress: number) {
+    if (!this.context || !this.sfxBus) return;
+    const now = this.context.currentTime;
+    if (now - this.lastLockBeep < 0.05) return;
+    this.lastLockBeep = now;
+    this.ambience?.duckFor(0.2);
+    const p = Math.max(0, Math.min(1, progress));
+    const from = 620 + 700 * p;
+    const oscillator = this.context.createOscillator();
+    const gain = this.context.createGain();
+    oscillator.type = 'square';
+    oscillator.frequency.setValueAtTime(from, now);
+    oscillator.frequency.exponentialRampToValueAtTime(from * 1.35, now + 0.06);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.05 * (this.currentSettings.calm ? 0.5 : 1), now + 0.006);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.07);
+    oscillator.connect(gain); gain.connect(this.sfxBus);
+    oscillator.start(now); oscillator.stop(now + 0.08);
     oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
   }
 

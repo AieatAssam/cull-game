@@ -160,6 +160,26 @@ button, input, select, summary { font: inherit; }
 .frame-message { top: 10%; }
 .coach { top: 22%; border: 1px solid var(--brass); }
 .coach.hidden, .title-card.hidden { display: none; }
+/* Hostile camera lock telegraph: tally + countdown ring over the monitor, carmine edge while it holds her. */
+.lock-overlay { position: absolute; inset: 0; z-index: 3; pointer-events: none; transition: box-shadow 0.12s linear; }
+.lock-mark { position: absolute; left: 0; top: 0; width: 44px; height: 44px; margin: -22px 0 0 -22px; }
+.lock-mark svg { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 1px 1px rgba(30, 26, 23, 0.6)); }
+.lock-track { fill: rgba(30, 26, 23, 0.55); stroke: var(--ink); stroke-width: 6; }
+.lock-fill { fill: none; stroke: var(--carmine); stroke-width: 6; stroke-linecap: round; stroke-dasharray: calc(var(--lock, 0) * 100) 100; transform: rotate(-90deg); transform-origin: 24px 24px; opacity: 0; }
+.lock-tally { fill: #6b1d18; stroke: var(--ink); stroke-width: 2; }
+.lock-mark.locking .lock-fill { opacity: 1; }
+.lock-mark.on .lock-tally { fill: #ff4b3e; filter: drop-shadow(0 0 4px #ff4b3e); }
+.lock-mark.locking { width: 56px; height: 56px; margin: -28px 0 0 -28px; }
+.gate.hostile-lock .lock-overlay {
+  box-shadow: inset 0 0 0 calc(3px + 5px * var(--lock, 0)) rgba(200, 50, 42, calc(0.55 + 0.4 * var(--lock, 0))),
+    inset 0 0 calc(24px + 56px * var(--lock, 0)) rgba(200, 50, 42, calc(0.35 + 0.4 * var(--lock, 0)));
+}
+.gate.hostile-lock.hostile-blink .lock-overlay { box-shadow: inset 0 0 0 calc(5px + 6px * var(--lock, 0)) rgba(255, 75, 62, 0.95), inset 0 0 calc(30px + 70px * var(--lock, 0)) rgba(200, 50, 42, 0.75); }
+.gate.hostile-lock .lock-overlay::after {
+  content: "● HOSTILE CAMERA ON HER — FRAME IT OUT";
+  position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); max-width: calc(100% - 40px);
+  padding: 4px 10px; background: var(--carmine); color: var(--paper); font-size: 13px; font-weight: 700; letter-spacing: 0.06em; white-space: nowrap;
+}
 .margin { height: 100%; display: flex; flex-direction: column; justify-content: space-between; gap: 12px; padding: 8px 0; min-width: 0; }
 .slate { line-height: 1.45; }
 .slate strong { color: var(--paper); font-family: Fraunces, Georgia, serif; font-size: 22px; font-weight: 700; }
