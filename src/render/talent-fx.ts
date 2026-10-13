@@ -16,14 +16,14 @@ export interface TalentPlay {
 const REST: TalentPlay = { sx: 1, sy: 1, lift: 0, lean: 0 };
 
 /**
- * Squash & stretch across the 4-frame walk. Frames 0 and 2 are contacts (squash ~0.88 Y / 1.10 X), 1 and 3 are
- * passing (stretch ~1.08 Y / 0.94 X, lifted). `phase` is continuous in frames, so the scale eases between them.
+ * Squash & stretch across the 4-frame walk. Frames 0 and 2 are contacts (squash ~0.955 Y / 1.03 X), 1 and 3 are
+ * passing (stretch ~1.045 Y / 0.97 X, lifted). `phase` is continuous in frames, so the scale eases between them.
  */
 export function walkPlay(phase: number, height: number): TalentPlay {
   const c = Math.cos(Math.PI * (phase - 0.5));
   // Hold a little longer at the extremes so the pose reads before it eases away.
   const k = Math.sign(c) * Math.abs(c) ** 0.6;
-  return { sx: 1.02 + 0.08 * k, sy: 0.98 - 0.1 * k, lift: height * 0.065 * (1 - k) / 2, lean: 0 };
+  return { sx: 1 + 0.03 * k, sy: 1 - 0.045 * k, lift: height * 0.035 * (1 - k) / 2, lean: 0 };
 }
 
 /** Flinch: snap back away from travel, hop and pop in the first ~10 frames, then hold the lean. */
@@ -34,6 +34,57 @@ export function flinchPlay(age: number, height: number, facing: number): TalentP
 
 export function restPlay(): TalentPlay {
   return REST;
+}
+
+const easeOutBack = (t: number) => 1 + 2.4 * (t - 1) ** 3 + 1.4 * (t - 1) ** 2;
+const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
+
+/** Idle: slow breathing, ~0.28 Hz, chest up = a hair taller and narrower. */
+export function idlePlay(seconds: number, height: number): TalentPlay {
+  const b = Math.sin(seconds * Math.PI * 2 * 0.28);
+  return { sx: 1 - 0.012 * b, sy: 1 + 0.02 * b, lift: height * 0.004 * (b + 1), lean: 0 };
+}
+
+/**
+ * Flinch over real time: a 90 ms anticipation crouch, an overshooting recoil up and back, then a trembling hold.
+ * `seconds` since the flinch began.
+ */
+export function flinchPlay2(seconds: number, height: number, facing: number): TalentPlay {
+  const crouch = clamp01(seconds / 0.09);
+  const recoil = clamp01((seconds - 0.09) / 0.26);
+  const pre = seconds < 0.09 ? Math.sin(crouch * Math.PI / 2) : 1 - easeOutBack(recoil);
+  const pop = seconds < 0.09 ? 0 : Math.sin(Math.PI * clamp01((seconds - 0.09) / 0.3));
+  const tremble = seconds > 0.4 ? Math.sin(seconds * 46) * 0.012 : 0;
+  return {
+    sx: 1 + 0.1 * pre - 0.07 * pop,
+    sy: 1 - 0.14 * pre + 0.12 * pop,
+    lift: height * 0.11 * pop,
+    lean: facing * (0.22 * easeOutBack(recoil) + 0.06 * pop + tremble),
+  };
+}
+
+/**
+ * Fall over real time on the square fallen texture: starts tipped back near upright, topples with gravity ease-in,
+ * lands with a squash and two small bounces. The fallen art lies with her feet to the right, so +lean stands it up.
+ */
+export function fallPlay(seconds: number, height: number, facing: number): TalentPlay {
+  const t = clamp01(seconds / 0.42);
+  const tip = (1 - t * t) * 1.15;
+  const after = Math.max(0, seconds - 0.42);
+  const bounce = Math.abs(Math.sin(after * 15)) * Math.exp(-after * 9);
+  const land = seconds > 0.42 ? Math.exp(-after * 14) : 0;
+  return { sx: 1 + 0.1 * land, sy: 1 - 0.14 * land, lift: height * 0.06 * bounce, lean: facing * tip };
+}
+
+/** One critically-under-damped spring step: overshoots and settles, so hair and cloth lag motion and swing past stops. */
+export function springStep(spring: { x: number; v: number }, target: number, dt: number, stiffness = 110, damping = 7) {
+  const steps = Math.max(1, Math.ceil(dt / (1 / 120)));
+  const h = dt / steps;
+  for (let i = 0; i < steps; i++) {
+    spring.v += (stiffness * (target - spring.x) - damping * spring.v) * h;
+    spring.x += spring.v * h;
+  }
+  return spring.x;
 }
 
 function inkCanvas(width: number, height: number, draw: (ctx: CanvasRenderingContext2D) => void) {

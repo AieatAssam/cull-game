@@ -10,7 +10,7 @@ export const SHOTS = ['Close-up', 'Medium shot', 'Wide shot', 'Stand-in', 'Gone'
 export const COACH_LINES = [
   'She walks on her own. Keep her in the shot: lose her and film burns, and after 3 seconds the take is gone.',
   'Zoom out and the spikes go dull, but only a close cut clears a defang mark. Zoom in to grab a film reel.',
-  'Push a hazard past the frame edge to cut it. A close cut scores more.',
+  'Push a hazard past the frame edge to cut it, at any distance. Only a cut close to her scores more and clears a defang mark.',
 ] as const;
 
 const URCHIN_STATE = ['spikes sharp', 'spikes sharp', 'spikes dull', 'a block', 'gone'] as const;
@@ -84,7 +84,7 @@ export function describeShot(state: SimState): ShotCopy {
   if (state.failed === 'wrapped') toast = "That's a wrap.";
   else if (state.failed) toast = 'The take is over.';
   else if (talentLost(state)) toast = 'Lost her! Film is burning. Follow the arrow and get her back in the shot.';
-  else if (goal?.kind === 'defang') toast = 'Shot list: defang. Cut the spiny ball close to her, past the frame edge. Zooming out will not clear it.';
+  else if (goal?.kind === 'defang') toast = 'Shot list: defang. Pan so the spiny ball next to her leaves the frame while she stays in. Zooming out will not clear it.';
   else if (goal?.kind === 'portrait') toast = 'Shot list: come in closer on her.';
   else if (urchin && urchinState !== 'gone' && urchinInShot(state, urchin)) toast = `${shot}. ${URCHIN_LINE[urchinTier] ?? URCHIN_LINE[4]}`;
   return { shot, hazards, gate, toast, coach: COACH_LINES };

@@ -1,5 +1,5 @@
 import { inFrame, projectPoint, projectedAabb } from './frame';
-import { gateOpen, markShots, shotBlocksTalent } from './framing';
+import { markShots, shotBlocksTalent } from './framing';
 import { lodTier, type LodTier } from './lod';
 import { lensAspect, lensLodFactor } from './lenses';
 import { TUNING } from './tuning';
@@ -38,11 +38,11 @@ function monitorCone(entity: CastEntity): MonitorCone {
 
 /**
  * Framed out but not cut: far Glass is unloaded intact (it only shatters within reach of the Talent, where it was
- * just on screen), and a stand-in on a gate mark only leaves when its shot has been called.
+ * just on screen). Everything else framed out is cut, at any distance — including a gate's stand-in (loop review
+ * 2026-10-13: a deliberate far cut removes it; it is re-dressed on its mark when the shot is called, see markShots).
  */
 function unloadsIntact(state: SimState, entity: CastEntity) {
-  if (entity.kind === 'glass') return distance(entity.x, entity.z, state.talent.x, state.talent.z) > TUNING.glassShatterRadius;
-  return entity.gate !== undefined && !gateOpen(state, entity.gate);
+  return entity.kind === 'glass' && distance(entity.x, entity.z, state.talent.x, state.talent.z) > TUNING.glassShatterRadius;
 }
 
 /** Mirrors the HUD call sheet ("Coming in"): unspawned cast just past the gate edge. */
@@ -110,6 +110,12 @@ function noteFrameCut(state: SimState, entity: CastEntity) {
   state.score += TUNING.closeCallScore;
 }
 
+/** Log zoom speed per second for an input in −127…127 (positive tightens): gentle near zero, fast at full input. */
+export function zoomLogRate(zoomInput: number): number {
+  const u = Math.max(-1, Math.min(1, zoomInput / 127));
+  return u * (1 + TUNING.zoomBoost * u ** 4) * Math.log(TUNING.zoomRate);
+}
+
 export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): SimState {
   if (previous.failed) return previous;
   const state: SimState = {
@@ -139,7 +145,7 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
   cam.x += cam.vx * dt;
   cam.z += cam.vz * dt;
   cam.moving = Math.hypot(cam.vx, cam.vz) / cam.zoom > TUNING.motionThreshold;
-  if (input.zoom && state.lens !== 'long-lens') cam.zoom = Math.max(TUNING.minZoom, Math.min(TUNING.maxZoom, cam.zoom * Math.exp(-(input.zoom / 127) * Math.log(TUNING.zoomRate) * dt)));
+  if (input.zoom && state.lens !== 'long-lens') cam.zoom = Math.max(TUNING.minZoom, Math.min(TUNING.maxZoom, cam.zoom * Math.exp(-zoomLogRate(input.zoom) * dt)));
   if (input.rotate && cam.rotationTicksRemaining === 0) {
     cam.yawTarget = (cam.yawTarget + input.rotate + 8) % 8;
     cam.rotationTicksRemaining = Math.round(TUNING.rotationSeconds * TUNING.tickRate);

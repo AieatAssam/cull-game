@@ -34,6 +34,10 @@ export const SCENE_LOOKS: SceneLook[] = [
 
 export interface DailiesCast extends SpriteAssets {
   walk: [THREE.Texture, THREE.Texture, THREE.Texture, THREE.Texture];
+  /** Tail-less body: 16 walk phases and a standing pose; `tails` are the ponytail layer at evenly spaced swings. */
+  walkCycle: THREE.Texture[];
+  standBody: THREE.Texture;
+  tails: THREE.Texture[];
   /** Breathing in, breathing out: plays while she waits. */
   idle: [THREE.Texture, THREE.Texture];
   /** Arms up, eyes wide: a hazard is inside the close-call radius. */
@@ -405,6 +409,8 @@ interface Pose {
   /** Ponytail swing: positive throws it back and up, negative lets it swing in behind her. */
   sway: number;
   fallen?: boolean;
+  /** Which layers to paint: the body without its ponytail, or the ponytail alone (main.ts springs it separately). */
+  layer?: 'body' | 'tail';
 }
 
 function drawLeg(ctx: Ctx, r: Rand, hx: number, hy: number, angle: number, lift: number, back: boolean) {
@@ -496,7 +502,8 @@ function talentPuppet(p: Pose) {
     const b = p.bob;
     const hy = -93 + b;
 
-    ponytail(ctx, r, hy, p.sway);
+    if (p.layer !== 'body') ponytail(ctx, r, hy, p.sway);
+    if (p.layer === 'tail') return;
     drawArm(ctx, r, -9, -68 + b, p.arms[0], true);
     drawLeg(ctx, r, -3.5, -30 + b, p.legs[0], p.lift[0], true);
     drawLeg(ctx, r, 3.5, -30 + b, p.legs[1], p.lift[1], false);
@@ -691,12 +698,26 @@ const FALL: Pose = { ...STAND, legs: [0.35, -0.2], arms: [-1.3, 0.9], eyes: 'x',
 /** main.ts shows the Talent at 0.66 × height; the fall pose goes square. */
 export const TALENT_ASPECT = 0.66;
 
+/** Continuous walk sampled at `n` phases: legs and arms swing on one sine, the trailing boot lifts while it passes. */
+function walkCycle(n: number) {
+  return Array.from({ length: n }, (_, i) => {
+    const a = Math.PI * 2 * i / n;
+    const c = Math.cos(a), s = Math.sin(a);
+    return talentTexture({ ...STAND, legs: [0.4 * c, -0.4 * c], arms: [-0.5 * c, 0.5 * c], lift: [0.22 * Math.max(0, s), 0.22 * Math.max(0, -s)], layer: 'body' }, 20 + i);
+  });
+}
+
+/** Ponytail alone at `n` swings from -1.4 (in behind her) to 1.4 (thrown back), for the spring-driven tail layer. */
+function tailSwings(n: number) {
+  return Array.from({ length: n }, (_, i) => talentTexture({ ...STAND, sway: -1.4 + 2.8 * i / (n - 1), layer: 'tail' }, 40 + i));
+}
+
 function talentTexture(p: Pose, seed: number) {
   return cast(talentPuppet(p), {
     ink: 1,
     halo: 0.9,
     haloAlpha: 0.7,
-    shadow: p.fallen ? [64, 120, 50, 5] : [65, 121.5, 22, 4.2],
+    shadow: p.layer === 'tail' ? undefined : p.fallen ? [64, 120, 50, 5] : [65, 121.5, 22, 4.2],
   }, seed, p.fallen ? 1 : TALENT_ASPECT);
 }
 
@@ -1596,6 +1617,9 @@ export function createDailiesCast(): DailiesCast {
   const idle: DailiesCast['idle'] = [talentTexture(IDLE[0]!, 5), talentTexture(IDLE[1]!, 6)];
   return {
     walk,
+    walkCycle: walkCycle(16),
+    standBody: talentTexture({ ...STAND, layer: 'body' }, 19),
+    tails: tailSwings(9),
     idle,
     flinch: talentTexture(FLINCH, 7),
     fall: talentTexture(FALL, 8),

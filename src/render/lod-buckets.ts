@@ -5,6 +5,10 @@ import type { CastEntity } from '../sim/types';
 import { PATH_RISE, SPRITE_SIZE } from './set-dressing';
 import type { SpriteAssets } from './sprite-assets';
 
+/** Render-only acting per urchin: breathing scale, anticipation squash and bristle shiver. */
+export interface UrchinPose { sx: number; sy: number; spin: number; lift: number }
+const REST_POSE: UrchinPose = { sx: 1, sy: 1, spin: 0, lift: 0 };
+
 const tierNames = ['close', 'medium', 'wide', 'proxy'] as const;
 
 export class UrchinLodBuckets {
@@ -30,7 +34,7 @@ export class UrchinLodBuckets {
     this.meshes.push(null); // Sub-pixel tier has no geometry and never enters a bucket.
   }
 
-  update(entities: CastEntity[], zoom: number, tick: number, showTransientRings = true, detailFactor: (x: number, z: number) => number = () => 1, displayPoint: (x: number, z: number) => { x: number; z: number } = (x, z) => ({ x, z }), cameraQuaternion = new THREE.Quaternion()) {
+  update(entities: CastEntity[], zoom: number, tick: number, showTransientRings = true, detailFactor: (x: number, z: number) => number = () => 1, displayPoint: (x: number, z: number) => { x: number; z: number } = (x, z) => ({ x, z }), cameraQuaternion = new THREE.Quaternion(), pose: (entity: CastEntity) => UrchinPose = () => REST_POSE) {
     for (const mesh of this.meshes) if (mesh) mesh.count = 0;
     for (const entity of entities) {
       if (entity.kind !== 'urchin' || !entity.spawned || entity.cut) continue;
@@ -58,8 +62,10 @@ export class UrchinLodBuckets {
       const point = displayPoint(entity.x, entity.z);
       this.transform.position.set(point.x, PATH_RISE + SPRITE_SIZE.urchin * 0.22, point.z);
       this.transform.quaternion.copy(cameraQuaternion);
-      this.transform.rotateZ(entity.age * 0.015);
-      this.transform.scale.set(SPRITE_SIZE.urchin, SPRITE_SIZE.urchin, 1);
+      const acting = pose(entity);
+      this.transform.position.y += acting.lift;
+      this.transform.rotateZ(entity.age * 0.015 + acting.spin);
+      this.transform.scale.set(SPRITE_SIZE.urchin * acting.sx, SPRITE_SIZE.urchin * acting.sy, 1);
       this.transform.updateMatrix();
       bucket.setMatrixAt(index, this.transform.matrix);
       bucket.instanceMatrix.needsUpdate = true;

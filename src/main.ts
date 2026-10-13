@@ -6,6 +6,8 @@ import { updateRenderCamera } from './render/camera';
 import { cameraBasis, projectPoint } from './sim/frame';
 import { NEUTRAL_INPUT, lostProgress, step, talentLost } from './sim/step';
 import { lodTier } from './sim/lod';
+import { assistInput, composeInput, dragCameraTarget, dragSettled, pinchZoomTarget, type DragTarget } from './ui/input-map';
+import { nextZoomStep } from './ui/zoom-control';
 import { TUNING } from './sim/tuning';
 import { createGeneratedState, createState } from './sim/world';
 import { createValidatedState } from './gen/validated';
@@ -18,7 +20,7 @@ import { measureSilhouettes } from './render/silhouettes';
 import { PATH_RISE, SPRITE_SIZE, createSetDressing, createTableTextures, raisedPathGeometry } from './render/set-dressing';
 import { DPR_SCALES, nextDprTier } from './render/adaptive-dpr';
 import { LockOverlay, lockFan, updateLockFan, type LockMark } from './render/hostile-lock';
-import { createDustPuff, createShockMark, flinchPlay, restPlay, walkPlay } from './render/talent-fx';
+import { createDustPuff, createShockMark, fallPlay, flinchPlay2, idlePlay, springStep, walkPlay } from './render/talent-fx';
 import { AudioDirector, type AudioSettings } from './audio/director';
 import { dailySeed } from './meta/daily';
 import { loadFilmography, personalBest, recordResult } from './meta/filmography';
@@ -30,7 +32,7 @@ import { filmStocks, loadFilmStock, saveFilmStock, unlockedFilmStocks, type Film
 import { lensFeats, unlockedLenses } from './meta/lenses';
 import { monitorConeContains } from './sim/m6';
 import { lensAspect, lensLodFactor, lensRenderTicks, type LensId } from './sim/lenses';
-import { closeCallsForGrade, coachIndex, describeShot } from './ui/describe-shot';
+import { COACH_LINES, closeCallsForGrade, describeShot } from './ui/describe-shot';
 import type { CastEntity, InputFrame, SimState } from './sim/types';
 
 const spriteAssets = createDailiesCast();
@@ -98,24 +100,30 @@ let pointer: { id: number; x: number; y: number } | null = null;
 const keys = new Set<string>();
 let frameInput: InputFrame = { ...NEUTRAL_INPUT };
 let sliderZoomTarget: number | null = null;
-let pointerPan: Pick<InputFrame, 'panX' | 'panZ'> | null = null;
-let zoomPulse = 0;
+// A zoom key or − + button that is down: a tap snaps a framing step, holding past the hold delay zooms at full speed.
+let zoomPress: { direction: 1 | -1; since: number } | null = null;
+let lastWheelStep = 0;
+let dragTarget: DragTarget | null = null;
+/** A short HUD line after a far cut or a re-dressed stand-in; it overrides the toast until `until`. */
+let cutNote: { text: string; until: number } | null = null;
 let rotationPulse: -1 | 0 | 1 = 0;
 let simAccumulator = 0;
 let previousTime = 0;
 let frameSamples: number[] = [];
 let hitStopUntil = 0;
-let coachStarted = 0;
+/** The intro and the coach lines are cards read before the take rolls; while one shows the loop advances no ticks. */
+const TUTORIAL_STEPS = ['Nothing exists unless it is in the shot. You hold the camera. She walks.', ...COACH_LINES] as const;
+const tutorial = { step: 0, steps: 0, showing: false };
 
 const shell = document.createElement('section');
 shell.className = 'stage';
 shell.innerHTML = `
   <header class="topbar"><div class="brand"><span class="rec-dot"></span><strong>CULL</strong><span class="tagline">CAMERA DEPARTMENT</span></div><label class="stock-control">STOCK <select id="film-stock" aria-label="Film stock"><option value="clean">35 MM · CLEAN</option><option value="kodachrome">KODACHROME · B</option><option value="bleach">BLEACH BYPASS · A</option><option value="ilford">ILFORD B&W · S</option></select></label><details class="sound-settings" id="sound-settings"><summary id="sound-summary">SOUND</summary><div class="sound-panel"><button id="mute-audio" type="button" aria-pressed="false">MUTE ALL</button><label>MASTER <input id="volume-master" aria-label="Master volume" type="range" min="0" max="100" value="100" /></label><label>MUSIC <input id="volume-music" aria-label="Music volume" type="range" min="0" max="100" value="80" /></label><label>EFFECTS <input id="volume-sfx" aria-label="Effects volume" type="range" min="0" max="100" value="80" /></label><label><input id="mono-audio" type="checkbox" /> MONO</label><label><input id="calm-audio" type="checkbox" /> CALM MIX</label></div></details><div class="readout"><a class="daily-link" href="?daily=1">DAILY</a><span>TAKE 01</span><b id="timecode">01:30</b><span id="lens">35 MM</span><button class="pause-button" id="pause" aria-label="Pause game">Ⅱ</button></div></header>
-  <div class="composition"><aside class="margin margin-left"><div class="slate">SCENE 01<br><strong>BACKLOT</strong><small>SEED <span id="seed">00001</span></small><small id="best">BEST —</small></div><div class="hint"><span class="hint-mark">↖</span> WASD / DRAG<br>TO FRAME THE SHOT<div class="preview" id="preview"></div></div></aside>
-    <div class="gate-wrap"><div class="gate-label"><span id="gate-ratio">VIEWFINDER · GATE 1:1</span><span id="lod">SHE IS IN A MEDIUM SHOT</span></div><div class="gate" id="gate"><div class="thirds"></div><div class="focus-band" id="focus-band" hidden></div><div class="gate-corners"></div><div class="sprockets left"></div><div class="sprockets right"></div><div id="mount" class="mount"></div><div class="depth-blur top"></div><div class="depth-blur bottom"></div><div class="lost-edge" id="lost-edge"></div><div class="lost-arrow hidden" id="lost-arrow"><span>➤</span><b>HER</b></div><div class="lost-banner hidden" id="lost-banner"><strong>LOST HER</strong><small id="lost-count">2.5 s TO CUT</small><div class="lost-track"><i id="lost-bar"></i></div></div><div class="frame-message" id="message">Keep her in the shot.</div><p class="coach hidden" id="coach"></p><div class="title-card hidden" id="title-card"><p class="title-kicker">SCENE 01 · TAKE 01</p><h1>CULL</h1><p>Nothing exists unless it is in the shot. You hold the camera. She walks.</p></div><div class="cut-flash" id="cut-flash"></div><div class="slice" id="slice"></div><div class="peel" id="peel"></div><div class="cut-stamp" id="cut-stamp">CUT</div><i class="spark" style="--dx:-18px;--dy:-24px;left:70%;top:40%"></i><i class="spark" style="--dx:16px;--dy:-20px;left:72%;top:46%"></i><i class="spark" style="--dx:8px;--dy:18px;left:68%;top:50%"></i><i class="spark" style="--dx:-22px;--dy:8px;left:74%;top:42%"></i></div><div class="gate-foot"><span>55° TABLETOP</span><span id="status">ROLLING</span></div></div>
+  <div class="composition"><aside class="margin margin-left"><div class="slate">SCENE 01<br><strong>BACKLOT</strong><small>SEED <span id="seed">00001</span></small><small id="best">BEST —</small></div><div class="hint"><span class="hint-mark">↖</span> <span class="key-hint">WASD / DRAG<br>TO FRAME THE SHOT</span><span class="touch-hint">DRAG TO FRAME<br>PINCH TO ZOOM</span><div class="preview" id="preview"></div></div></aside>
+    <div class="gate-wrap"><div class="gate-label"><span id="gate-ratio">VIEWFINDER · GATE 1:1</span><span id="lod">SHE IS IN A MEDIUM SHOT</span></div><div class="gate" id="gate"><div class="thirds"></div><div class="focus-band" id="focus-band" hidden></div><div class="gate-corners"></div><div class="sprockets left"></div><div class="sprockets right"></div><div id="mount" class="mount"></div><div class="depth-blur top"></div><div class="depth-blur bottom"></div><div class="lost-edge" id="lost-edge"></div><div class="lost-arrow hidden" id="lost-arrow"><span>➤</span><b>HER</b></div><div class="lost-banner hidden" id="lost-banner"><strong>LOST HER</strong><small id="lost-count">2.5 s TO CUT</small><div class="lost-track"><i id="lost-bar"></i></div></div><div class="title-card hidden" id="title-card"><p class="title-kicker">SCENE 01 · TAKE 01</p><h1>CULL</h1></div><div class="cut-flash" id="cut-flash"></div><div class="slice" id="slice"></div><div class="peel" id="peel"></div><div class="cut-stamp" id="cut-stamp">CUT</div><i class="spark" style="--dx:-18px;--dy:-24px;left:70%;top:40%"></i><i class="spark" style="--dx:16px;--dy:-20px;left:72%;top:46%"></i><i class="spark" style="--dx:8px;--dy:18px;left:68%;top:50%"></i><i class="spark" style="--dx:-22px;--dy:8px;left:74%;top:42%"></i></div><div class="gate-notes"><p class="frame-message" id="message">Keep her in the shot.</p><div class="tutorial hidden" id="tutorial" role="dialog" aria-labelledby="tutorial-text"><p class="tutorial-kicker" id="tutorial-kicker"></p><p class="tutorial-text" id="tutorial-text"></p><button id="tutorial-next" type="button">CONTINUE</button></div></div><div class="gate-foot"><span>55° TABLETOP</span><span id="status">ROLLING</span></div></div>
     <aside class="margin margin-right"><div class="camera-mark">Slate<small>CAM 01</small></div><div class="call-sheet"><span>CALL SHEET</span><div id="call-sheet">Looking outside the frame…</div></div></aside>
   </div>
-  <footer class="controlbar"><div class="controls"><span><kbd>WASD</kbd> PAN</span><span><kbd>−</kbd> / <kbd>+</kbd> ZOOM</span><span><kbd>SPACE</kbd> HOLD</span><span><kbd>Q</kbd> / <kbd>E</kbd> ROTATE</span></div><div class="mobile-controls"><button id="hold" aria-label="Hold Talent">HOLD</button><label>ZOOM <input id="zoom-slider" aria-label="Zoom" type="range" min="10" max="48" value="30" /></label></div><div class="assist-controls"><button id="left-hand" type="button" aria-pressed="false">LEFT HAND</button><button id="overcrank" type="button" aria-pressed="false">75% SPEED</button></div><div class="film"><span>FILM</span><div class="film-track"><i id="filmbar"></i></div><b id="film">90s</b><em id="film-drain" hidden>−${TUNING.offscreenFilmDrainPerSecond}s/s</em></div></footer>
+  <footer class="controlbar"><div class="controls"><span><kbd>WASD</kbd> PAN</span><span><kbd>−</kbd> / <kbd>+</kbd> ZOOM</span><span><kbd>SPACE</kbd> HOLD</span><span><kbd>Q</kbd> / <kbd>E</kbd> ROTATE</span></div><p class="touch-hint">Drag to frame · pinch to zoom</p><div class="mobile-controls"><button id="hold" type="button" aria-label="Hold Talent">HOLD</button><div class="touch-buttons"><button id="rotate-left" type="button" aria-label="Rotate left">↺</button><button id="rotate-right" type="button" aria-label="Rotate right">↻</button><button id="zoom-out" type="button" aria-label="Zoom out">−</button><button id="zoom-in" type="button" aria-label="Zoom in">+</button></div><label class="zoom-slider">ZOOM <input id="zoom-slider" aria-label="Zoom" type="range" min="10" max="48" value="30" /></label></div><div class="assist-controls"><button id="left-hand" type="button" aria-pressed="false">LEFT HAND</button><button id="overcrank" type="button" aria-pressed="false">75% SPEED</button></div><div class="film"><span>FILM</span><div class="film-track"><i id="filmbar"></i></div><b id="film">90s</b><em id="film-drain" hidden>−${TUNING.offscreenFilmDrainPerSecond}s/s</em></div></footer>
   <div class="end-card hidden" id="end-card"><div class="end-stamp">TAKE ENDED</div><h1 id="end-title">CUT</h1><p id="end-detail"></p><p id="share-card"></p><div id="grade-detail" class="grade-detail"></div><details class="grade-method"><summary>How the grade works</summary><p>The grade averages four things: how often she sits on a thirds mark, how smooth the camera was, close cuts (10 points each, up to 100), and how many film reels you kept. S is 90 or above, A is 75, B is 60, and the rest is C.</p></details><details class="lens-feats"><summary>LENS FEATS</summary><ul id="lens-feat-list"></ul></details><label class="next-lens">NEXT TAKE LENS <select id="lens-select" aria-label="Lens for next take"></select></label><div class="end-actions"><a id="download-sheet" download>CONTACT SHEET ↓</a><button id="make-reel">DIRECTOR'S REEL</button><a id="download-reel" class="hidden" download>WEBM ↓</a><button id="share">SHARE</button><a id="replay-link" target="_blank" rel="noreferrer">REPLAY ↗</a></div><details class="filmography"><summary>FILMOGRAPHY · LAST 5 TAKES</summary><ol id="filmography-list"></ol></details><button id="restart">NEW TAKE ↗</button></div>
 `;
 app.append(shell);
@@ -335,15 +343,31 @@ const talentSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: spriteAsse
 talentSprite.center.set(0.5, 0);
 talentSprite.scale.set(2.3, 3.5, 1);
 talentSprite.renderOrder = 4;
+// Ponytail layer behind the body, picked from pre-drawn swings by a spring so it lags and overshoots.
+const tailSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: spriteAssets.tails[4], transparent: true, alphaTest: 0.04, depthWrite: false }));
+tailSprite.center.set(0.5, 0);
+tailSprite.renderOrder = 3;
+talent.add(tailSprite);
 const shockMark = createShockMark();
 const dustPuff = createDustPuff();
 talent.add(talentSprite, shockMark, dustPuff);
 scene.add(talent);
-/** Render frames spent in the current pose kind, so a flinch pops once on entry and the dust settles. */
+/** Real-time pose clock and the springs behind her secondary motion. All render-only. */
 let talentPoseKind = '';
-let talentPoseAge = 0;
+let talentPoseStart = 0;
+let talentClock = 0;
 let renderedTalentTier = -1;
 let renderedTalentHeight = 3.5;
+let walkCycle = 0;
+let lastFoot: { x: number; z: number } | null = null;
+let smoothSpeed = 0;
+const tailSpring = { x: 0, v: 0 };
+const leanSpring = { x: 0, v: 0 };
+const hemSpring = { x: 0, v: 0 };
+/** Body pivot as a fraction of sprite height: about where her coat is belted. */
+const WAIST = 0.44;
+/** Metres per full stride (two steps): the walk phase advances with distance, so feet don't skate. */
+const STRIDE = 1.5;
 function syncTalentLod() {
   const tier = state.talent.lodTier ?? Math.min(lodTier(1000 / state.camera.zoom * detailFactor(state.talent.x, state.talent.z)), 3);
   if (tier !== renderedTalentTier) {
@@ -351,48 +375,80 @@ function syncTalentLod() {
     talent.visible = tier < 4;
     renderedTalentHeight = tier <= 1 ? 3.5 : tier === 2 ? 2.8 : 2;
   }
-  const map = talentPose();
-  if (talentSprite.material.map !== map) talentSprite.material.map = map;
+  const now = performance.now() / 1000;
+  const dt = talentClock ? Math.min(0.1, Math.max(0, now - talentClock)) : 1 / 60;
+  talentClock = now;
+  const moved = lastFoot ? Math.hypot(state.talent.x - lastFoot.x, state.talent.z - lastFoot.z) : 0;
+  lastFoot = { x: state.talent.x, z: state.talent.z };
+  const step = moved > 2 ? 0 : moved;
+  const kind = talentPose();
+  if (kind === 'walk') walkCycle = (walkCycle + step / STRIDE) % 1;
+  smoothSpeed += ((dt > 0 ? step / dt : 0) - smoothSpeed) * Math.min(1, dt * 10);
+  if (kind !== talentPoseKind) { talentPoseKind = kind; talentPoseStart = now; }
+  const age = now - talentPoseStart;
   const height = renderedTalentHeight;
   const facing = talentFacing();
-  const walkFrame = spriteAssets.walk.indexOf(map);
-  const kind = map === spriteAssets.fall ? 'fall' : map === spriteAssets.flinch ? 'flinch' : walkFrame >= 0 ? 'walk' : 'idle';
-  if (kind !== talentPoseKind) { talentPoseKind = kind; talentPoseAge = 0; } else talentPoseAge++;
-  // The debug pose stills show the flinch at the top of its hop and the dust fully out.
-  const age = poseDemo ? (kind === 'flinch' ? 4 : 12) : talentPoseAge;
-  // Squash, stretch, bob and recoil are applied here, on the sprite transform, so the drawn frames stay as authored.
-  const play = kind === 'walk' ? walkPlay(state.tick / 8, height) : kind === 'flinch' ? flinchPlay(age, height, facing) : restPlay();
-  // The fall pose is drawn square; every other pose uses the usual 0.66 sprite. Flip to face her next path point on screen.
+  const map = kind === 'walk' ? spriteAssets.walkCycle[Math.floor(walkCycle * spriteAssets.walkCycle.length) % spriteAssets.walkCycle.length]!
+    : kind === 'idle' ? spriteAssets.standBody : spriteAssets[kind];
+  if (talentSprite.material.map !== map) talentSprite.material.map = map;
+  // Squash, stretch, bob, recoil and topple are eased transforms on the rig, so the drawn parts stay as authored.
+  const play = kind === 'walk' ? walkPlay(walkCycle * 4, height) : kind === 'flinch' ? flinchPlay2(age, height, facing)
+    : kind === 'fall' ? fallPlay(age, height, facing) : idlePlay(now, height);
+  // Follow-through: she leans into her pace and rocks back past upright when she stops.
+  const pace = Math.min(1, smoothSpeed / 3);
+  const lean = springStep(leanSpring, kind === 'walk' ? 0.05 * pace : 0, dt, 60, 6);
+  // The ponytail is thrown back by speed and swings with the stride a beat behind her steps.
+  const tailTarget = kind === 'walk' ? 0.35 * pace + 0.55 * Math.sin(walkCycle * Math.PI * 4 - 1.1) : 0;
+  const sway = springStep(tailSpring, tailTarget, dt, 90, 5);
+  // Coat hem: the body swings a hair about the waist, trailing her pace and the stride, and swinging past on stops.
+  const upright = kind === 'walk' || kind === 'idle';
+  const hemTarget = kind === 'walk' ? 0.03 * pace + 0.008 * Math.sin(walkCycle * Math.PI * 4 - 0.6) : 0;
+  const hem = springStep(hemSpring, hemTarget, dt, 70, 4);
   const width = height * (kind === 'fall' ? 1 : TALENT_ASPECT);
   talentSprite.scale.set(width * facing * play.sx, height * play.sy, 1);
-  talentSprite.position.y = play.lift;
-  talentSprite.material.rotation = play.lean;
+  // Lean still pivots at her feet; the sprite is centred on the waist so the hem swing pivots there.
+  const bodyLean = play.lean - facing * lean;
+  const waist = WAIST * height * play.sy;
+  talentSprite.center.set(0.5, WAIST);
+  talentSprite.position.set(-Math.sin(bodyLean) * waist, play.lift + Math.cos(bodyLean) * waist, 0).applyQuaternion(camera.quaternion);
+  talentSprite.material.rotation = bodyLean - (upright ? facing * hem : 0);
+  tailSprite.visible = kind === 'walk' || kind === 'idle';
+  if (tailSprite.visible) {
+    const tails = spriteAssets.tails;
+    const index = Math.round((Math.max(-1.4, Math.min(1.4, sway)) + 1.4) / 2.8 * (tails.length - 1));
+    if (tailSprite.material.map !== tails[index]) tailSprite.material.map = tails[index]!;
+    tailSprite.scale.copy(talentSprite.scale);
+    tailSprite.center.copy(talentSprite.center);
+    tailSprite.position.copy(talentSprite.position);
+    tailSprite.material.rotation = talentSprite.material.rotation;
+  }
   shockMark.visible = kind === 'flinch';
   if (shockMark.visible) {
-    const jitter = age % 6 < 3 ? 1 : 0.92;
-    shockMark.scale.set(height * 0.5 * jitter, height * 0.5 * jitter, 1);
+    const jitter = Math.sin(age * 26) > 0 ? 1 : 0.92;
+    const pop = Math.min(1, age / 0.18);
+    shockMark.scale.set(height * 0.5 * jitter * pop, height * 0.5 * jitter * pop, 1);
     // Follow her head through the lean, then float clear above it and a touch behind, away from what she's recoiling from.
     const headX = -Math.sin(play.lean) * height * 0.9;
     // Sprites stand in the camera plane, so the offset is built in view space too.
     shockMark.position.set(headX - facing * height * 0.1, play.lift + Math.cos(play.lean) * height * 0.88, 0).applyQuaternion(camera.quaternion);
   }
-  dustPuff.visible = kind === 'fall';
+  dustPuff.visible = kind === 'fall' && age > 0.38;
   if (dustPuff.visible) {
-    const spread = 0.75 + 0.25 * Math.min(age / 12, 1);
+    const spread = 0.6 + 0.4 * Math.min((age - 0.38) / 0.35, 1);
     dustPuff.scale.set(width * 1.75 * spread, width * 0.42 * spread, 1);
   }
 }
 
 /** Read-only pose pick: fall on a failed take, flinch when a hazard is within the close-call radius, idle while waiting. */
-function talentPose(): THREE.Texture {
-  if (poseDemo) return spriteAssets[poseDemo];
-  if (state.failed === 'hit' || state.failed === 'fell') return spriteAssets.fall;
+function talentPose(): 'walk' | 'idle' | 'flinch' | 'fall' {
+  if (poseDemo) return poseDemo;
+  if (state.failed === 'hit' || state.failed === 'fell') return 'fall';
   const danger = state.entities.some((entity) => entity.spawned && !entity.cut
     && entity.kind !== 'reel' && entity.kind !== 'monitor' && entity.kind !== 'continuity'
     && Math.hypot(entity.x - state.talent.x, entity.z - state.talent.z) <= TUNING.closeCallRadius);
-  if (danger && !state.failed) return spriteAssets.flinch;
-  if (state.waiting || state.failed) return spriteAssets.idle[Math.floor(state.tick / 40) % 2]!;
-  return spriteAssets.walk[Math.floor(state.tick / 8) % spriteAssets.walk.length]!;
+  if (danger && !state.failed) return 'flinch';
+  if (state.waiting || state.failed) return 'idle';
+  return 'walk';
 }
 
 const facingFrom = new THREE.Vector3();
@@ -537,6 +593,58 @@ function advanceTally(now: number) {
   tallyOn = lockDemo !== null && demoMonitor ? true : tallyPhase < 0.5;
   if (tallyOn && !wasOn && lockDemo === null) audio.playLockBeep(progress);
 }
+/** Stable per-entity phase so idle breathing never beats in unison. */
+function entityPhase(id: string) {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
+  return (h >>> 0) % 1000 / 1000 * Math.PI * 2;
+}
+/** 0..1 over the last ~250 ms before a hazard's current heading brings it into contact with her. */
+function anticipation(entity: CastEntity, reach: number) {
+  const dx = state.talent.x - entity.x, dz = state.talent.z - entity.z;
+  const distance = Math.hypot(dx, dz);
+  const closing = distance > 1e-6 ? (dx * entity.vx + dz * entity.vz) / distance : 0;
+  if (closing <= 0.05 || state.failed) return 0;
+  const contact = Math.max(0, distance - reach) / closing;
+  return contact < 0.25 ? 1 - contact / 0.25 : 0;
+}
+function urchinPose(entity: CastEntity) {
+  const now = performance.now() / 1000;
+  const breath = Math.sin(now * 2.4 + entityPhase(entity.id)) * 0.03;
+  const ready = anticipation(entity, TUNING.urchinRadius + 0.35);
+  const wind = Math.sin(Math.PI * Math.min(1, ready * 1.15));
+  return {
+    sx: 1 + breath + 0.16 * wind,
+    sy: 1 - breath - 0.2 * wind,
+    spin: Math.sin(now * 55) * 0.09 * ready,
+    lift: -SPRITE_SIZE.urchin * 0.08 * wind,
+  };
+}
+/** Render-only acting on non-urchin cast: breathing, hop squash for rollers, lean and shudder as a lock fills. */
+function actEntity(entity: CastEntity, object: THREE.Object3D) {
+  const now = performance.now() / 1000;
+  const phase = entityPhase(entity.id);
+  const breath = 1 + 0.03 * Math.sin(now * 2.2 + phase);
+  if (entity.kind === 'glass' || entity.kind === 'bridge') return;
+  if (entity.kind === 'boulder' || entity.kind === 'stagehand') {
+    // A small hop per metre travelled; it squashes on each landing and stretches at the top.
+    const hop = Math.abs(Math.sin((entity.x + entity.z) * (entity.kind === 'boulder' ? 1.4 : 2.2) + phase));
+    const landing = (1 - hop) ** 6;
+    const moving = Math.min(1, Math.hypot(entity.vx, entity.vz));
+    object.position.y += (entity.kind === 'boulder' ? 0.22 : 0.12) * hop * moving;
+    const ready = anticipation(entity, (entity.kind === 'boulder' ? TUNING.boulderRadius : 0.5) + 0.35);
+    object.scale.set(object.scale.x * (breath + 0.12 * landing * moving + 0.08 * ready), object.scale.y * (2 - breath - 0.16 * landing * moving - 0.1 * ready), object.scale.z);
+    return;
+  }
+  if (entity.kind === 'red-monitor') {
+    const progress = lockProgress(entity);
+    const eased = progress * progress * (3 - 2 * progress);
+    object.rotation.x = 0.16 * eased;
+    object.position.x += Math.sin(now * 61 + phase) * 0.05 * progress * progress;
+    object.position.z += Math.sin(now * 47 + phase * 2) * 0.04 * progress * progress;
+  }
+  object.scale.multiplyScalar(breath);
+}
 function syncEntities(showTransientRings = true) {
   const marks: LockMark[] = [];
   for (const entity of renderEntities()) {
@@ -548,6 +656,7 @@ function syncEntities(showTransientRings = true) {
     const spriteEntity = entity.kind === 'boulder' || entity.kind === 'stagehand' || entity.kind === 'reel' || entity.kind === 'extras' || entity.kind === 'continuity';
     object.position.set(point.x, entity.kind === 'swarm' ? 0.55 : PATH_RISE, point.z);
     object.rotation.y = spriteEntity ? 0 : entity.age * 0.015;
+    object.scale.set(1, 1, 1);
     if (entity.kind === 'rumour') object.scale.setScalar(Math.max(0.1, entity.radius ?? 0.5));
     if (entity.kind === 'monitor' || entity.kind === 'red-monitor') {
       object.rotation.y = -(entity.heading ?? 0) + Math.PI / 2;
@@ -614,6 +723,7 @@ function syncEntities(showTransientRings = true) {
       const tier = entity.lodTier ?? lodTier(1000 / state.camera.zoom * detailFactor(entity.x, entity.z));
       planks.visible = tier <= 1;
     }
+    actEntity(entity, object);
     object.visible = true;
   }
   lockOverlay.update(marks);
@@ -621,7 +731,7 @@ function syncEntities(showTransientRings = true) {
     const found = renderEntities().find((entity) => entity.id === id);
     if (!found || found.cut || !found.spawned) object.visible = false;
   }
-  urchinBuckets.update(state.entities, state.camera.zoom, state.tick, showTransientRings && !window.matchMedia('(prefers-reduced-motion: reduce)').matches, detailFactor, displayPoint, camera.quaternion);
+  urchinBuckets.update(state.entities, state.camera.zoom, state.tick, showTransientRings && !window.matchMedia('(prefers-reduced-motion: reduce)').matches, detailFactor, displayPoint, camera.quaternion, urchinPose);
   let shade = 0;
   const putShade = (x: number, z: number, width: number, depth: number) => {
     if (shade >= 512) return;
@@ -827,12 +937,47 @@ async function renderReplayContactFrames(): Promise<ScoredFrame[]> {
     renderViewfinder();
   }
 }
-function render() {
+/** `draw = false` lets the real-time loop draw once per display frame, interpolated, instead of once per tick. */
+function render(draw = true) {
   audio.update(state);
   advanceTally(performance.now());
-  renderViewfinder();
-  captureContactFrame();
+  if (draw) { renderViewfinder(); captureContactFrame(); } else captureDue = true;
   updateHud();
+}
+let captureDue = false;
+/** Positions before the latest tick, so a display frame can draw between ticks (render alpha). Render-only. */
+const lerpFrom = new Map<string, { x: number; z: number }>();
+const lerpTalent = { x: 0, z: 0 };
+const lerpCamera = { x: 0, z: 0, zoom: 1 };
+function snapshotForLerp() {
+  for (const entity of state.entities) {
+    const from = lerpFrom.get(entity.id);
+    if (from) { from.x = entity.x; from.z = entity.z; } else lerpFrom.set(entity.id, { x: entity.x, z: entity.z });
+  }
+  lerpTalent.x = state.talent.x; lerpTalent.z = state.talent.z;
+  lerpCamera.x = state.camera.x; lerpCamera.z = state.camera.z; lerpCamera.zoom = state.camera.zoom;
+}
+/** Draws the viewfinder `alpha` of the way from the previous tick to this one, then puts the sim state back untouched. */
+function drawInterpolated(alpha: number) {
+  const mix = (a: number, b: number) => (Math.abs(b - a) > 3 ? b : a + (b - a) * alpha);
+  const saved = state.entities.map((entity) => [entity.x, entity.z] as const);
+  const talentAt = [state.talent.x, state.talent.z] as const;
+  const cameraAt = [state.camera.x, state.camera.z, state.camera.zoom] as const;
+  for (const entity of state.entities) {
+    const from = lerpFrom.get(entity.id);
+    if (from) { entity.x = mix(from.x, entity.x); entity.z = mix(from.z, entity.z); }
+  }
+  state.talent.x = mix(lerpTalent.x, state.talent.x); state.talent.z = mix(lerpTalent.z, state.talent.z);
+  state.camera.x = mix(lerpCamera.x, state.camera.x); state.camera.z = mix(lerpCamera.z, state.camera.z);
+  state.camera.zoom = lerpCamera.zoom + (state.camera.zoom - lerpCamera.zoom) * alpha;
+  try {
+    renderViewfinder();
+    if (captureDue) { captureDue = false; captureContactFrame(); }
+  } finally {
+    state.entities.forEach((entity, index) => { const at = saved[index]; if (at) { entity.x = at[0]; entity.z = at[1]; } });
+    state.talent.x = talentAt[0]; state.talent.z = talentAt[1];
+    state.camera.x = cameraAt[0]; state.camera.z = cameraAt[1]; state.camera.zoom = cameraAt[2];
+  }
 }
 const CAST_NAMES: Record<string, string> = {
   urchin: 'spiny ball', boulder: 'rolling rock', glass: 'glass floor', reel: 'film reel', extras: 'crowd',
@@ -900,15 +1045,11 @@ function updateHud() {
   const focusBand = $('#focus-band');
   focusBand.hidden = state.lens !== 'tilt-shift';
   focusBand.style.top = `${(0.5 - state.camera.focusOffset - 0.2) * 100}%`;
-  $('#status').textContent = state.waiting ? 'HOLDING FOR SET…' : paused ? 'PAUSED' : state.camera.moving ? 'IN MOTION' : 'ROLLING';
+  $('#status').textContent = tutorial.showing ? 'STANDING BY' : state.waiting ? 'HOLDING FOR SET…' : paused ? 'PAUSED' : state.camera.moving ? 'IN MOTION' : 'ROLLING';
   const copy = describeShot(state);
   $('#lod').textContent = copy.gate;
-  const coachAt = coachStarted ? coachIndex(performance.now() - coachStarted) : null;
-  const lesson = coachAt === null ? null : copy.coach[coachAt];
-  const coach = $('#coach');
-  coach.textContent = lesson ?? '';
-  coach.classList.toggle('hidden', !lesson);
-  $('#message').textContent = !state.failed && invalidReplay ? 'INVALID REPLAY URL' : copy.toast;
+  const cutNoteLive = cutNote && performance.now() < cutNote.until && !state.failed && !talentLost(state);
+  $('#message').textContent = !state.failed && invalidReplay ? 'INVALID REPLAY URL' : cutNoteLive ? cutNote!.text : copy.toast;
   if (sliderZoomTarget !== null && Math.abs(sliderZoomTarget - state.camera.zoom) < 0.12) sliderZoomTarget = null;
   const zoomSlider = $('#zoom-slider') as HTMLInputElement;
   zoomSlider.value = String(Math.round(sliderZoomTarget ?? state.camera.zoom));
@@ -927,37 +1068,18 @@ function updateHud() {
 }
 
 function buildInput(): InputFrame {
-  const keyInput = panFromKeys();
-  const sliderZoom = sliderZoomTarget === null ? 0 : Math.abs(sliderZoomTarget - state.camera.zoom) < 0.12 ? 0 : sliderZoomTarget > state.camera.zoom ? -127 : 127;
-  return leashInput(quantizeInput({
-    ...frameInput, ...keyInput,
-    panX: pointerPan?.panX ?? (keys.size ? keyInput.panX : frameInput.panX),
-    panZ: pointerPan?.panZ ?? (keys.size ? keyInput.panZ : frameInput.panZ),
-    zoom: keyInput.zoom || zoomPulse || sliderZoom || frameInput.zoom,
-    rotate: rotationPulse || frameInput.rotate,
-    hold: keyInput.hold || frameInput.hold,
-    steady: keyInput.steady || frameInput.steady,
-  }));
-}
-function leashInput(input: InputFrame): InputFrame {
-  const dx = state.talent.x - state.camera.x;
-  const dz = state.talent.z - state.camera.z;
-  const reach = Math.max(1, state.camera.zoom * 0.5);
-  const edge = Math.max(Math.abs(dx), Math.abs(dz) * TUNING.projectionPitchScale) / reach;
-  if (edge < 0.34) return input;
-  const blend = Math.min(1, (edge - 0.34) / 0.22) * 0.9;
-  return quantizeInput({
-    ...input,
-    panX: input.panX * (1 - blend) + Math.sign(dx || 1) * 100 * blend,
-    panZ: input.panZ * (1 - blend) + Math.sign(dz || 1) * 100 * blend,
-  });
-}
-function quantizeInput(input: InputFrame): InputFrame {
-  const axis = (value: number) => Math.max(-127, Math.min(127, Math.round(value)));
-  return { panX: axis(input.panX), panZ: axis(input.panZ), zoom: axis(input.zoom), rotate: input.rotate, hold: Boolean(input.hold), steady: Boolean(input.steady) };
+  const composed = composeInput({
+    keys, holdButton, dragTarget, rotationPulse, frameInput, zoomTarget: sliderZoomTarget,
+    zoomPress: zoomPress && { direction: zoomPress.direction, heldSeconds: (performance.now() - zoomPress.since) / 1000 },
+  }, state);
+  sliderZoomTarget = composed.zoomTarget;
+  // A lifted drag settles onto where the finger left the world, then stops: no residual drift.
+  if (dragTarget && !pointer && dragSettled(state, dragTarget)) dragTarget = null;
+  return assistInput(composed.input, state);
 }
 function advanceTick(forcedInput?: InputFrame) {
-  if (!paused && !state.failed) {
+  // A tutorial card blocks the take: no ticks run, so nothing can reach her while it is read.
+  if (!paused && !tutorial.showing && !state.failed) {
     const input = replayData ? replayData.frames[replayIndex++] ?? NEUTRAL_INPUT : bot ? inputForBot(state, bot, botRandom) : forcedInput ?? buildInput();
     inputLog.push(input);
     const previousCuts = state.cuts.length;
@@ -994,10 +1116,15 @@ function advanceTick(forcedInput?: InputFrame) {
       }
     }
     const cutHazard = newlyCut.find((entity) => !['reel', 'monitor', 'red-monitor', 'continuity'].includes(entity.kind));
+    const redressed = previousEntities.some((before) => before.cut && state.entities.some((after) => after.id === before.id && !after.cut && after.gate !== undefined));
+    if (redressed) cutNote = { text: 'Shot called: the stand-in is back on its mark. Cut it close to her.', until: performance.now() + 3000 };
     if (state.score > previousScore && !cutHazard) audio.playCue('reel');
     else if (cutHazard) {
       audio.playCue('cut');
-      showCut(cutHazard);
+      // Only a cut within close-call reach of her counts for the close-call bonus and the defang mark: say so when it was too far.
+      const far = state.closeCalls === previousCloseCalls;
+      showCut(cutHazard, far ? 'TOO FAR' : 'CUT');
+      if (far) cutNote = { text: 'Cut — but too far from her. Only a cut close to her scores or clears a defang mark.', until: performance.now() + 2500 };
     } else if (state.cuts.length > previousCuts) audio.playCue('cut');
     else if (state.entities.filter((entity) => entity.spawned && !entity.cut).length > previousSpawned) audio.playCue('pop');
     else if (state.talent.lodTier !== previousTalentTier || state.entities.some((entity) => entity.lodTier !== previousEntityTiers.get(entity.id))) audio.playCue('lod');
@@ -1005,10 +1132,10 @@ function advanceTick(forcedInput?: InputFrame) {
   }
   audio.update(state);
   frameInput = { ...NEUTRAL_INPUT };
-  zoomPulse = 0;
   rotationPulse = 0;
 }
-function showCut(entity: { x: number; z: number }) {
+function showCut(entity: { x: number; z: number }, label: 'CUT' | 'TOO FAR') {
+  $('#cut-stamp').textContent = label;
   const projected = projectPoint(entity.x, entity.z, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, lensAspect(state.lens));
   const edge = Math.abs(projected.x) > Math.abs(projected.y) ? (projected.x < 0 ? 'left' : 'right') : (projected.y > 0 ? 'top' : 'bottom');
   const gate = $('#gate');
@@ -1019,8 +1146,9 @@ function showCut(entity: { x: number; z: number }) {
   if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) hitStopUntil = performance.now() + 70;
 }
 function stepFrame() {
+  snapshotForLerp();
   advanceTick();
-  render();
+  render(false);
 }
 function loop(now: number) {
   if (!previousTime) previousTime = now;
@@ -1051,44 +1179,102 @@ function loop(now: number) {
     }
     simAccumulator -= tickInterval; ticks++;
   }
+  // Super 8 keeps its deliberate stutter; every other lens draws at display rate between ticks.
+  if (ticksPerRender === 1) drawInterpolated(Math.min(1, simAccumulator / tickInterval));
+  else if (captureDue) { captureDue = false; renderViewfinder(); captureContactFrame(); }
   requestAnimationFrame(loop);
-}
-function panFromKeys(): InputFrame {
-  let x = 0; let z = 0;
-  if (keys.has('a') || keys.has('arrowleft')) x -= 90;
-  if (keys.has('d') || keys.has('arrowright')) x += 90;
-  if (keys.has('w') || keys.has('arrowup')) z -= 90;
-  if (keys.has('s') || keys.has('arrowdown')) z += 90;
-  return { ...NEUTRAL_INPUT, panX: x, panZ: z, zoom: (keys.has('x') || keys.has('=') || keys.has('+') ? 60 : 0) - (keys.has('z') || keys.has('-') ? 60 : 0), rotate: 0, hold: keys.has(' ') || holdButton, steady: keys.has('shift') };
 }
 let holdButton = false;
 window.addEventListener('keydown', (event) => {
   unlockAudio();
+  if (tutorial.showing) {
+    if (event.key === ' ' || event.key === 'Enter') { event.preventDefault(); if (!event.repeat) advanceTutorial(); }
+    return;
+  }
   if ([' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) event.preventDefault();
   keys.add(event.key.toLowerCase());
+  const zoomDirection = zoomKeyDirection(event.key);
+  if (zoomDirection && !event.repeat) startZoomPress(zoomDirection);
   if (!event.repeat && event.key.toLowerCase() === 'q') rotationPulse = -1;
   if (!event.repeat && event.key.toLowerCase() === 'e') rotationPulse = 1;
   if (event.key === 'Escape' || event.key.toLowerCase() === 'p') paused = !paused;
 });
-window.addEventListener('keyup', (event) => { keys.delete(event.key.toLowerCase()); });
+window.addEventListener('keyup', (event) => {
+  keys.delete(event.key.toLowerCase());
+  if (zoomKeyDirection(event.key) === zoomPress?.direction) zoomPress = null;
+});
+window.addEventListener('blur', () => { zoomPress = null; });
+const touches = new Map<number, { x: number; y: number }>();
+let pinch: { distance: number; zoom: number } | null = null;
+const touchSpread = () => { const [a, b] = [...touches.values()]; return a && b ? Math.hypot(a.x - b.x, a.y - b.y) : 0; };
+const zoomKeyDirection = (key: string): 1 | -1 | 0 => (['x', '=', '+'].includes(key.toLowerCase()) ? 1 : ['z', '-', '_'].includes(key.toLowerCase()) ? -1 : 0);
+/** A tap: snap to the next framing step, chaining from a snap still in progress so a double tap goes two steps. */
+function stepZoom(direction: 1 | -1) {
+  if (state.lens !== 'long-lens') sliderZoomTarget = nextZoomStep(sliderZoomTarget ?? state.camera.zoom, direction);
+}
+function startZoomPress(direction: 1 | -1) {
+  stepZoom(direction);
+  zoomPress = { direction, since: performance.now() };
+}
 renderer.domElement.addEventListener('pointerdown', (event) => {
   unlockAudio();
-  pointer = { id: event.pointerId, x: event.clientX, y: event.clientY };
+  touches.set(event.pointerId, { x: event.clientX, y: event.clientY });
   try { renderer.domElement.setPointerCapture(event.pointerId); } catch { /* synthetic touch events have no browser pointer capture */ }
+  if (touches.size >= 2) {
+    // A second finger turns the drag into a pinch: the camera holds its pan while the spread sets the zoom.
+    pointer = null; dragTarget = null;
+    pinch = { distance: Math.max(1, touchSpread()), zoom: sliderZoomTarget ?? state.camera.zoom };
+  } else {
+    pointer = { id: event.pointerId, x: event.clientX, y: event.clientY };
+    dragTarget = { x: state.camera.x, z: state.camera.z };
+  }
 });
 renderer.domElement.addEventListener('pointermove', (event) => {
+  if (!touches.has(event.pointerId)) return;
+  touches.set(event.pointerId, { x: event.clientX, y: event.clientY });
+  if (pinch) {
+    if (state.lens !== 'long-lens') sliderZoomTarget = pinchZoomTarget(pinch.zoom, pinch.distance, touchSpread());
+    return;
+  }
   if (!pointer || pointer.id !== event.pointerId) return;
   const rect = renderer.domElement.getBoundingClientRect();
   const dx = event.clientX - pointer.x;
   const dy = event.clientY - pointer.y;
-  pointerPan = { panX: Math.max(-127, Math.min(127, -dx / rect.width * 127)), panZ: Math.max(-127, Math.min(127, dy / rect.height * 127)) };
+  dragTarget = dragCameraTarget(dragTarget ?? { x: state.camera.x, z: state.camera.z }, dx, dy, rect.width, rect.height, state);
   pointer.x = event.clientX; pointer.y = event.clientY;
 });
-renderer.domElement.addEventListener('pointerup', () => { pointer = null; pointerPan = null; });
-renderer.domElement.addEventListener('wheel', (event) => { event.preventDefault(); zoomPulse = -Math.sign(event.deltaY) * 60; }, { passive: false });
+for (const type of ['pointerup', 'pointercancel'] as const) {
+  renderer.domElement.addEventListener(type, (event) => {
+    touches.delete(event.pointerId);
+    if (touches.size < 2) pinch = null;
+    // Lifting one finger of a pinch hands the drag back to the finger still down, from where it is now.
+    const [rest] = [...touches.entries()];
+    pointer = rest && !pinch ? { id: rest[0], x: rest[1].x, y: rest[1].y } : null;
+  });
+}
+renderer.domElement.addEventListener('wheel', (event) => {
+  event.preventDefault();
+  // One framing step per wheel notch; a trackpad's burst of small deltas still steps at most every 120 ms.
+  if (!event.deltaY || performance.now() - lastWheelStep < 120) return;
+  lastWheelStep = performance.now();
+  stepZoom(event.deltaY < 0 ? 1 : -1);
+}, { passive: false });
 document.addEventListener('visibilitychange', () => { if (document.hidden) paused = true; });
 $('#hold').addEventListener('pointerdown', () => { holdButton = true; frameInput.hold = true; });
 for (const type of ['pointerup', 'pointercancel', 'pointerleave']) $('#hold').addEventListener(type, () => { holdButton = false; frameInput.hold = false; });
+$('#rotate-left').addEventListener('click', () => { rotationPulse = -1; });
+$('#rotate-right').addEventListener('click', () => { rotationPulse = 1; });
+for (const [id, direction] of [['#zoom-in', 1], ['#zoom-out', -1]] as const) {
+  const button = $(id);
+  button.addEventListener('pointerdown', (event) => { event.preventDefault(); unlockAudio(); startZoomPress(direction); });
+  for (const type of ['pointerup', 'pointercancel', 'pointerleave']) button.addEventListener(type, () => { if (zoomPress?.direction === direction) zoomPress = null; });
+  // Keyboard activation (Enter/Space on the focused button) has no pointer: treat it as a tap.
+  button.addEventListener('click', (event) => { if (event.detail === 0) stepZoom(direction); });
+}
+// Keep the page itself still: drags and pinches on the viewfinder and the camera controls belong to the camera, never to browser scroll or zoom.
+for (const surface of [$('#gate'), $('.controlbar')]) surface.addEventListener('touchmove', (event) => { event.preventDefault(); }, { passive: false });
+document.addEventListener('touchmove', (event) => { if (event.touches.length > 1) event.preventDefault(); }, { passive: false });
+for (const type of ['gesturestart', 'gesturechange']) document.addEventListener(type, (event) => { event.preventDefault(); });
 $('#zoom-slider').addEventListener('input', (event) => { sliderZoomTarget = Number((event.currentTarget as HTMLInputElement).value); });
 $('#pause').addEventListener('click', () => { paused = !paused; });
 $('#make-reel').addEventListener('click', () => {
@@ -1167,11 +1353,11 @@ $('#share').addEventListener('click', async () => {
 });
 
 if (query.has('debug')) {
-  Object.assign(window, { __cull: { step: (n = 1) => { for (let i = 0; i < n; i++) advanceTick(); render(); }, input: (input: InputFrame) => { frameInput = input; }, hash: () => stateHash(state), state: () => structuredClone(state), diagnostics: () => ({ paused, keys: [...keys], hidden: document.hidden, focused: document.hasFocus(), dprTier, pointerPan: pointerPan && { ...pointerPan } }), performance: () => ({ drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles }), lod: () => urchinBuckets.diagnostics(), load: (seed: number) => { state = createGeneratedState(seed); terrainTiles = null; urchinBuckets.reset(); }, loadShootScene: (sceneIndex: number) => { state = createShootSceneState(state.seed, sceneIndex); terrainTiles = null; urchinBuckets.reset(); render(); }, finishForShare: () => { state.failed = 'hit'; render(); }, loadLodDemo: () => { state = createGeneratedState(1, 0, 2); state.entities = [{ id: 'lod-demo-urchin', kind: 'urchin', x: 0, z: 2, vx: 0, vz: 0, spawned: true, cut: false, age: 0 }]; state.talent.x = -4; render(); }, setTier: (tier: number) => { const size = [64, 36, 17, 7, 2][tier] ?? 36; state.camera.zoom = TUNING.urchinRadius * 1000 / size; }, setCamera: (x: number, z: number, zoom: number) => { state.camera.x = x; state.camera.z = z; state.camera.zoom = zoom; }, poseDemo: (kind: 'flinch' | 'fall' | null = null) => { poseDemo = kind; render(); }, lostDemo: (seconds: number | null = null) => { lostDemoTicks = seconds === null ? null : Math.round(Math.max(0, seconds) * TUNING.tickRate); render(); }, talentScreen: () => { const rect = renderer.domElement.getBoundingClientRect(); const at = (v: THREE.Vector3) => { const p = v.clone().project(camera); return { x: rect.left + (p.x + 1) / 2 * rect.width, y: rect.top + (1 - p.y) / 2 * rect.height }; }; const foot = at(talent.getWorldPosition(new THREE.Vector3())); const head = at(talent.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0, renderedTalentHeight, 0))); return { foot, head, mark: at(shockMark.getWorldPosition(new THREE.Vector3())), lean: talentSprite.material.rotation, flip: talentSprite.scale.x < 0 }; }, lockDemo: (progress: number | null = null) => {
+  Object.assign(window, { __cull: { step: (n = 1) => { for (let i = 0; i < n; i++) advanceTick(); render(); }, input: (input: InputFrame) => { frameInput = input; }, hash: () => stateHash(state), state: () => structuredClone(state), diagnostics: () => ({ paused, keys: [...keys], hidden: document.hidden, focused: document.hasFocus(), dprTier, dragTarget: dragTarget && { ...dragTarget } }), performance: () => ({ drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles }), lod: () => urchinBuckets.diagnostics(), load: (seed: number) => { state = createGeneratedState(seed); terrainTiles = null; urchinBuckets.reset(); }, loadShootScene: (sceneIndex: number) => { state = createShootSceneState(state.seed, sceneIndex); terrainTiles = null; urchinBuckets.reset(); render(); }, finishForShare: () => { state.failed = 'hit'; render(); }, loadLodDemo: () => { state = createGeneratedState(1, 0, 2); state.entities = [{ id: 'lod-demo-urchin', kind: 'urchin', x: 0, z: 2, vx: 0, vz: 0, spawned: true, cut: false, age: 0 }]; state.talent.x = -4; render(); }, setTier: (tier: number) => { const size = [64, 36, 17, 7, 2][tier] ?? 36; state.camera.zoom = TUNING.urchinRadius * 1000 / size; }, setCamera: (x: number, z: number, zoom: number) => { state.camera.x = x; state.camera.z = z; state.camera.zoom = zoom; }, poseDemo: (kind: 'flinch' | 'fall' | null = null) => { poseDemo = kind; render(); }, lostDemo: (seconds: number | null = null) => { lostDemoTicks = seconds === null ? null : Math.round(Math.max(0, seconds) * TUNING.tickRate); render(); }, talentScreen: () => { const rect = renderer.domElement.getBoundingClientRect(); const at = (v: THREE.Vector3) => { const p = v.clone().project(camera); return { x: rect.left + (p.x + 1) / 2 * rect.width, y: rect.top + (1 - p.y) / 2 * rect.height }; }; const foot = at(talent.getWorldPosition(new THREE.Vector3())); const head = at(talent.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0, renderedTalentHeight, 0))); return { foot, head, mark: at(shockMark.getWorldPosition(new THREE.Vector3())), lean: talentSprite.material.rotation, flip: talentSprite.scale.x < 0 }; }, lockDemo: (progress: number | null = null) => {
     lockDemo = progress === null ? null : Math.max(0, Math.min(1, progress));
     demoMonitor = lockDemo === null ? null : { id: 'demo-red-monitor', kind: 'red-monitor', x: state.talent.x + 5, z: state.talent.z - 3.5, vx: 0, vz: 0, spawned: true, cut: false, age: 0, heading: Math.atan2(3.5, -5), range: 8, halfAngle: 0.45 };
     render();
-  }, silhouettes: () => measureSilhouettes({ urchin: spriteAssets.urchinTiers[2]!, boulder: spriteAssets.boulder, glass: spriteAssets.glass, extras: spriteAssets.extras[0]!, swarm: spriteAssets.swarmMoth, rumour: spriteAssets.rumour, stagehand: spriteAssets.stagehand, monitor: spriteAssets.monitorTeal, redMonitor: spriteAssets.monitorRed, continuity: spriteAssets.continuity[2]!, talent: spriteAssets.walk[0]! }) } });
+  }, tutorial: () => ({ step: tutorial.step, steps: tutorial.steps, showing: tutorial.showing, paused: paused || tutorial.showing }), silhouettes: () => measureSilhouettes({ urchin: spriteAssets.urchinTiers[2]!, boulder: spriteAssets.boulder, glass: spriteAssets.glass, extras: spriteAssets.extras[0]!, swarm: spriteAssets.swarmMoth, rumour: spriteAssets.rumour, stagehand: spriteAssets.stagehand, monitor: spriteAssets.monitorTeal, redMonitor: spriteAssets.monitorRed, continuity: spriteAssets.continuity[2]!, talent: spriteAssets.walk[0]! }) } });
 }
 
 new ResizeObserver(() => {
@@ -1180,17 +1366,36 @@ new ResizeObserver(() => {
   render();
 }).observe(mount);
 render();
+function showTutorialStep() {
+  const last = tutorial.step >= tutorial.steps - 1;
+  $('#tutorial-kicker').textContent = tutorial.step === 0 ? `SCENE 01 · TAKE 01${tutorial.steps > 1 ? ` · 1/${tutorial.steps}` : ''}` : `HOW TO SHOOT · ${tutorial.step + 1}/${tutorial.steps}`;
+  $('#tutorial-text').textContent = TUTORIAL_STEPS[tutorial.step]!;
+  $('#tutorial-next').textContent = last ? 'ROLL CAMERA ▶' : 'CONTINUE ▶';
+  $('#title-card').classList.toggle('hidden', tutorial.step !== 0);
+}
+function advanceTutorial() {
+  if (!tutorial.showing) return;
+  unlockAudio();
+  if (tutorial.step < tutorial.steps - 1) { tutorial.step++; showTutorialStep(); return; }
+  tutorial.showing = false;
+  // Drop the time spent reading so the first frame after the card does not try to catch up.
+  previousTime = 0; simAccumulator = 0;
+  shell.classList.remove('tutorial-open');
+  $('#tutorial').classList.add('hidden');
+  $('#title-card').classList.add('hidden');
+  try { window.localStorage.setItem('cull.tutorial.v1', 'seen'); } catch { /* The full tutorial shows again next visit. */ }
+  render();
+}
 if (!frozen && !bot && !replayData) {
-  paused = true;
-  $('#title-card').classList.remove('hidden');
-  const beginTake = () => {
-    if (coachStarted) return;
-    paused = false;
-    coachStarted = performance.now();
-    $('#title-card').classList.add('hidden');
-  };
-  window.setTimeout(beginTake, 3800);
-  window.addEventListener('pointerdown', beginTake, { once: true });
-  window.addEventListener('keydown', beginTake, { once: true });
+  let seen = false;
+  try { seen = window.localStorage.getItem('cull.tutorial.v1') === 'seen'; } catch { /* Treat as a first visit. */ }
+  // A first visit walks every coach card; a return visit only waits on the slate.
+  tutorial.steps = seen ? 1 : TUTORIAL_STEPS.length;
+  tutorial.showing = true;
+  shell.classList.add('tutorial-open');
+  $('#tutorial').classList.remove('hidden');
+  showTutorialStep();
+  $('#tutorial-next').addEventListener('click', advanceTutorial);
+  render();
 }
 if (!frozen) requestAnimationFrame(loop);

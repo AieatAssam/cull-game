@@ -16,7 +16,12 @@ export const TUNING = {
   panSpeed: 0.3,
   panAcceleration: 0.9,
   steadyFactor: 0.35,
+  // Zoom speed per second at a light input; the curve below boosts it hard toward full input (DECISIONS 2026-10-13, fast zoom).
   zoomRate: 1.6,
+  // Full input zooms ln(zoomRate) × (1 + zoomBoost) per second in log terms: widest→tightest ≈ 0.35 s. Light inputs (bots, fine trims) stay near zoomRate.
+  zoomBoost: 8.6,
+  // Framing steps a tap snaps between: close-up 10 and 16, medium 24, medium-wide 38 (Urchins dull), wide 48.
+  zoomSteps: [10, 16, 24, 38, 48] as const,
   rotationSeconds: 0.18,
   motionThreshold: 0.12,
   popInExclusion: 2,

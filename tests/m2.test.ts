@@ -53,15 +53,22 @@ describe('bible M2: defang needs a close cut made since the gate opened', () => 
     expect(reach - 3.6 / TUNING.tickRate).toBeGreaterThan(TUNING.urchinRadius + TUNING.talentRadii[2]);
   });
 
-  it('only lets the stand-in be cut once its shot is called; framed out earlier it is unloaded intact', () => {
+  it('cuts a stand-in framed out far before its shot is called, without credit, and re-dresses it when the shot is called', () => {
     let state = gateFixture();
     state.camera.x = 21;
     state = step(state, held);
     expect(state.entities[0]!.spawned).toBe(true);
     state.camera.x = -40;
     state = step(state, held);
-    expect(state.entities[0]).toMatchObject({ spawned: false, cut: false });
-    expect(state.cuts).not.toContain('gate-urchin-0');
+    expect(state.entities[0]).toMatchObject({ cut: true });
+    expect(state.cuts).toContain('gate-urchin-0');
+    expect(state.closeCalls).toBe(0);
+    // Her reaching the mark calls the shot: the stand-in is back on its mark, and the shot still needs a close cut.
+    state.talent.x = 19.7;
+    state.camera.x = 19.7;
+    state = step(state, held);
+    expect(state.entities[0]).toMatchObject({ cut: false, x: gateCast(state.path, [{ at: 20, kind: 'defang', done: false }])[0]!.x });
+    expect(state.shots![0]!.done).toBe(false);
   });
 
   it('can be cleared by a player who frames the stand-in out close', () => {
@@ -215,13 +222,13 @@ describe('bible M2: Adaptive policy helpers', () => {
   });
 });
 
-// Fixed replay hashes after the bible M2 rule changes (DECISIONS 2026-10-13, round 2) and the graded out-of-frame rule (DECISIONS 2026-10-13, LOST HER). Regenerate only with a decision entry.
+// Fixed replay hashes after the bible M2 rule changes (DECISIONS 2026-10-13, round 2) and the graded out-of-frame rule (DECISIONS 2026-10-13, LOST HER) and fast zoom (DECISIONS 2026-10-13, fast zoom). Regenerate only with a decision entry.
 describe('fixed replay hashes', () => {
   const frames = Array.from({ length: 10_000 }, (_, i) => ({ ...NEUTRAL_INPUT, panX: (i % 240 < 120 ? 30 : -30), zoom: i % 300 < 150 ? 0 : 1 }));
   const fixtures: Record<number, [string, string, string]> = {
-    1: ['4500bdc4', '4339a9ff', '6ebb4e8c'],
-    19: ['5f4a7114', 'af0d6135', 'ce00d1c4'],
-    2026: ['ec251869', '85774155', '38027c06'],
+    1: ['4500bdc4', '4339a9ff', 'e0c89e0d'],
+    19: ['5f4a7114', 'af0d6135', 'a80d24ad'],
+    2026: ['ec251869', '85774155', '9951f3d0'],
   };
   it.each(Object.entries(fixtures))('seed %s: strip world, generated strip and a full fair Adaptive Shoot', (seedText, [world, generated, shoot]) => {
     const seed = Number(seedText);

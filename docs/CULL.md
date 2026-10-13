@@ -82,7 +82,7 @@ Start with 90 s ⚙. Film burns 1 s per second (2× while holding or waiting). R
 | **Hold Talent** | Space | large HOLD button bottom-right of the pad (left-hand option in settings) | emergency brake, at a film cost |
 | **Pause** | Esc / P | tap the timecode; auto-pause on `visibilitychange` | |
 
-**Camera physics (sim-side, deterministic).** The input is a *desired* pan velocity. The camera has max speed 1.2 gate-widths/s ⚙ and acceleration 6 gate-widths/s² ⚙, with critically damped smoothing. Zoom is rate-limited to ×1.6 per second ⚙, and rotation tweens 0.18 s ⚙ per 45°.
+**Camera physics (sim-side, deterministic).** The input is a *desired* pan velocity. The camera has max speed 1.2 gate-widths/s ⚙ and acceleration 6 gate-widths/s² ⚙, with critically damped smoothing. Zoom is rate-limited by a response curve: ×1.6 per second ⚙ for light inputs, rising to about ×90 per second ⚙ at full input. A tap snaps to the next framing step (10 / 16 / 24 / 38 / 48 ⚙), and a hold zooms at full speed. Both are input-side easing over the same channel the bots use, and rotation tweens 0.18 s ⚙ per 45°.
 - *Why limits:* without them a flick could cull everything instantly. Limits make framing a skill (M4, Swink's game feel).
 - *Motion state:* when camera speed exceeds 0.6 gate/s ⚙ the frame is **"in motion"**. It gets a light directional blur, and the Stagehand moves (§5).
 - **No free-look and no camera shake from gameplay** (shake is only a 1-frame cue on a cut, and is disabled under reduced motion).
@@ -328,6 +328,7 @@ data/archetypes.json, data/chunks/*.json
      - (d) a consumed spawn point never respawns (except RECURRING);
      - (e) SET reload is byte-identical.
 2. **State hashes.** Golden hashes for 5 seeds × 3 bots at ticks 600/3,600/18,000. Any change needs `UPDATE_HASHES=1` plus a reason in the PR.
+   - Current pinned fair-Adaptive Shoot hashes (`tests/m2.test.ts`): seed 1 `e0c89e0d`, seed 19 `a80d24ad`, seed 2026 `9951f3d0`. These were bumped 2026-10-13 (loop review) because a far cut now removes a gate stand-in, which is re-dressed on its mark when the shot is called, instead of unloading intact. See `DECISIONS.md`.
 3. **Scenario tests.** Tiny hand-authored chunks with scripted inputs, e.g. "Urchin at W=30 touches the Talent → no fail", "Bridge at W=40 → FELL", "Stagehand doesn't move while camera speed < 0.6", "Rumour grows by exactly 0.3·t off-screen".
 4. **Bot players** (`src/bots`, also runnable in the browser via `?bot=`):
    - **TrackerBot** keeps the Talent centred at mid zoom (the passive baseline).
@@ -394,7 +395,8 @@ A cold playtest still watches five signals. The old M2 kill criterion and its pi
 | zoom W range (scene 1/2/3 max) | 10–48 / 40 / 32 u |
 | pan max / accel | 1.2 gate/s / 6 gate/s² |
 | steady pan factor | 0.35 |
-| zoom rate | ×1.6/s |
+| zoom rate | ×1.6/s at a light input, boosted ×(1 + 8.6·u⁴) toward full input u = 1 (≈ ×90/s; widest→tightest 0.35 s) |
+| zoom framing steps (tap snap) | 10 / 16 / 24 / 38 / 48 u, eased ≈ 0.15 s; holding past 0.15 s zooms at full speed (widest→tightest held ≈ 0.5 s) |
 | rotate tween | 0.18 s per 45° |
 | in-motion threshold | 0.6 gate/s |
 | off-screen grace (free) | 0.5 s |

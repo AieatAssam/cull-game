@@ -85,6 +85,10 @@ export function markShots(state: SimState) {
       // The stand-in leaves its mark once the shot is made, whoever was cut.
       for (const entity of state.entities) if (entity.gate === defangIndex && !entity.cut) { entity.cut = true; entity.spawned = false; }
     }
+    // A stand-in cut early (far from her) is re-dressed on its mark once the shot is called: the shot still needs a close cut.
+    if (!defang.done && defang.opened !== undefined) {
+      for (const entity of state.entities) if (entity.gate === defangIndex && entity.cut) { entity.cut = false; entity.spawned = false; entity.age = 0; }
+    }
   }
   const portrait = shots.find((shot) => shot.kind === 'portrait');
   if (portrait && !portrait.done && defang?.done && state.camera.zoom >= 16 && state.camera.zoom <= 34) portrait.done = true;
