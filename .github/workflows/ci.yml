@@ -24,4 +24,14 @@ jobs:
       - name: M6 full Shoot bot duration report (non-blocking while the AdaptiveBot gate is red)
         run: npm run validate:m6
         continue-on-error: true
+      - name: Balance report (Stage 0, report-only)
+        run: npm run balance -- --stage=0 --mode=both --seeds=200 --jitter=8
+        continue-on-error: true
+      - name: Upload balance reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: balance-reports
+          path: reports/balance/
+          if-no-files-found: ignore
       - run: npm run test:e2e

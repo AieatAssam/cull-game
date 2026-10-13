@@ -12,7 +12,8 @@ function direction(value: number): number {
   return Math.abs(value) < 1.1 ? 0 : Math.sign(value) * 127;
 }
 
-export function inputForBot(state: SimState, bot: BotKind, random: () => number = () => 0.5): InputFrame {
+/** `aim` scales every target zoom; the balance harness's jitter uses it for ±5% aim noise. 1 reproduces the shipped bots exactly. */
+export function inputForBot(state: SimState, bot: BotKind, random: () => number = () => 0.5, aim = 1): InputFrame {
   if (bot === 'chaos') return {
     panX: Math.round(random() * 254 - 127), panZ: Math.round(random() * 254 - 127),
     zoom: Math.round(random() * 254 - 127), rotate: random() < 0.02 ? (random() < 0.5 ? -1 : 1) : 0,
@@ -24,13 +25,13 @@ export function inputForBot(state: SimState, bot: BotKind, random: () => number 
   const targetX = state.talent.x;
   const targetZ = state.talent.z;
   let zoom = 0;
-  if (bot === 'tracker') zoom = state.camera.zoom > 24.1 ? 32 : state.camera.zoom < 23.9 ? -32 : 0;
+  if (bot === 'tracker') zoom = state.camera.zoom > 24 * aim + 0.1 ? 32 : state.camera.zoom < 24 * aim - 0.1 ? -32 : 0;
   if (bot === 'wide') zoom = -127;
   if (bot === 'close') zoom = 127;
   if (bot === 'adaptive') {
     const danger = state.entities.some((entity) => !entity.cut && entity.kind === 'urchin'
       && Math.hypot(entity.x - state.talent.x, entity.z - state.talent.z) < 8);
-    const targetZoom = state.shoot?.sceneIndex === 3 ? 48 : danger ? 48 : 24;
+    const targetZoom = (state.shoot?.sceneIndex === 3 ? 48 : danger ? 48 : 24) * aim;
     zoom = state.camera.zoom > targetZoom + 0.5 ? 64 : state.camera.zoom < targetZoom - 0.5 ? -64 : 0;
   }
   const frameX = glassAhead ? state.talent.x + Math.max(-4, Math.min(4, (glassAhead.x - state.talent.x) * 0.5)) : targetX;
