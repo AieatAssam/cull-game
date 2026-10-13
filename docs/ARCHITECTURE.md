@@ -1,9 +1,8 @@
 # CULL architecture
 
-This is the implementation contract for M0–M2. The runtime uses Three.js,
-Vite and TypeScript, with pinned dependencies. Repository instructions take
-precedence over the design draft: browser checks use Chromium only, and
-deployment and pushing are outside this work.
+The runtime uses Three.js, Vite and TypeScript, with pinned dependencies.
+Campaign milestones live in `docs/design/game-design.md`. Browser checks use
+Chromium only.
 
 ## Module layout
 
@@ -26,7 +25,7 @@ src/
   input/                  mouse, keyboard and touch → tick input
   render/                 Three.js objects and snapshot interpolation
   ui/                     DOM gate, HUD and minimal cut/LOD feedback
-  bots/                   TrackerBot and scripted M2 skilled path
+  bots/                   scripted play
   replay/                 seed and ordered tick-input recording
 data/
   archetypes.json          entity classes and per-tier data
@@ -37,10 +36,6 @@ tests/
   scenarios/              small chunks with scripted inputs
   browser/                Chromium smoke, controls and frozen frames
 ```
-
-Audio, richer replay compression, the full bot roster and wider content are
-later extensions. M0 establishes the boundaries; M1 builds the core; M2 adds
-the greybox renderer, controls and three prototype entities.
 
 ## Simulation and rendering boundary
 
@@ -99,8 +94,7 @@ Runtime entities contain a stable entity ID, archetype key, spawn ID, chunk
 ID, transform, current tier and explicit behaviour state. Spawn records and
 the consumed-spawn set are separate from visible meshes. SET reload restores
 the same record; consuming a spawn prevents respawn except for RECURRING.
-M2 implements Urchin with LOD, Boulder pop-in and Glass floor using these
-contracts. Adding behaviour requires data, a module and a scenario test.
+Adding behaviour requires data, a module and a scenario test.
 
 ## Determinism and replay
 
@@ -119,28 +113,16 @@ Hash canonical, quantised state with FNV-1a: sort IDs and sets, include RNG
 and lifecycle state, and exclude render objects and interpolation. Hash
 changes require an explicit update and a matching `docs/DECISIONS.md` entry.
 
-## Test harness and milestone gates
+## Test harness
 
 Run checks through repository lint, typecheck, unit, browser and perf scripts.
 Vitest runs simulation tests in Node; fast-check uses reproducible seeds and
 reports the seed and inputs for failures. Scenario fixtures are tiny chunks
-with scripted tick inputs and explicit expected state.
-
-- **M0:** scaffold and CI checks pass; Chromium renders an empty gate with
-  no console errors; a planted forbidden simulation call makes lint fail.
-- **M1:** unit and scenario coverage for core rules and all five failure
-  states; properties cover CAST gate membership (with specified exceptions),
-  failure after 60 off-frame Talent ticks, consumed-spawn persistence and
-  byte-identical SET reload. Compare hashes across repeated 10,000-tick runs
-  for three seeds. Compare pure projection against Three.js projection.
-- **M2:** TrackerBot and a scripted skilled path finish their runs without
-  errors; Chromium touch emulation pans and zooms. Exercise the three entities
-  in the hand-built 90-second scene and ten seeded strips. The human fun test
-  remains a separate acceptance gate.
+with scripted tick inputs and explicit expected state. Acceptance for the
+current campaign is in `docs/design/game-design.md`.
 
 Under `?debug`, expose `window.__cull` with `step(n)`, `input(frame)`, `hash()`,
 `state()`, `load(seed)` and `setTier(t)`. Support deterministic seed, tick,
 freeze, lens, tier and bot URL controls. Return state copies; debug mutations
 go through explicit simulation commands. Frozen frames support reproducible
-Chromium screenshots. Future long-run hashes, full bot comparisons and perf
-budgets extend this harness as their corresponding milestones arrive.
+Chromium screenshots.

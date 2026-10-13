@@ -3,7 +3,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import './style.css';
 import { stateHash } from './sim/hash';
 import { updateRenderCamera } from './render/camera';
-import { cameraBasis, inFrame, projectPoint } from './sim/frame';
+import { cameraBasis, projectPoint } from './sim/frame';
 import { NEUTRAL_INPUT, step } from './sim/step';
 import { lodTier } from './sim/lod';
 import { TUNING } from './sim/tuning';
@@ -28,6 +28,7 @@ import { filmStocks, loadFilmStock, saveFilmStock, unlockedFilmStocks, type Film
 import { lensFeats, unlockedLenses } from './meta/lenses';
 import { monitorConeContains } from './sim/m6';
 import { lensAspect, lensLodFactor, lensRenderTicks, type LensId } from './sim/lenses';
+import { closeCallsForGrade, coachIndex, describeShot } from './ui/describe-shot';
 import type { CastEntity, InputFrame, SimState } from './sim/types';
 
 const spriteAssets = createDailiesCast();
@@ -81,7 +82,6 @@ let thirdsTicks = 0;
 let activeTicks = 0;
 let jerkTotal = 0;
 let priorVelocityDelta = { x: 0, z: 0 };
-let closeCallCount = 0;
 let reelsCollected = 0;
 let monitorUses = 0;
 let monitorWasActive = false;
@@ -589,7 +589,7 @@ async function saveRunSummary() {
   const metrics = {
     thirdsPercent: activeTicks ? Math.round(thirdsTicks / activeTicks * 100) : 0,
     smoothness: smoothnessFromMeanJerk(activeTicks ? jerkTotal / activeTicks : 0),
-    closeCalls: closeCallCount,
+    closeCalls: closeCallsForGrade(state),
     reelsCollected,
     reelsAvailable: reelIds.size,
   };
@@ -719,14 +719,6 @@ const CAST_NAMES: Record<string, string> = {
   swarm: 'moths', stagehand: 'stagehand', bridge: 'rope bridge', rumour: 'growing smoke', monitor: 'friendly camera',
   'red-monitor': 'hostile camera', continuity: 'swappable prop',
 };
-function coachMessage(): string | null {
-  if (!coachStarted) return null;
-  const elapsed = performance.now() - coachStarted;
-  if (elapsed < 0 || elapsed > 20_000) return null;
-  if (elapsed < 7_000) return 'She walks on her own. Keep her in the shot.';
-  if (elapsed < 14_000) return 'Zoom out and the spikes go dull. Zoom in to grab a film reel.';
-  return 'Push a hazard past the frame edge to cut it. A close cut scores more.';
-}
 function callSheetLines() {
   const aspect = lensAspect(state.lens);
   const lines: string[] = [];
@@ -761,26 +753,14 @@ function updateHud() {
   focusBand.hidden = state.lens !== 'tilt-shift';
   focusBand.style.top = `${(0.5 - state.camera.focusOffset - 0.2) * 100}%`;
   $('#status').textContent = state.waiting ? 'HOLDING FOR SET…' : paused ? 'PAUSED' : state.camera.moving ? 'IN MOTION' : 'ROLLING';
-  const tierIndex = state.talent.lodTier ?? lodTier(1000 / state.camera.zoom);
-  const tierName = ['Close-up', 'Medium shot', 'Wide shot', 'Stand-in', 'Gone'][tierIndex] ?? 'Medium shot';
-  const urchin = state.entities.find((entity) => entity.kind === 'urchin' && entity.spawned && !entity.cut);
-  const urchinTier = urchin?.lodTier ?? lodTier(TUNING.urchinRadius * 1000 / state.camera.zoom);
-  const spikeName = ['spikes will hit her', 'spikes still hurt', 'spikes are gone', 'just a block', 'gone'][urchinTier] ?? 'in shot';
-  $('#lod').textContent = `${tierName} · ${spikeName}`;
-  const urchinInShot = state.entities.some((entity) => entity.kind === 'urchin' && entity.spawned && !entity.cut && inFrame(entity.x, entity.z, TUNING.urchinRadius, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, 0.8, lensAspect(state.lens), state.lens === 'tilt-shift' ? state.camera.focusOffset : null, state.lens === 'fisheye') && urchinTier < 4);
-  const blockedShot = state.shots?.find((shot) => !shot.done && state.talent.x >= shot.at - 0.35);
-  $('#message').textContent = blockedShot?.kind === 'defang'
-    ? 'Shot list: zoom out until the spikes go dull, or cut one close.'
-    : blockedShot?.kind === 'portrait'
-      ? 'Shot list: come back to a medium shot of her.'
-      : urchinInShot
-        ? ['Very close. That spiny ball will hit her.', 'Medium shot. The spikes still hurt.', 'Wide shot. The spikes are gone.', 'So wide it is only a harmless block.', 'The spiny ball is gone.'][urchinTier]
-        : 'Keep her in the shot.';
-  const lesson = coachMessage();
+  const copy = describeShot(state);
+  $('#lod').textContent = copy.gate;
+  const coachAt = coachStarted ? coachIndex(performance.now() - coachStarted) : null;
+  const lesson = coachAt === null ? null : copy.coach[coachAt];
   const coach = $('#coach');
   coach.textContent = lesson ?? '';
   coach.classList.toggle('hidden', !lesson);
-  if (invalidReplay) $('#message').textContent = 'INVALID REPLAY URL';
+  $('#message').textContent = !state.failed && invalidReplay ? 'INVALID REPLAY URL' : copy.toast;
   if (sliderZoomTarget !== null && Math.abs(sliderZoomTarget - state.camera.zoom) < 0.12) sliderZoomTarget = null;
   const zoomSlider = $('#zoom-slider') as HTMLInputElement;
   zoomSlider.value = String(Math.round(sliderZoomTarget ?? state.camera.zoom));
@@ -789,7 +769,6 @@ function updateHud() {
   const filmBar = shell.querySelector<HTMLElement>('.film-track')!;
   filmBar.style.setProperty('--remaining', `${Math.max(0, state.film / 90 * 100)}%`);
   if (state.failed) {
-    $('#message').textContent = state.failed === 'wrapped' ? "That's a wrap." : 'The take is over.';
     const endings: Record<string, string> = { 'lost-talent': 'LOST HER', hit: 'HIT', fell: 'SHE FELL', 'out-of-film': 'OUT OF FILM', wrapped: "THAT'S A WRAP" };
     $('#end-title').textContent = endings[state.failed] ?? 'CUT';
     $('#end-detail').textContent = `Take ${String(state.seed).padStart(5, '0')} · ${Math.floor(state.totalDistance)} metres · ${state.cuts.length} cuts`;
@@ -833,6 +812,7 @@ function advanceTick(forcedInput?: InputFrame) {
     const input = replayData ? replayData.frames[replayIndex++] ?? NEUTRAL_INPUT : bot ? inputForBot(state, bot, botRandom) : forcedInput ?? buildInput();
     inputLog.push(input);
     const previousCuts = state.cuts.length;
+    const previousCloseCalls = state.closeCalls;
     const previousSpawned = state.entities.filter((entity) => entity.spawned && !entity.cut).length;
     const previousWrap = state.shoot?.wrapCaught ?? false;
     const previousMonitorActive = monitorWasActive;
@@ -857,11 +837,10 @@ function advanceTick(forcedInput?: InputFrame) {
       const collected = newlyCut.find((entity) => entity.kind === 'reel');
       if (collected) reelsCollected++;
     }
-    for (const entity of newlyCut) {
-      if (['reel', 'monitor', 'red-monitor', 'continuity'].includes(entity.kind)) continue;
-      if (Math.hypot(entity.x - previousTalent.x, entity.z - previousTalent.z) <= 1.5) {
-        closeCallCount++;
-        pendingCloseCall = true;
+    if (state.closeCalls > previousCloseCalls) {
+      pendingCloseCall = true;
+      for (const entity of newlyCut) {
+        if (['reel', 'monitor', 'red-monitor', 'continuity'].includes(entity.kind)) continue;
         pendingCloseCallRank = Math.min(pendingCloseCallRank, Math.hypot(entity.x - previousTalent.x, entity.z - previousTalent.z));
       }
     }
@@ -1003,7 +982,7 @@ $('#restart').addEventListener('click', () => {
   botRandom = mulberry32((nextSeed ^ 0xb07b07) >>> 0); inputLog = []; replayIndex = 0;
   contactFrames.length = 0; closeCallFrames.length = 0; lastContactTick = 0; bestThirdsDistance = Number.POSITIVE_INFINITY;
   thirdsTicks = 0; activeTicks = 0; jerkTotal = 0; priorVelocityDelta = { x: 0, z: 0 };
-  closeCallCount = 0; reelsCollected = 0; monitorUses = 0; monitorWasActive = false; reelIds.clear();
+  reelsCollected = 0; monitorUses = 0; monitorWasActive = false; reelIds.clear();
   state.entities.filter((entity) => entity.kind === 'reel').forEach((entity) => reelIds.add(entity.id));
   pendingCloseCall = false; pendingCloseCallRank = Number.POSITIVE_INFINITY; sliderZoomTarget = null;
   frameInput = { ...NEUTRAL_INPUT }; resultSaved = false; displayedLocation = locationFor(state); refreshPersonalBest();

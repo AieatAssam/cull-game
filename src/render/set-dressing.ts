@@ -460,10 +460,14 @@ export function createSetDressing(lookIndex: number, pathTiles: Array<{ x: numbe
     group.add(mesh);
   };
   if (lookIndex === 1) {
-    addInstances(bevelledBlockGeometry(0.9, 1, 0.9), quiet('#e6d3b8', textures.paper), setTiles.map((tile) => {
+    const blocks = setTiles.map((tile) => {
       const roll = dressHash(tile.x, tile.z);
-      return { x: tile.x, y: 0, z: tile.z, sx: 0.8 + roll * 0.9, sy: 1.6 + roll * 2.4, sz: 0.7 + (1 - roll) * 0.6, yaw: roll * 0.4 };
-    }));
+      return { x: tile.x, y: 0, z: tile.z, sx: 1.25 + roll * 0.85, sy: 4.4 + roll * 3.8, sz: 1.1 + (1 - roll) * 0.75, yaw: (roll - 0.5) * 0.2 };
+    });
+    addInstances(bevelledBlockGeometry(1, 1, 1), quiet('#f4ead4', textures.paper), blocks);
+    addInstances(new THREE.BoxGeometry(1.14, 0.32, 1.14), quiet('#c4513a'), blocks.map((block) => ({
+      x: block.x, y: block.sy, z: block.z, sx: block.sx, sy: 1, sz: block.sz, yaw: block.yaw,
+    })));
     const kerb = pathTiles.filter((tile) => dressHash(tile.x + 3, tile.z) > 0.72).map((tile) => ({
       x: tile.x, y: 0.06, z: tile.z + 0.62, sx: 0.92, sy: 1, sz: 1, yaw: 0,
     }));

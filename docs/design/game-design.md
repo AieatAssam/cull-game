@@ -61,7 +61,7 @@ This is the build every milestone starts from.
 | Single strip, 200 seeds | 99% | 0% | A/T distance 5.0×, Wide 0.36×, Close 0.20×, chaos 1,000/1,000 |
 | Full Shoot, 20 seeds (`validate:m6`) | **8/20** finish | not measured | the other 12 die to a hit in Night Shoot or the finale; 197.7 / 233.0 / 257.8 s |
 
-Tracker's 0% is an artefact: it never changes zoom, so the first gate holds it until film runs out. A passive bot that zooms on cue passes `defang` with `zoom >= 36` alone and needs no cut, and the review's blind metronome won the strip in 87.9 s before PR #1. Passive play still wins too much; M1 measures it properly. (`MORNING-REPORT.md` and the review quote older figures.)
+Tracker's 0% is an artefact: it never changes zoom, so the first gate holds it until film runs out. A passive bot that zooms on cue passes `defang` with `zoom >= 36` alone and needs no cut, and the review's blind metronome won the strip in 87.9 s before PR #1. Passive play still wins too much; M1 measures it properly. (`docs/design/review-2026-10-12.md` quotes older figures.)
 
 ---
 
