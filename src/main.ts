@@ -30,7 +30,7 @@ import { filmStocks, loadFilmStock, saveFilmStock, unlockedFilmStocks, type Film
 import { lensFeats, unlockedLenses } from './meta/lenses';
 import { monitorConeContains } from './sim/m6';
 import { lensAspect, lensLodFactor, lensRenderTicks, type LensId } from './sim/lenses';
-import { closeCallsForGrade, coachIndex, describeShot } from './ui/describe-shot';
+import { COACH_LINES, closeCallsForGrade, describeShot } from './ui/describe-shot';
 import type { CastEntity, InputFrame, SimState } from './sim/types';
 
 const spriteAssets = createDailiesCast();
@@ -105,17 +105,19 @@ let simAccumulator = 0;
 let previousTime = 0;
 let frameSamples: number[] = [];
 let hitStopUntil = 0;
-let coachStarted = 0;
+/** The intro and the coach lines are cards read before the take rolls; while one shows the loop advances no ticks. */
+const TUTORIAL_STEPS = ['Nothing exists unless it is in the shot. You hold the camera. She walks.', ...COACH_LINES] as const;
+const tutorial = { step: 0, steps: 0, showing: false };
 
 const shell = document.createElement('section');
 shell.className = 'stage';
 shell.innerHTML = `
   <header class="topbar"><div class="brand"><span class="rec-dot"></span><strong>CULL</strong><span class="tagline">CAMERA DEPARTMENT</span></div><label class="stock-control">STOCK <select id="film-stock" aria-label="Film stock"><option value="clean">35 MM · CLEAN</option><option value="kodachrome">KODACHROME · B</option><option value="bleach">BLEACH BYPASS · A</option><option value="ilford">ILFORD B&W · S</option></select></label><details class="sound-settings" id="sound-settings"><summary id="sound-summary">SOUND</summary><div class="sound-panel"><button id="mute-audio" type="button" aria-pressed="false">MUTE ALL</button><label>MASTER <input id="volume-master" aria-label="Master volume" type="range" min="0" max="100" value="100" /></label><label>MUSIC <input id="volume-music" aria-label="Music volume" type="range" min="0" max="100" value="80" /></label><label>EFFECTS <input id="volume-sfx" aria-label="Effects volume" type="range" min="0" max="100" value="80" /></label><label><input id="mono-audio" type="checkbox" /> MONO</label><label><input id="calm-audio" type="checkbox" /> CALM MIX</label></div></details><div class="readout"><a class="daily-link" href="?daily=1">DAILY</a><span>TAKE 01</span><b id="timecode">01:30</b><span id="lens">35 MM</span><button class="pause-button" id="pause" aria-label="Pause game">Ⅱ</button></div></header>
-  <div class="composition"><aside class="margin margin-left"><div class="slate">SCENE 01<br><strong>BACKLOT</strong><small>SEED <span id="seed">00001</span></small><small id="best">BEST —</small></div><div class="hint"><span class="hint-mark">↖</span> WASD / DRAG<br>TO FRAME THE SHOT<div class="preview" id="preview"></div></div></aside>
-    <div class="gate-wrap"><div class="gate-label"><span id="gate-ratio">VIEWFINDER · GATE 1:1</span><span id="lod">SHE IS IN A MEDIUM SHOT</span></div><div class="gate" id="gate"><div class="thirds"></div><div class="focus-band" id="focus-band" hidden></div><div class="gate-corners"></div><div class="sprockets left"></div><div class="sprockets right"></div><div id="mount" class="mount"></div><div class="depth-blur top"></div><div class="depth-blur bottom"></div><div class="lost-edge" id="lost-edge"></div><div class="lost-arrow hidden" id="lost-arrow"><span>➤</span><b>HER</b></div><div class="lost-banner hidden" id="lost-banner"><strong>LOST HER</strong><small id="lost-count">2.5 s TO CUT</small><div class="lost-track"><i id="lost-bar"></i></div></div><div class="frame-message" id="message">Keep her in the shot.</div><p class="coach hidden" id="coach"></p><div class="title-card hidden" id="title-card"><p class="title-kicker">SCENE 01 · TAKE 01</p><h1>CULL</h1><p>Nothing exists unless it is in the shot. You hold the camera. She walks.</p></div><div class="cut-flash" id="cut-flash"></div><div class="slice" id="slice"></div><div class="peel" id="peel"></div><div class="cut-stamp" id="cut-stamp">CUT</div><i class="spark" style="--dx:-18px;--dy:-24px;left:70%;top:40%"></i><i class="spark" style="--dx:16px;--dy:-20px;left:72%;top:46%"></i><i class="spark" style="--dx:8px;--dy:18px;left:68%;top:50%"></i><i class="spark" style="--dx:-22px;--dy:8px;left:74%;top:42%"></i></div><div class="gate-foot"><span>55° TABLETOP</span><span id="status">ROLLING</span></div></div>
+  <div class="composition"><aside class="margin margin-left"><div class="slate">SCENE 01<br><strong>BACKLOT</strong><small>SEED <span id="seed">00001</span></small><small id="best">BEST —</small></div><div class="hint"><span class="hint-mark">↖</span> <span class="key-hint">WASD / DRAG<br>TO FRAME THE SHOT</span><span class="touch-hint">DRAG TO FRAME<br>PINCH TO ZOOM</span><div class="preview" id="preview"></div></div></aside>
+    <div class="gate-wrap"><div class="gate-label"><span id="gate-ratio">VIEWFINDER · GATE 1:1</span><span id="lod">SHE IS IN A MEDIUM SHOT</span></div><div class="gate" id="gate"><div class="thirds"></div><div class="focus-band" id="focus-band" hidden></div><div class="gate-corners"></div><div class="sprockets left"></div><div class="sprockets right"></div><div id="mount" class="mount"></div><div class="depth-blur top"></div><div class="depth-blur bottom"></div><div class="lost-edge" id="lost-edge"></div><div class="lost-arrow hidden" id="lost-arrow"><span>➤</span><b>HER</b></div><div class="lost-banner hidden" id="lost-banner"><strong>LOST HER</strong><small id="lost-count">2.5 s TO CUT</small><div class="lost-track"><i id="lost-bar"></i></div></div><div class="title-card hidden" id="title-card"><p class="title-kicker">SCENE 01 · TAKE 01</p><h1>CULL</h1></div><div class="cut-flash" id="cut-flash"></div><div class="slice" id="slice"></div><div class="peel" id="peel"></div><div class="cut-stamp" id="cut-stamp">CUT</div><i class="spark" style="--dx:-18px;--dy:-24px;left:70%;top:40%"></i><i class="spark" style="--dx:16px;--dy:-20px;left:72%;top:46%"></i><i class="spark" style="--dx:8px;--dy:18px;left:68%;top:50%"></i><i class="spark" style="--dx:-22px;--dy:8px;left:74%;top:42%"></i></div><div class="gate-notes"><p class="frame-message" id="message">Keep her in the shot.</p><div class="tutorial hidden" id="tutorial" role="dialog" aria-labelledby="tutorial-text"><p class="tutorial-kicker" id="tutorial-kicker"></p><p class="tutorial-text" id="tutorial-text"></p><button id="tutorial-next" type="button">CONTINUE</button></div></div><div class="gate-foot"><span>55° TABLETOP</span><span id="status">ROLLING</span></div></div>
     <aside class="margin margin-right"><div class="camera-mark">Slate<small>CAM 01</small></div><div class="call-sheet"><span>CALL SHEET</span><div id="call-sheet">Looking outside the frame…</div></div></aside>
   </div>
-  <footer class="controlbar"><div class="controls"><span><kbd>WASD</kbd> PAN</span><span><kbd>−</kbd> / <kbd>+</kbd> ZOOM</span><span><kbd>SPACE</kbd> HOLD</span><span><kbd>Q</kbd> / <kbd>E</kbd> ROTATE</span></div><div class="mobile-controls"><button id="hold" aria-label="Hold Talent">HOLD</button><label>ZOOM <input id="zoom-slider" aria-label="Zoom" type="range" min="10" max="48" value="30" /></label></div><div class="assist-controls"><button id="left-hand" type="button" aria-pressed="false">LEFT HAND</button><button id="overcrank" type="button" aria-pressed="false">75% SPEED</button></div><div class="film"><span>FILM</span><div class="film-track"><i id="filmbar"></i></div><b id="film">90s</b><em id="film-drain" hidden>−${TUNING.offscreenFilmDrainPerSecond}s/s</em></div></footer>
+  <footer class="controlbar"><div class="controls"><span><kbd>WASD</kbd> PAN</span><span><kbd>−</kbd> / <kbd>+</kbd> ZOOM</span><span><kbd>SPACE</kbd> HOLD</span><span><kbd>Q</kbd> / <kbd>E</kbd> ROTATE</span></div><p class="touch-hint">Drag to frame · pinch to zoom</p><div class="mobile-controls"><button id="hold" type="button" aria-label="Hold Talent">HOLD</button><div class="touch-buttons"><button id="rotate-left" type="button" aria-label="Rotate left">↺</button><button id="rotate-right" type="button" aria-label="Rotate right">↻</button><button id="zoom-out" type="button" aria-label="Zoom out">−</button><button id="zoom-in" type="button" aria-label="Zoom in">+</button></div><label class="zoom-slider">ZOOM <input id="zoom-slider" aria-label="Zoom" type="range" min="10" max="48" value="30" /></label></div><div class="assist-controls"><button id="left-hand" type="button" aria-pressed="false">LEFT HAND</button><button id="overcrank" type="button" aria-pressed="false">75% SPEED</button></div><div class="film"><span>FILM</span><div class="film-track"><i id="filmbar"></i></div><b id="film">90s</b><em id="film-drain" hidden>−${TUNING.offscreenFilmDrainPerSecond}s/s</em></div></footer>
   <div class="end-card hidden" id="end-card"><div class="end-stamp">TAKE ENDED</div><h1 id="end-title">CUT</h1><p id="end-detail"></p><p id="share-card"></p><div id="grade-detail" class="grade-detail"></div><details class="grade-method"><summary>How the grade works</summary><p>The grade averages four things: how often she sits on a thirds mark, how smooth the camera was, close cuts (10 points each, up to 100), and how many film reels you kept. S is 90 or above, A is 75, B is 60, and the rest is C.</p></details><details class="lens-feats"><summary>LENS FEATS</summary><ul id="lens-feat-list"></ul></details><label class="next-lens">NEXT TAKE LENS <select id="lens-select" aria-label="Lens for next take"></select></label><div class="end-actions"><a id="download-sheet" download>CONTACT SHEET ↓</a><button id="make-reel">DIRECTOR'S REEL</button><a id="download-reel" class="hidden" download>WEBM ↓</a><button id="share">SHARE</button><a id="replay-link" target="_blank" rel="noreferrer">REPLAY ↗</a></div><details class="filmography"><summary>FILMOGRAPHY · LAST 5 TAKES</summary><ol id="filmography-list"></ol></details><button id="restart">NEW TAKE ↗</button></div>
 `;
 app.append(shell);
@@ -900,14 +902,9 @@ function updateHud() {
   const focusBand = $('#focus-band');
   focusBand.hidden = state.lens !== 'tilt-shift';
   focusBand.style.top = `${(0.5 - state.camera.focusOffset - 0.2) * 100}%`;
-  $('#status').textContent = state.waiting ? 'HOLDING FOR SET…' : paused ? 'PAUSED' : state.camera.moving ? 'IN MOTION' : 'ROLLING';
+  $('#status').textContent = tutorial.showing ? 'STANDING BY' : state.waiting ? 'HOLDING FOR SET…' : paused ? 'PAUSED' : state.camera.moving ? 'IN MOTION' : 'ROLLING';
   const copy = describeShot(state);
   $('#lod').textContent = copy.gate;
-  const coachAt = coachStarted ? coachIndex(performance.now() - coachStarted) : null;
-  const lesson = coachAt === null ? null : copy.coach[coachAt];
-  const coach = $('#coach');
-  coach.textContent = lesson ?? '';
-  coach.classList.toggle('hidden', !lesson);
   $('#message').textContent = !state.failed && invalidReplay ? 'INVALID REPLAY URL' : copy.toast;
   if (sliderZoomTarget !== null && Math.abs(sliderZoomTarget - state.camera.zoom) < 0.12) sliderZoomTarget = null;
   const zoomSlider = $('#zoom-slider') as HTMLInputElement;
@@ -957,7 +954,8 @@ function quantizeInput(input: InputFrame): InputFrame {
   return { panX: axis(input.panX), panZ: axis(input.panZ), zoom: axis(input.zoom), rotate: input.rotate, hold: Boolean(input.hold), steady: Boolean(input.steady) };
 }
 function advanceTick(forcedInput?: InputFrame) {
-  if (!paused && !state.failed) {
+  // A tutorial card blocks the take: no ticks run, so nothing can reach her while it is read.
+  if (!paused && !tutorial.showing && !state.failed) {
     const input = replayData ? replayData.frames[replayIndex++] ?? NEUTRAL_INPUT : bot ? inputForBot(state, bot, botRandom) : forcedInput ?? buildInput();
     inputLog.push(input);
     const previousCuts = state.cuts.length;
@@ -1064,6 +1062,10 @@ function panFromKeys(): InputFrame {
 let holdButton = false;
 window.addEventListener('keydown', (event) => {
   unlockAudio();
+  if (tutorial.showing) {
+    if (event.key === ' ' || event.key === 'Enter') { event.preventDefault(); if (!event.repeat) advanceTutorial(); }
+    return;
+  }
   if ([' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) event.preventDefault();
   keys.add(event.key.toLowerCase());
   if (!event.repeat && event.key.toLowerCase() === 'q') rotationPulse = -1;
@@ -1071,12 +1073,27 @@ window.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' || event.key.toLowerCase() === 'p') paused = !paused;
 });
 window.addEventListener('keyup', (event) => { keys.delete(event.key.toLowerCase()); });
+const touches = new Map<number, { x: number; y: number }>();
+let pinch: { distance: number; zoom: number } | null = null;
+const touchSpread = () => { const [a, b] = [...touches.values()]; return a && b ? Math.hypot(a.x - b.x, a.y - b.y) : 0; };
+const clampZoom = (zoom: number) => Math.max(TUNING.minZoom, Math.min(TUNING.maxZoom, zoom));
 renderer.domElement.addEventListener('pointerdown', (event) => {
   unlockAudio();
-  pointer = { id: event.pointerId, x: event.clientX, y: event.clientY };
+  touches.set(event.pointerId, { x: event.clientX, y: event.clientY });
   try { renderer.domElement.setPointerCapture(event.pointerId); } catch { /* synthetic touch events have no browser pointer capture */ }
+  if (touches.size >= 2) {
+    // A second finger turns the drag into a pinch: the camera holds its pan while the spread sets the zoom.
+    pointer = null; pointerPan = null;
+    pinch = { distance: Math.max(1, touchSpread()), zoom: sliderZoomTarget ?? state.camera.zoom };
+  } else pointer = { id: event.pointerId, x: event.clientX, y: event.clientY };
 });
 renderer.domElement.addEventListener('pointermove', (event) => {
+  if (!touches.has(event.pointerId)) return;
+  touches.set(event.pointerId, { x: event.clientX, y: event.clientY });
+  if (pinch) {
+    if (state.lens !== 'long-lens') sliderZoomTarget = clampZoom(pinch.zoom * pinch.distance / Math.max(1, touchSpread()));
+    return;
+  }
   if (!pointer || pointer.id !== event.pointerId) return;
   const rect = renderer.domElement.getBoundingClientRect();
   const dx = event.clientX - pointer.x;
@@ -1084,11 +1101,29 @@ renderer.domElement.addEventListener('pointermove', (event) => {
   pointerPan = { panX: Math.max(-127, Math.min(127, -dx / rect.width * 127)), panZ: Math.max(-127, Math.min(127, dy / rect.height * 127)) };
   pointer.x = event.clientX; pointer.y = event.clientY;
 });
-renderer.domElement.addEventListener('pointerup', () => { pointer = null; pointerPan = null; });
+for (const type of ['pointerup', 'pointercancel'] as const) {
+  renderer.domElement.addEventListener(type, (event) => {
+    touches.delete(event.pointerId);
+    pointerPan = null;
+    if (touches.size < 2) pinch = null;
+    // Lifting one finger of a pinch hands the drag back to the finger still down, from where it is now.
+    const [rest] = [...touches.entries()];
+    pointer = rest && !pinch ? { id: rest[0], x: rest[1].x, y: rest[1].y } : null;
+  });
+}
 renderer.domElement.addEventListener('wheel', (event) => { event.preventDefault(); zoomPulse = -Math.sign(event.deltaY) * 60; }, { passive: false });
 document.addEventListener('visibilitychange', () => { if (document.hidden) paused = true; });
 $('#hold').addEventListener('pointerdown', () => { holdButton = true; frameInput.hold = true; });
 for (const type of ['pointerup', 'pointercancel', 'pointerleave']) $('#hold').addEventListener(type, () => { holdButton = false; frameInput.hold = false; });
+$('#rotate-left').addEventListener('click', () => { rotationPulse = -1; });
+$('#rotate-right').addEventListener('click', () => { rotationPulse = 1; });
+const nudgeZoom = (delta: number) => { if (state.lens !== 'long-lens') sliderZoomTarget = clampZoom(Math.round(sliderZoomTarget ?? state.camera.zoom) + delta); };
+$('#zoom-in').addEventListener('click', () => nudgeZoom(-6));
+$('#zoom-out').addEventListener('click', () => nudgeZoom(6));
+// Keep the page itself still: drags and pinches on the viewfinder and the camera controls belong to the camera, never to browser scroll or zoom.
+for (const surface of [$('#gate'), $('.controlbar')]) surface.addEventListener('touchmove', (event) => { event.preventDefault(); }, { passive: false });
+document.addEventListener('touchmove', (event) => { if (event.touches.length > 1) event.preventDefault(); }, { passive: false });
+for (const type of ['gesturestart', 'gesturechange']) document.addEventListener(type, (event) => { event.preventDefault(); });
 $('#zoom-slider').addEventListener('input', (event) => { sliderZoomTarget = Number((event.currentTarget as HTMLInputElement).value); });
 $('#pause').addEventListener('click', () => { paused = !paused; });
 $('#make-reel').addEventListener('click', () => {
@@ -1171,7 +1206,7 @@ if (query.has('debug')) {
     lockDemo = progress === null ? null : Math.max(0, Math.min(1, progress));
     demoMonitor = lockDemo === null ? null : { id: 'demo-red-monitor', kind: 'red-monitor', x: state.talent.x + 5, z: state.talent.z - 3.5, vx: 0, vz: 0, spawned: true, cut: false, age: 0, heading: Math.atan2(3.5, -5), range: 8, halfAngle: 0.45 };
     render();
-  }, silhouettes: () => measureSilhouettes({ urchin: spriteAssets.urchinTiers[2]!, boulder: spriteAssets.boulder, glass: spriteAssets.glass, extras: spriteAssets.extras[0]!, swarm: spriteAssets.swarmMoth, rumour: spriteAssets.rumour, stagehand: spriteAssets.stagehand, monitor: spriteAssets.monitorTeal, redMonitor: spriteAssets.monitorRed, continuity: spriteAssets.continuity[2]!, talent: spriteAssets.walk[0]! }) } });
+  }, tutorial: () => ({ step: tutorial.step, steps: tutorial.steps, showing: tutorial.showing, paused: paused || tutorial.showing }), silhouettes: () => measureSilhouettes({ urchin: spriteAssets.urchinTiers[2]!, boulder: spriteAssets.boulder, glass: spriteAssets.glass, extras: spriteAssets.extras[0]!, swarm: spriteAssets.swarmMoth, rumour: spriteAssets.rumour, stagehand: spriteAssets.stagehand, monitor: spriteAssets.monitorTeal, redMonitor: spriteAssets.monitorRed, continuity: spriteAssets.continuity[2]!, talent: spriteAssets.walk[0]! }) } });
 }
 
 new ResizeObserver(() => {
@@ -1180,17 +1215,36 @@ new ResizeObserver(() => {
   render();
 }).observe(mount);
 render();
+function showTutorialStep() {
+  const last = tutorial.step >= tutorial.steps - 1;
+  $('#tutorial-kicker').textContent = tutorial.step === 0 ? `SCENE 01 · TAKE 01${tutorial.steps > 1 ? ` · 1/${tutorial.steps}` : ''}` : `HOW TO SHOOT · ${tutorial.step + 1}/${tutorial.steps}`;
+  $('#tutorial-text').textContent = TUTORIAL_STEPS[tutorial.step]!;
+  $('#tutorial-next').textContent = last ? 'ROLL CAMERA ▶' : 'CONTINUE ▶';
+  $('#title-card').classList.toggle('hidden', tutorial.step !== 0);
+}
+function advanceTutorial() {
+  if (!tutorial.showing) return;
+  unlockAudio();
+  if (tutorial.step < tutorial.steps - 1) { tutorial.step++; showTutorialStep(); return; }
+  tutorial.showing = false;
+  // Drop the time spent reading so the first frame after the card does not try to catch up.
+  previousTime = 0; simAccumulator = 0;
+  shell.classList.remove('tutorial-open');
+  $('#tutorial').classList.add('hidden');
+  $('#title-card').classList.add('hidden');
+  try { window.localStorage.setItem('cull.tutorial.v1', 'seen'); } catch { /* The full tutorial shows again next visit. */ }
+  render();
+}
 if (!frozen && !bot && !replayData) {
-  paused = true;
-  $('#title-card').classList.remove('hidden');
-  const beginTake = () => {
-    if (coachStarted) return;
-    paused = false;
-    coachStarted = performance.now();
-    $('#title-card').classList.add('hidden');
-  };
-  window.setTimeout(beginTake, 3800);
-  window.addEventListener('pointerdown', beginTake, { once: true });
-  window.addEventListener('keydown', beginTake, { once: true });
+  let seen = false;
+  try { seen = window.localStorage.getItem('cull.tutorial.v1') === 'seen'; } catch { /* Treat as a first visit. */ }
+  // A first visit walks every coach card; a return visit only waits on the slate.
+  tutorial.steps = seen ? 1 : TUTORIAL_STEPS.length;
+  tutorial.showing = true;
+  shell.classList.add('tutorial-open');
+  $('#tutorial').classList.remove('hidden');
+  showTutorialStep();
+  $('#tutorial-next').addEventListener('click', advanceTutorial);
+  render();
 }
 if (!frozen) requestAnimationFrame(loop);

@@ -63,11 +63,13 @@ button, input, select, summary { font: inherit; }
 .composition {
   flex: 1;
   display: grid;
-  grid-template-columns: minmax(128px, 0.8fr) minmax(280px, min(70vh, calc(100vw - 300px))) minmax(128px, 0.8fr);
+  grid-template-columns: minmax(128px, 0.8fr) minmax(280px, min(calc(100vh - 280px), calc(100vw - 300px))) minmax(128px, 0.8fr);
   align-items: center;
   gap: 16px;
   min-height: 0;
 }
+.gate, .controlbar, .mobile-controls { touch-action: none; }
+.touch-hint { display: none; }
 .gate-wrap { display: flex; flex-direction: column; gap: 8px; min-width: 0; min-height: 0; }
 .gate-label, .gate-foot { display: flex; justify-content: space-between; gap: 8px; }
 .gate {
@@ -144,22 +146,16 @@ button, input, select, summary { font: inherit; }
     linear-gradient(var(--paper) 0 0) right bottom / 22px 2px no-repeat,
     linear-gradient(var(--paper) 0 0) right bottom / 2px 22px no-repeat;
 }
-.frame-message, .coach {
-  position: absolute;
-  z-index: 4;
-  left: 50%;
-  transform: translateX(-50%);
-  max-width: calc(100% - 48px);
-  padding: 6px 10px;
-  background: rgba(30, 26, 23, 0.88);
-  color: var(--paper);
-  font-size: 14px;
-  line-height: 1.3;
-  text-align: center;
-}
-.frame-message { top: 10%; }
-.coach { top: 22%; border: 1px solid var(--brass); }
-.coach.hidden, .title-card.hidden { display: none; }
+.title-card.hidden { display: none; }
+/* Captions and tutorial cards dock in a strip under the viewfinder so nothing written ever covers the set. */
+.gate-notes { min-height: 44px; display: flex; flex-direction: column; justify-content: center; }
+.frame-message { margin: 0; padding: 4px 10px; border-left: 3px solid var(--brass); background: rgba(30, 26, 23, 0.6); color: var(--paper); font-size: 14px; line-height: 1.3; }
+.stage.tutorial-open .frame-message { display: none; }
+.tutorial { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 4px 12px; padding: 8px 10px; background: #1e1a17; border: 1px solid var(--brass); }
+.tutorial.hidden { display: none; }
+.tutorial-kicker { grid-column: 1 / -1; margin: 0; color: var(--brass); font-size: 12px; letter-spacing: 0.16em; }
+.tutorial-text { margin: 0; color: var(--paper); font-size: 15px; line-height: 1.35; }
+.tutorial button { min-height: 44px; padding: 8px 14px; background: var(--burn); color: var(--ink); border: 0; font-size: 14px; font-weight: 600; letter-spacing: 0.08em; cursor: pointer; white-space: nowrap; }
 /* Hostile camera lock telegraph: tally + countdown ring over the monitor, carmine edge while it holds her. */
 .lock-overlay { position: absolute; inset: 0; z-index: 3; pointer-events: none; transition: box-shadow 0.12s linear; }
 .lock-mark { position: absolute; left: 0; top: 0; width: 44px; height: 44px; margin: -22px 0 0 -22px; }
@@ -202,6 +198,9 @@ kbd { color: var(--paper); border: 1px solid #8a7562; padding: 2px 6px; border-r
 .preview::before { content: "□"; position: absolute; left: 62%; top: 18%; color: var(--carmine); font-size: 20px; }
 .mobile-controls { display: flex; gap: 10px; align-items: center; }
 .mobile-controls button { font-size: 14px; letter-spacing: 0.08em; padding: 10px 16px; color: var(--ink); background: var(--burn); border: 0; touch-action: none; }
+.touch-buttons { display: flex; gap: 8px; }
+.mobile-controls .touch-buttons button { width: 48px; padding: 0; font-size: 22px; line-height: 1; color: var(--paper); background: transparent; border: 1px solid #8a7562; }
+.mobile-controls .touch-buttons button:active { background: #5a4636; }
 .mobile-controls label { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
 .mobile-controls input { width: 110px; accent-color: var(--burn); touch-action: pan-x; }
 .cut-flash { position: absolute; inset: 0; z-index: 5; pointer-events: none; box-shadow: inset 0 0 0 0 var(--burn); }
@@ -317,7 +316,7 @@ kbd { color: var(--paper); border: 1px solid #8a7562; padding: 2px 6px; border-r
 .stage.fisheye .mount { clip-path: ellipse(75% 76% at 50% 50%); }
 .stage.anamorphic .gate { aspect-ratio: 2.39; }
 
-@media (min-width: 801px) { .mobile-controls { display: none; } }
+@media (min-width: 801px) and (pointer: fine) { .mobile-controls { display: none; } }
 @media (max-width: 800px) {
   .stage { gap: 6px; }
   .composition { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr) auto; gap: 8px; }
@@ -330,6 +329,40 @@ kbd { color: var(--paper); border: 1px solid #8a7562; padding: 2px 6px; border-r
   .film { width: 100%; justify-content: flex-end; }
   .film-track { width: 40vw; }
   .topbar { flex-wrap: wrap; }
+}
+@media (pointer: coarse) {
+  .controls, .key-hint { display: none; }
+  .touch-hint { display: inline; }
+  .controlbar .touch-hint { display: block; margin: 0; font-size: 13px; letter-spacing: 0.04em; color: var(--muted); }
+  .zoom-slider { display: none !important; }
+  .stage button, .stage summary, .stage select, .daily-link { min-height: 44px; min-width: 44px; touch-action: manipulation; }
+  .daily-link, .sound-settings summary { display: inline-flex; align-items: center; }
+  .mobile-controls #hold { min-height: 56px; min-width: 112px; font-size: 16px; font-weight: 600; }
+  .mobile-controls .touch-buttons button { height: 56px; width: 52px; }
+  .title-card { display: none !important; }
+}
+@media (max-width: 800px) {
+  .title-card { display: none !important; }
+  .margin-left .hint .preview, .margin-right .camera-mark { display: none; }
+  .composition { gap: 4px; }
+  .margin { padding: 0; gap: 4px 12px; justify-content: space-between; }
+  .slate { line-height: 1.25; }
+  .slate small { display: inline; margin: 0 8px 0 0; }
+  .slate strong { display: block; }
+  .controlbar { gap: 6px; padding-top: 6px; }
+  .mobile-controls { width: 100%; justify-content: space-between; }
+  .controlbar { flex-direction: row; flex-wrap: wrap; align-items: center; }
+  .controlbar .touch-hint { display: none; }
+  .assist-controls { flex: 0 0 auto; }
+  .film { flex: 1 1 120px; width: auto; }
+  .film-track { flex: 1 1 auto; width: auto; }
+  .call-sheet > span { display: none; }
+  .call-sheet div { font-size: 13px; line-height: 1.3; height: 3.9em; overflow: hidden; }
+  .gate-wrap { gap: 6px; width: min(94vw, calc(100dvh - 500px)); }
+  .gate-notes { min-height: 62px; }
+  .frame-message { font-size: 13px; }
+  .tutorial-text { font-size: 14px; }
+  .stage.tutorial-open .margin-right { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition: none !important; }
