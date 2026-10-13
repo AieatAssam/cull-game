@@ -1,4 +1,4 @@
-import { shotListForPath } from './framing';
+import { gateCast, shotListForPath } from './framing';
 import { seededRange } from './rng';
 import { generateScene } from '../gen/generate';
 import type { CastEntity, EntityKind, SimState, SpawnPoint } from './types';
@@ -61,7 +61,8 @@ export function createGeneratedState(seed: number, difficulty = 0, chunkCount?: 
   state.path = scene.path;
   state.forks = scene.forks;
   state.tiles = scene.tiles;
-  state.shots = shotListForPath(scene.path);
+  state.shots = shotListForPath(scene.path, seed, scene.forks, scene.entities);
+  state.entities.push(...gateCast(scene.path, state.shots));
   const start = scene.path[0];
   if (start) {
     state.talent.x = start.x;

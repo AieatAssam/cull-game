@@ -29,22 +29,42 @@ export const TUNING = {
   closeCallScore: 250,
   // Glass and bridges this far past the gate (projected) stay, so a zoom twitch cannot delete the floor.
   fragileKeepMargin: 0.12,
+  // Glass framed out farther than this from the Talent is unloaded intact; nearer, it shatters (bible M2: no unseen holes).
+  glassShatterRadius: 6,
   urchinSpeed: 1.5,
+  // Bible M2 "Night/finale hazard density and speed": Urchin roll speed by scene difficulty (Backlot, City, Night, finale).
+  urchinSpeedByDifficulty: [1.5, 1.5, 4.4, 4.7] as const,
   urchinRadius: 0.7,
+  // Share of generated Urchins that enter ahead on the walked path (bible M2: ≥ 50%), denser at Night and in the finale.
+  aheadEntryShare: [0.6, 0.6, 0.9, 0.9] as const,
+  // From this scene difficulty on (Night, finale), ahead-entry Urchins are already rolling once they are on the call sheet.
+  rollingEntryFromDifficulty: 2,
   boulderSpeed: 4,
   boulderRadius: 0.8,
   extrasSpeed: 0.8,
   extrasMemberRadius: 0.18,
   extrasRadius: 2,
+  // A Wide crowd tramples on contact with a visible member, not an invisible disc around its centre.
+  extrasContactRadius: 0.35,
   swarmRadius: 0.08,
   stagehandSpeed: 3,
   rumourGrowRate: 0.3,
   rumourShrinkRate: 0.5,
   bridgeLength: 14,
+  // The hostile camera's tally: it must hold the Talent in its cone, in frame, this long before the take fails.
+  hostileLockSeconds: 1,
+  hostileOffset: 6,
+  hostileRange: 18,
+  // Shot-list gates (bible M2): seeded per scene; the defang stand-in waits this far ahead of the held Talent.
+  defangGateFraction: [0.14, 0.28] as const,
+  portraitGateGap: [0.16, 0.28] as const,
+  gateMarkDistance: 1.4,
   wrapLastSceneFraction: 0.25,
   wrapSpeeds: [1.8, 2.2, 2.6] as const,
   threatBudgets: [1, 1.6, 2.3, 2.8] as const,
   chunkSize: 16,
+  // Bible M2: every scene has at least this many heading changes of ≥ 90°.
+  minimumSharpTurns: 2,
   chunkTemplateCount: 40,
   minimumReelsPerScene: 6,
   sceneLength: [120, 220] as const,

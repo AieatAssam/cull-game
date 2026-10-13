@@ -207,7 +207,10 @@ describe('frame projection and lifecycle', () => {
       state.entities = [{ id: 'prop', kind: 'glass', x, z, vx: 0, vz: 0, spawned: true, cut: false, age: 0 }];
       const next = step(state);
       for (const item of next.entities.filter((cast) => cast.spawned && !cast.cut)) {
-        expect(inFrame(item.x, item.z, 0.55, next.camera.x, next.camera.z, next.camera.zoom, next.camera.yaw, 0.8)).toBe(true);
+        // Fragile floor within `fragileKeepMargin` past the gate is kept live on purpose (DECISIONS 2026-10-12).
+        const bounds = projectedAabb(item.x, item.z, 0.55, 0.8, next.camera.x, next.camera.z, next.camera.zoom, next.camera.yaw);
+        const margin = TUNING.fragileKeepMargin;
+        expect(overlapsFrame(bounds, { left: -0.5 - margin, right: 0.5 + margin, bottom: -0.5 - margin, top: 0.5 + margin })).toBe(true);
       }
     }));
   });
@@ -374,7 +377,7 @@ describe('fixed step simulation and failure rules', () => {
     expect(next.closeCalls).toBe(1);
     expect(next.score).toBe(TUNING.closeCallScore);
   });
-  it('holds the Talent for a wide shot, then for a medium portrait', () => {
+  it('holds the Talent until a close cut defangs, then for a medium portrait', () => {
     const state = createGeneratedState(3, 0, 4);
     state.talent.x = state.shots![0]!.at;
     state.camera.x = state.talent.x;
@@ -382,8 +385,18 @@ describe('fixed step simulation and failure rules', () => {
     const held = step(state, { ...NEUTRAL_INPUT, hold: false });
     expect(held.waiting).toBe(true);
     expect(held.talent.x).toBeCloseTo(state.talent.x);
+    // Bible M2: zoom alone no longer defangs.
     held.camera.zoom = 40;
-    const wide = step(held);
+    let still = held;
+    for (let i = 0; i < 30; i++) still = step(still);
+    expect(still.shots?.find((shot) => shot.kind === 'defang')?.done).toBe(false);
+    // Cut the stand-in on its mark close: put the frame's right edge on the Talent.
+    const standIn = still.entities.find((cast) => cast.gate === 0)!;
+    expect(standIn.spawned).toBe(true);
+    still.camera.x = still.talent.x - still.camera.zoom / 2 + 0.2;
+    const cut = step(still);
+    expect(cut.closeCalls).toBe(still.closeCalls + 1);
+    const wide = step(cut);
     expect(wide.shots?.find((shot) => shot.kind === 'defang')?.done).toBe(true);
     const portrait = wide.shots!.find((shot) => shot.kind === 'portrait')!;
     wide.talent.x = portrait.at;
@@ -401,8 +414,21 @@ describe('fixed step simulation and failure rules', () => {
     entity(state, 'glass', 16.2);
     const next = step(state, { ...NEUTRAL_INPUT, hold: true });
     expect(next.entities[0]?.cut).toBe(false);
+    // Bible M2: Glass framed out far from the Talent is unloaded intact, never left as an unseen hole.
     next.camera.x = -20;
-    expect(step(next, { ...NEUTRAL_INPUT, hold: true }).entities[0]?.cut).toBe(true);
+    const unloaded = step(next, { ...NEUTRAL_INPUT, hold: true });
+    expect(unloaded.entities[0]).toMatchObject({ cut: false, spawned: false });
+  });
+  it('shatters Glass framed out within reach of the Talent, and the Talent falls through it', () => {
+    const state = createState(1, []);
+    state.camera.zoom = 10;
+    const glass = entity(state, 'glass', 3);
+    state.camera.x = -5.2;
+    const shattered = step(state, { ...NEUTRAL_INPUT, hold: true });
+    expect(shattered.entities[0]).toMatchObject({ cut: true });
+    expect(Math.hypot(glass.x - state.talent.x, glass.z - state.talent.z)).toBeLessThanOrEqual(TUNING.glassShatterRadius);
+    shattered.talent.x = 3;
+    expect(step(shattered, { ...NEUTRAL_INPUT, hold: true }).failed).toBe('fell');
   });
   it('crushes the Talent with a close boulder and lets a medium boulder pass', () => {
     const close = createState(1, []);
@@ -415,7 +441,7 @@ describe('fixed step simulation and failure rules', () => {
     expect(step(medium, { ...NEUTRAL_INPUT, hold: true }).failed).toBeNull();
   });
   it('places a defang gate before the portrait gate', () => {
-    const shots = shotListForPath([{ x: 0 }, { x: 100 }]);
+    const shots = shotListForPath([{ x: 0, z: 0 }, { x: 100, z: 0 }]);
     expect(shots[0]?.kind).toBe('defang');
     expect(shots[1]!.at).toBeGreaterThan(shots[0]!.at);
   });

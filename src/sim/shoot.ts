@@ -1,4 +1,4 @@
-import { shotListForPath } from './framing';
+import { gateCast, shotListForPath } from './framing';
 import { generateScene } from '../gen/generate';
 import { createContinuitySequence } from './m6';
 import { TUNING } from './tuning';
@@ -25,7 +25,7 @@ function addM6Cast(state: SimState, seed: number, sceneIndex: number): CastEntit
   );
   if (sceneIndex === 2 || sceneIndex === 3) cast.push(
     { id: `rumour-${sceneIndex}`, kind: 'rumour', x: rumour.x, z: rumour.z + 5, vx: 0, vz: 0, spawned: false, cut: false, age: 0, radius: 0.5 },
-    { id: `red-monitor-${sceneIndex}`, kind: 'red-monitor', x: hostile.x, z: hostile.z + 6, vx: 0, vz: 0, spawned: true, cut: false, age: 0, heading: Math.atan2(hostile.z - (hostile.z + 6), end.x - hostile.x), range: 18, halfAngle: Math.PI / 6 },
+    { id: `red-monitor-${sceneIndex}`, kind: 'red-monitor', x: hostile.x, z: hostile.z + TUNING.hostileOffset, vx: 0, vz: 0, spawned: true, cut: false, age: 0, heading: Math.atan2(-TUNING.hostileOffset, end.x - hostile.x), range: TUNING.hostileRange, halfAngle: Math.PI / 6 },
     { id: `continuity-${sceneIndex}`, kind: 'continuity', x: prop.x, z: prop.z - 2, vx: 0, vz: 0, spawned: false, cut: false, age: 0, propIndex: 0, propSequence: sequence.map((kind) => propKinds.indexOf(kind)), heading: 0 },
   );
   return cast;
@@ -56,7 +56,8 @@ function makeScene(seed: number, sceneIndex: number, carry: SimState): SimState 
   next.cuts = [...carry.cuts];
   next.shoot = { sceneIndex, biome: biomes[sceneIndex]!, wrapDistance: null, wrapCaught: false, finaleTicks: 0 };
   next.closeCalls = 0;
-  next.shots = sceneIndex < 3 ? shotListForPath(generated.path) : undefined;
+  next.shots = sceneIndex < 3 ? shotListForPath(generated.path, sceneSeed(seed, sceneIndex), generated.forks, generatedEntities) : undefined;
+  if (next.shots) next.entities.push(...gateCast(generated.path, next.shots));
   return next;
 }
 

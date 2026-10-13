@@ -1,8 +1,9 @@
 import { inFrame, projectPoint, projectedAabb } from './frame';
-import { markShots, shotBlocksTalent } from './framing';
+import { gateOpen, markShots, shotBlocksTalent } from './framing';
 import { lodTier, type LodTier } from './lod';
 import { lensAspect, lensLodFactor } from './lenses';
 import { TUNING } from './tuning';
+import { pathZAt } from '../gen/generate';
 import { advanceRumourRadius, advanceWrap, isDeletedByWrap, isWrapActive, monitorConeContains, redMonitorOverlapsTarget, type MonitorCone } from './m6';
 import type { CastEntity, FailReason, InputFrame, SimState } from './types';
 
@@ -33,6 +34,47 @@ function entityInFrame(state: SimState, entity: CastEntity) {
 
 function monitorCone(entity: CastEntity): MonitorCone {
   return { origin: { x: entity.x, z: entity.z }, heading: entity.heading ?? 0, range: entity.range ?? 0, halfAngle: entity.halfAngle ?? 0 };
+}
+
+/**
+ * Framed out but not cut: far Glass is unloaded intact (it only shatters within reach of the Talent, where it was
+ * just on screen), and a stand-in on a gate mark only leaves when its shot has been called.
+ */
+function unloadsIntact(state: SimState, entity: CastEntity) {
+  if (entity.kind === 'glass') return distance(entity.x, entity.z, state.talent.x, state.talent.z) > TUNING.glassShatterRadius;
+  return entity.gate !== undefined && !gateOpen(state, entity.gate);
+}
+
+/** Mirrors the HUD call sheet ("Coming in"): unspawned cast just past the gate edge. */
+function onCallSheet(state: SimState, entity: CastEntity) {
+  const projected = projectPoint(entity.x, entity.z, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, lensAspect(state.lens));
+  const outside = Math.max(Math.abs(projected.x), Math.abs(projected.y)) - 0.5;
+  return outside >= 0 && outside <= TUNING.callSheetMargin;
+}
+
+/** A Wide crowd tramples the Talent when a visible member touches it. */
+function crowdContact(entity: CastEntity, talent: SimState['talent'], talentRadius: number) {
+  return entity.members?.some((member) => !member.cut
+    && distance(entity.x + member.dx, entity.z + member.dz, talent.x, talent.z) <= TUNING.extrasContactRadius + talentRadius) ?? false;
+}
+
+/** Length along the set path (x is strictly increasing) up to world x, via a cumulative table and binary search. */
+function pathArcLength(path: SimState['path']): (x: number) => number {
+  const cumulative = [0];
+  for (let i = 1; i < path.length; i++) cumulative.push(cumulative[i - 1]! + distance(path[i - 1]!.x, path[i - 1]!.z, path[i]!.x, path[i]!.z));
+  return (x) => {
+    if (path.length < 2 || x <= path[0]!.x) return 0;
+    if (x >= path.at(-1)!.x) return cumulative.at(-1)! + x - path.at(-1)!.x;
+    let low = 1;
+    let high = path.length - 1;
+    while (low < high) {
+      const mid = (low + high) >> 1;
+      if (path[mid]!.x < x) low = mid + 1; else high = mid;
+    }
+    const a = path[low - 1]!;
+    const b = path[low]!;
+    return cumulative[low - 1]! + (cumulative[low]! - cumulative[low - 1]!) * ((x - a.x) / (b.x - a.x));
+  };
 }
 
 function fail(state: SimState, reason: FailReason) {
@@ -167,15 +209,20 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
       if (visible) entity.spawned = true;
       if (!entity.spawned) continue;
     }
+    // Night/finale Urchins announced on the call sheet ("Coming in") are already rolling down the set toward the frame.
+    if (!entity.spawned && entity.rollsIn && onCallSheet(state, entity)) {
+      entity.x += entity.vx * dt;
+      entity.z = pathZAt(state.path, entity.x);
+    }
     if (!entity.spawned) {
-      const nearTalent = entity.kind === 'extras' && entity.members
+      const nearTalent = entity.gate !== undefined ? false : entity.kind === 'extras' && entity.members
         ? entity.members.some((member) => !member.cut && distance(entity.x + member.dx, entity.z + member.dz, talent.x, talent.z) < TUNING.popInExclusion)
         : distance(entity.x, entity.z, talent.x, talent.z) < TUNING.popInExclusion;
       const spawnTier = lodTier((entity.kind === 'bridge' || entity.kind === 'extras' ? 1 : entity.kind === 'swarm' ? TUNING.swarmRadius : entity.kind === 'urchin' ? TUNING.urchinRadius : 0.55) * 1000 / cam.zoom * detailFactor(state, entity.x, entity.z), entity.lodTier as LodTier | undefined);
       if (entityInFrame(state, entity) && !nearTalent && !(entity.kind === 'swarm' && spawnTier === 4)) {
         entity.spawned = true;
         entity.age = 0;
-        if (entity.kind !== 'continuity') state.consumed.push(entity.id);
+        if (entity.kind !== 'continuity' && !state.consumed.includes(entity.id)) state.consumed.push(entity.id);
       }
     }
     if (!entity.spawned) continue;
@@ -201,11 +248,12 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
     }
     entity.age++;
     entity.x += entity.vx * dt;
-    entity.z += entity.vz * dt;
+    entity.z = entity.pathBound ? pathZAt(state.path, entity.x) : entity.z + entity.vz * dt;
     const visible = entityInFrame(state, entity);
     const fragileHold = (entity.kind === 'glass' || entity.kind === 'bridge')
       && outsideFrame(state, entity.x, entity.z, radius, 0.8) < TUNING.fragileKeepMargin;
     if (!visible && !fragileHold && entity.kind !== 'swarm' && entity.kind !== 'rumour') {
+      if (unloadsIntact(state, entity)) { entity.spawned = false; continue; }
       entity.cut = true;
       noteFrameCut(state, entity);
       continue;
@@ -237,7 +285,7 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
       talent.x += push * dt;
     }
     if (close && entity.kind === 'swarm') fail(state, 'hit');
-    if (close && entity.kind === 'extras' && tier >= 2) fail(state, 'hit');
+    if (entity.kind === 'extras' && tier >= 2 && crowdContact(entity, talent, TUNING.talentRadii[Math.min(talentTier, 3)])) fail(state, 'hit');
     if (entity.kind === 'bridge' && tier >= 2 && talent.x >= entity.x - TUNING.bridgeLength / 2 && talent.x <= entity.x + TUNING.bridgeLength / 2
       && Math.abs(talent.z - entity.z) <= 0.6 + TUNING.talentRadii[Math.min(talentTier, 3)]) fail(state, 'fell');
     if (close && entity.kind === 'reel' && talentTier <= 1) {
@@ -248,11 +296,18 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
     }
   }
 
-  for (const hostile of state.entities.filter((entity) => entity.kind === 'red-monitor' && entity.spawned && !entity.cut
-    && framed(state, entity.x, entity.z, 0.8, 1))) {
-    if (redMonitorOverlapsTarget(monitorCone(hostile), { x: talent.x, z: talent.z }, TUNING.talentRadii[Math.min(talentTier, 3)])) fail(state, 'hit');
+  // The hostile camera is live only while it is on screen. Its tally runs while it holds the Talent in its cone,
+  // and the take fails only once the tally has run for `hostileLockSeconds` (framing it out or leaving the cone resets it).
+  for (const hostile of state.entities.filter((entity) => entity.kind === 'red-monitor' && entity.spawned && !entity.cut)) {
+    const live = entityInFrame(state, hostile);
+    const sees = live && redMonitorOverlapsTarget(monitorCone(hostile), { x: talent.x, z: talent.z }, TUNING.talentRadii[Math.min(talentTier, 3)]);
+    hostile.lockTicks = sees ? (hostile.lockTicks ?? 0) + 1 : 0;
+    if (hostile.lockTicks >= TUNING.hostileLockSeconds * TUNING.tickRate) fail(state, 'hit');
+    if (!live) continue;
     for (const target of state.entities) {
-      if (target === hostile || target.cut || target.kind === 'monitor' || target.kind === 'red-monitor' || target.kind === 'continuity' || target.kind === 'rumour') continue;
+      // It cuts only cast the player can see, and never the floor (Glass, bridges).
+      if (target === hostile || target.cut || !target.spawned || target.kind === 'monitor' || target.kind === 'red-monitor' || target.kind === 'continuity'
+        || target.kind === 'rumour' || target.kind === 'glass' || target.kind === 'bridge' || !entityInFrame(state, target)) continue;
       const radius = target.kind === 'urchin' ? TUNING.urchinRadius : target.kind === 'boulder' ? TUNING.boulderRadius : 0.55;
       if (redMonitorOverlapsTarget(monitorCone(hostile), { x: target.x, z: target.z }, radius)) {
         target.cut = true;
@@ -266,7 +321,6 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
   state.film -= dt * (input.hold || state.waiting ? 2 : 1);
   if (state.film <= 0) { state.film = 0; fail(state, 'out-of-film'); }
   if (state.shoot) {
-    const startX = state.path[0]?.x ?? 0;
     const pathLength = state.path.slice(1).reduce((sum, point, index) => sum + distance(point.x, point.z, state.path[index]!.x, state.path[index]!.z), 0);
     const active = state.shoot.sceneIndex === 3 || isWrapActive(state.travelDistance, pathLength);
     if (active) {
@@ -276,11 +330,13 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
       const advanced = advanceWrap(strike, dt, speed, talentDistance);
       state.shoot.wrapDistance = advanced.strikeDistance;
       state.shoot.wrapCaught = advanced.wrapped;
-      const worldPathSpan = (state.path.at(-1)?.x ?? startX) - startX || 1;
-      const pathCoordinate = (x: number) => ((x - startX) / worldPathSpan) * pathLength;
-      state.tiles = state.tiles.filter((tile) => !isDeletedByWrap(pathCoordinate(tile.x), advanced.strikeDistance));
+      // The strike line sits (travel − strike) path units behind the Talent, measured along the set path. (A straight
+      // x-to-length scale put it ahead of the Talent on winding paths, deleting floor it was standing on.)
+      const arcLength = pathArcLength(state.path);
+      const strikeLine = arcLength(talent.x) - (talentDistance - advanced.strikeDistance);
+      state.tiles = state.tiles.filter((tile) => !isDeletedByWrap(arcLength(tile.x), strikeLine));
       for (const entity of state.entities) {
-        if (!entity.cut && pathCoordinate(entity.x) <= advanced.strikeDistance) {
+        if (!entity.cut && arcLength(entity.x) <= strikeLine) {
           entity.cut = true;
           state.cuts.push(entity.id);
         }
