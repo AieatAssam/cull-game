@@ -77,6 +77,17 @@ function pathArcLength(path: SimState['path']): (x: number) => number {
   };
 }
 
+/** Past the out-of-frame grace: the Talent is "lost" — film burns extra until she is reframed or the take fails. */
+export function talentLost(state: Pick<SimState, 'talent'>) {
+  return state.talent.offscreenTicks > TUNING.offscreenGrace * TUNING.tickRate;
+}
+
+/** 0 at the end of grace, 1 at the lost-talent fail. */
+export function lostProgress(state: Pick<SimState, 'talent'>) {
+  const grace = TUNING.offscreenGrace * TUNING.tickRate;
+  return Math.max(0, Math.min(1, (state.talent.offscreenTicks - grace) / (TUNING.offscreenFailSeconds * TUNING.tickRate - grace)));
+}
+
 function fail(state: SimState, reason: FailReason) {
   if (!state.failed) state.failed = reason;
 }
@@ -193,7 +204,7 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
     && monitorConeContains(monitorCone(monitor), { x: talent.x, z: talent.z }));
   if (talentInMonitor || framed(state, talent.x, talent.z, TUNING.talentRadii[Math.min(talentTier, 3)], 1.4)) talent.offscreenTicks = 0;
   else talent.offscreenTicks++;
-  if (talent.offscreenTicks >= TUNING.offscreenGrace * TUNING.tickRate) fail(state, 'lost-talent');
+  if (talent.offscreenTicks >= TUNING.offscreenFailSeconds * TUNING.tickRate) fail(state, 'lost-talent');
 
   for (const entity of state.entities) {
     if (entity.cut) continue;
@@ -319,6 +330,8 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
   if (state.entities.some((glass) => glass.kind === 'glass' && glass.cut
     && Math.abs(talent.x - glass.x) <= 0.5 && Math.abs(talent.z - glass.z) <= 0.5)) fail(state, 'fell');
   state.film -= dt * (input.hold || state.waiting ? 2 : 1);
+  // Past the grace window a lost Talent burns film on top of the normal drain.
+  if (talentLost(state)) state.film -= dt * TUNING.offscreenFilmDrainPerSecond;
   if (state.film <= 0) { state.film = 0; fail(state, 'out-of-film'); }
   if (state.shoot) {
     const pathLength = state.path.slice(1).reduce((sum, point, index) => sum + distance(point.x, point.z, state.path[index]!.x, state.path[index]!.z), 0);

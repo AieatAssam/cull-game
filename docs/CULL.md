@@ -44,7 +44,7 @@ The research says one tangible rule twist that changes every second of play is w
 | **CAST** (dynamic) | **CUT, deleted permanently** for this run, marked with a "CUT" stamp on the call sheet | never returns | enemies, hazards, pickups, fragile floors |
 | **LEDGER** (rare, marked red) | keeps a tiny abstract record (e.g. "time unseen") with **no simulation of position** | re-spawns with its state advanced by its ledger rule | the Rumour |
 | **RECURRING** | unloaded | re-rolled to the next entry in its seeded sequence | the Continuity Prop |
-| **TALENT** (the hero) | 1.0 s ⚙ "OFF SCREEN" countdown, then the run fails ("Lost the Talent") | n/a | the hero |
+| **TALENT** (the hero) | 0.5 s ⚙ free grace, then "LOST HER": film burns +4 s/s ⚙ and a countdown runs; at 3.0 s ⚙ out of frame the run fails ("Lost the Talent") | n/a | the hero |
 
 - **Spawning:** every CAST, LEDGER and RECURRING entity has a seeded *spawn point* from the generator (§7). It loads the first tick its projected AABB overlaps the gate, in its seed state (position, velocity, facing). A spawn point is consumed once loaded, unless it's RECURRING.
 - **Pop-in safety:** no hazard spawns with its AABB within 2.0 u ⚙ of the Talent. A spawn that would breach this waits until the frame moves.
@@ -58,7 +58,7 @@ The research says one tangible rule twist that changes every second of play is w
 - The Talent never turns back on their own and doesn't fight. Collisions with SET push them along the path; collisions with CAST resolve by that entity's tier stats.
 
 ### 2.5 Failure states (the run ends)
-1. **Lost the Talent:** the Talent has been fully outside the gate for 1.0 s ⚙.
+1. **Lost the Talent:** the Talent has been fully outside the gate (and outside every friendly monitor cone) for 3.0 s ⚙. The rule is graded: the first 0.5 s ⚙ out of frame are free; after that she is **lost**, film drains an extra 4 s per second ⚙ on top of the normal burn, the gate edge flashes, a "LOST HER" banner counts down to the cut and an edge arrow points to her. Reframing her resets the count.
 2. **Hit:** a lethal-tier CAST entity touches the Talent.
 3. **Fell:** no floor under the Talent's centre (a fragile floor was cut, or a bridge dropped its planks at low LOD).
 4. **Out of film:** the film counter reaches 0.
@@ -221,7 +221,7 @@ At "That's a wrap!" the game re-simulates the run deterministically and auto-pic
 |---|---|---|
 | 0:00 | The page loads in under 2 s straight into a viewfinder. A slate clacks: "SCENE 1 · TAKE 1". The Talent stands on a plywood path. A single line: **"Keep them in the shot."** The Talent starts walking. | The hero moves on their own; I'm the camera. |
 | 0:08 | The Talent nears the right edge. The player drags the thumb pad and the frame follows. Tiles stream in at the leading edge with a soft tick. | Pan. The world appears as I look. |
-| 0:20 | The player lingers, the Talent walks off-frame and "OFF SCREEN 1.0" flashes red, counting down. They pan back in time. | The Talent is subject to the rule too. |
+| 0:20 | The player lingers, the Talent walks off-frame; after half a second "LOST HER" flashes red, the film meter burns and a bar counts down to the cut. They pan back in time. | The Talent is subject to the rule too. |
 | 0:35 | A cyan Reel box appears in the margin. It loads into the frame; the Talent collects it (+15 s). | Previews in the margin tell the truth. |
 | 0:50 | **Intro chunk: Urchin.** A spiked ball rolls toward the Talent, and the hint "pinch to zoom out" appears. The player zooms out, the urchin *visibly simplifies* (spikes retract with a mesh-swap shimmer and an "LOD2" ring flash), and it bumps the Talent harmlessly. | **LOD is physics.** The "wait, what?" moment. |
 | 1:10 | Zoomed out, the Talent passes a Reel, and a grey "WIDE: can't collect" tag appears. The player zooms back in. | Zoom is a trade-off. |
@@ -397,7 +397,9 @@ A cold playtest still watches five signals. The old M2 kill criterion and its pi
 | zoom rate | ×1.6/s |
 | rotate tween | 0.18 s per 45° |
 | in-motion threshold | 0.6 gate/s |
-| off-screen grace | 1.0 s |
+| off-screen grace (free) | 0.5 s |
+| lost-Talent film drain | +4 film-s per s (after grace) |
+| lost-Talent fail | 3.0 s out of frame |
 | pop-in exclusion | 2.0 u |
 | call-sheet margin | 0.25 W |
 | LOD thresholds | 48/24/10/4 lpx, 15% hysteresis |

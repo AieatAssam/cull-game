@@ -337,3 +337,22 @@ kbd { color: var(--paper); border: 1px solid #8a7562; padding: 2px 6px; border-r
   .cut-flash.active { box-shadow: none; }
   .gate.cutting, .gate.cutting .peel, .gate.cutting .cut-stamp, .gate.cutting .spark { animation: none; }
 }
+/* Out-of-frame telegraph ("LOST HER"): pulsing carmine edge, centre banner with a countdown bar to the cut, and an edge arrow toward her. */
+.lost-edge { position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: 0; }
+.gate.talent-lost .lost-edge {
+  opacity: 1; animation: lost-pulse 0.5s ease-in-out infinite alternate;
+  box-shadow: inset 0 0 0 calc(4px + 6px * var(--lost, 0)) rgba(255, 75, 62, 0.95), inset 0 0 calc(30px + 60px * var(--lost, 0)) rgba(200, 50, 42, 0.7);
+}
+@keyframes lost-pulse { from { opacity: 0.55; } to { opacity: 1; } }
+.lost-banner { position: absolute; z-index: 5; left: 50%; top: 42%; transform: translate(-50%, -50%); min-width: 200px; max-width: calc(100% - 24px); padding: 8px 14px 10px; background: var(--carmine); color: var(--paper); text-align: center; border: 2px solid var(--paper); pointer-events: none; }
+.lost-banner strong { display: block; white-space: nowrap; font-family: Fraunces, Georgia, serif; font-size: clamp(22px, 6vw, 30px); letter-spacing: 0.08em; }
+.lost-banner small { display: block; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; margin: 2px 0 6px; }
+.lost-track { height: 8px; background: rgba(30, 26, 23, 0.6); }
+.lost-track i { display: block; height: 100%; background: var(--paper); }
+.lost-arrow { position: absolute; z-index: 5; width: 0; height: 0; pointer-events: none; color: #ff4b3e; }
+.lost-arrow span { position: absolute; left: -18px; top: -22px; width: 36px; font-size: 38px; line-height: 44px; text-align: center; transform: rotate(var(--angle, 0rad)); text-shadow: 0 0 3px var(--paper), 0 0 6px var(--paper); animation: lost-pulse 0.5s ease-in-out infinite alternate; }
+.lost-arrow b { position: absolute; left: calc(-20px + var(--tag-x, 0px)); top: calc(-8px + var(--tag-y, 0px)); width: 40px; text-align: center; font-size: 11px; color: var(--paper); background: var(--carmine); }
+.lost-banner.hidden, .lost-arrow.hidden { display: none; }
+.film em { font-style: normal; font-weight: 700; font-size: 13px; color: #ff4b3e; }
+.film.draining .film-track { outline: 2px solid #ff4b3e; animation: lost-pulse 0.5s ease-in-out infinite alternate; }
+.film.draining .film-track i { background: #ff4b3e !important; }

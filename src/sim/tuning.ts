@@ -7,7 +7,10 @@ export const TUNING = {
   tickRate: 60,
   maxCatchupTicks: 5,
   startFilm: 90,
-  offscreenGrace: 1,
+  // Out-of-frame rule (graded): free for offscreenGrace, then film drains extra while she is lost, and the take fails at offscreenFailSeconds.
+  offscreenGrace: 0.5,
+  offscreenFilmDrainPerSecond: 4,
+  offscreenFailSeconds: 3,
   minZoom: 10,
   maxZoom: 48,
   panSpeed: 0.3,

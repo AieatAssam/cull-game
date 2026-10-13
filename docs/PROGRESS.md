@@ -2,6 +2,8 @@
 
 Campaign milestones are in `docs/design/game-design.md`. The old M0–M10 checklist and the M2 kill criterion are retired. Core rules stay in `docs/CULL.md`.
 
+Out-of-frame rule, graded (2026-10-13, "LOST HER"): 0.5 s of free grace, then film burns an extra 4 s/s while she is lost, and the take fails at 3 s. The gate edge flashes, a banner counts down to the cut, an edge arrow points to her, and the film meter shows the drain. Stage 0 balance, 200 seeds × jitter 8: Adaptive 100% on strip and Shoot. Tracker, Gatekeeper, Metronome, Wide, Close and Chaos are all 0%, and every completion rate is unchanged. The strip and generated-strip replay hashes were bumped; the Shoot hashes did not move (see DECISIONS).
+
 Bible M4 (set dressing) is on main: a hand-cut felt path, per-scene dressing, and `npm run silhouettes`. Simulation hashes were left unchanged.
 
 Bible M3: the gate caption, toast and coach lines come from `describeShot`. The grade's close-call count is the sim's `closeCalls`.
