@@ -1,7 +1,7 @@
 import { mulberry32, seededRange } from '../sim/rng';
 import { TUNING } from '../sim/tuning';
 import type { InputFrame, SimState } from '../sim/types';
-import { composeInput, leashInput, pinchZoomTarget, pointerDragPan, type InputDevices } from '../ui/input-map';
+import { assistInput, composeInput, dragCameraTarget, dragSettled, pinchZoomTarget, type DragTarget, type InputDevices } from '../ui/input-map';
 import { nextZoomStep, ZOOM_HOLD_DELAY } from '../ui/zoom-control';
 import { createObserver, type PlayerView } from './observe';
 import { cutFraming } from './players';
@@ -9,8 +9,8 @@ import { cutFraming } from './players';
 /**
  * Human-like personas (M-review 2026-10-13). They play only through the real input layer (`src/ui/input-map.ts`):
  * `human-keys` holds WASD at KEY_PAN and taps − + like zoom-control; `human-touch` drags a finger (≤ 1500 px/s) mapped
- * exactly like the browser's pointer pan, pinches to zoom and presses the on-screen HOLD button. The browser's leash
- * is applied to their input, as it is to a player's.
+ * 1:1 like the browser's pointer pan (the world under the finger follows it), pinches to zoom and presses the on-screen
+ * HOLD button. The browser's lost-her assist is applied to their input, as it is to a player's.
  *
  * Human limits: a seeded 200–300 ms perception/reaction delay (they act on the PlayerView as it was then, while
  * feeling their own camera now), Gaussian aim error of 6–10% of the viewport per aim, a 100 ms decision cadence,
@@ -80,8 +80,8 @@ function gaussian(random: () => number): number {
   return Math.sqrt(-2 * Math.log(1 - random())) * Math.cos(2 * Math.PI * random());
 }
 
-/** A driver like `createDriver`: full sim state in, InputFrame out. It reads the state only through `observe` and the leash. */
-export function createHumanDriver(persona: HumanPersona, seed: number, options: { leash?: boolean } = {}): (state: SimState) => InputFrame {
+/** A driver like `createDriver`: full sim state in, InputFrame out. It reads the state only through `observe` and the assist. */
+export function createHumanDriver(persona: HumanPersona, seed: number, options: { assist?: boolean } = {}): (state: SimState) => InputFrame {
   const traits = humanTraits(seed, persona);
   const random = mulberry32((seed ^ (persona === 'human-keys' ? 0x6b657973 : 0x746f7563)) >>> 0);
   const observe = createObserver();
@@ -100,7 +100,7 @@ export function createHumanDriver(persona: HumanPersona, seed: number, options: 
   let finger: { x: number; y: number; vx: number; vy: number } | null = null;
   let fingerFreeAt = 0;
   let pinch: { startZoom: number; startSpread: number; spread: number } | null = null;
-  let pointerPan: Pick<InputFrame, 'panX' | 'panZ'> | null = null;
+  let dragTarget: DragTarget | null = null;
   let holdButton = false;
 
   const setKey = (key: string, down: boolean) => {
@@ -154,34 +154,40 @@ export function createHumanDriver(persona: HumanPersona, seed: number, options: 
         if (Math.abs(pinch.spread - wanted) < 1) { pinch = null; fingerFreeAt = ticks + regripTicks; }
       } else if (zoomOff && ticks >= fingerFreeAt) {
         // Two fingers down: the drag ends and the spread sets the zoom target.
-        finger = null; pointerPan = null;
+        finger = null; dragTarget = null;
         pinch = { startZoom: zoomTarget ?? camera.zoom, startSpread: 160, spread: 160 };
       } else if (ticks >= fingerFreeAt && (Math.abs(errorX) > band || Math.abs(errorZ) > band || finger)) {
         if (Math.abs(errorX) <= band && Math.abs(errorZ) <= band) {
-          finger = null; pointerPan = null; fingerFreeAt = ticks + regripTicks;
+          finger = null; fingerFreeAt = ticks + regripTicks;
         } else {
-          // Grab the set and drag it: the world moves with the finger, the camera the other way.
+          // Grab the set and drag it 1:1: move the finger until the world point they want centred sits under the frame centre.
           finger ??= { x: viewportPx / 2 + Math.sign(errorX) * viewportPx * 0.3, y: viewportPx / 2 - Math.sign(errorZ) * viewportPx * 0.3, vx: 0, vy: 0 };
-          const wantX = -Math.sign(errorX) * (Math.abs(errorX) > band ? fingerMaxPxPerTick : 0);
-          const wantY = Math.sign(errorZ) * (Math.abs(errorZ) > band ? fingerMaxPxPerTick : 0);
+          dragTarget ??= { x: camera.x, z: camera.z };
+          const view = { camera, lens: state.lens };
+          const remainingX = frozen ? 0 : goalX - dragTarget.x;
+          const remainingZ = frozen ? 0 : goalZ - dragTarget.z;
+          const wantX = Math.max(-fingerMaxPxPerTick, Math.min(fingerMaxPxPerTick, -remainingX / camera.zoom * viewportPx));
+          const wantY = Math.max(-fingerMaxPxPerTick, Math.min(fingerMaxPxPerTick, remainingZ * TUNING.projectionPitchScale / camera.zoom * viewportPx));
           finger.vx += Math.max(-fingerMaxAccelPxPerTick, Math.min(fingerMaxAccelPxPerTick, wantX - finger.vx));
           finger.vy += Math.max(-fingerMaxAccelPxPerTick, Math.min(fingerMaxAccelPxPerTick, wantY - finger.vy));
           finger.x += finger.vx; finger.y += finger.vy;
-          pointerPan = pointerDragPan(finger.vx, finger.vy, viewportPx, viewportPx);
+          dragTarget = dragCameraTarget(dragTarget, finger.vx, finger.vy, viewportPx, viewportPx, view);
           // Out of glass: lift and re-grip.
-          if (finger.x < 0 || finger.x > viewportPx || finger.y < 0 || finger.y > viewportPx) { finger = null; pointerPan = null; fingerFreeAt = ticks + regripTicks; }
+          if (finger.x < 0 || finger.x > viewportPx || finger.y < 0 || finger.y > viewportPx) { finger = null; fingerFreeAt = ticks + regripTicks; }
         }
       }
+      // A lifted drag settles where the finger left the world, as in the browser.
+      if (!finger && dragTarget && dragSettled({ camera }, dragTarget)) dragTarget = null;
     }
 
     const devices: InputDevices = {
-      keys, holdButton, pointerPan, rotationPulse: 0, frameInput: { panX: 0, panZ: 0, zoom: 0, rotate: 0, hold: false, steady: false }, zoomTarget,
+      keys, holdButton, dragTarget, rotationPulse: 0, frameInput: { panX: 0, panZ: 0, zoom: 0, rotate: 0, hold: false, steady: false }, zoomTarget,
       zoomPress: tap && { direction: tap.direction, heldSeconds: (ticks - tap.since) * tick },
     };
-    const composed = composeInput(devices, camera.zoom);
+    const composed = composeInput(devices, state);
     zoomTarget = composed.zoomTarget;
     if (zoomTarget !== null && Math.abs(zoomTarget - camera.zoom) < 0.12 && !pinch) zoomTarget = null;
-    // `leash: false` is a what-if for the loop review only; the browser always leashes.
-    return options.leash === false ? composed.input : leashInput(composed.input, state);
+    // `assist: false` is a what-if for the loop review only; the browser always assists.
+    return options.assist === false ? composed.input : assistInput(composed.input, state);
   };
 }

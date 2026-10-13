@@ -328,6 +328,7 @@ data/archetypes.json, data/chunks/*.json
      - (d) a consumed spawn point never respawns (except RECURRING);
      - (e) SET reload is byte-identical.
 2. **State hashes.** Golden hashes for 5 seeds × 3 bots at ticks 600/3,600/18,000. Any change needs `UPDATE_HASHES=1` plus a reason in the PR.
+   - Current pinned fair-Adaptive Shoot hashes (`tests/m2.test.ts`): seed 1 `e0c89e0d`, seed 19 `a80d24ad`, seed 2026 `9951f3d0`. These were bumped 2026-10-13 (loop review) because a far cut now removes a gate stand-in, which is re-dressed on its mark when the shot is called, instead of unloading intact. See `DECISIONS.md`.
 3. **Scenario tests.** Tiny hand-authored chunks with scripted inputs, e.g. "Urchin at W=30 touches the Talent → no fail", "Bridge at W=40 → FELL", "Stagehand doesn't move while camera speed < 0.6", "Rumour grows by exactly 0.3·t off-screen".
 4. **Bot players** (`src/bots`, also runnable in the browser via `?bot=`):
    - **TrackerBot** keeps the Talent centred at mid zoom (the passive baseline).

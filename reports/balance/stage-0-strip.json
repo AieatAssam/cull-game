@@ -188,45 +188,59 @@
     },
     "human-keys": {
       "runs": 200,
-      "completed": 0,
-      "completion": 0,
-      "meanDistance": 33.97,
+      "completed": 118,
+      "completion": 0.59,
+      "meanDistance": 120.01,
       "timeouts": 0,
-      "clearSeconds": null,
+      "clearSeconds": {
+        "min": 68.1,
+        "mean": 95.7,
+        "max": 133.1
+      },
       "failReasons": {
-        "out-of-film": 200
+        "lost-talent": 72,
+        "out-of-film": 10
       },
       "killers": {
-        "film": 200
+        "offscreen": 72,
+        "film": 10
       },
       "scenes": {
-        "STRIP": 200
+        "STRIP": 82
       },
       "sceneKillers": {
         "STRIP": {
-          "film": 200
+          "offscreen": 72,
+          "film": 10
         }
       }
     },
     "human-touch": {
       "runs": 200,
-      "completed": 0,
-      "completion": 0,
-      "meanDistance": 33.96,
+      "completed": 124,
+      "completion": 0.62,
+      "meanDistance": 125.89,
       "timeouts": 0,
-      "clearSeconds": null,
+      "clearSeconds": {
+        "min": 64.7,
+        "mean": 93.1,
+        "max": 128.3
+      },
       "failReasons": {
-        "out-of-film": 200
+        "out-of-film": 16,
+        "lost-talent": 60
       },
       "killers": {
-        "film": 200
+        "film": 16,
+        "offscreen": 60
       },
       "scenes": {
-        "STRIP": 200
+        "STRIP": 76
       },
       "sceneKillers": {
         "STRIP": {
-          "film": 200
+          "film": 16,
+          "offscreen": 60
         }
       }
     }
@@ -352,20 +366,20 @@
       "pass": true
     },
     {
-      "name": "adaptive is the ceiling (perfect-information reflexes, no leash)",
+      "name": "adaptive is the ceiling (perfect-information reflexes, no assist)",
       "value": "100%",
       "target": "ceiling",
       "pass": null
     },
     {
       "name": "human-keys strip clear",
-      "value": "0%",
+      "value": "59%",
       "target": "60–80% (target, report-only)",
       "pass": null
     },
     {
       "name": "human-touch strip clear",
-      "value": "0%",
+      "value": "62%",
       "target": "60–80% (target, report-only)",
       "pass": null
     }
@@ -513,24 +527,24 @@
     {
       "bot": "human-keys",
       "seed": 1,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 36.69,
-      "seconds": 61.93333333333333
+      "distance": 175,
+      "seconds": 100.51666666666667
     },
     {
       "bot": "human-touch",
       "seed": 1,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 36.69,
-      "seconds": 61.93333333333333
+      "distance": 175,
+      "seconds": 94.28333333333333
     },
     {
       "bot": "adaptive",
@@ -612,24 +626,24 @@
     {
       "bot": "human-keys",
       "seed": 2,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 47.5,
-      "seconds": 79.85
+      "distance": 191,
+      "seconds": 108.8
     },
     {
       "bot": "human-touch",
       "seed": 2,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 47.5,
-      "seconds": 79.25
+      "distance": 191,
+      "seconds": 104.73333333333333
     },
     {
       "bot": "adaptive",
@@ -711,13 +725,13 @@
     {
       "bot": "human-keys",
       "seed": 3,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 34.83,
-      "seconds": 69.16666666666667
+      "distance": 191,
+      "seconds": 106.38333333333334
     },
     {
       "bot": "human-touch",
@@ -727,8 +741,8 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "STRIP",
-      "distance": 34.83,
-      "seconds": 69.15
+      "distance": 159.46,
+      "seconds": 88.7
     },
     {
       "bot": "adaptive",
@@ -810,24 +824,24 @@
     {
       "bot": "human-keys",
       "seed": 4,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 51.37,
-      "seconds": 73.55
+      "distance": 207,
+      "seconds": 120.53333333333333
     },
     {
       "bot": "human-touch",
       "seed": 4,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 51.1,
-      "seconds": 73.85
+      "distance": 207,
+      "seconds": 112.91666666666667
     },
     {
       "bot": "adaptive",
@@ -909,24 +923,24 @@
     {
       "bot": "human-keys",
       "seed": 5,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 39.75,
-      "seconds": 63.75
+      "distance": 191,
+      "seconds": 108.9
     },
     {
       "bot": "human-touch",
       "seed": 5,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 39.7,
-      "seconds": 63.61666666666667
+      "distance": 191,
+      "seconds": 105.48333333333333
     },
     {
       "bot": "adaptive",
@@ -1008,24 +1022,24 @@
     {
       "bot": "human-keys",
       "seed": 6,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 28.17,
-      "seconds": 60.733333333333334
+      "distance": 175,
+      "seconds": 100.46666666666667
     },
     {
       "bot": "human-touch",
       "seed": 6,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 28.17,
-      "seconds": 60.35
+      "distance": 35.21,
+      "seconds": 31.9
     },
     {
       "bot": "adaptive",
@@ -1036,7 +1050,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 66.9
+      "seconds": 67.13333333333334
     },
     {
       "bot": "tracker",
@@ -1109,22 +1123,22 @@
       "seed": 7,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 28.92,
-      "seconds": 60.9
+      "distance": 35.58,
+      "seconds": 23.05
     },
     {
       "bot": "human-touch",
       "seed": 7,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 28.92,
-      "seconds": 68.01666666666667
+      "distance": 127,
+      "seconds": 67.41666666666667
     },
     {
       "bot": "adaptive",
@@ -1206,24 +1220,24 @@
     {
       "bot": "human-keys",
       "seed": 8,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 29.35,
-      "seconds": 67.86666666666666
+      "distance": 127,
+      "seconds": 68.48333333333333
     },
     {
       "bot": "human-touch",
       "seed": 8,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 29.34,
-      "seconds": 67.88333333333334
+      "distance": 127,
+      "seconds": 70.16666666666667
     },
     {
       "bot": "adaptive",
@@ -1305,24 +1319,24 @@
     {
       "bot": "human-keys",
       "seed": 9,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 23.47,
-      "seconds": 58.85
+      "distance": 143,
+      "seconds": 82.61666666666666
     },
     {
       "bot": "human-touch",
       "seed": 9,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 23.47,
-      "seconds": 59.15
+      "distance": 143,
+      "seconds": 86.33333333333333
     },
     {
       "bot": "adaptive",
@@ -1404,24 +1418,24 @@
     {
       "bot": "human-keys",
       "seed": 10,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 36.96,
-      "seconds": 62.75
+      "distance": 175,
+      "seconds": 97.91666666666667
     },
     {
       "bot": "human-touch",
       "seed": 10,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 36.96,
-      "seconds": 77.31666666666666
+      "distance": 175,
+      "seconds": 98.6
     },
     {
       "bot": "adaptive",
@@ -1505,22 +1519,22 @@
       "seed": 11,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 46,
-      "seconds": 80.2
+      "distance": 53.15,
+      "seconds": 32.3
     },
     {
       "bot": "human-touch",
       "seed": 11,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 46,
-      "seconds": 73
+      "distance": 175,
+      "seconds": 96.85
     },
     {
       "bot": "adaptive",
@@ -1602,24 +1616,24 @@
     {
       "bot": "human-keys",
       "seed": 12,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 24.04,
-      "seconds": 59.38333333333333
+      "distance": 143,
+      "seconds": 76.95
     },
     {
       "bot": "human-touch",
       "seed": 12,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 24.04,
-      "seconds": 58.983333333333334
+      "distance": 29.78,
+      "seconds": 18.866666666666667
     },
     {
       "bot": "adaptive",
@@ -1630,7 +1644,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 90.9
+      "seconds": 91.26666666666667
     },
     {
       "bot": "tracker",
@@ -1703,22 +1717,22 @@
       "seed": 13,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 29.5,
-      "seconds": 60.38333333333333
+      "distance": 35.88,
+      "seconds": 23.45
     },
     {
       "bot": "human-touch",
       "seed": 13,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 29.5,
-      "seconds": 67.68333333333334
+      "distance": 35.88,
+      "seconds": 23.4
     },
     {
       "bot": "adaptive",
@@ -1805,19 +1819,19 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "STRIP",
-      "distance": 36.58,
-      "seconds": 61.88333333333333
+      "distance": 113.64,
+      "seconds": 91.33333333333333
     },
     {
       "bot": "human-touch",
       "seed": 14,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 36.58,
-      "seconds": 69.28333333333333
+      "distance": 159,
+      "seconds": 90.8
     },
     {
       "bot": "adaptive",
@@ -1899,24 +1913,24 @@
     {
       "bot": "human-keys",
       "seed": 15,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 45.35,
-      "seconds": 79.41666666666667
+      "distance": 143,
+      "seconds": 81.76666666666667
     },
     {
       "bot": "human-touch",
       "seed": 15,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 45.35,
-      "seconds": 79.41666666666667
+      "distance": 143,
+      "seconds": 78.21666666666667
     },
     {
       "bot": "adaptive",
@@ -1998,24 +2012,24 @@
     {
       "bot": "human-keys",
       "seed": 16,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 44.04,
-      "seconds": 71.16666666666667
+      "distance": 175,
+      "seconds": 95.41666666666667
     },
     {
       "bot": "human-touch",
       "seed": 16,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 44.04,
-      "seconds": 71.16666666666667
+      "distance": 175,
+      "seconds": 91.51666666666667
     },
     {
       "bot": "adaptive",
@@ -2099,22 +2113,22 @@
       "seed": 17,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 46.19,
-      "seconds": 65.1
+      "distance": 53.12,
+      "seconds": 34.95
     },
     {
       "bot": "human-touch",
       "seed": 17,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 46.21,
-      "seconds": 72.66666666666667
+      "distance": 191,
+      "seconds": 116.45
     },
     {
       "bot": "adaptive",
@@ -2196,24 +2210,24 @@
     {
       "bot": "human-keys",
       "seed": 18,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 43.42,
-      "seconds": 80.46666666666667
+      "distance": 159,
+      "seconds": 97.88333333333334
     },
     {
       "bot": "human-touch",
       "seed": 18,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 43.42,
-      "seconds": 72.21666666666667
+      "distance": 159,
+      "seconds": 95.81666666666666
     },
     {
       "bot": "adaptive",
@@ -2295,24 +2309,24 @@
     {
       "bot": "human-keys",
       "seed": 19,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 25.38,
-      "seconds": 59.416666666666664
+      "distance": 127,
+      "seconds": 68.06666666666666
     },
     {
       "bot": "human-touch",
       "seed": 19,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 25.38,
-      "seconds": 67.01666666666667
+      "distance": 127,
+      "seconds": 71.6
     },
     {
       "bot": "adaptive",
@@ -2396,22 +2410,22 @@
       "seed": 20,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 39.71,
-      "seconds": 63.28333333333333
+      "distance": 45.83,
+      "seconds": 29.15
     },
     {
       "bot": "human-touch",
       "seed": 20,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 39.71,
-      "seconds": 70.78333333333333
+      "distance": 191,
+      "seconds": 106.08333333333333
     },
     {
       "bot": "adaptive",
@@ -2493,24 +2507,24 @@
     {
       "bot": "human-keys",
       "seed": 21,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 34.25,
-      "seconds": 76.33333333333333
+      "distance": 159,
+      "seconds": 84.63333333333334
     },
     {
       "bot": "human-touch",
       "seed": 21,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 34.25,
-      "seconds": 76.21666666666667
+      "distance": 159,
+      "seconds": 86.25
     },
     {
       "bot": "adaptive",
@@ -2521,7 +2535,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 92.41666666666667
+      "seconds": 94.8
     },
     {
       "bot": "tracker",
@@ -2592,13 +2606,13 @@
     {
       "bot": "human-keys",
       "seed": 22,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 30.67,
-      "seconds": 61.78333333333333
+      "distance": 175,
+      "seconds": 106.9
     },
     {
       "bot": "human-touch",
@@ -2608,8 +2622,8 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "STRIP",
-      "distance": 30.95,
-      "seconds": 61.56666666666667
+      "distance": 157.32,
+      "seconds": 91.61666666666666
     },
     {
       "bot": "adaptive",
@@ -2693,22 +2707,22 @@
       "seed": 23,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 25.92,
-      "seconds": 59.81666666666667
+      "distance": 32.29,
+      "seconds": 23.183333333333334
     },
     {
       "bot": "human-touch",
       "seed": 23,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 25.92,
-      "seconds": 59.81666666666667
+      "distance": 32.25,
+      "seconds": 20.766666666666666
     },
     {
       "bot": "adaptive",
@@ -2790,24 +2804,24 @@
     {
       "bot": "human-keys",
       "seed": 24,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 34.5,
-      "seconds": 68.95
+      "distance": 143,
+      "seconds": 79.08333333333333
     },
     {
       "bot": "human-touch",
       "seed": 24,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 34.5,
-      "seconds": 76.05
+      "distance": 143,
+      "seconds": 79.61666666666666
     },
     {
       "bot": "adaptive",
@@ -2818,7 +2832,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 88.96666666666667
+      "seconds": 89.11666666666666
     },
     {
       "bot": "tracker",
@@ -2891,22 +2905,22 @@
       "seed": 25,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 30.25,
-      "seconds": 60.68333333333333
+      "distance": 37.67,
+      "seconds": 22.283333333333335
     },
     {
       "bot": "human-touch",
       "seed": 25,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 30.25,
-      "seconds": 68.18333333333334
+      "distance": 37.67,
+      "seconds": 23.15
     },
     {
       "bot": "adaptive",
@@ -2988,24 +3002,24 @@
     {
       "bot": "human-keys",
       "seed": 26,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 27.83,
-      "seconds": 67.36666666666666
+      "distance": 175,
+      "seconds": 103.48333333333333
     },
     {
       "bot": "human-touch",
       "seed": 26,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 27.83,
-      "seconds": 66.96666666666667
+      "distance": 175,
+      "seconds": 95.61666666666666
     },
     {
       "bot": "adaptive",
@@ -3016,7 +3030,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 82.96666666666667
+      "seconds": 82.18333333333334
     },
     {
       "bot": "tracker",
@@ -3087,24 +3101,24 @@
     {
       "bot": "human-keys",
       "seed": 27,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 29.55,
-      "seconds": 61.88333333333333
+      "distance": 159,
+      "seconds": 89.06666666666666
     },
     {
       "bot": "human-touch",
       "seed": 27,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 29.83,
-      "seconds": 61.4
+      "distance": 159,
+      "seconds": 89.06666666666666
     },
     {
       "bot": "adaptive",
@@ -3186,24 +3200,24 @@
     {
       "bot": "human-keys",
       "seed": 28,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 31.17,
-      "seconds": 60.85
+      "distance": 159,
+      "seconds": 85.03333333333333
     },
     {
       "bot": "human-touch",
       "seed": 28,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 31.17,
-      "seconds": 61.083333333333336
+      "distance": 38.58,
+      "seconds": 23.966666666666665
     },
     {
       "bot": "adaptive",
@@ -3285,24 +3299,24 @@
     {
       "bot": "human-keys",
       "seed": 29,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 24.33,
-      "seconds": 59.15
+      "distance": 143,
+      "seconds": 77.63333333333334
     },
     {
       "bot": "human-touch",
       "seed": 29,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 24.33,
-      "seconds": 58.93333333333333
+      "distance": 143,
+      "seconds": 82.81666666666666
     },
     {
       "bot": "adaptive",
@@ -3384,24 +3398,24 @@
     {
       "bot": "human-keys",
       "seed": 30,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 53.35,
-      "seconds": 82
+      "distance": 207,
+      "seconds": 116.7
     },
     {
       "bot": "human-touch",
       "seed": 30,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 53.35,
-      "seconds": 74.63333333333334
+      "distance": 60.18,
+      "seconds": 37.53333333333333
     },
     {
       "bot": "adaptive",
@@ -3483,24 +3497,24 @@
     {
       "bot": "human-keys",
       "seed": 31,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 46.17,
-      "seconds": 79.05
+      "distance": 191,
+      "seconds": 103.6
     },
     {
       "bot": "human-touch",
       "seed": 31,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 46.17,
-      "seconds": 71.55
+      "distance": 191,
+      "seconds": 103.61666666666666
     },
     {
       "bot": "adaptive",
@@ -3582,24 +3596,24 @@
     {
       "bot": "human-keys",
       "seed": 32,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 40.75,
-      "seconds": 63.55
+      "distance": 159,
+      "seconds": 92.83333333333333
     },
     {
       "bot": "human-touch",
       "seed": 32,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 40.75,
-      "seconds": 71.11666666666666
+      "distance": 159,
+      "seconds": 88.41666666666667
     },
     {
       "bot": "adaptive",
@@ -3681,24 +3695,24 @@
     {
       "bot": "human-keys",
       "seed": 33,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 41.47,
-      "seconds": 64.15
+      "distance": 175,
+      "seconds": 99.75
     },
     {
       "bot": "human-touch",
       "seed": 33,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 41.47,
-      "seconds": 64.36666666666666
+      "distance": 175,
+      "seconds": 99.38333333333334
     },
     {
       "bot": "adaptive",
@@ -3785,19 +3799,19 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "STRIP",
-      "distance": 35.97,
-      "seconds": 62.05
+      "distance": 139.87,
+      "seconds": 84.61666666666666
     },
     {
       "bot": "human-touch",
       "seed": 34,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 35.96,
-      "seconds": 69.53333333333333
+      "distance": 175,
+      "seconds": 98.13333333333334
     },
     {
       "bot": "adaptive",
@@ -3879,24 +3893,24 @@
     {
       "bot": "human-keys",
       "seed": 35,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 19.58,
-      "seconds": 58.18333333333333
+      "distance": 127,
+      "seconds": 72.63333333333334
     },
     {
       "bot": "human-touch",
       "seed": 35,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 19.58,
-      "seconds": 58
+      "distance": 25.38,
+      "seconds": 20
     },
     {
       "bot": "adaptive",
@@ -3980,11 +3994,11 @@
       "seed": 36,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 46.21,
-      "seconds": 80.25
+      "distance": 51.92,
+      "seconds": 34.35
     },
     {
       "bot": "human-touch",
@@ -3994,8 +4008,8 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "STRIP",
-      "distance": 46.21,
-      "seconds": 79.98333333333333
+      "distance": 203.85,
+      "seconds": 123.91666666666667
     },
     {
       "bot": "adaptive",
@@ -4006,7 +4020,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 93.05
+      "seconds": 93.31666666666666
     },
     {
       "bot": "tracker",
@@ -4077,24 +4091,24 @@
     {
       "bot": "human-keys",
       "seed": 37,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 31.41,
-      "seconds": 61.483333333333334
+      "distance": 175,
+      "seconds": 118.16666666666667
     },
     {
       "bot": "human-touch",
       "seed": 37,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 31.41,
-      "seconds": 68.58333333333333
+      "distance": 175,
+      "seconds": 100.78333333333333
     },
     {
       "bot": "adaptive",
@@ -4176,24 +4190,24 @@
     {
       "bot": "human-keys",
       "seed": 38,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 32.62,
-      "seconds": 61.266666666666666
+      "distance": 191,
+      "seconds": 107.76666666666667
     },
     {
       "bot": "human-touch",
       "seed": 38,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 32.62,
-      "seconds": 68.36666666666666
+      "distance": 191,
+      "seconds": 104.45
     },
     {
       "bot": "adaptive",
@@ -4275,24 +4289,24 @@
     {
       "bot": "human-keys",
       "seed": 39,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 17.54,
-      "seconds": 58.05
+      "distance": 127,
+      "seconds": 87.08333333333333
     },
     {
       "bot": "human-touch",
       "seed": 39,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 17.54,
-      "seconds": 57.516666666666666
+      "distance": 24.38,
+      "seconds": 19.066666666666666
     },
     {
       "bot": "adaptive",
@@ -4376,22 +4390,22 @@
       "seed": 40,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 28.83,
-      "seconds": 68.21666666666667
+      "distance": 35.5,
+      "seconds": 24.316666666666666
     },
     {
       "bot": "human-touch",
       "seed": 40,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 28.83,
-      "seconds": 67.7
+      "distance": 175,
+      "seconds": 99.5
     },
     {
       "bot": "adaptive",
@@ -4473,13 +4487,13 @@
     {
       "bot": "human-keys",
       "seed": 41,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 50.58,
-      "seconds": 65.98333333333333
+      "distance": 207,
+      "seconds": 116.01666666666667
     },
     {
       "bot": "human-touch",
@@ -4489,8 +4503,8 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "STRIP",
-      "distance": 50.58,
-      "seconds": 65.98333333333333
+      "distance": 124.04,
+      "seconds": 89.28333333333333
     },
     {
       "bot": "adaptive",
@@ -4501,7 +4515,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 90.6
+      "seconds": 90.61666666666666
     },
     {
       "bot": "tracker",
@@ -4572,24 +4586,24 @@
     {
       "bot": "human-keys",
       "seed": 42,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 30,
-      "seconds": 60.88333333333333
+      "distance": 175,
+      "seconds": 106.6
     },
     {
       "bot": "human-touch",
       "seed": 42,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 30,
-      "seconds": 60.68333333333333
+      "distance": 175,
+      "seconds": 97.81666666666666
     },
     {
       "bot": "adaptive",
@@ -4671,24 +4685,24 @@
     {
       "bot": "human-keys",
       "seed": 43,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 47.33,
-      "seconds": 71.78333333333333
+      "distance": 207,
+      "seconds": 114.88333333333334
     },
     {
       "bot": "human-touch",
       "seed": 43,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 47.33,
-      "seconds": 71.46666666666667
+      "distance": 207,
+      "seconds": 106.33333333333333
     },
     {
       "bot": "adaptive",
@@ -4775,19 +4789,19 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "STRIP",
-      "distance": 43.32,
-      "seconds": 72.28333333333333
+      "distance": 51.88,
+      "seconds": 70.68333333333334
     },
     {
       "bot": "human-touch",
       "seed": 44,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 43.32,
-      "seconds": 79.46666666666667
+      "distance": 207,
+      "seconds": 121.76666666666667
     },
     {
       "bot": "adaptive",
@@ -4871,22 +4885,22 @@
       "seed": 45,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 32.04,
-      "seconds": 61.56666666666667
+      "distance": 36.8,
+      "seconds": 28.416666666666668
     },
     {
       "bot": "human-touch",
       "seed": 45,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 32.04,
-      "seconds": 69.13333333333334
+      "distance": 127,
+      "seconds": 71.91666666666667
     },
     {
       "bot": "adaptive",
@@ -4968,24 +4982,24 @@
     {
       "bot": "human-keys",
       "seed": 46,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 18.25,
-      "seconds": 57.46666666666667
+      "distance": 127,
+      "seconds": 80.53333333333333
     },
     {
       "bot": "human-touch",
       "seed": 46,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 18.25,
-      "seconds": 57.46666666666667
+      "distance": 127,
+      "seconds": 72.38333333333334
     },
     {
       "bot": "adaptive",
@@ -5067,24 +5081,24 @@
     {
       "bot": "human-keys",
       "seed": 47,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 31.04,
-      "seconds": 60.333333333333336
+      "distance": 175,
+      "seconds": 101.55
     },
     {
       "bot": "human-touch",
       "seed": 47,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 31.04,
-      "seconds": 67.83333333333333
+      "distance": 175,
+      "seconds": 91.46666666666667
     },
     {
       "bot": "adaptive",
@@ -5168,22 +5182,22 @@
       "seed": 48,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 35.27,
-      "seconds": 69.31666666666666
+      "distance": 42,
+      "seconds": 27.966666666666665
     },
     {
       "bot": "human-touch",
       "seed": 48,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 35.27,
-      "seconds": 69.31666666666666
+      "distance": 42,
+      "seconds": 26.183333333333334
     },
     {
       "bot": "adaptive",
@@ -5194,7 +5208,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 83.33333333333333
+      "seconds": 83.45
     },
     {
       "bot": "tracker",
@@ -5267,22 +5281,22 @@
       "seed": 49,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 29.71,
-      "seconds": 60.516666666666666
+      "distance": 36.37,
+      "seconds": 21.9
     },
     {
       "bot": "human-touch",
       "seed": 49,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 29.71,
-      "seconds": 68.01666666666667
+      "distance": 159,
+      "seconds": 87.51666666666667
     },
     {
       "bot": "adaptive",
@@ -5366,22 +5380,22 @@
       "seed": 50,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 44.87,
-      "seconds": 71.85
+      "distance": 52.09,
+      "seconds": 33.6
     },
     {
       "bot": "human-touch",
       "seed": 50,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 44.87,
-      "seconds": 71.96666666666667
+      "distance": 52.11,
+      "seconds": 33.18333333333333
     },
     {
       "bot": "adaptive",
@@ -5465,22 +5479,22 @@
       "seed": 51,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 34.18,
-      "seconds": 69.6
+      "distance": 40.35,
+      "seconds": 31.483333333333334
     },
     {
       "bot": "human-touch",
       "seed": 51,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 34.18,
-      "seconds": 69.5
+      "distance": 127,
+      "seconds": 73.85
     },
     {
       "bot": "adaptive",
@@ -5562,24 +5576,24 @@
     {
       "bot": "human-keys",
       "seed": 52,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 23,
-      "seconds": 66.35
+      "distance": 143,
+      "seconds": 77.06666666666666
     },
     {
       "bot": "human-touch",
       "seed": 52,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 23,
-      "seconds": 66.43333333333334
+      "distance": 143,
+      "seconds": 76.83333333333333
     },
     {
       "bot": "adaptive",
@@ -5661,24 +5675,24 @@
     {
       "bot": "human-keys",
       "seed": 53,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 28,
-      "seconds": 59.96666666666667
+      "distance": 127,
+      "seconds": 69.06666666666666
     },
     {
       "bot": "human-touch",
       "seed": 53,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 28,
-      "seconds": 67.08333333333333
+      "distance": 35.35,
+      "seconds": 20.45
     },
     {
       "bot": "adaptive",
@@ -5762,22 +5776,22 @@
       "seed": 54,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 22.75,
-      "seconds": 59.05
+      "distance": 30.38,
+      "seconds": 21.233333333333334
     },
     {
       "bot": "human-touch",
       "seed": 54,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 22.76,
-      "seconds": 58.333333333333336
+      "distance": 143,
+      "seconds": 78.9
     },
     {
       "bot": "adaptive",
@@ -5859,24 +5873,24 @@
     {
       "bot": "human-keys",
       "seed": 55,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 30.13,
-      "seconds": 60.45
+      "distance": 159,
+      "seconds": 94.78333333333333
     },
     {
       "bot": "human-touch",
       "seed": 55,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 30.13,
-      "seconds": 67.95
+      "distance": 37.54,
+      "seconds": 24.316666666666666
     },
     {
       "bot": "adaptive",
@@ -5958,24 +5972,24 @@
     {
       "bot": "human-keys",
       "seed": 56,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 24.25,
-      "seconds": 59.233333333333334
+      "distance": 127,
+      "seconds": 74.35
     },
     {
       "bot": "human-touch",
       "seed": 56,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 24.25,
-      "seconds": 59.1
+      "distance": 127,
+      "seconds": 72.53333333333333
     },
     {
       "bot": "adaptive",
@@ -5986,7 +6000,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 95.96666666666667
+      "seconds": 96.15
     },
     {
       "bot": "tracker",
@@ -6059,22 +6073,22 @@
       "seed": 57,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 30.77,
-      "seconds": 60.43333333333333
+      "distance": 36.91,
+      "seconds": 25.116666666666667
     },
     {
       "bot": "human-touch",
       "seed": 57,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 30.77,
-      "seconds": 60.733333333333334
+      "distance": 191,
+      "seconds": 101.73333333333333
     },
     {
       "bot": "adaptive",
@@ -6156,24 +6170,24 @@
     {
       "bot": "human-keys",
       "seed": 58,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 26.15,
-      "seconds": 59.55
+      "distance": 159,
+      "seconds": 89.08333333333333
     },
     {
       "bot": "human-touch",
       "seed": 58,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 26.15,
-      "seconds": 67.48333333333333
+      "distance": 33.42,
+      "seconds": 22.75
     },
     {
       "bot": "adaptive",
@@ -6255,24 +6269,24 @@
     {
       "bot": "human-keys",
       "seed": 59,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 34.54,
-      "seconds": 61.8
+      "distance": 159,
+      "seconds": 91.63333333333334
     },
     {
       "bot": "human-touch",
       "seed": 59,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 34.54,
-      "seconds": 69.18333333333334
+      "distance": 159,
+      "seconds": 95.71666666666667
     },
     {
       "bot": "adaptive",
@@ -6354,24 +6368,24 @@
     {
       "bot": "human-keys",
       "seed": 60,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 26.82,
-      "seconds": 59.983333333333334
+      "distance": 143,
+      "seconds": 81.66666666666667
     },
     {
       "bot": "human-touch",
       "seed": 60,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 26.82,
-      "seconds": 59.6
+      "distance": 143,
+      "seconds": 80.11666666666666
     },
     {
       "bot": "adaptive",
@@ -6453,24 +6467,24 @@
     {
       "bot": "human-keys",
       "seed": 61,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 41.93,
-      "seconds": 71.61666666666666
+      "distance": 175,
+      "seconds": 109.26666666666667
     },
     {
       "bot": "human-touch",
       "seed": 61,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 41.95,
-      "seconds": 78.93333333333334
+      "distance": 175,
+      "seconds": 100.18333333333334
     },
     {
       "bot": "adaptive",
@@ -6557,8 +6571,8 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "STRIP",
-      "distance": 30.33,
-      "seconds": 61.43333333333333
+      "distance": 166,
+      "seconds": 99.73333333333333
     },
     {
       "bot": "human-touch",
@@ -6568,8 +6582,8 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "STRIP",
-      "distance": 30.33,
-      "seconds": 68.93333333333334
+      "distance": 155.91,
+      "seconds": 97.25
     },
     {
       "bot": "adaptive",
@@ -6651,24 +6665,24 @@
     {
       "bot": "human-keys",
       "seed": 63,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 37.64,
-      "seconds": 69.76666666666667
+      "distance": 143,
+      "seconds": 93.28333333333333
     },
     {
       "bot": "human-touch",
       "seed": 63,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 37.37,
-      "seconds": 69.73333333333333
+      "distance": 143,
+      "seconds": 80.38333333333334
     },
     {
       "bot": "adaptive",
@@ -6750,24 +6764,24 @@
     {
       "bot": "human-keys",
       "seed": 64,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 42.8,
-      "seconds": 70.86666666666666
+      "distance": 207,
+      "seconds": 118.6
     },
     {
       "bot": "human-touch",
       "seed": 64,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 42.8,
-      "seconds": 70.86666666666666
+      "distance": 50.12,
+      "seconds": 43.6
     },
     {
       "bot": "adaptive",
@@ -6778,7 +6792,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 68.9
+      "seconds": 68.05
     },
     {
       "bot": "tracker",
@@ -6851,22 +6865,22 @@
       "seed": 65,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 28.54,
-      "seconds": 61.56666666666667
+      "distance": 36.14,
+      "seconds": 26.333333333333332
     },
     {
       "bot": "human-touch",
       "seed": 65,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 28.57,
-      "seconds": 61.583333333333336
+      "distance": 36.13,
+      "seconds": 26.316666666666666
     },
     {
       "bot": "adaptive",
@@ -6948,24 +6962,24 @@
     {
       "bot": "human-keys",
       "seed": 66,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 25.28,
-      "seconds": 60.5
+      "distance": 127,
+      "seconds": 73
     },
     {
       "bot": "human-touch",
       "seed": 66,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 25.55,
-      "seconds": 60.13333333333333
+      "distance": 127,
+      "seconds": 71.4
     },
     {
       "bot": "adaptive",
@@ -7049,22 +7063,22 @@
       "seed": 67,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 44.87,
-      "seconds": 72.41666666666667
+      "distance": 51.46,
+      "seconds": 37.266666666666666
     },
     {
       "bot": "human-touch",
       "seed": 67,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 44.87,
-      "seconds": 79.45
+      "distance": 207,
+      "seconds": 125.46666666666667
     },
     {
       "bot": "adaptive",
@@ -7148,22 +7162,22 @@
       "seed": 68,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 27.71,
-      "seconds": 60.233333333333334
+      "distance": 34.59,
+      "seconds": 23.383333333333333
     },
     {
       "bot": "human-touch",
       "seed": 68,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 27.71,
-      "seconds": 60.06666666666667
+      "distance": 159,
+      "seconds": 90.45
     },
     {
       "bot": "adaptive",
@@ -7245,24 +7259,24 @@
     {
       "bot": "human-keys",
       "seed": 69,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 34.58,
-      "seconds": 61.95
+      "distance": 191,
+      "seconds": 117.41666666666667
     },
     {
       "bot": "human-touch",
       "seed": 69,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 34.58,
-      "seconds": 69.25
+      "distance": 191,
+      "seconds": 120.56666666666666
     },
     {
       "bot": "adaptive",
@@ -7346,22 +7360,22 @@
       "seed": 70,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 46.08,
-      "seconds": 71.2
+      "distance": 52.09,
+      "seconds": 30.466666666666665
     },
     {
       "bot": "human-touch",
       "seed": 70,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 46.08,
-      "seconds": 71.06666666666666
+      "distance": 52.09,
+      "seconds": 31.7
     },
     {
       "bot": "adaptive",
@@ -7443,24 +7457,24 @@
     {
       "bot": "human-keys",
       "seed": 71,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 42.91,
-      "seconds": 72.15
+      "distance": 191,
+      "seconds": 114.56666666666666
     },
     {
       "bot": "human-touch",
       "seed": 71,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 42.91,
-      "seconds": 64.65
+      "distance": 50.62,
+      "seconds": 34.65
     },
     {
       "bot": "adaptive",
@@ -7544,22 +7558,22 @@
       "seed": 72,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 23.56,
-      "seconds": 59.21666666666667
+      "distance": 29.88,
+      "seconds": 22.9
     },
     {
       "bot": "human-touch",
       "seed": 72,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 23.29,
-      "seconds": 59.083333333333336
+      "distance": 143,
+      "seconds": 81.3
     },
     {
       "bot": "adaptive",
@@ -7570,7 +7584,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 96.5
+      "seconds": 96.73333333333333
     },
     {
       "bot": "tracker",
@@ -7641,24 +7655,24 @@
     {
       "bot": "human-keys",
       "seed": 73,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 52.79,
-      "seconds": 75.2
+      "distance": 191,
+      "seconds": 107.81666666666666
     },
     {
       "bot": "human-touch",
       "seed": 73,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 52.79,
-      "seconds": 82.11666666666666
+      "distance": 191,
+      "seconds": 104.01666666666667
     },
     {
       "bot": "adaptive",
@@ -7740,24 +7754,24 @@
     {
       "bot": "human-keys",
       "seed": 74,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 20.04,
-      "seconds": 58.46666666666667
+      "distance": 127,
+      "seconds": 83.91666666666667
     },
     {
       "bot": "human-touch",
       "seed": 74,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 20.04,
-      "seconds": 58.38333333333333
+      "distance": 127,
+      "seconds": 73.36666666666666
     },
     {
       "bot": "adaptive",
@@ -7839,24 +7853,24 @@
     {
       "bot": "human-keys",
       "seed": 75,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 35.09,
-      "seconds": 61.46666666666667
+      "distance": 143,
+      "seconds": 84.48333333333333
     },
     {
       "bot": "human-touch",
       "seed": 75,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 35.09,
-      "seconds": 61.46666666666667
+      "distance": 143,
+      "seconds": 80.85
     },
     {
       "bot": "adaptive",
@@ -7940,22 +7954,22 @@
       "seed": 76,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 43.5,
-      "seconds": 80.36666666666666
+      "distance": 49.95,
+      "seconds": 40.983333333333334
     },
     {
       "bot": "human-touch",
       "seed": 76,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 43.5,
-      "seconds": 73.53333333333333
+      "distance": 159,
+      "seconds": 89.7
     },
     {
       "bot": "adaptive",
@@ -8039,22 +8053,22 @@
       "seed": 77,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 40.87,
-      "seconds": 70.06666666666666
+      "distance": 47.54,
+      "seconds": 27.3
     },
     {
       "bot": "human-touch",
       "seed": 77,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 40.87,
-      "seconds": 70.33333333333333
+      "distance": 159,
+      "seconds": 91.75
     },
     {
       "bot": "adaptive",
@@ -8136,24 +8150,24 @@
     {
       "bot": "human-keys",
       "seed": 78,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 34.33,
-      "seconds": 69.23333333333333
+      "distance": 175,
+      "seconds": 104.4
     },
     {
       "bot": "human-touch",
       "seed": 78,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 34.33,
-      "seconds": 69.23333333333333
+      "distance": 175,
+      "seconds": 96.81666666666666
     },
     {
       "bot": "adaptive",
@@ -8237,22 +8251,22 @@
       "seed": 79,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 18,
-      "seconds": 57.733333333333334
+      "distance": 25.15,
+      "seconds": 18.55
     },
     {
       "bot": "human-touch",
       "seed": 79,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 18,
-      "seconds": 57.63333333333333
+      "distance": 25.15,
+      "seconds": 19.3
     },
     {
       "bot": "adaptive",
@@ -8334,24 +8348,24 @@
     {
       "bot": "human-keys",
       "seed": 80,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 32.33,
-      "seconds": 61.333333333333336
+      "distance": 191,
+      "seconds": 109.71666666666667
     },
     {
       "bot": "human-touch",
       "seed": 80,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 32.33,
-      "seconds": 61.21666666666667
+      "distance": 191,
+      "seconds": 109.01666666666667
     },
     {
       "bot": "adaptive",
@@ -8433,24 +8447,24 @@
     {
       "bot": "human-keys",
       "seed": 81,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 46.58,
-      "seconds": 65.31666666666666
+      "distance": 207,
+      "seconds": 121.78333333333333
     },
     {
       "bot": "human-touch",
       "seed": 81,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 46.58,
-      "seconds": 79.96666666666667
+      "distance": 207,
+      "seconds": 115.7
     },
     {
       "bot": "adaptive",
@@ -8532,24 +8546,24 @@
     {
       "bot": "human-keys",
       "seed": 82,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 39.15,
-      "seconds": 69.76666666666667
+      "distance": 191,
+      "seconds": 96.88333333333334
     },
     {
       "bot": "human-touch",
       "seed": 82,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 39.15,
-      "seconds": 62.65
+      "distance": 191,
+      "seconds": 102.26666666666667
     },
     {
       "bot": "adaptive",
@@ -8631,24 +8645,24 @@
     {
       "bot": "human-keys",
       "seed": 83,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 29.37,
-      "seconds": 68.86666666666666
+      "distance": 191,
+      "seconds": 108.56666666666666
     },
     {
       "bot": "human-touch",
       "seed": 83,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 29.37,
-      "seconds": 68.26666666666667
+      "distance": 191,
+      "seconds": 109.58333333333333
     },
     {
       "bot": "adaptive",
@@ -8732,22 +8746,22 @@
       "seed": 84,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 31.65,
-      "seconds": 61.833333333333336
+      "distance": 38.54,
+      "seconds": 43.333333333333336
     },
     {
       "bot": "human-touch",
       "seed": 84,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 31.65,
-      "seconds": 60.88333333333333
+      "distance": 38.75,
+      "seconds": 27.516666666666666
     },
     {
       "bot": "adaptive",
@@ -8829,24 +8843,24 @@
     {
       "bot": "human-keys",
       "seed": 85,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 31.04,
-      "seconds": 61.05
+      "distance": 159,
+      "seconds": 86.8
     },
     {
       "bot": "human-touch",
       "seed": 85,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 31.04,
-      "seconds": 67.88333333333334
+      "distance": 159,
+      "seconds": 84.78333333333333
     },
     {
       "bot": "adaptive",
@@ -8930,22 +8944,22 @@
       "seed": 86,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 26.83,
-      "seconds": 59.71666666666667
+      "distance": 33.25,
+      "seconds": 21.233333333333334
     },
     {
       "bot": "human-touch",
       "seed": 86,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 26.83,
-      "seconds": 59.71666666666667
+      "distance": 127,
+      "seconds": 73.38333333333334
     },
     {
       "bot": "adaptive",
@@ -9029,22 +9043,22 @@
       "seed": 87,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 34.5,
-      "seconds": 61.63333333333333
+      "distance": 40.71,
+      "seconds": 26.7
     },
     {
       "bot": "human-touch",
       "seed": 87,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 34.5,
-      "seconds": 69.13333333333334
+      "distance": 40.62,
+      "seconds": 25.35
     },
     {
       "bot": "adaptive",
@@ -9126,24 +9140,24 @@
     {
       "bot": "human-keys",
       "seed": 88,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 44.17,
-      "seconds": 79.43333333333334
+      "distance": 207,
+      "seconds": 115.8
     },
     {
       "bot": "human-touch",
       "seed": 88,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 44.17,
-      "seconds": 79.43333333333334
+      "distance": 207,
+      "seconds": 118.1
     },
     {
       "bot": "adaptive",
@@ -9225,13 +9239,13 @@
     {
       "bot": "human-keys",
       "seed": 89,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 38.47,
-      "seconds": 63.233333333333334
+      "distance": 207,
+      "seconds": 119.35
     },
     {
       "bot": "human-touch",
@@ -9241,8 +9255,8 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "STRIP",
-      "distance": 38.21,
-      "seconds": 63.25
+      "distance": 171.53,
+      "seconds": 99.96666666666667
     },
     {
       "bot": "adaptive",
@@ -9326,22 +9340,22 @@
       "seed": 90,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 31.21,
-      "seconds": 61.25
+      "distance": 36.62,
+      "seconds": 26.566666666666666
     },
     {
       "bot": "human-touch",
       "seed": 90,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 31.21,
-      "seconds": 68.43333333333334
+      "distance": 127,
+      "seconds": 81.08333333333333
     },
     {
       "bot": "adaptive",
@@ -9423,24 +9437,24 @@
     {
       "bot": "human-keys",
       "seed": 91,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 33.04,
-      "seconds": 68.7
+      "distance": 175,
+      "seconds": 102.31666666666666
     },
     {
       "bot": "human-touch",
       "seed": 91,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 33.04,
-      "seconds": 68.78333333333333
+      "distance": 175,
+      "seconds": 99.06666666666666
     },
     {
       "bot": "adaptive",
@@ -9524,22 +9538,22 @@
       "seed": 92,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 22.24,
-      "seconds": 65.91666666666667
+      "distance": 28.47,
+      "seconds": 17.7
     },
     {
       "bot": "human-touch",
       "seed": 92,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 22.24,
-      "seconds": 65.91666666666667
+      "distance": 159,
+      "seconds": 89.06666666666666
     },
     {
       "bot": "adaptive",
@@ -9621,24 +9635,24 @@
     {
       "bot": "human-keys",
       "seed": 93,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 20.73,
-      "seconds": 59.083333333333336
+      "distance": 143,
+      "seconds": 83.65
     },
     {
       "bot": "human-touch",
       "seed": 93,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 20.73,
-      "seconds": 58.63333333333333
+      "distance": 143,
+      "seconds": 80.31666666666666
     },
     {
       "bot": "adaptive",
@@ -9722,22 +9736,22 @@
       "seed": 94,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 34.04,
-      "seconds": 61.25
+      "distance": 40.33,
+      "seconds": 27.383333333333333
     },
     {
       "bot": "human-touch",
       "seed": 94,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 34.04,
-      "seconds": 61.25
+      "distance": 40.33,
+      "seconds": 26.716666666666665
     },
     {
       "bot": "adaptive",
@@ -9821,22 +9835,22 @@
       "seed": 95,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 27.23,
-      "seconds": 67.51666666666667
+      "distance": 34.35,
+      "seconds": 24.266666666666666
     },
     {
       "bot": "human-touch",
       "seed": 95,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 27.24,
-      "seconds": 67.25
+      "distance": 34.38,
+      "seconds": 22.95
     },
     {
       "bot": "adaptive",
@@ -9920,22 +9934,22 @@
       "seed": 96,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 26.38,
-      "seconds": 59.95
+      "distance": 34.12,
+      "seconds": 24.716666666666665
     },
     {
       "bot": "human-touch",
       "seed": 96,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 26.38,
-      "seconds": 59.55
+      "distance": 34.12,
+      "seconds": 19.85
     },
     {
       "bot": "adaptive",
@@ -10019,22 +10033,22 @@
       "seed": 97,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 40.33,
-      "seconds": 71.13333333333334
+      "distance": 46.83,
+      "seconds": 43.36666666666667
     },
     {
       "bot": "human-touch",
       "seed": 97,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 40.33,
-      "seconds": 71.13333333333334
+      "distance": 175,
+      "seconds": 102.95
     },
     {
       "bot": "adaptive",
@@ -10116,24 +10130,24 @@
     {
       "bot": "human-keys",
       "seed": 98,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 44.19,
-      "seconds": 64.36666666666666
+      "distance": 175,
+      "seconds": 104.28333333333333
     },
     {
       "bot": "human-touch",
       "seed": 98,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 43.9,
-      "seconds": 64.56666666666666
+      "distance": 175,
+      "seconds": 105.68333333333334
     },
     {
       "bot": "adaptive",
@@ -10215,24 +10229,24 @@
     {
       "bot": "human-keys",
       "seed": 99,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 24.13,
-      "seconds": 66.63333333333334
+      "distance": 143,
+      "seconds": 82.55
     },
     {
       "bot": "human-touch",
       "seed": 99,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 23.84,
-      "seconds": 59.18333333333333
+      "distance": 30.65,
+      "seconds": 22.616666666666667
     },
     {
       "bot": "adaptive",
@@ -10314,24 +10328,24 @@
     {
       "bot": "human-keys",
       "seed": 100,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 35.07,
-      "seconds": 61.983333333333334
+      "distance": 143,
+      "seconds": 86.56666666666666
     },
     {
       "bot": "human-touch",
       "seed": 100,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 34.79,
-      "seconds": 61.266666666666666
+      "distance": 143,
+      "seconds": 76.88333333333334
     },
     {
       "bot": "adaptive",
@@ -10415,22 +10429,22 @@
       "seed": 101,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 24.79,
-      "seconds": 59.28333333333333
+      "distance": 32.79,
+      "seconds": 22.3
     },
     {
       "bot": "human-touch",
       "seed": 101,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 24.79,
-      "seconds": 66.38333333333334
+      "distance": 127,
+      "seconds": 67.3
     },
     {
       "bot": "adaptive",
@@ -10514,22 +10528,22 @@
       "seed": 102,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 45.91,
-      "seconds": 79.93333333333334
+      "distance": 52.83,
+      "seconds": 51.68333333333333
     },
     {
       "bot": "human-touch",
       "seed": 102,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 45.91,
-      "seconds": 72.05
+      "distance": 191,
+      "seconds": 106.85
     },
     {
       "bot": "adaptive",
@@ -10613,22 +10627,22 @@
       "seed": 103,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 27.29,
-      "seconds": 59.95
+      "distance": 34.21,
+      "seconds": 22.916666666666668
     },
     {
       "bot": "human-touch",
       "seed": 103,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 27.29,
-      "seconds": 59.55
+      "distance": 34.12,
+      "seconds": 20.183333333333334
     },
     {
       "bot": "adaptive",
@@ -10710,24 +10724,24 @@
     {
       "bot": "human-keys",
       "seed": 104,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 30.46,
-      "seconds": 61.38333333333333
+      "distance": 207,
+      "seconds": 112.91666666666667
     },
     {
       "bot": "human-touch",
       "seed": 104,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 30.46,
-      "seconds": 60.983333333333334
+      "distance": 36.77,
+      "seconds": 25.733333333333334
     },
     {
       "bot": "adaptive",
@@ -10738,7 +10752,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 66.03333333333333
+      "seconds": 67.9
     },
     {
       "bot": "tracker",
@@ -10809,24 +10823,24 @@
     {
       "bot": "human-keys",
       "seed": 105,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 30.04,
-      "seconds": 61.11666666666667
+      "distance": 127,
+      "seconds": 69.13333333333334
     },
     {
       "bot": "human-touch",
       "seed": 105,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 30.04,
-      "seconds": 60.85
+      "distance": 127,
+      "seconds": 74.5
     },
     {
       "bot": "adaptive",
@@ -10908,24 +10922,24 @@
     {
       "bot": "human-keys",
       "seed": 106,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 30.09,
-      "seconds": 61.2
+      "distance": 143,
+      "seconds": 87.76666666666667
     },
     {
       "bot": "human-touch",
       "seed": 106,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 29.83,
-      "seconds": 60.6
+      "distance": 143,
+      "seconds": 84.06666666666666
     },
     {
       "bot": "adaptive",
@@ -11012,19 +11026,19 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "STRIP",
-      "distance": 49.13,
-      "seconds": 64.56666666666666
+      "distance": 196.54,
+      "seconds": 112.11666666666666
     },
     {
       "bot": "human-touch",
       "seed": 107,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 49.13,
-      "seconds": 79.66666666666667
+      "distance": 207,
+      "seconds": 112.3
     },
     {
       "bot": "adaptive",
@@ -11106,13 +11120,13 @@
     {
       "bot": "human-keys",
       "seed": 108,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 35.7,
-      "seconds": 62.35
+      "distance": 159,
+      "seconds": 98.98333333333333
     },
     {
       "bot": "human-touch",
@@ -11122,8 +11136,8 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "STRIP",
-      "distance": 35.7,
-      "seconds": 61.63333333333333
+      "distance": 136.96,
+      "seconds": 82.9
     },
     {
       "bot": "adaptive",
@@ -11207,22 +11221,22 @@
       "seed": 109,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 48.58,
-      "seconds": 73.63333333333334
+      "distance": 55.92,
+      "seconds": 36.6
     },
     {
       "bot": "human-touch",
       "seed": 109,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 48.58,
-      "seconds": 65.65
+      "distance": 56.17,
+      "seconds": 35.833333333333336
     },
     {
       "bot": "adaptive",
@@ -11304,13 +11318,13 @@
     {
       "bot": "human-keys",
       "seed": 110,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 20.17,
-      "seconds": 58.56666666666667
+      "distance": 127,
+      "seconds": 83.26666666666667
     },
     {
       "bot": "human-touch",
@@ -11320,8 +11334,8 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "STRIP",
-      "distance": 20.17,
-      "seconds": 58.333333333333336
+      "distance": 76.63,
+      "seconds": 70
     },
     {
       "bot": "adaptive",
@@ -11403,24 +11417,24 @@
     {
       "bot": "human-keys",
       "seed": 111,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 47.17,
-      "seconds": 79.93333333333334
+      "distance": 207,
+      "seconds": 117.08333333333333
     },
     {
       "bot": "human-touch",
       "seed": 111,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 47.17,
-      "seconds": 72.11666666666666
+      "distance": 52.58,
+      "seconds": 40.266666666666666
     },
     {
       "bot": "adaptive",
@@ -11502,24 +11516,24 @@
     {
       "bot": "human-keys",
       "seed": 112,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 30.24,
-      "seconds": 60.9
+      "distance": 175,
+      "seconds": 95.28333333333333
     },
     {
       "bot": "human-touch",
       "seed": 112,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 30.24,
-      "seconds": 68.01666666666667
+      "distance": 37.33,
+      "seconds": 25.15
     },
     {
       "bot": "adaptive",
@@ -11601,24 +11615,24 @@
     {
       "bot": "human-keys",
       "seed": 113,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 45.29,
-      "seconds": 63.78333333333333
+      "distance": 191,
+      "seconds": 99.31666666666666
     },
     {
       "bot": "human-touch",
       "seed": 113,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 45.29,
-      "seconds": 71.28333333333333
+      "distance": 51.91,
+      "seconds": 34.85
     },
     {
       "bot": "adaptive",
@@ -11629,7 +11643,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 83.93333333333334
+      "seconds": 84.21666666666667
     },
     {
       "bot": "tracker",
@@ -11700,24 +11714,24 @@
     {
       "bot": "human-keys",
       "seed": 114,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 37.29,
-      "seconds": 70.48333333333333
+      "distance": 159,
+      "seconds": 93.28333333333333
     },
     {
       "bot": "human-touch",
       "seed": 114,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 37.29,
-      "seconds": 70.6
+      "distance": 159,
+      "seconds": 95.1
     },
     {
       "bot": "adaptive",
@@ -11728,7 +11742,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 72.9
+      "seconds": 77.91666666666667
     },
     {
       "bot": "tracker",
@@ -11799,24 +11813,24 @@
     {
       "bot": "human-keys",
       "seed": 115,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 29.71,
-      "seconds": 60.416666666666664
+      "distance": 143,
+      "seconds": 84.53333333333333
     },
     {
       "bot": "human-touch",
       "seed": 115,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 29.71,
-      "seconds": 60.416666666666664
+      "distance": 143,
+      "seconds": 77.86666666666666
     },
     {
       "bot": "adaptive",
@@ -11827,7 +11841,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 107.13333333333334
+      "seconds": 107.3
     },
     {
       "bot": "tracker",
@@ -11898,24 +11912,24 @@
     {
       "bot": "human-keys",
       "seed": 116,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 34.37,
-      "seconds": 61.85
+      "distance": 207,
+      "seconds": 111.55
     },
     {
       "bot": "human-touch",
       "seed": 116,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 34.37,
-      "seconds": 61.6
+      "distance": 207,
+      "seconds": 111.6
     },
     {
       "bot": "adaptive",
@@ -11999,22 +12013,22 @@
       "seed": 117,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 25.5,
-      "seconds": 67.13333333333334
+      "distance": 32.5,
+      "seconds": 22.383333333333333
     },
     {
       "bot": "human-touch",
       "seed": 117,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 25.5,
-      "seconds": 59.56666666666667
+      "distance": 143,
+      "seconds": 87.05
     },
     {
       "bot": "adaptive",
@@ -12025,7 +12039,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 69.08333333333333
+      "seconds": 70.5
     },
     {
       "bot": "tracker",
@@ -12096,24 +12110,24 @@
     {
       "bot": "human-keys",
       "seed": 118,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 29.58,
-      "seconds": 61.916666666666664
+      "distance": 127,
+      "seconds": 81.03333333333333
     },
     {
       "bot": "human-touch",
       "seed": 118,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 29.58,
-      "seconds": 61.31666666666667
+      "distance": 127,
+      "seconds": 79.26666666666667
     },
     {
       "bot": "adaptive",
@@ -12195,24 +12209,24 @@
     {
       "bot": "human-keys",
       "seed": 119,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 35.62,
-      "seconds": 69.41666666666667
+      "distance": 207,
+      "seconds": 120.91666666666667
     },
     {
       "bot": "human-touch",
       "seed": 119,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 35.62,
-      "seconds": 69.03333333333333
+      "distance": 207,
+      "seconds": 122.25
     },
     {
       "bot": "adaptive",
@@ -12223,7 +12237,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 104.8
+      "seconds": 105.08333333333333
     },
     {
       "bot": "tracker",
@@ -12294,24 +12308,24 @@
     {
       "bot": "human-keys",
       "seed": 120,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 30.79,
-      "seconds": 61.06666666666667
+      "distance": 207,
+      "seconds": 112.96666666666667
     },
     {
       "bot": "human-touch",
       "seed": 120,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 30.79,
-      "seconds": 68.18333333333334
+      "distance": 207,
+      "seconds": 112.56666666666666
     },
     {
       "bot": "adaptive",
@@ -12395,22 +12409,22 @@
       "seed": 121,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 32.96,
-      "seconds": 61.53333333333333
+      "distance": 39.54,
+      "seconds": 26.25
     },
     {
       "bot": "human-touch",
       "seed": 121,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 32.96,
-      "seconds": 69.11666666666666
+      "distance": 127,
+      "seconds": 75.15
     },
     {
       "bot": "adaptive",
@@ -12421,7 +12435,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 96.2
+      "seconds": 96.18333333333334
     },
     {
       "bot": "tracker",
@@ -12492,24 +12506,24 @@
     {
       "bot": "human-keys",
       "seed": 122,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 30.18,
-      "seconds": 60.93333333333333
+      "distance": 191,
+      "seconds": 113.23333333333333
     },
     {
       "bot": "human-touch",
       "seed": 122,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 30.11,
-      "seconds": 67.93333333333334
+      "distance": 191,
+      "seconds": 103.48333333333333
     },
     {
       "bot": "adaptive",
@@ -12591,24 +12605,24 @@
     {
       "bot": "human-keys",
       "seed": 123,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 38.79,
-      "seconds": 69.83333333333333
+      "distance": 191,
+      "seconds": 106.86666666666666
     },
     {
       "bot": "human-touch",
       "seed": 123,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 38.79,
-      "seconds": 69.56666666666666
+      "distance": 191,
+      "seconds": 106.35
     },
     {
       "bot": "adaptive",
@@ -12690,24 +12704,24 @@
     {
       "bot": "human-keys",
       "seed": 124,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 45.25,
-      "seconds": 71.81666666666666
+      "distance": 191,
+      "seconds": 107.6
     },
     {
       "bot": "human-touch",
       "seed": 124,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 45.25,
-      "seconds": 79.31666666666666
+      "distance": 191,
+      "seconds": 106.65
     },
     {
       "bot": "adaptive",
@@ -12789,13 +12803,13 @@
     {
       "bot": "human-keys",
       "seed": 125,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 55.33,
-      "seconds": 82.16666666666667
+      "distance": 207,
+      "seconds": 112.41666666666667
     },
     {
       "bot": "human-touch",
@@ -12805,8 +12819,8 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "STRIP",
-      "distance": 55,
-      "seconds": 74.35
+      "distance": 150.83,
+      "seconds": 97.8
     },
     {
       "bot": "adaptive",
@@ -12890,22 +12904,22 @@
       "seed": 126,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 25.25,
-      "seconds": 59.266666666666666
+      "distance": 32.92,
+      "seconds": 19.916666666666668
     },
     {
       "bot": "human-touch",
       "seed": 126,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 25.25,
-      "seconds": 59.45
+      "distance": 32.92,
+      "seconds": 23.416666666666668
     },
     {
       "bot": "adaptive",
@@ -12987,24 +13001,24 @@
     {
       "bot": "human-keys",
       "seed": 127,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 21.17,
-      "seconds": 59.016666666666666
+      "distance": 143,
+      "seconds": 78.16666666666667
     },
     {
       "bot": "human-touch",
       "seed": 127,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 21.17,
-      "seconds": 58.68333333333333
+      "distance": 143,
+      "seconds": 77.4
     },
     {
       "bot": "adaptive",
@@ -13088,22 +13102,22 @@
       "seed": 128,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 31.29,
-      "seconds": 69.11666666666666
+      "distance": 37.46,
+      "seconds": 29.75
     },
     {
       "bot": "human-touch",
       "seed": 128,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 31.29,
-      "seconds": 69.08333333333333
+      "distance": 159,
+      "seconds": 89.16666666666667
     },
     {
       "bot": "adaptive",
@@ -13185,24 +13199,24 @@
     {
       "bot": "human-keys",
       "seed": 129,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 34,
-      "seconds": 68.88333333333334
+      "distance": 143,
+      "seconds": 78.35
     },
     {
       "bot": "human-touch",
       "seed": 129,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 34,
-      "seconds": 61.05
+      "distance": 143,
+      "seconds": 77.11666666666666
     },
     {
       "bot": "adaptive",
@@ -13284,24 +13298,24 @@
     {
       "bot": "human-keys",
       "seed": 130,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 29.25,
-      "seconds": 60.55
+      "distance": 143,
+      "seconds": 80.86666666666666
     },
     {
       "bot": "human-touch",
       "seed": 130,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 29.25,
-      "seconds": 68.05
+      "distance": 143,
+      "seconds": 80.73333333333333
     },
     {
       "bot": "adaptive",
@@ -13385,22 +13399,22 @@
       "seed": 131,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 26.79,
-      "seconds": 67.76666666666667
+      "distance": 33.92,
+      "seconds": 24.25
     },
     {
       "bot": "human-touch",
       "seed": 131,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 26.79,
-      "seconds": 67.48333333333333
+      "distance": 143,
+      "seconds": 80.5
     },
     {
       "bot": "adaptive",
@@ -13482,24 +13496,24 @@
     {
       "bot": "human-keys",
       "seed": 132,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 34.67,
-      "seconds": 69.01666666666667
+      "distance": 159,
+      "seconds": 95.03333333333333
     },
     {
       "bot": "human-touch",
       "seed": 132,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 34.67,
-      "seconds": 76.48333333333333
+      "distance": 159,
+      "seconds": 96.65
     },
     {
       "bot": "adaptive",
@@ -13510,7 +13524,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 90.51666666666667
+      "seconds": 90.73333333333333
     },
     {
       "bot": "tracker",
@@ -13583,22 +13597,22 @@
       "seed": 133,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 28.29,
-      "seconds": 60.45
+      "distance": 35.16,
+      "seconds": 24.116666666666667
     },
     {
       "bot": "human-touch",
       "seed": 133,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 28.29,
-      "seconds": 67.56666666666666
+      "distance": 35.22,
+      "seconds": 24
     },
     {
       "bot": "adaptive",
@@ -13609,7 +13623,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 92.75
+      "seconds": 92.93333333333334
     },
     {
       "bot": "tracker",
@@ -13680,24 +13694,24 @@
     {
       "bot": "human-keys",
       "seed": 134,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 35.86,
-      "seconds": 62.8
+      "distance": 175,
+      "seconds": 106.96666666666667
     },
     {
       "bot": "human-touch",
       "seed": 134,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 35.86,
-      "seconds": 62.45
+      "distance": 175,
+      "seconds": 101.86666666666666
     },
     {
       "bot": "adaptive",
@@ -13781,22 +13795,22 @@
       "seed": 135,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 31.46,
-      "seconds": 69.53333333333333
+      "distance": 38.79,
+      "seconds": 27.466666666666665
     },
     {
       "bot": "human-touch",
       "seed": 135,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 31.46,
-      "seconds": 61.61666666666667
+      "distance": 38.12,
+      "seconds": 30.633333333333333
     },
     {
       "bot": "adaptive",
@@ -13878,24 +13892,24 @@
     {
       "bot": "human-keys",
       "seed": 136,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 37.29,
-      "seconds": 76.4
+      "distance": 159,
+      "seconds": 90.56666666666666
     },
     {
       "bot": "human-touch",
       "seed": 136,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 37.29,
-      "seconds": 76.4
+      "distance": 159,
+      "seconds": 88.96666666666667
     },
     {
       "bot": "adaptive",
@@ -13979,22 +13993,22 @@
       "seed": 137,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 47.12,
-      "seconds": 72.25
+      "distance": 54.46,
+      "seconds": 30.8
     },
     {
       "bot": "human-touch",
       "seed": 137,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 47.12,
-      "seconds": 79.75
+      "distance": 54.5,
+      "seconds": 38.916666666666664
     },
     {
       "bot": "adaptive",
@@ -14078,22 +14092,22 @@
       "seed": 138,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 28.17,
-      "seconds": 68.91666666666667
+      "distance": 35.67,
+      "seconds": 30.116666666666667
     },
     {
       "bot": "human-touch",
       "seed": 138,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 28.21,
-      "seconds": 68.35
+      "distance": 127,
+      "seconds": 74.36666666666666
     },
     {
       "bot": "adaptive",
@@ -14104,7 +14118,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 85.03333333333333
+      "seconds": 85.25
     },
     {
       "bot": "tracker",
@@ -14180,8 +14194,8 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "STRIP",
-      "distance": 39.67,
-      "seconds": 63.68333333333333
+      "distance": 154.94,
+      "seconds": 89.13333333333334
     },
     {
       "bot": "human-touch",
@@ -14191,8 +14205,8 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "STRIP",
-      "distance": 39.67,
-      "seconds": 71.1
+      "distance": 153.62,
+      "seconds": 89.58333333333333
     },
     {
       "bot": "adaptive",
@@ -14274,24 +14288,24 @@
     {
       "bot": "human-keys",
       "seed": 140,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 25.21,
-      "seconds": 66.65
+      "distance": 143,
+      "seconds": 77.78333333333333
     },
     {
       "bot": "human-touch",
       "seed": 140,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 25.21,
-      "seconds": 66.65
+      "distance": 31.44,
+      "seconds": 19.983333333333334
     },
     {
       "bot": "adaptive",
@@ -14375,22 +14389,22 @@
       "seed": 141,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 32.96,
-      "seconds": 69.26666666666667
+      "distance": 39.65,
+      "seconds": 38.13333333333333
     },
     {
       "bot": "human-touch",
       "seed": 141,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 32.95,
-      "seconds": 69.13333333333334
+      "distance": 191,
+      "seconds": 104.65
     },
     {
       "bot": "adaptive",
@@ -14472,24 +14486,24 @@
     {
       "bot": "human-keys",
       "seed": 142,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 28.25,
-      "seconds": 60.416666666666664
+      "distance": 175,
+      "seconds": 97.86666666666666
     },
     {
       "bot": "human-touch",
       "seed": 142,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 28.25,
-      "seconds": 67.91666666666667
+      "distance": 175,
+      "seconds": 97.61666666666666
     },
     {
       "bot": "adaptive",
@@ -14571,24 +14585,24 @@
     {
       "bot": "human-keys",
       "seed": 143,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 53.12,
-      "seconds": 89.58333333333333
+      "distance": 207,
+      "seconds": 117.06666666666666
     },
     {
       "bot": "human-touch",
       "seed": 143,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 53.12,
-      "seconds": 89.4
+      "distance": 207,
+      "seconds": 113.66666666666667
     },
     {
       "bot": "adaptive",
@@ -14670,24 +14684,24 @@
     {
       "bot": "human-keys",
       "seed": 144,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 21.58,
-      "seconds": 66.65
+      "distance": 127,
+      "seconds": 71.45
     },
     {
       "bot": "human-touch",
       "seed": 144,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 21.29,
-      "seconds": 65.75
+      "distance": 127,
+      "seconds": 68.78333333333333
     },
     {
       "bot": "adaptive",
@@ -14771,22 +14785,22 @@
       "seed": 145,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 28.29,
-      "seconds": 68.38333333333334
+      "distance": 35,
+      "seconds": 28.433333333333334
     },
     {
       "bot": "human-touch",
       "seed": 145,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 28.29,
-      "seconds": 61.016666666666666
+      "distance": 175,
+      "seconds": 98.81666666666666
     },
     {
       "bot": "adaptive",
@@ -14870,22 +14884,22 @@
       "seed": 146,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 19.35,
-      "seconds": 58.5
+      "distance": 25.83,
+      "seconds": 20.716666666666665
     },
     {
       "bot": "human-touch",
       "seed": 146,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 19.35,
-      "seconds": 58.1
+      "distance": 25.88,
+      "seconds": 27.133333333333333
     },
     {
       "bot": "adaptive",
@@ -14967,24 +14981,24 @@
     {
       "bot": "human-keys",
       "seed": 147,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 26.56,
-      "seconds": 60
+      "distance": 159,
+      "seconds": 87.46666666666667
     },
     {
       "bot": "human-touch",
       "seed": 147,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 26.94,
-      "seconds": 60
+      "distance": 34.87,
+      "seconds": 22.95
     },
     {
       "bot": "adaptive",
@@ -15066,24 +15080,24 @@
     {
       "bot": "human-keys",
       "seed": 148,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 31.5,
-      "seconds": 69
+      "distance": 175,
+      "seconds": 94.88333333333334
     },
     {
       "bot": "human-touch",
       "seed": 148,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 31.5,
-      "seconds": 68.95
+      "distance": 175,
+      "seconds": 95.1
     },
     {
       "bot": "adaptive",
@@ -15167,22 +15181,22 @@
       "seed": 149,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 35.38,
-      "seconds": 62.5
+      "distance": 41.56,
+      "seconds": 28.216666666666665
     },
     {
       "bot": "human-touch",
       "seed": 149,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 35.38,
-      "seconds": 69.6
+      "distance": 159,
+      "seconds": 88.16666666666667
     },
     {
       "bot": "adaptive",
@@ -15269,19 +15283,19 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "STRIP",
-      "distance": 34.56,
-      "seconds": 69.53333333333333
+      "distance": 184.5,
+      "seconds": 118.08333333333333
     },
     {
       "bot": "human-touch",
       "seed": 150,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 34.56,
-      "seconds": 61.55
+      "distance": 191,
+      "seconds": 124.66666666666667
     },
     {
       "bot": "adaptive",
@@ -15365,22 +15379,22 @@
       "seed": 151,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 30.88,
-      "seconds": 68.16666666666667
+      "distance": 37.08,
+      "seconds": 22.95
     },
     {
       "bot": "human-touch",
       "seed": 151,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 30.88,
-      "seconds": 68.06666666666666
+      "distance": 37.04,
+      "seconds": 23.666666666666668
     },
     {
       "bot": "adaptive",
@@ -15391,7 +15405,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 84.25
+      "seconds": 84.46666666666667
     },
     {
       "bot": "tracker",
@@ -15462,24 +15476,24 @@
     {
       "bot": "human-keys",
       "seed": 152,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 39.58,
-      "seconds": 71.08333333333333
+      "distance": 159,
+      "seconds": 93.13333333333334
     },
     {
       "bot": "human-touch",
       "seed": 152,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 39.58,
-      "seconds": 70.81666666666666
+      "distance": 159,
+      "seconds": 90.13333333333334
     },
     {
       "bot": "adaptive",
@@ -15561,24 +15575,24 @@
     {
       "bot": "human-keys",
       "seed": 153,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 30.54,
-      "seconds": 59.9
+      "distance": 127,
+      "seconds": 70
     },
     {
       "bot": "human-touch",
       "seed": 153,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 30.54,
-      "seconds": 59.9
+      "distance": 37.41,
+      "seconds": 21.316666666666666
     },
     {
       "bot": "adaptive",
@@ -15660,24 +15674,24 @@
     {
       "bot": "human-keys",
       "seed": 154,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 27.47,
-      "seconds": 67.91666666666667
+      "distance": 175,
+      "seconds": 97.76666666666667
     },
     {
       "bot": "human-touch",
       "seed": 154,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 27.47,
-      "seconds": 67.5
+      "distance": 175,
+      "seconds": 95
     },
     {
       "bot": "adaptive",
@@ -15759,13 +15773,13 @@
     {
       "bot": "human-keys",
       "seed": 155,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 25.39,
-      "seconds": 60.35
+      "distance": 159,
+      "seconds": 93.51666666666667
     },
     {
       "bot": "human-touch",
@@ -15775,8 +15789,8 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "STRIP",
-      "distance": 25.42,
-      "seconds": 59.56666666666667
+      "distance": 150.83,
+      "seconds": 88.83333333333333
     },
     {
       "bot": "adaptive",
@@ -15860,22 +15874,22 @@
       "seed": 156,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 32.83,
-      "seconds": 61.083333333333336
+      "distance": 39.06,
+      "seconds": 24.216666666666665
     },
     {
       "bot": "human-touch",
       "seed": 156,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 32.83,
-      "seconds": 61.35
+      "distance": 175,
+      "seconds": 98.63333333333334
     },
     {
       "bot": "adaptive",
@@ -15957,24 +15971,24 @@
     {
       "bot": "human-keys",
       "seed": 157,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 35.06,
-      "seconds": 70.16666666666667
+      "distance": 143,
+      "seconds": 90.96666666666667
     },
     {
       "bot": "human-touch",
       "seed": 157,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 35.06,
-      "seconds": 69.68333333333334
+      "distance": 40.92,
+      "seconds": 28.283333333333335
     },
     {
       "bot": "adaptive",
@@ -16056,24 +16070,24 @@
     {
       "bot": "human-keys",
       "seed": 158,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 32.04,
-      "seconds": 61.65
+      "distance": 127,
+      "seconds": 83.98333333333333
     },
     {
       "bot": "human-touch",
       "seed": 158,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 32.04,
-      "seconds": 61.25
+      "distance": 127,
+      "seconds": 78.75
     },
     {
       "bot": "adaptive",
@@ -16155,24 +16169,24 @@
     {
       "bot": "human-keys",
       "seed": 159,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 27.18,
-      "seconds": 68.28333333333333
+      "distance": 143,
+      "seconds": 80.88333333333334
     },
     {
       "bot": "human-touch",
       "seed": 159,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 27.18,
-      "seconds": 67.66666666666667
+      "distance": 34.24,
+      "seconds": 28.216666666666665
     },
     {
       "bot": "adaptive",
@@ -16183,7 +16197,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 106.05
+      "seconds": 106.21666666666667
     },
     {
       "bot": "tracker",
@@ -16256,11 +16270,11 @@
       "seed": 160,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 37.06,
-      "seconds": 70.01666666666667
+      "distance": 42.95,
+      "seconds": 28.316666666666666
     },
     {
       "bot": "human-touch",
@@ -16270,8 +16284,8 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "STRIP",
-      "distance": 37.06,
-      "seconds": 70.4
+      "distance": 198.87,
+      "seconds": 115.65
     },
     {
       "bot": "adaptive",
@@ -16355,22 +16369,22 @@
       "seed": 161,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 28.21,
-      "seconds": 60.03333333333333
+      "distance": 35.37,
+      "seconds": 22.116666666666667
     },
     {
       "bot": "human-touch",
       "seed": 161,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 28.21,
-      "seconds": 59.63333333333333
+      "distance": 35.33,
+      "seconds": 20.216666666666665
     },
     {
       "bot": "adaptive",
@@ -16452,24 +16466,24 @@
     {
       "bot": "human-keys",
       "seed": 162,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 47.39,
-      "seconds": 72.55
+      "distance": 191,
+      "seconds": 113.81666666666666
     },
     {
       "bot": "human-touch",
       "seed": 162,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 47.66,
-      "seconds": 72.33333333333333
+      "distance": 191,
+      "seconds": 108.2
     },
     {
       "bot": "adaptive",
@@ -16553,22 +16567,22 @@
       "seed": 163,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 39.47,
-      "seconds": 63.333333333333336
+      "distance": 45.65,
+      "seconds": 36.56666666666667
     },
     {
       "bot": "human-touch",
       "seed": 163,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 39.47,
-      "seconds": 62.85
+      "distance": 159,
+      "seconds": 93.16666666666667
     },
     {
       "bot": "adaptive",
@@ -16652,22 +16666,22 @@
       "seed": 164,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 32.71,
-      "seconds": 61.11666666666667
+      "distance": 40.01,
+      "seconds": 40.4
     },
     {
       "bot": "human-touch",
       "seed": 164,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 32.71,
-      "seconds": 60.63333333333333
+      "distance": 40.03,
+      "seconds": 27.3
     },
     {
       "bot": "adaptive",
@@ -16751,22 +16765,22 @@
       "seed": 165,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 35.21,
-      "seconds": 61.71666666666667
+      "distance": 41.15,
+      "seconds": 40.81666666666667
     },
     {
       "bot": "human-touch",
       "seed": 165,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 35.21,
-      "seconds": 61.71666666666667
+      "distance": 175,
+      "seconds": 92.76666666666667
     },
     {
       "bot": "adaptive",
@@ -16848,24 +16862,24 @@
     {
       "bot": "human-keys",
       "seed": 166,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 32.79,
-      "seconds": 68.16666666666667
+      "distance": 191,
+      "seconds": 102.4
     },
     {
       "bot": "human-touch",
       "seed": 166,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 32.79,
-      "seconds": 61.2
+      "distance": 39,
+      "seconds": 26.35
     },
     {
       "bot": "adaptive",
@@ -16952,19 +16966,19 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "STRIP",
-      "distance": 44.62,
-      "seconds": 63.833333333333336
+      "distance": 199.56,
+      "seconds": 113.83333333333333
     },
     {
       "bot": "human-touch",
       "seed": 167,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 44.62,
-      "seconds": 79.23333333333333
+      "distance": 207,
+      "seconds": 128.33333333333334
     },
     {
       "bot": "adaptive",
@@ -17046,24 +17060,24 @@
     {
       "bot": "human-keys",
       "seed": 168,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 22.04,
-      "seconds": 58.666666666666664
+      "distance": 143,
+      "seconds": 83.06666666666666
     },
     {
       "bot": "human-touch",
       "seed": 168,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 22.04,
-      "seconds": 58.88333333333333
+      "distance": 28.38,
+      "seconds": 21.95
     },
     {
       "bot": "adaptive",
@@ -17147,22 +17161,22 @@
       "seed": 169,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 27.46,
-      "seconds": 68.16666666666667
+      "distance": 35.27,
+      "seconds": 23.016666666666666
     },
     {
       "bot": "human-touch",
       "seed": 169,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 27.46,
-      "seconds": 68.15
+      "distance": 35.29,
+      "seconds": 23.566666666666666
     },
     {
       "bot": "adaptive",
@@ -17246,22 +17260,22 @@
       "seed": 170,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 36.94,
-      "seconds": 63.583333333333336
+      "distance": 42.75,
+      "seconds": 43.21666666666667
     },
     {
       "bot": "human-touch",
       "seed": 170,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 36.94,
-      "seconds": 70.33333333333333
+      "distance": 42.75,
+      "seconds": 29.083333333333332
     },
     {
       "bot": "adaptive",
@@ -17343,24 +17357,24 @@
     {
       "bot": "human-keys",
       "seed": 171,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 42.82,
-      "seconds": 71.6
+      "distance": 175,
+      "seconds": 94.9
     },
     {
       "bot": "human-touch",
       "seed": 171,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 42.82,
-      "seconds": 71.4
+      "distance": 49.17,
+      "seconds": 36.43333333333333
     },
     {
       "bot": "adaptive",
@@ -17442,24 +17456,24 @@
     {
       "bot": "human-keys",
       "seed": 172,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 17.68,
-      "seconds": 57.71666666666667
+      "distance": 127,
+      "seconds": 73.6
     },
     {
       "bot": "human-touch",
       "seed": 172,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 17.68,
-      "seconds": 57.333333333333336
+      "distance": 127,
+      "seconds": 69.31666666666666
     },
     {
       "bot": "adaptive",
@@ -17541,24 +17555,24 @@
     {
       "bot": "human-keys",
       "seed": 173,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 24.25,
-      "seconds": 59.88333333333333
+      "distance": 127,
+      "seconds": 74.56666666666666
     },
     {
       "bot": "human-touch",
       "seed": 173,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 24.25,
-      "seconds": 59.483333333333334
+      "distance": 127,
+      "seconds": 79.3
     },
     {
       "bot": "adaptive",
@@ -17640,24 +17654,24 @@
     {
       "bot": "human-keys",
       "seed": 174,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 32.04,
-      "seconds": 69.61666666666666
+      "distance": 175,
+      "seconds": 100.88333333333334
     },
     {
       "bot": "human-touch",
       "seed": 174,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 32.04,
-      "seconds": 68.83333333333333
+      "distance": 175,
+      "seconds": 97.01666666666667
     },
     {
       "bot": "adaptive",
@@ -17739,24 +17753,24 @@
     {
       "bot": "human-keys",
       "seed": 175,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 34.71,
-      "seconds": 69.7
+      "distance": 175,
+      "seconds": 97.95
     },
     {
       "bot": "human-touch",
       "seed": 175,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 34.71,
-      "seconds": 69.35
+      "distance": 175,
+      "seconds": 102.28333333333333
     },
     {
       "bot": "adaptive",
@@ -17840,22 +17854,22 @@
       "seed": 176,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 23.91,
-      "seconds": 58.916666666666664
+      "distance": 30.74,
+      "seconds": 22.25
     },
     {
       "bot": "human-touch",
       "seed": 176,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 23.91,
-      "seconds": 59.28333333333333
+      "distance": 30.74,
+      "seconds": 22.5
     },
     {
       "bot": "adaptive",
@@ -17939,22 +17953,22 @@
       "seed": 177,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 30.03,
-      "seconds": 67.86666666666666
+      "distance": 36.77,
+      "seconds": 21.483333333333334
     },
     {
       "bot": "human-touch",
       "seed": 177,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 30.33,
-      "seconds": 67.7
+      "distance": 175,
+      "seconds": 102.78333333333333
     },
     {
       "bot": "adaptive",
@@ -18036,24 +18050,24 @@
     {
       "bot": "human-keys",
       "seed": 178,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 34.62,
-      "seconds": 62.65
+      "distance": 207,
+      "seconds": 123.96666666666667
     },
     {
       "bot": "human-touch",
       "seed": 178,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 34.62,
-      "seconds": 70.13333333333334
+      "distance": 40.37,
+      "seconds": 37.53333333333333
     },
     {
       "bot": "adaptive",
@@ -18137,22 +18151,22 @@
       "seed": 179,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 45.17,
-      "seconds": 72
+      "distance": 51.79,
+      "seconds": 31.283333333333335
     },
     {
       "bot": "human-touch",
       "seed": 179,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 45.17,
-      "seconds": 71.61666666666666
+      "distance": 175,
+      "seconds": 93.41666666666667
     },
     {
       "bot": "adaptive",
@@ -18234,24 +18248,24 @@
     {
       "bot": "human-keys",
       "seed": 180,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 48.96,
-      "seconds": 72.78333333333333
+      "distance": 207,
+      "seconds": 116.86666666666666
     },
     {
       "bot": "human-touch",
       "seed": 180,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 48.96,
-      "seconds": 72.78333333333333
+      "distance": 207,
+      "seconds": 120.06666666666666
     },
     {
       "bot": "adaptive",
@@ -18333,24 +18347,24 @@
     {
       "bot": "human-keys",
       "seed": 181,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 22.13,
-      "seconds": 59.1
+      "distance": 159,
+      "seconds": 87.01666666666667
     },
     {
       "bot": "human-touch",
       "seed": 181,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 22.13,
-      "seconds": 58.56666666666667
+      "distance": 28.42,
+      "seconds": 18.833333333333332
     },
     {
       "bot": "adaptive",
@@ -18361,7 +18375,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 107.96666666666667
+      "seconds": 108.23333333333333
     },
     {
       "bot": "tracker",
@@ -18434,22 +18448,22 @@
       "seed": 182,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 28.92,
-      "seconds": 60.88333333333333
+      "distance": 35.8,
+      "seconds": 25.75
     },
     {
       "bot": "human-touch",
       "seed": 182,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 28.92,
-      "seconds": 67.9
+      "distance": 35.8,
+      "seconds": 24.066666666666666
     },
     {
       "bot": "adaptive",
@@ -18460,7 +18474,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 68.93333333333334
+      "seconds": 68.95
     },
     {
       "bot": "tracker",
@@ -18531,13 +18545,13 @@
     {
       "bot": "human-keys",
       "seed": 183,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 33.53,
-      "seconds": 61.75
+      "distance": 127,
+      "seconds": 82.66666666666667
     },
     {
       "bot": "human-touch",
@@ -18547,8 +18561,8 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "STRIP",
-      "distance": 33.53,
-      "seconds": 68.86666666666666
+      "distance": 118.33,
+      "seconds": 79.9
     },
     {
       "bot": "adaptive",
@@ -18630,13 +18644,13 @@
     {
       "bot": "human-keys",
       "seed": 184,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 33.37,
-      "seconds": 61.916666666666664
+      "distance": 127,
+      "seconds": 76.93333333333334
     },
     {
       "bot": "human-touch",
@@ -18646,8 +18660,8 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "STRIP",
-      "distance": 33.37,
-      "seconds": 61.516666666666666
+      "distance": 100.73,
+      "seconds": 75.81666666666666
     },
     {
       "bot": "adaptive",
@@ -18731,22 +18745,22 @@
       "seed": 185,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 43.21,
-      "seconds": 71.63333333333334
+      "distance": 50.92,
+      "seconds": 33.333333333333336
     },
     {
       "bot": "human-touch",
       "seed": 185,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 43.21,
-      "seconds": 71.63333333333334
+      "distance": 50.92,
+      "seconds": 31.583333333333332
     },
     {
       "bot": "adaptive",
@@ -18828,24 +18842,24 @@
     {
       "bot": "human-keys",
       "seed": 186,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 47.08,
-      "seconds": 72.36666666666666
+      "distance": 175,
+      "seconds": 98.85
     },
     {
       "bot": "human-touch",
       "seed": 186,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 47.08,
-      "seconds": 72.26666666666667
+      "distance": 175,
+      "seconds": 97.01666666666667
     },
     {
       "bot": "adaptive",
@@ -18927,13 +18941,13 @@
     {
       "bot": "human-keys",
       "seed": 187,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 35.09,
-      "seconds": 62.083333333333336
+      "distance": 207,
+      "seconds": 133.1
     },
     {
       "bot": "human-touch",
@@ -18943,8 +18957,8 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "STRIP",
-      "distance": 35.41,
-      "seconds": 69.3
+      "distance": 152.51,
+      "seconds": 95.16666666666667
     },
     {
       "bot": "adaptive",
@@ -19028,22 +19042,22 @@
       "seed": 188,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 38.5,
-      "seconds": 69.91666666666667
+      "distance": 45.06,
+      "seconds": 26.4
     },
     {
       "bot": "human-touch",
       "seed": 188,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 38.5,
-      "seconds": 70.26666666666667
+      "distance": 45.06,
+      "seconds": 27.6
     },
     {
       "bot": "adaptive",
@@ -19127,22 +19141,22 @@
       "seed": 189,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 19.83,
-      "seconds": 58.56666666666667
+      "distance": 26.17,
+      "seconds": 25.8
     },
     {
       "bot": "human-touch",
       "seed": 189,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 19.83,
-      "seconds": 57.8
+      "distance": 127,
+      "seconds": 64.73333333333333
     },
     {
       "bot": "adaptive",
@@ -19153,7 +19167,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 91.2
+      "seconds": 91.21666666666667
     },
     {
       "bot": "tracker",
@@ -19224,24 +19238,24 @@
     {
       "bot": "human-keys",
       "seed": 190,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 46.17,
-      "seconds": 79.95
+      "distance": 175,
+      "seconds": 100.51666666666667
     },
     {
       "bot": "human-touch",
       "seed": 190,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 46.17,
-      "seconds": 79.18333333333334
+      "distance": 175,
+      "seconds": 92.56666666666666
     },
     {
       "bot": "adaptive",
@@ -19323,24 +19337,24 @@
     {
       "bot": "human-keys",
       "seed": 191,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 20.28,
-      "seconds": 58.8
+      "distance": 127,
+      "seconds": 73.66666666666667
     },
     {
       "bot": "human-touch",
       "seed": 191,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 20.28,
-      "seconds": 58.11666666666667
+      "distance": 127,
+      "seconds": 79.4
     },
     {
       "bot": "adaptive",
@@ -19424,22 +19438,22 @@
       "seed": 192,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 30.33,
-      "seconds": 62.083333333333336
+      "distance": 37.34,
+      "seconds": 29.933333333333334
     },
     {
       "bot": "human-touch",
       "seed": 192,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 30.33,
-      "seconds": 61.45
+      "distance": 37.35,
+      "seconds": 29.483333333333334
     },
     {
       "bot": "adaptive",
@@ -19521,24 +19535,24 @@
     {
       "bot": "human-keys",
       "seed": 193,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 44.71,
-      "seconds": 72.36666666666666
+      "distance": 191,
+      "seconds": 105.48333333333333
     },
     {
       "bot": "human-touch",
       "seed": 193,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 44.71,
-      "seconds": 72.36666666666666
+      "distance": 51.21,
+      "seconds": 32.483333333333334
     },
     {
       "bot": "adaptive",
@@ -19622,22 +19636,22 @@
       "seed": 194,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 39.31,
-      "seconds": 63.266666666666666
+      "distance": 44.79,
+      "seconds": 33.03333333333333
     },
     {
       "bot": "human-touch",
       "seed": 194,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 39.04,
-      "seconds": 63.21666666666667
+      "distance": 191,
+      "seconds": 104.78333333333333
     },
     {
       "bot": "adaptive",
@@ -19724,8 +19738,8 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "STRIP",
-      "distance": 54.46,
-      "seconds": 81.26666666666667
+      "distance": 131.42,
+      "seconds": 97.55
     },
     {
       "bot": "human-touch",
@@ -19735,8 +19749,8 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "STRIP",
-      "distance": 54.46,
-      "seconds": 81.26666666666667
+      "distance": 166.92,
+      "seconds": 98.36666666666666
     },
     {
       "bot": "adaptive",
@@ -19820,22 +19834,22 @@
       "seed": 196,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 32.08,
-      "seconds": 61.25
+      "distance": 38.25,
+      "seconds": 28.466666666666665
     },
     {
       "bot": "human-touch",
       "seed": 196,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 32.08,
-      "seconds": 61.53333333333333
+      "distance": 191,
+      "seconds": 99.73333333333333
     },
     {
       "bot": "adaptive",
@@ -19846,7 +19860,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 76.41666666666667
+      "seconds": 76.63333333333334
     },
     {
       "bot": "tracker",
@@ -19919,22 +19933,22 @@
       "seed": 197,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 30,
-      "seconds": 60.93333333333333
+      "distance": 36.74,
+      "seconds": 22.583333333333332
     },
     {
       "bot": "human-touch",
       "seed": 197,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 30,
-      "seconds": 60.93333333333333
+      "distance": 36.74,
+      "seconds": 22.5
     },
     {
       "bot": "adaptive",
@@ -20018,22 +20032,22 @@
       "seed": 198,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 48.21,
-      "seconds": 63.93333333333333
+      "distance": 54.33,
+      "seconds": 30.05
     },
     {
       "bot": "human-touch",
       "seed": 198,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 48.21,
-      "seconds": 71.43333333333334
+      "distance": 54.33,
+      "seconds": 29.15
     },
     {
       "bot": "adaptive",
@@ -20120,19 +20134,19 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "STRIP",
-      "distance": 37.07,
-      "seconds": 70.43333333333334
+      "distance": 197.77,
+      "seconds": 128.18333333333334
     },
     {
       "bot": "human-touch",
       "seed": 199,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 37.07,
-      "seconds": 70.03333333333333
+      "distance": 42.35,
+      "seconds": 27.55
     },
     {
       "bot": "adaptive",
@@ -20216,22 +20230,22 @@
       "seed": 200,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 27.03,
-      "seconds": 59.8
+      "distance": 33.91,
+      "seconds": 22.633333333333333
     },
     {
       "bot": "human-touch",
       "seed": 200,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 26.75,
-      "seconds": 59.666666666666664
+      "distance": 143,
+      "seconds": 77.26666666666667
     }
   ],
   "jitterWins": {

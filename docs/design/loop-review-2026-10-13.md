@@ -88,3 +88,52 @@ In a trace (seed 1, human-keys) the Talent reaches the first **defang** gate at 
 5. **Gate film burn:** stop the 2× HOLD burn while the gate itself is holding her. This is a sim rule change and needs its own PR plus a hash bump. Expected: +5–10 pp as a safety margin.
 
 Fixes 1–3 together should land the human personas inside the 60–80% Backlot target. Re-run `npm run balance -- --stage=0 --mode=both --seeds=200 --jitter=8 --workers=8` after each.
+
+## Results after fixes
+
+Implemented fixes 1–4. Fix 5, the gate film burn, is not done. Two tuning tries were used.
+
+- **Leash → soft lost-her assist** (`assistInput`, `src/ui/input-map.ts`):
+  - It is inert while she is in frame. Out of frame, it ramps over the LOST HER grace to at most a 30% blend toward her.
+  - It is suspended while the player pans near an open defang gate or a hazard within `closeCallRadius` + 1. The defang cut is reachable again.
+- **Touch drag is 1:1:**
+  - `dragCameraTarget` turns finger px into world displacement at the current zoom, yaw and aspect.
+  - `panToward` chases that target with braking and stops on it, so there is no residual drift. A lifted drag settles where the finger left it.
+  - Device parity: a drag never pans faster than held keys (try 2).
+- **Far cuts (sim):**
+  - A gate stand-in framed out early and far is now cut (CUT/TOO FAR stamp, logged, no credit) instead of unloading intact.
+  - It is re-dressed on its mark when the shot is called, because the defang still needs a close cut.
+  - The HUD explains "TOO FAR" and "stand-in back on its mark".
+  - Hashes were bumped: seed 1 `e0c89e0d`, seed 19 `a80d24ad`, seed 2026 unchanged `9951f3d0`. See `DECISIONS.md`.
+- **Copy:** the defang toast and coach line 3 now state the close/far rule.
+
+### Tuning tries (`--stage=0 --mode=both --seeds=200 --jitter=8`)
+
+| try | change | human-keys Backlot | human-touch Backlot |
+|---|---|---|---|
+| 1 | fixes 1–3 | 69.5% | 91.5% (too high: a drag panned at full 127 vs keys' 90) |
+| 2 | drag capped at `KEY_PAN` (device parity) | **69.5%** | **65.5%** |
+
+### Final table, try 2 (Shoot, stage 0)
+
+| bot | completion | deaths by killer |
+|---|---|---|
+| adaptive (ceiling, no assist) | 99.5% | film 1 (MINIATURE CITY) |
+| tracker / gatekeeper / metronome / wide / close / chaos | 0% each | unchanged from before |
+| human-keys | 23.5% | offscreen 139, film 11, red-monitor 3 |
+| human-touch | 23% | offscreen 143, film 10, red-monitor 1 |
+
+Human deaths by scene:
+- human-keys: BACKLOT offscreen 57, film 4. MINIATURE CITY offscreen 53, film 4. NIGHT SHOOT offscreen 29, film 3, red-monitor 3.
+- human-touch: BACKLOT offscreen 68, film 1. MINIATURE CITY offscreen 52, film 6. NIGHT SHOOT offscreen 23, film 3, red-monitor 1.
+
+Other results:
+- Strip: Adaptive 100%, passive and scripted bots 0%, human-keys 59%, human-touch 62%.
+- Luck checks: jitter(gatekeeper) 0% of variants, jitter(adaptive) 99.7%.
+
+Deaths at the defang gate (film-out) are gone. What is left is mostly **offscreen**, so humans now lose her rather than stall. Remaining gate failures predate this change:
+- "one scene's share of adaptive deaths" (the only Adaptive death is in MINIATURE CITY);
+- passive FailReasons variety;
+- Backlot roster kinds (2).
+
+Next lever if the full-Shoot human clear needs to rise: Miniature City tracking, or fix 5.

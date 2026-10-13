@@ -17,12 +17,12 @@
       "runs": 200,
       "completed": 199,
       "completion": 0.995,
-      "meanDistance": 650.86,
+      "meanDistance": 650.87,
       "timeouts": 0,
       "clearSeconds": {
         "min": 252.9,
         "mean": 261.9,
-        "max": 271
+        "max": 271.1
       },
       "failReasons": {
         "out-of-film": 1
@@ -162,7 +162,7 @@
       "runs": 200,
       "completed": 0,
       "completion": 0,
-      "meanDistance": 28.62,
+      "meanDistance": 28.65,
       "timeouts": 0,
       "clearSeconds": null,
       "failReasons": {
@@ -185,45 +185,85 @@
     },
     "human-keys": {
       "runs": 200,
-      "completed": 0,
-      "completion": 0,
-      "meanDistance": 41.77,
+      "completed": 47,
+      "completion": 0.235,
+      "meanDistance": 315.76,
       "timeouts": 0,
-      "clearSeconds": null,
+      "clearSeconds": {
+        "min": 267.6,
+        "mean": 281.8,
+        "max": 312.6
+      },
       "failReasons": {
-        "out-of-film": 200
+        "lost-talent": 139,
+        "out-of-film": 11,
+        "hit": 3
       },
       "killers": {
-        "film": 200
+        "offscreen": 139,
+        "film": 11,
+        "red-monitor": 3
       },
       "scenes": {
-        "BACKLOT": 200
+        "MINIATURE CITY": 57,
+        "BACKLOT": 61,
+        "NIGHT SHOOT": 35
       },
       "sceneKillers": {
+        "MINIATURE CITY": {
+          "offscreen": 53,
+          "film": 4
+        },
         "BACKLOT": {
-          "film": 200
+          "film": 4,
+          "offscreen": 57
+        },
+        "NIGHT SHOOT": {
+          "offscreen": 29,
+          "film": 3,
+          "red-monitor": 3
         }
       }
     },
     "human-touch": {
       "runs": 200,
-      "completed": 0,
-      "completion": 0,
-      "meanDistance": 40.94,
+      "completed": 46,
+      "completion": 0.23,
+      "meanDistance": 298.34,
       "timeouts": 0,
-      "clearSeconds": null,
+      "clearSeconds": {
+        "min": 266.2,
+        "mean": 278.1,
+        "max": 292.7
+      },
       "failReasons": {
-        "out-of-film": 200
+        "lost-talent": 143,
+        "out-of-film": 10,
+        "hit": 1
       },
       "killers": {
-        "film": 200
+        "offscreen": 143,
+        "film": 10,
+        "red-monitor": 1
       },
       "scenes": {
-        "BACKLOT": 200
+        "BACKLOT": 69,
+        "MINIATURE CITY": 58,
+        "NIGHT SHOOT": 27
       },
       "sceneKillers": {
         "BACKLOT": {
-          "film": 200
+          "offscreen": 68,
+          "film": 1
+        },
+        "MINIATURE CITY": {
+          "offscreen": 52,
+          "film": 6
+        },
+        "NIGHT SHOOT": {
+          "offscreen": 23,
+          "film": 3,
+          "red-monitor": 1
         }
       }
     }
@@ -267,27 +307,27 @@
     },
     "adaptive": {
       "runs": 1600,
-      "completed": 1598,
-      "completion": 0.9988,
-      "meanDistance": 652.74,
+      "completed": 1595,
+      "completion": 0.9969,
+      "meanDistance": 652.28,
       "timeouts": 0,
       "clearSeconds": {
         "min": 253.4,
         "mean": 262.6,
-        "max": 272
+        "max": 272.5
       },
       "failReasons": {
-        "hit": 2
+        "hit": 5
       },
       "killers": {
-        "urchin": 2
+        "urchin": 5
       },
       "scenes": {
-        "NIGHT SHOOT": 2
+        "NIGHT SHOOT": 5
       },
       "sceneKillers": {
         "NIGHT SHOOT": {
-          "urchin": 2
+          "urchin": 5
         }
       },
       "winsHistogram": [
@@ -297,9 +337,9 @@
         0,
         0,
         0,
+        2,
         1,
-        0,
-        199
+        197
       ]
     }
   },
@@ -330,7 +370,7 @@
     },
     {
       "name": "adaptive / passive mean distance",
-      "value": "32.559×",
+      "value": "32.56×",
       "target": "≥ 1.5×",
       "pass": true
     },
@@ -359,20 +399,20 @@
       "pass": true
     },
     {
-      "name": "adaptive is the ceiling (perfect-information reflexes, no leash)",
+      "name": "adaptive is the ceiling (perfect-information reflexes, no assist)",
       "value": "99.5%",
       "target": "ceiling",
       "pass": null
     },
     {
       "name": "human-keys Backlot clear",
-      "value": "0%",
+      "value": "69.5%",
       "target": "60–80% (target, report-only)",
       "pass": null
     },
     {
       "name": "human-touch Backlot clear",
-      "value": "0%",
+      "value": "65.5%",
       "target": "60–80% (target, report-only)",
       "pass": null
     }
@@ -434,7 +474,7 @@
     },
     {
       "name": "duration: Adaptive clear sim time",
-      "value": "252.9 / 261.9 / 271 s",
+      "value": "252.9 / 261.9 / 271.1 s",
       "target": "180–480 s",
       "pass": true
     }
@@ -449,7 +489,7 @@
       "killer": null,
       "scene": "LONG TAKE",
       "distance": 654.86,
-      "seconds": 263.03333333333336
+      "seconds": 263.01666666666665
     },
     {
       "bot": "tracker",
@@ -522,22 +562,22 @@
       "seed": 1,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 44.89,
-      "seconds": 61.31666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 244.64,
+      "seconds": 109.76666666666667
     },
     {
       "bot": "human-touch",
       "seed": 1,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 44.41,
-      "seconds": 61.21666666666667
+      "distance": 53.03,
+      "seconds": 27.633333333333333
     },
     {
       "bot": "adaptive",
@@ -548,7 +588,7 @@
       "killer": null,
       "scene": "LONG TAKE",
       "distance": 648.08,
-      "seconds": 259.51666666666665
+      "seconds": 259.75
     },
     {
       "bot": "tracker",
@@ -624,19 +664,19 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "BACKLOT",
-      "distance": 46.78,
-      "seconds": 61.666666666666664
+      "distance": 161.44,
+      "seconds": 79.06666666666666
     },
     {
       "bot": "human-touch",
       "seed": 2,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 43.76,
-      "seconds": 61.06666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 232.3,
+      "seconds": 97.55
     },
     {
       "bot": "adaptive",
@@ -720,22 +760,22 @@
       "seed": 3,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 39.72,
-      "seconds": 67.81666666666666
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 437.1,
+      "seconds": 198.68333333333334
     },
     {
       "bot": "human-touch",
       "seed": 3,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 38.92,
-      "seconds": 67.65
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 433,
+      "seconds": 195.95
     },
     {
       "bot": "adaptive",
@@ -819,22 +859,22 @@
       "seed": 4,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 42.81,
-      "seconds": 60.86666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 221.45,
+      "seconds": 109.45
     },
     {
       "bot": "human-touch",
       "seed": 4,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 42.81,
-      "seconds": 60.86666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 223.42,
+      "seconds": 97.46666666666667
     },
     {
       "bot": "adaptive",
@@ -845,7 +885,7 @@
       "killer": null,
       "scene": "LONG TAKE",
       "distance": 653.48,
-      "seconds": 261.78333333333336
+      "seconds": 261.93333333333334
     },
     {
       "bot": "tracker",
@@ -918,22 +958,22 @@
       "seed": 5,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 40.76,
-      "seconds": 60.483333333333334
+      "distance": 48.74,
+      "seconds": 23.366666666666667
     },
     {
       "bot": "human-touch",
       "seed": 5,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 40.76,
-      "seconds": 67.98333333333333
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 229.04,
+      "seconds": 99.86666666666666
     },
     {
       "bot": "adaptive",
@@ -944,7 +984,7 @@
       "killer": null,
       "scene": "LONG TAKE",
       "distance": 648.34,
-      "seconds": 259.93333333333334
+      "seconds": 259.9166666666667
     },
     {
       "bot": "tracker",
@@ -1017,22 +1057,22 @@
       "seed": 6,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 34.28,
-      "seconds": 59.25
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 239.07,
+      "seconds": 105.86666666666666
     },
     {
       "bot": "human-touch",
       "seed": 6,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 32.34,
-      "seconds": 58.85
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 236.43,
+      "seconds": 101.38333333333334
     },
     {
       "bot": "adaptive",
@@ -1043,7 +1083,7 @@
       "killer": null,
       "scene": "LONG TAKE",
       "distance": 652.44,
-      "seconds": 261.76666666666665
+      "seconds": 261.96666666666664
     },
     {
       "bot": "tracker",
@@ -1116,22 +1156,22 @@
       "seed": 7,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 42.75,
-      "seconds": 60.86666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 404.75,
+      "seconds": 173.63333333333333
     },
     {
       "bot": "human-touch",
       "seed": 7,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 40.81,
-      "seconds": 67.96666666666667
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 652.21,
+      "seconds": 276.25
     },
     {
       "bot": "adaptive",
@@ -1217,20 +1257,20 @@
       "timedOut": false,
       "failed": "out-of-film",
       "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 45.13,
-      "seconds": 61.35
+      "scene": "NIGHT SHOOT",
+      "distance": 408.5,
+      "seconds": 233
     },
     {
       "bot": "human-touch",
       "seed": 8,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 43.86,
-      "seconds": 61.1
+      "distance": 54.89,
+      "seconds": 26.65
     },
     {
       "bot": "adaptive",
@@ -1314,11 +1354,11 @@
       "seed": 9,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 32.29,
-      "seconds": 58.85
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 440.04,
+      "seconds": 193.06666666666666
     },
     {
       "bot": "human-touch",
@@ -1327,9 +1367,9 @@
       "timedOut": false,
       "failed": "out-of-film",
       "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 33.83,
-      "seconds": 59.15
+      "scene": "MINIATURE CITY",
+      "distance": 237.93,
+      "seconds": 117
     },
     {
       "bot": "adaptive",
@@ -1339,8 +1379,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 653.9,
-      "seconds": 262.43333333333334
+      "distance": 653.85,
+      "seconds": 262.76666666666665
     },
     {
       "bot": "tracker",
@@ -1411,24 +1451,24 @@
     {
       "bot": "human-keys",
       "seed": 10,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 43.44,
-      "seconds": 68.51666666666667
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 662.02,
+      "seconds": 278.3
     },
     {
       "bot": "human-touch",
       "seed": 10,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 41.5,
-      "seconds": 60.63333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 657.45,
+      "seconds": 275.68333333333334
     },
     {
       "bot": "adaptive",
@@ -1512,22 +1552,22 @@
       "seed": 11,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 48.85,
-      "seconds": 62.06666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 220.5,
+      "seconds": 99.03333333333333
     },
     {
       "bot": "human-touch",
       "seed": 11,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 49.77,
-      "seconds": 62.25
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 224.08,
+      "seconds": 97.18333333333334
     },
     {
       "bot": "adaptive",
@@ -1611,11 +1651,11 @@
       "seed": 12,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 33.33,
-      "seconds": 59.05
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 429.76,
+      "seconds": 184.73333333333332
     },
     {
       "bot": "human-touch",
@@ -1624,9 +1664,9 @@
       "timedOut": false,
       "failed": "out-of-film",
       "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 31.4,
-      "seconds": 58.65
+      "scene": "MINIATURE CITY",
+      "distance": 251.48,
+      "seconds": 115.58333333333333
     },
     {
       "bot": "adaptive",
@@ -1708,24 +1748,24 @@
     {
       "bot": "human-keys",
       "seed": 13,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 36.52,
-      "seconds": 59.68333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 662.33,
+      "seconds": 279.1166666666667
     },
     {
       "bot": "human-touch",
       "seed": 13,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 35.5,
-      "seconds": 59.483333333333334
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 659.67,
+      "seconds": 287.06666666666666
     },
     {
       "bot": "adaptive",
@@ -1809,22 +1849,22 @@
       "seed": 14,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 45,
-      "seconds": 68.81666666666666
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 224.59,
+      "seconds": 111.75
     },
     {
       "bot": "human-touch",
       "seed": 14,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 45,
-      "seconds": 68.81666666666666
+      "distance": 54.67,
+      "seconds": 24
     },
     {
       "bot": "adaptive",
@@ -1906,24 +1946,24 @@
     {
       "bot": "human-keys",
       "seed": 15,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 54.43,
-      "seconds": 78.18333333333334
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 659.59,
+      "seconds": 276.3833333333333
     },
     {
       "bot": "human-touch",
       "seed": 15,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 54.43,
-      "seconds": 78.18333333333334
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 431.2,
+      "seconds": 194.31666666666666
     },
     {
       "bot": "adaptive",
@@ -2005,24 +2045,24 @@
     {
       "bot": "human-keys",
       "seed": 16,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 46.17,
-      "seconds": 61.53333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 657.3,
+      "seconds": 275.1333333333333
     },
     {
       "bot": "human-touch",
       "seed": 16,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 46.17,
-      "seconds": 61.53333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 660.76,
+      "seconds": 273.76666666666665
     },
     {
       "bot": "adaptive",
@@ -2106,22 +2146,22 @@
       "seed": 17,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 45.89,
-      "seconds": 69
+      "distance": 53.76,
+      "seconds": 26.266666666666666
     },
     {
       "bot": "human-touch",
       "seed": 17,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 46.34,
-      "seconds": 69.1
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 664.23,
+      "seconds": 282.18333333333334
     },
     {
       "bot": "adaptive",
@@ -2205,22 +2245,22 @@
       "seed": 18,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 52.94,
-      "seconds": 77.9
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 433.5,
+      "seconds": 191.23333333333332
     },
     {
       "bot": "human-touch",
       "seed": 18,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 50.55,
-      "seconds": 69.91666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 253.21,
+      "seconds": 115.98333333333333
     },
     {
       "bot": "adaptive",
@@ -2230,8 +2270,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 639.71,
-      "seconds": 256.05
+      "distance": 639.72,
+      "seconds": 256.1333333333333
     },
     {
       "bot": "tracker",
@@ -2302,24 +2342,24 @@
     {
       "bot": "human-keys",
       "seed": 19,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 39.21,
-      "seconds": 60.18333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 642.53,
+      "seconds": 267.81666666666666
     },
     {
       "bot": "human-touch",
       "seed": 19,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 39.51,
-      "seconds": 60.25
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 643.97,
+      "seconds": 272.3333333333333
     },
     {
       "bot": "adaptive",
@@ -2329,8 +2369,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 653.12,
-      "seconds": 262.0833333333333
+      "distance": 653.08,
+      "seconds": 262.48333333333335
     },
     {
       "bot": "tracker",
@@ -2403,22 +2443,22 @@
       "seed": 20,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 44.4,
-      "seconds": 61.21666666666667
+      "distance": 52.27,
+      "seconds": 27.1
     },
     {
       "bot": "human-touch",
       "seed": 20,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 43.88,
-      "seconds": 68.61666666666666
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 657.14,
+      "seconds": 274.68333333333334
     },
     {
       "bot": "adaptive",
@@ -2429,7 +2469,7 @@
       "killer": null,
       "scene": "LONG TAKE",
       "distance": 631.31,
-      "seconds": 253.33333333333334
+      "seconds": 253.35
     },
     {
       "bot": "tracker",
@@ -2502,22 +2542,22 @@
       "seed": 21,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 41.43,
-      "seconds": 68.11666666666666
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 404.25,
+      "seconds": 175.16666666666666
     },
     {
       "bot": "human-touch",
       "seed": 21,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 40.89,
-      "seconds": 60.5
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 633.69,
+      "seconds": 266.1666666666667
     },
     {
       "bot": "adaptive",
@@ -2601,22 +2641,22 @@
       "seed": 22,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 35.58,
-      "seconds": 59.483333333333334
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 425.55,
+      "seconds": 181.45
     },
     {
       "bot": "human-touch",
       "seed": 22,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 35.42,
-      "seconds": 59.45
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 236.9,
+      "seconds": 101.43333333333334
     },
     {
       "bot": "adaptive",
@@ -2627,7 +2667,7 @@
       "killer": null,
       "scene": "LONG TAKE",
       "distance": 641.21,
-      "seconds": 256.93333333333334
+      "seconds": 256.98333333333335
     },
     {
       "bot": "tracker",
@@ -2700,22 +2740,22 @@
       "seed": 23,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 37.39,
-      "seconds": 59.81666666666667
+      "distance": 45.35,
+      "seconds": 23.133333333333333
     },
     {
       "bot": "human-touch",
       "seed": 23,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 37.39,
-      "seconds": 67.31666666666666
+      "distance": 45.3,
+      "seconds": 20.683333333333334
     },
     {
       "bot": "adaptive",
@@ -2799,22 +2839,22 @@
       "seed": 24,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 47.72,
-      "seconds": 69.36666666666666
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 400.45,
+      "seconds": 186.38333333333333
     },
     {
       "bot": "human-touch",
       "seed": 24,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 45.79,
-      "seconds": 68.96666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 401.56,
+      "seconds": 177.86666666666667
     },
     {
       "bot": "adaptive",
@@ -2898,22 +2938,22 @@
       "seed": 25,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 42.22,
-      "seconds": 60.78333333333333
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 436.78,
+      "seconds": 194.05
     },
     {
       "bot": "human-touch",
       "seed": 25,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 42.22,
-      "seconds": 60.78333333333333
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 238.02,
+      "seconds": 104
     },
     {
       "bot": "adaptive",
@@ -2995,24 +3035,24 @@
     {
       "bot": "human-keys",
       "seed": 26,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 35.49,
-      "seconds": 59.483333333333334
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 656.75,
+      "seconds": 283.31666666666666
     },
     {
       "bot": "human-touch",
       "seed": 26,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 32.81,
-      "seconds": 58.95
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 653.9,
+      "seconds": 281.4166666666667
     },
     {
       "bot": "adaptive",
@@ -3096,22 +3136,22 @@
       "seed": 27,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 39.84,
-      "seconds": 60.333333333333336
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 229.96,
+      "seconds": 101.11666666666666
     },
     {
       "bot": "human-touch",
       "seed": 27,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 38.35,
-      "seconds": 67.53333333333333
+      "distance": 46.31,
+      "seconds": 23.366666666666667
     },
     {
       "bot": "adaptive",
@@ -3121,8 +3161,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 659.44,
-      "seconds": 264.0833333333333
+      "distance": 659.45,
+      "seconds": 264.28333333333336
     },
     {
       "bot": "tracker",
@@ -3193,24 +3233,24 @@
     {
       "bot": "human-keys",
       "seed": 28,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 39.51,
-      "seconds": 67.73333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 663.78,
+      "seconds": 278.8833333333333
     },
     {
       "bot": "human-touch",
       "seed": 28,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 39.51,
-      "seconds": 67.73333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 660.79,
+      "seconds": 278.05
     },
     {
       "bot": "adaptive",
@@ -3294,22 +3334,22 @@
       "seed": 29,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 35.52,
-      "seconds": 59.483333333333334
+      "distance": 43.55,
+      "seconds": 27.783333333333335
     },
     {
       "bot": "human-touch",
       "seed": 29,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 34.47,
-      "seconds": 59.266666666666666
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 231.84,
+      "seconds": 107.71666666666667
     },
     {
       "bot": "adaptive",
@@ -3319,8 +3359,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 658.35,
-      "seconds": 264.1666666666667
+      "distance": 658.3,
+      "seconds": 264.28333333333336
     },
     {
       "bot": "tracker",
@@ -3391,13 +3431,13 @@
     {
       "bot": "human-keys",
       "seed": 30,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 50.54,
-      "seconds": 62.416666666666664
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 659.18,
+      "seconds": 293.71666666666664
     },
     {
       "bot": "human-touch",
@@ -3406,9 +3446,9 @@
       "timedOut": false,
       "failed": "out-of-film",
       "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 49.96,
-      "seconds": 62.3
+      "scene": "NIGHT SHOOT",
+      "distance": 534.4,
+      "seconds": 228.35
     },
     {
       "bot": "adaptive",
@@ -3492,22 +3532,22 @@
       "seed": 31,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 47.56,
-      "seconds": 61.81666666666667
+      "failed": "hit",
+      "killer": "red-monitor",
+      "scene": "NIGHT SHOOT",
+      "distance": 538.1,
+      "seconds": 240.5
     },
     {
       "bot": "human-touch",
       "seed": 31,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 47.56,
-      "seconds": 61.81666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 228.14,
+      "seconds": 97.55
     },
     {
       "bot": "adaptive",
@@ -3517,8 +3557,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 651.89,
-      "seconds": 261.03333333333336
+      "distance": 651.86,
+      "seconds": 261.25
     },
     {
       "bot": "tracker",
@@ -3591,22 +3631,22 @@
       "seed": 32,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 52.21,
-      "seconds": 62.75
+      "distance": 60.12,
+      "seconds": 33.016666666666666
     },
     {
       "bot": "human-touch",
       "seed": 32,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 53.85,
-      "seconds": 70.56666666666666
+      "distance": 58.76,
+      "seconds": 32.55
     },
     {
       "bot": "adaptive",
@@ -3616,8 +3656,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 665.56,
-      "seconds": 267.53333333333336
+      "distance": 665.57,
+      "seconds": 267.45
     },
     {
       "bot": "tracker",
@@ -3688,24 +3728,24 @@
     {
       "bot": "human-keys",
       "seed": 33,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 46.12,
-      "seconds": 61.53333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 671.73,
+      "seconds": 283.2
     },
     {
       "bot": "human-touch",
       "seed": 33,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 46.12,
-      "seconds": 61.53333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 673.11,
+      "seconds": 286.31666666666666
     },
     {
       "bot": "adaptive",
@@ -3716,7 +3756,7 @@
       "killer": null,
       "scene": "LONG TAKE",
       "distance": 649.71,
-      "seconds": 260.3666666666667
+      "seconds": 260.53333333333336
     },
     {
       "bot": "tracker",
@@ -3789,22 +3829,22 @@
       "seed": 34,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 43.64,
-      "seconds": 61.06666666666667
+      "distance": 51.68,
+      "seconds": 24.866666666666667
     },
     {
       "bot": "human-touch",
       "seed": 34,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 44.37,
-      "seconds": 61.21666666666667
+      "distance": 52.25,
+      "seconds": 25.65
     },
     {
       "bot": "adaptive",
@@ -3888,22 +3928,22 @@
       "seed": 35,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 31.66,
-      "seconds": 66.23333333333333
+      "distance": 39.62,
+      "seconds": 18.883333333333333
     },
     {
       "bot": "human-touch",
       "seed": 35,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 30.81,
-      "seconds": 66.05
+      "distance": 40.74,
+      "seconds": 21.016666666666666
     },
     {
       "bot": "adaptive",
@@ -3987,22 +4027,22 @@
       "seed": 36,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 37.7,
-      "seconds": 59.9
+      "distance": 45.74,
+      "seconds": 21.083333333333332
     },
     {
       "bot": "human-touch",
       "seed": 36,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 37.7,
-      "seconds": 59.9
+      "distance": 45.65,
+      "seconds": 20.816666666666666
     },
     {
       "bot": "adaptive",
@@ -4086,22 +4126,22 @@
       "seed": 37,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 36.12,
-      "seconds": 59.63333333333333
+      "distance": 44.06,
+      "seconds": 24.283333333333335
     },
     {
       "bot": "human-touch",
       "seed": 37,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 34.19,
-      "seconds": 59.233333333333334
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 427.89,
+      "seconds": 187.83333333333334
     },
     {
       "bot": "adaptive",
@@ -4185,22 +4225,22 @@
       "seed": 38,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 36.85,
-      "seconds": 59.75
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 228.19,
+      "seconds": 100
     },
     {
       "bot": "human-touch",
       "seed": 38,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 34.91,
-      "seconds": 59.36666666666667
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 662.81,
+      "seconds": 279.8333333333333
     },
     {
       "bot": "adaptive",
@@ -4284,22 +4324,22 @@
       "seed": 39,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 28.67,
-      "seconds": 58.15
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 426.1,
+      "seconds": 205.78333333333333
     },
     {
       "bot": "human-touch",
       "seed": 39,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 26.73,
-      "seconds": 57.766666666666666
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 424.44,
+      "seconds": 190.55
     },
     {
       "bot": "adaptive",
@@ -4383,22 +4423,22 @@
       "seed": 40,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 43.46,
-      "seconds": 68.55
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 251.2,
+      "seconds": 140.93333333333334
     },
     {
       "bot": "human-touch",
       "seed": 40,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 40.91,
-      "seconds": 68.03333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 668.27,
+      "seconds": 279.4
     },
     {
       "bot": "adaptive",
@@ -4482,22 +4522,22 @@
       "seed": 41,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 47.04,
-      "seconds": 69.21666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 238.07,
+      "seconds": 108.73333333333333
     },
     {
       "bot": "human-touch",
       "seed": 41,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 47.08,
-      "seconds": 61.71666666666667
+      "distance": 57.13,
+      "seconds": 34.9
     },
     {
       "bot": "adaptive",
@@ -4507,8 +4547,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 658.87,
-      "seconds": 263.75
+      "distance": 658.86,
+      "seconds": 264
     },
     {
       "bot": "tracker",
@@ -4581,11 +4621,11 @@
       "seed": 42,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 35.15,
-      "seconds": 59.416666666666664
+      "distance": 43.14,
+      "seconds": 21.9
     },
     {
       "bot": "human-touch",
@@ -4594,9 +4634,9 @@
       "timedOut": false,
       "failed": "out-of-film",
       "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 34.18,
-      "seconds": 59.21666666666667
+      "scene": "NIGHT SHOOT",
+      "distance": 538.94,
+      "seconds": 241.06666666666666
     },
     {
       "bot": "adaptive",
@@ -4606,8 +4646,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 655.98,
-      "seconds": 262.8
+      "distance": 656.11,
+      "seconds": 263.1166666666667
     },
     {
       "bot": "tracker",
@@ -4678,24 +4718,24 @@
     {
       "bot": "human-keys",
       "seed": 43,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 46.44,
-      "seconds": 61.6
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 663.42,
+      "seconds": 278.1666666666667
     },
     {
       "bot": "human-touch",
       "seed": 43,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 44.44,
-      "seconds": 68.71666666666667
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 661.17,
+      "seconds": 271.95
     },
     {
       "bot": "adaptive",
@@ -4790,11 +4830,11 @@
       "seed": 44,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 38.83,
-      "seconds": 60.13333333333333
+      "distance": 47.77,
+      "seconds": 21.6
     },
     {
       "bot": "adaptive",
@@ -4870,30 +4910,30 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 46.51,
-      "seconds": 23.6
+      "distance": 58.63,
+      "seconds": 23.25
     },
     {
       "bot": "human-keys",
       "seed": 45,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 47.78,
-      "seconds": 69.36666666666666
+      "distance": 55.57,
+      "seconds": 27.283333333333335
     },
     {
       "bot": "human-touch",
       "seed": 45,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 48.36,
-      "seconds": 61.983333333333334
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 221.44,
+      "seconds": 109.26666666666667
     },
     {
       "bot": "adaptive",
@@ -4903,8 +4943,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 643.87,
-      "seconds": 258
+      "distance": 643.88,
+      "seconds": 258.21666666666664
     },
     {
       "bot": "tracker",
@@ -4977,22 +5017,22 @@
       "seed": 46,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 28.61,
-      "seconds": 65.63333333333334
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 227.53,
+      "seconds": 120.91666666666667
     },
     {
       "bot": "human-touch",
       "seed": 46,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.94,
-      "seconds": 65.5
+      "distance": 37.83,
+      "seconds": 19.483333333333334
     },
     {
       "bot": "adaptive",
@@ -5076,22 +5116,22 @@
       "seed": 47,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 34.02,
-      "seconds": 66.66666666666667
+      "distance": 42.05,
+      "seconds": 21.816666666666666
     },
     {
       "bot": "human-touch",
       "seed": 47,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 35.15,
-      "seconds": 66.9
+      "distance": 42.05,
+      "seconds": 19.283333333333335
     },
     {
       "bot": "adaptive",
@@ -5175,22 +5215,22 @@
       "seed": 48,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 32.76,
-      "seconds": 66.43333333333334
+      "distance": 40,
+      "seconds": 18.316666666666666
     },
     {
       "bot": "human-touch",
       "seed": 48,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 32.01,
-      "seconds": 66.28333333333333
+      "distance": 40.08,
+      "seconds": 19.45
     },
     {
       "bot": "adaptive",
@@ -5200,8 +5240,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 655.74,
-      "seconds": 263.21666666666664
+      "distance": 655.79,
+      "seconds": 262.9
     },
     {
       "bot": "tracker",
@@ -5274,22 +5314,22 @@
       "seed": 49,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 40.81,
-      "seconds": 68.01666666666667
+      "distance": 48.84,
+      "seconds": 35
     },
     {
       "bot": "human-touch",
       "seed": 49,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 40.81,
-      "seconds": 68.01666666666667
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 656.87,
+      "seconds": 274.8666666666667
     },
     {
       "bot": "adaptive",
@@ -5373,22 +5413,22 @@
       "seed": 50,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 51.69,
-      "seconds": 62.65
+      "distance": 59.55,
+      "seconds": 28.616666666666667
     },
     {
       "bot": "human-touch",
       "seed": 50,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 50.75,
-      "seconds": 62.46666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 421.25,
+      "seconds": 189.1
     },
     {
       "bot": "adaptive",
@@ -5472,22 +5512,22 @@
       "seed": 51,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 62.26,
-      "seconds": 72.25
+      "distance": 70.04,
+      "seconds": 31.35
     },
     {
       "bot": "human-touch",
       "seed": 51,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 63.26,
-      "seconds": 79.95
+      "distance": 71.08,
+      "seconds": 35.083333333333336
     },
     {
       "bot": "adaptive",
@@ -5497,8 +5537,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 653.26,
-      "seconds": 261.7
+      "distance": 653.24,
+      "seconds": 262.01666666666665
     },
     {
       "bot": "tracker",
@@ -5571,22 +5611,22 @@
       "seed": 52,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 31.89,
-      "seconds": 58.766666666666666
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 237.01,
+      "seconds": 103.31666666666666
     },
     {
       "bot": "human-touch",
       "seed": 52,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 32.34,
-      "seconds": 58.85
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 236.72,
+      "seconds": 104.28333333333333
     },
     {
       "bot": "adaptive",
@@ -5670,22 +5710,22 @@
       "seed": 53,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 46.53,
-      "seconds": 61.63333333333333
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 226.12,
+      "seconds": 97.75
     },
     {
       "bot": "human-touch",
       "seed": 53,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 44.6,
-      "seconds": 61.233333333333334
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 224.12,
+      "seconds": 93.68333333333334
     },
     {
       "bot": "adaptive",
@@ -5769,22 +5809,22 @@
       "seed": 54,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 34.52,
-      "seconds": 59.3
+      "distance": 42.55,
+      "seconds": 21.9
     },
     {
       "bot": "human-touch",
       "seed": 54,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 31.11,
-      "seconds": 58.61666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 226.21,
+      "seconds": 100.5
     },
     {
       "bot": "adaptive",
@@ -5868,22 +5908,22 @@
       "seed": 55,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 28.19,
-      "seconds": 58.05
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 219.79,
+      "seconds": 104.03333333333333
     },
     {
       "bot": "human-touch",
       "seed": 55,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 28.19,
-      "seconds": 58.05
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 222.54,
+      "seconds": 98.23333333333333
     },
     {
       "bot": "adaptive",
@@ -5894,7 +5934,7 @@
       "killer": null,
       "scene": "LONG TAKE",
       "distance": 653.78,
-      "seconds": 262.01666666666665
+      "seconds": 262.26666666666665
     },
     {
       "bot": "tracker",
@@ -5967,22 +6007,22 @@
       "seed": 56,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 36.33,
-      "seconds": 59.61666666666667
+      "distance": 44.29,
+      "seconds": 20.35
     },
     {
       "bot": "human-touch",
       "seed": 56,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 36.34,
-      "seconds": 67.11666666666666
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 248.47,
+      "seconds": 127.08333333333333
     },
     {
       "bot": "adaptive",
@@ -6066,22 +6106,22 @@
       "seed": 57,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 41.06,
-      "seconds": 68.06666666666666
+      "distance": 49.02,
+      "seconds": 26.433333333333334
     },
     {
       "bot": "human-touch",
       "seed": 57,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 42.59,
-      "seconds": 68.36666666666666
+      "distance": 53.06,
+      "seconds": 29.5
     },
     {
       "bot": "adaptive",
@@ -6163,24 +6203,24 @@
     {
       "bot": "human-keys",
       "seed": 58,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 33.38,
-      "seconds": 59.06666666666667
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 667.8,
+      "seconds": 282.8
     },
     {
       "bot": "human-touch",
       "seed": 58,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 33.67,
-      "seconds": 59.11666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 231.29,
+      "seconds": 102.81666666666666
     },
     {
       "bot": "adaptive",
@@ -6262,24 +6302,24 @@
     {
       "bot": "human-keys",
       "seed": 59,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 44.64,
-      "seconds": 68.75
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 650.78,
+      "seconds": 280.46666666666664
     },
     {
       "bot": "human-touch",
       "seed": 59,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 44.64,
-      "seconds": 68.75
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 243.22,
+      "seconds": 106.08333333333333
     },
     {
       "bot": "adaptive",
@@ -6363,22 +6403,22 @@
       "seed": 60,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 43.36,
-      "seconds": 68.53333333333333
+      "distance": 51.32,
+      "seconds": 26.516666666666666
     },
     {
       "bot": "human-touch",
       "seed": 60,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 42.74,
-      "seconds": 68.4
+      "distance": 49.58,
+      "seconds": 25.233333333333334
     },
     {
       "bot": "adaptive",
@@ -6460,24 +6500,24 @@
     {
       "bot": "human-keys",
       "seed": 61,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 45.2,
-      "seconds": 68.85
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 642.1,
+      "seconds": 289.93333333333334
     },
     {
       "bot": "human-touch",
       "seed": 61,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 45.2,
-      "seconds": 61.35
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 646.76,
+      "seconds": 278.1
     },
     {
       "bot": "adaptive",
@@ -6561,22 +6601,22 @@
       "seed": 62,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 29.55,
-      "seconds": 65.81666666666666
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 425.76,
+      "seconds": 186.88333333333333
     },
     {
       "bot": "human-touch",
       "seed": 62,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 30.43,
-      "seconds": 65.98333333333333
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 426.54,
+      "seconds": 202.26666666666668
     },
     {
       "bot": "adaptive",
@@ -6586,8 +6626,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 639.72,
-      "seconds": 258
+      "distance": 639.77,
+      "seconds": 258.8666666666667
     },
     {
       "bot": "tracker",
@@ -6660,22 +6700,22 @@
       "seed": 63,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 57.7,
-      "seconds": 71.3
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 231.07,
+      "seconds": 112.65
     },
     {
       "bot": "human-touch",
       "seed": 63,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 58.37,
-      "seconds": 78.93333333333334
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 643.43,
+      "seconds": 270.8666666666667
     },
     {
       "bot": "adaptive",
@@ -6759,22 +6799,22 @@
       "seed": 64,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 43.4,
-      "seconds": 68.51666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 222.33,
+      "seconds": 97.56666666666666
     },
     {
       "bot": "human-touch",
       "seed": 64,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 41.55,
-      "seconds": 68.15
+      "distance": 53.13,
+      "seconds": 25.75
     },
     {
       "bot": "adaptive",
@@ -6858,22 +6898,22 @@
       "seed": 65,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 47.71,
-      "seconds": 61.86666666666667
+      "distance": 55.45,
+      "seconds": 33.05
     },
     {
       "bot": "human-touch",
       "seed": 65,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 45.77,
-      "seconds": 68.96666666666667
+      "distance": 55.45,
+      "seconds": 28.166666666666668
     },
     {
       "bot": "adaptive",
@@ -6955,24 +6995,24 @@
     {
       "bot": "human-keys",
       "seed": 66,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 45.94,
-      "seconds": 61.53333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 657.22,
+      "seconds": 282.28333333333336
     },
     {
       "bot": "human-touch",
       "seed": 66,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 45.5,
-      "seconds": 61.45
+      "distance": 52.69,
+      "seconds": 28.25
     },
     {
       "bot": "adaptive",
@@ -7056,22 +7096,22 @@
       "seed": 67,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 46.22,
-      "seconds": 61.56666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 227.58,
+      "seconds": 104
     },
     {
       "bot": "human-touch",
       "seed": 67,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 45.57,
-      "seconds": 68.95
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 228.31,
+      "seconds": 102.41666666666667
     },
     {
       "bot": "adaptive",
@@ -7155,22 +7195,22 @@
       "seed": 68,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 35.82,
-      "seconds": 59.55
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 405.68,
+      "seconds": 179.71666666666667
     },
     {
       "bot": "human-touch",
       "seed": 68,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 35,
-      "seconds": 59.38333333333333
+      "distance": 45.02,
+      "seconds": 22.933333333333334
     },
     {
       "bot": "adaptive",
@@ -7180,8 +7220,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 652.53,
-      "seconds": 261.8333333333333
+      "distance": 652.58,
+      "seconds": 261.7
     },
     {
       "bot": "tracker",
@@ -7252,13 +7292,13 @@
     {
       "bot": "human-keys",
       "seed": 69,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 35.65,
-      "seconds": 59.5
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 659.71,
+      "seconds": 288.6
     },
     {
       "bot": "human-touch",
@@ -7267,9 +7307,9 @@
       "timedOut": false,
       "failed": "out-of-film",
       "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 33.05,
-      "seconds": 58.983333333333334
+      "scene": "MINIATURE CITY",
+      "distance": 291.48,
+      "seconds": 140.61666666666667
     },
     {
       "bot": "adaptive",
@@ -7351,24 +7391,24 @@
     {
       "bot": "human-keys",
       "seed": 70,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 46.44,
-      "seconds": 61.6
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 666.4,
+      "seconds": 280.9166666666667
     },
     {
       "bot": "human-touch",
       "seed": 70,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 44.44,
-      "seconds": 68.7
+      "failed": "hit",
+      "killer": "red-monitor",
+      "scene": "NIGHT SHOOT",
+      "distance": 547.07,
+      "seconds": 236.16666666666666
     },
     {
       "bot": "adaptive",
@@ -7452,22 +7492,22 @@
       "seed": 71,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 47.15,
-      "seconds": 69.25
+      "distance": 55.07,
+      "seconds": 28.983333333333334
     },
     {
       "bot": "human-touch",
       "seed": 71,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 47.15,
-      "seconds": 69.25
+      "distance": 54.94,
+      "seconds": 26.5
     },
     {
       "bot": "adaptive",
@@ -7478,7 +7518,7 @@
       "killer": null,
       "scene": "LONG TAKE",
       "distance": 654.04,
-      "seconds": 261.75
+      "seconds": 262.05
     },
     {
       "bot": "tracker",
@@ -7551,22 +7591,22 @@
       "seed": 72,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 35.1,
-      "seconds": 59.416666666666664
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 241.68,
+      "seconds": 109.65
     },
     {
       "bot": "human-touch",
       "seed": 72,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 35.1,
-      "seconds": 59.416666666666664
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 239.75,
+      "seconds": 103.18333333333334
     },
     {
       "bot": "adaptive",
@@ -7576,8 +7616,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 651.59,
-      "seconds": 261.15
+      "distance": 651.72,
+      "seconds": 261.53333333333336
     },
     {
       "bot": "tracker",
@@ -7648,24 +7688,24 @@
     {
       "bot": "human-keys",
       "seed": 73,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 57.11,
-      "seconds": 63.71666666666667
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 652.27,
+      "seconds": 267.6
     },
     {
       "bot": "human-touch",
       "seed": 73,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 55.87,
-      "seconds": 63.45
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 415.24,
+      "seconds": 175.13333333333333
     },
     {
       "bot": "adaptive",
@@ -7675,8 +7715,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 645.19,
-      "seconds": 258.3333333333333
+      "distance": 645.22,
+      "seconds": 258.35
     },
     {
       "bot": "tracker",
@@ -7749,22 +7789,22 @@
       "seed": 74,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 33.73,
-      "seconds": 59.15
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 242.17,
+      "seconds": 126.1
     },
     {
       "bot": "human-touch",
       "seed": 74,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 34.7,
-      "seconds": 59.333333333333336
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 418.25,
+      "seconds": 183.93333333333334
     },
     {
       "bot": "adaptive",
@@ -7848,22 +7888,22 @@
       "seed": 75,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 46.15,
-      "seconds": 61.53333333333333
+      "distance": 53.93,
+      "seconds": 29.616666666666667
     },
     {
       "bot": "human-touch",
       "seed": 75,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 46.15,
-      "seconds": 61.53333333333333
+      "distance": 55.87,
+      "seconds": 24.533333333333335
     },
     {
       "bot": "adaptive",
@@ -7947,22 +7987,22 @@
       "seed": 76,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 59.5,
-      "seconds": 71.7
+      "distance": 67.29,
+      "seconds": 37.666666666666664
     },
     {
       "bot": "human-touch",
       "seed": 76,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 62.15,
-      "seconds": 79.71666666666667
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 663.98,
+      "seconds": 281.6166666666667
     },
     {
       "bot": "adaptive",
@@ -7972,8 +8012,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 650.88,
-      "seconds": 260.5833333333333
+      "distance": 650.9,
+      "seconds": 260.78333333333336
     },
     {
       "bot": "tracker",
@@ -8044,24 +8084,24 @@
     {
       "bot": "human-keys",
       "seed": 77,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 49.1,
-      "seconds": 69.61666666666666
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 655.98,
+      "seconds": 276.3
     },
     {
       "bot": "human-touch",
       "seed": 77,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 48.16,
-      "seconds": 76.95
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 233.69,
+      "seconds": 104.05
     },
     {
       "bot": "adaptive",
@@ -8145,22 +8185,22 @@
       "seed": 78,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 36.6,
-      "seconds": 67.16666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 244.72,
+      "seconds": 111.5
     },
     {
       "bot": "human-touch",
       "seed": 78,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 36.6,
-      "seconds": 67.16666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 246.28,
+      "seconds": 119.58333333333333
     },
     {
       "bot": "adaptive",
@@ -8170,8 +8210,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 666.98,
-      "seconds": 267.06666666666666
+      "distance": 667.13,
+      "seconds": 267.78333333333336
     },
     {
       "bot": "tracker",
@@ -8244,22 +8284,22 @@
       "seed": 79,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 30.83,
-      "seconds": 58.583333333333336
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 255.95,
+      "seconds": 118.91666666666667
     },
     {
       "bot": "human-touch",
       "seed": 79,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 30.38,
-      "seconds": 58.483333333333334
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 671.83,
+      "seconds": 292.6666666666667
     },
     {
       "bot": "adaptive",
@@ -8343,22 +8383,22 @@
       "seed": 80,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 33.59,
-      "seconds": 66.6
+      "distance": 41.59,
+      "seconds": 24.683333333333334
     },
     {
       "bot": "human-touch",
       "seed": 80,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 33.57,
-      "seconds": 66.58333333333333
+      "distance": 43.68,
+      "seconds": 22.45
     },
     {
       "bot": "adaptive",
@@ -8368,8 +8408,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 671.09,
-      "seconds": 270.3833333333333
+      "distance": 671.53,
+      "seconds": 271.0833333333333
     },
     {
       "bot": "tracker",
@@ -8442,22 +8482,22 @@
       "seed": 81,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 42.88,
-      "seconds": 60.88333333333333
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 240.45,
+      "seconds": 109.3
     },
     {
       "bot": "human-touch",
       "seed": 81,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 40.06,
-      "seconds": 60.31666666666667
+      "distance": 47.98,
+      "seconds": 33.03333333333333
     },
     {
       "bot": "adaptive",
@@ -8467,8 +8507,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 645.22,
-      "seconds": 258.85
+      "distance": 645.18,
+      "seconds": 258.96666666666664
     },
     {
       "bot": "tracker",
@@ -8541,22 +8581,22 @@
       "seed": 82,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 42.37,
-      "seconds": 60.81666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 245.56,
+      "seconds": 105.63333333333334
     },
     {
       "bot": "human-touch",
       "seed": 82,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 44.29,
-      "seconds": 61.2
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 251.15,
+      "seconds": 116.65
     },
     {
       "bot": "adaptive",
@@ -8638,24 +8678,24 @@
     {
       "bot": "human-keys",
       "seed": 83,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 33.41,
-      "seconds": 59.083333333333336
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 662.67,
+      "seconds": 286.4
     },
     {
       "bot": "human-touch",
       "seed": 83,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 31.93,
-      "seconds": 58.78333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 659.91,
+      "seconds": 283.25
     },
     {
       "bot": "adaptive",
@@ -8731,30 +8771,30 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 54.66,
-      "seconds": 21.633333333333333
+      "distance": 47.93,
+      "seconds": 22.466666666666665
     },
     {
       "bot": "human-keys",
       "seed": 84,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 43.86,
-      "seconds": 61.11666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 420.98,
+      "seconds": 186.25
     },
     {
       "bot": "human-touch",
       "seed": 84,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 38.81,
-      "seconds": 67.61666666666666
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 416.4,
+      "seconds": 190.85
     },
     {
       "bot": "adaptive",
@@ -8838,22 +8878,22 @@
       "seed": 85,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 44.24,
-      "seconds": 68.7
+      "distance": 52.15,
+      "seconds": 24.95
     },
     {
       "bot": "human-touch",
       "seed": 85,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 40.85,
-      "seconds": 68.03333333333333
+      "distance": 50.7,
+      "seconds": 23.2
     },
     {
       "bot": "adaptive",
@@ -8940,8 +8980,8 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "BACKLOT",
-      "distance": 40.91,
-      "seconds": 60.516666666666666
+      "distance": 184.03,
+      "seconds": 84.13333333333334
     },
     {
       "bot": "human-touch",
@@ -8950,9 +8990,9 @@
       "timedOut": false,
       "failed": "out-of-film",
       "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 40.91,
-      "seconds": 60.516666666666666
+      "scene": "MINIATURE CITY",
+      "distance": 251.88,
+      "seconds": 124.13333333333334
     },
     {
       "bot": "adaptive",
@@ -8962,8 +9002,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 649.84,
-      "seconds": 260.9166666666667
+      "distance": 649.85,
+      "seconds": 261.0833333333333
     },
     {
       "bot": "tracker",
@@ -9036,22 +9076,22 @@
       "seed": 87,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 52.89,
-      "seconds": 77.88333333333334
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 229.27,
+      "seconds": 107.2
     },
     {
       "bot": "human-touch",
       "seed": 87,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 52.89,
-      "seconds": 70.38333333333334
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 659,
+      "seconds": 280.45
     },
     {
       "bot": "adaptive",
@@ -9062,7 +9102,7 @@
       "killer": null,
       "scene": "LONG TAKE",
       "distance": 659.4,
-      "seconds": 264.26666666666665
+      "seconds": 264.6
     },
     {
       "bot": "tracker",
@@ -9135,22 +9175,22 @@
       "seed": 88,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 40.25,
-      "seconds": 60.38333333333333
+      "distance": 48.04,
+      "seconds": 23.45
     },
     {
       "bot": "human-touch",
       "seed": 88,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 40.25,
-      "seconds": 67.88333333333334
+      "distance": 48.04,
+      "seconds": 21.683333333333334
     },
     {
       "bot": "adaptive",
@@ -9234,22 +9274,22 @@
       "seed": 89,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 43.51,
-      "seconds": 68.56666666666666
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 235.09,
+      "seconds": 105.18333333333334
     },
     {
       "bot": "human-touch",
       "seed": 89,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 42.88,
-      "seconds": 68.43333333333334
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 238.16,
+      "seconds": 106.71666666666667
     },
     {
       "bot": "adaptive",
@@ -9260,7 +9300,7 @@
       "killer": null,
       "scene": "LONG TAKE",
       "distance": 651.49,
-      "seconds": 260.93333333333334
+      "seconds": 260.9166666666667
     },
     {
       "bot": "tracker",
@@ -9333,22 +9373,22 @@
       "seed": 90,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 52.04,
-      "seconds": 70.21666666666667
+      "distance": 59.87,
+      "seconds": 30.883333333333333
     },
     {
       "bot": "human-touch",
       "seed": 90,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 50.56,
-      "seconds": 69.91666666666667
+      "distance": 58.38,
+      "seconds": 29.95
     },
     {
       "bot": "adaptive",
@@ -9430,24 +9470,24 @@
     {
       "bot": "human-keys",
       "seed": 91,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 36.83,
-      "seconds": 59.71666666666667
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 655.47,
+      "seconds": 272.26666666666665
     },
     {
       "bot": "human-touch",
       "seed": 91,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 36.83,
-      "seconds": 67.21666666666667
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 654.46,
+      "seconds": 273.6666666666667
     },
     {
       "bot": "adaptive",
@@ -9531,22 +9571,22 @@
       "seed": 92,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 27.69,
-      "seconds": 57.95
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 241.87,
+      "seconds": 112.98333333333333
     },
     {
       "bot": "human-touch",
       "seed": 92,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 27.69,
-      "seconds": 57.95
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 430.39,
+      "seconds": 182.36666666666667
     },
     {
       "bot": "adaptive",
@@ -9630,22 +9670,22 @@
       "seed": 93,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 32.03,
-      "seconds": 58.81666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 232.92,
+      "seconds": 108.2
     },
     {
       "bot": "human-touch",
       "seed": 93,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.84,
-      "seconds": 58.38333333333333
+      "distance": 39.77,
+      "seconds": 20.533333333333335
     },
     {
       "bot": "adaptive",
@@ -9655,8 +9695,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 653.61,
-      "seconds": 261.68333333333334
+      "distance": 653.7,
+      "seconds": 262.28333333333336
     },
     {
       "bot": "tracker",
@@ -9729,22 +9769,22 @@
       "seed": 94,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 46.43,
-      "seconds": 61.6
+      "distance": 54.25,
+      "seconds": 26.9
     },
     {
       "bot": "human-touch",
       "seed": 94,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 45.19,
-      "seconds": 61.35
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 239.97,
+      "seconds": 111.21666666666667
     },
     {
       "bot": "adaptive",
@@ -9754,8 +9794,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 641.48,
-      "seconds": 257.26666666666665
+      "distance": 641.5,
+      "seconds": 257.5833333333333
     },
     {
       "bot": "tracker",
@@ -9828,22 +9868,22 @@
       "seed": 95,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 31.65,
-      "seconds": 66.23333333333333
+      "distance": 39.65,
+      "seconds": 21.933333333333334
     },
     {
       "bot": "human-touch",
       "seed": 95,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 31.81,
-      "seconds": 66.25
+      "distance": 40.4,
+      "seconds": 20.483333333333334
     },
     {
       "bot": "adaptive",
@@ -9927,22 +9967,22 @@
       "seed": 96,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 41.53,
-      "seconds": 68.15
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 231.16,
+      "seconds": 100.16666666666667
     },
     {
       "bot": "human-touch",
       "seed": 96,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 39.59,
-      "seconds": 67.75
+      "distance": 47.46,
+      "seconds": 22.166666666666668
     },
     {
       "bot": "adaptive",
@@ -10026,22 +10066,22 @@
       "seed": 97,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 47.85,
-      "seconds": 61.88333333333333
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 417.7,
+      "seconds": 188.18333333333334
     },
     {
       "bot": "human-touch",
       "seed": 97,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 47.85,
-      "seconds": 61.88333333333333
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 224.92,
+      "seconds": 110.86666666666666
     },
     {
       "bot": "adaptive",
@@ -10123,24 +10163,24 @@
     {
       "bot": "human-keys",
       "seed": 98,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 52.49,
-      "seconds": 62.8
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 669.26,
+      "seconds": 286.18333333333334
     },
     {
       "bot": "human-touch",
       "seed": 98,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 51.7,
-      "seconds": 62.65
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 237.77,
+      "seconds": 107.43333333333334
     },
     {
       "bot": "adaptive",
@@ -10224,22 +10264,22 @@
       "seed": 99,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 42.04,
-      "seconds": 60.766666666666666
+      "distance": 50.08,
+      "seconds": 25.716666666666665
     },
     {
       "bot": "human-touch",
       "seed": 99,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 40.1,
-      "seconds": 67.86666666666666
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 428.44,
+      "seconds": 191.71666666666667
     },
     {
       "bot": "adaptive",
@@ -10323,22 +10363,22 @@
       "seed": 100,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 46.4,
-      "seconds": 61.6
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 217.98,
+      "seconds": 103.7
     },
     {
       "bot": "human-touch",
       "seed": 100,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 43.43,
-      "seconds": 61
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 214.74,
+      "seconds": 96.65
     },
     {
       "bot": "adaptive",
@@ -10422,22 +10462,22 @@
       "seed": 101,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 38.12,
-      "seconds": 59.96666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 241.33,
+      "seconds": 105.51666666666667
     },
     {
       "bot": "human-touch",
       "seed": 101,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 36.18,
-      "seconds": 59.583333333333336
+      "distance": 44.05,
+      "seconds": 22.95
     },
     {
       "bot": "adaptive",
@@ -10523,20 +10563,20 @@
       "timedOut": false,
       "failed": "out-of-film",
       "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 45.37,
-      "seconds": 68.88333333333334
+      "scene": "MINIATURE CITY",
+      "distance": 243.24,
+      "seconds": 147.23333333333332
     },
     {
       "bot": "human-touch",
       "seed": 102,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 43.43,
-      "seconds": 61
+      "distance": 53.15,
+      "seconds": 26.516666666666666
     },
     {
       "bot": "adaptive",
@@ -10620,22 +10660,22 @@
       "seed": 103,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 39.6,
-      "seconds": 60.28333333333333
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 234.3,
+      "seconds": 109.01666666666667
     },
     {
       "bot": "human-touch",
       "seed": 103,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 37.66,
-      "seconds": 59.88333333333333
+      "distance": 45.62,
+      "seconds": 20.7
     },
     {
       "bot": "adaptive",
@@ -10719,22 +10759,22 @@
       "seed": 104,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 32.57,
-      "seconds": 58.93333333333333
+      "distance": 40.55,
+      "seconds": 21.133333333333333
     },
     {
       "bot": "human-touch",
       "seed": 104,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 30.63,
-      "seconds": 58.53333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 674.3,
+      "seconds": 288.78333333333336
     },
     {
       "bot": "adaptive",
@@ -10818,22 +10858,22 @@
       "seed": 105,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 43.17,
-      "seconds": 60.95
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 396.83,
+      "seconds": 175.4
     },
     {
       "bot": "human-touch",
       "seed": 105,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 41.23,
-      "seconds": 60.55
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 640.65,
+      "seconds": 269.93333333333334
     },
     {
       "bot": "adaptive",
@@ -10917,22 +10957,22 @@
       "seed": 106,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 43.89,
-      "seconds": 61.11666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 421.81,
+      "seconds": 197.5
     },
     {
       "bot": "human-touch",
       "seed": 106,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 41.12,
-      "seconds": 60.56666666666667
+      "distance": 51.29,
+      "seconds": 25.316666666666666
     },
     {
       "bot": "adaptive",
@@ -11016,22 +11056,22 @@
       "seed": 107,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 45.58,
-      "seconds": 61.43333333333333
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 427.92,
+      "seconds": 185.9
     },
     {
       "bot": "human-touch",
       "seed": 107,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 47.6,
-      "seconds": 61.833333333333336
+      "distance": 54.99,
+      "seconds": 34.35
     },
     {
       "bot": "adaptive",
@@ -11115,22 +11155,22 @@
       "seed": 108,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 47.58,
-      "seconds": 61.833333333333336
+      "distance": 55.33,
+      "seconds": 28.483333333333334
     },
     {
       "bot": "human-touch",
       "seed": 108,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 44.03,
-      "seconds": 68.63333333333334
+      "distance": 53.71,
+      "seconds": 23.983333333333334
     },
     {
       "bot": "adaptive",
@@ -11140,8 +11180,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 651.38,
-      "seconds": 260.85
+      "distance": 651.35,
+      "seconds": 260.8666666666667
     },
     {
       "bot": "tracker",
@@ -11214,11 +11254,11 @@
       "seed": 109,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 50.98,
-      "seconds": 70.01666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 223.24,
+      "seconds": 101.58333333333333
     },
     {
       "bot": "human-touch",
@@ -11227,9 +11267,9 @@
       "timedOut": false,
       "failed": "out-of-film",
       "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 48.59,
-      "seconds": 62.03333333333333
+      "scene": "MINIATURE CITY",
+      "distance": 352.42,
+      "seconds": 153.33333333333334
     },
     {
       "bot": "adaptive",
@@ -11239,8 +11279,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 653.97,
-      "seconds": 261.85
+      "distance": 653.96,
+      "seconds": 262.01666666666665
     },
     {
       "bot": "tracker",
@@ -11313,22 +11353,22 @@
       "seed": 110,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 31.59,
-      "seconds": 58.71666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 235.36,
+      "seconds": 102.38333333333334
     },
     {
       "bot": "human-touch",
       "seed": 110,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 30.46,
-      "seconds": 58.483333333333334
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 232.29,
+      "seconds": 98.41666666666667
     },
     {
       "bot": "adaptive",
@@ -11339,7 +11379,7 @@
       "killer": null,
       "scene": "LONG TAKE",
       "distance": 667.4,
-      "seconds": 267.4
+      "seconds": 267.56666666666666
     },
     {
       "bot": "tracker",
@@ -11412,22 +11452,22 @@
       "seed": 111,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 48.37,
-      "seconds": 69.48333333333333
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 247.62,
+      "seconds": 115.16666666666667
     },
     {
       "bot": "human-touch",
       "seed": 111,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 47.5,
-      "seconds": 61.81666666666667
+      "distance": 57.26,
+      "seconds": 27.583333333333332
     },
     {
       "bot": "adaptive",
@@ -11437,8 +11477,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 643.48,
-      "seconds": 257.98333333333335
+      "distance": 643.61,
+      "seconds": 258.0833333333333
     },
     {
       "bot": "tracker",
@@ -11513,20 +11553,20 @@
       "timedOut": false,
       "failed": "out-of-film",
       "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 42.96,
-      "seconds": 60.93333333333333
+      "scene": "MINIATURE CITY",
+      "distance": 326.11,
+      "seconds": 155.08333333333334
     },
     {
       "bot": "human-touch",
       "seed": 112,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 41.02,
-      "seconds": 68.05
+      "distance": 50.79,
+      "seconds": 26.116666666666667
     },
     {
       "bot": "adaptive",
@@ -11536,8 +11576,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 638.85,
-      "seconds": 256.85
+      "distance": 639.25,
+      "seconds": 258.5
     },
     {
       "bot": "tracker",
@@ -11610,22 +11650,22 @@
       "seed": 113,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 44.83,
-      "seconds": 68.76666666666667
+      "distance": 52.7,
+      "seconds": 26.333333333333332
     },
     {
       "bot": "human-touch",
       "seed": 113,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 44.93,
-      "seconds": 68.8
+      "distance": 52.99,
+      "seconds": 25.65
     },
     {
       "bot": "adaptive",
@@ -11707,24 +11747,24 @@
     {
       "bot": "human-keys",
       "seed": 114,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 45.26,
-      "seconds": 68.86666666666666
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 654.55,
+      "seconds": 289.8833333333333
     },
     {
       "bot": "human-touch",
       "seed": 114,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 45.64,
-      "seconds": 61.45
+      "distance": 54.05,
+      "seconds": 36.8
     },
     {
       "bot": "adaptive",
@@ -11806,24 +11846,24 @@
     {
       "bot": "human-keys",
       "seed": 115,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 40.37,
-      "seconds": 60.416666666666664
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 662.69,
+      "seconds": 281.23333333333335
     },
     {
       "bot": "human-touch",
       "seed": 115,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 40.37,
-      "seconds": 67.91666666666667
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 662.8,
+      "seconds": 279.8333333333333
     },
     {
       "bot": "adaptive",
@@ -11907,22 +11947,22 @@
       "seed": 116,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 35.79,
-      "seconds": 59.55
+      "distance": 43.78,
+      "seconds": 23.983333333333334
     },
     {
       "bot": "human-touch",
       "seed": 116,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 34.56,
-      "seconds": 59.3
+      "distance": 43.52,
+      "seconds": 21.75
     },
     {
       "bot": "adaptive",
@@ -12006,22 +12046,22 @@
       "seed": 117,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 36.14,
-      "seconds": 59.6
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 243.82,
+      "seconds": 110.06666666666666
     },
     {
       "bot": "human-touch",
       "seed": 117,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 37.56,
-      "seconds": 59.88333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 654.97,
+      "seconds": 280
     },
     {
       "bot": "adaptive",
@@ -12105,22 +12145,22 @@
       "seed": 118,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 47.59,
-      "seconds": 61.85
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 421.44,
+      "seconds": 187.53333333333333
     },
     {
       "bot": "human-touch",
       "seed": 118,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 45.73,
-      "seconds": 61.46666666666667
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 661.94,
+      "seconds": 280.68333333333334
     },
     {
       "bot": "adaptive",
@@ -12204,22 +12244,22 @@
       "seed": 119,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 35.13,
-      "seconds": 59.4
+      "distance": 43.08,
+      "seconds": 22.433333333333334
     },
     {
       "bot": "human-touch",
       "seed": 119,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 33.19,
-      "seconds": 59.016666666666666
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 241.77,
+      "seconds": 105.3
     },
     {
       "bot": "adaptive",
@@ -12230,7 +12270,7 @@
       "killer": null,
       "scene": "LONG TAKE",
       "distance": 662.04,
-      "seconds": 265.6666666666667
+      "seconds": 265.5
     },
     {
       "bot": "tracker",
@@ -12303,22 +12343,22 @@
       "seed": 120,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 31.62,
-      "seconds": 58.733333333333334
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 243.58,
+      "seconds": 110.13333333333334
     },
     {
       "bot": "human-touch",
       "seed": 120,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 29.68,
-      "seconds": 58.333333333333336
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 427.77,
+      "seconds": 182.31666666666666
     },
     {
       "bot": "adaptive",
@@ -12402,22 +12442,22 @@
       "seed": 121,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 50.19,
-      "seconds": 62.35
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 228.25,
+      "seconds": 97.68333333333334
     },
     {
       "bot": "human-touch",
       "seed": 121,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 50.64,
-      "seconds": 69.93333333333334
+      "distance": 60.4,
+      "seconds": 28.966666666666665
     },
     {
       "bot": "adaptive",
@@ -12503,20 +12543,20 @@
       "timedOut": false,
       "failed": "out-of-film",
       "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 35.1,
-      "seconds": 66.91666666666667
+      "scene": "MINIATURE CITY",
+      "distance": 298.31,
+      "seconds": 156.9
     },
     {
       "bot": "human-touch",
       "seed": 122,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 31.61,
-      "seconds": 66.21666666666667
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 663.23,
+      "seconds": 286.1
     },
     {
       "bot": "adaptive",
@@ -12598,24 +12638,24 @@
     {
       "bot": "human-keys",
       "seed": 123,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 41.95,
-      "seconds": 68.23333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 650.05,
+      "seconds": 272.01666666666665
     },
     {
       "bot": "human-touch",
       "seed": 123,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 41.79,
-      "seconds": 68.2
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 227.35,
+      "seconds": 101.98333333333333
     },
     {
       "bot": "adaptive",
@@ -12625,8 +12665,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 643.27,
-      "seconds": 258.55
+      "distance": 643.31,
+      "seconds": 258.8666666666667
     },
     {
       "bot": "tracker",
@@ -12699,22 +12739,22 @@
       "seed": 124,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 43.75,
-      "seconds": 61.06666666666667
+      "distance": 51.46,
+      "seconds": 25.033333333333335
     },
     {
       "bot": "human-touch",
       "seed": 124,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 42.13,
-      "seconds": 68.25
+      "distance": 51.77,
+      "seconds": 23.466666666666665
     },
     {
       "bot": "adaptive",
@@ -12796,24 +12836,24 @@
     {
       "bot": "human-keys",
       "seed": 125,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 52.86,
-      "seconds": 62.88333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 656.74,
+      "seconds": 296.8833333333333
     },
     {
       "bot": "human-touch",
       "seed": 125,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 51.95,
-      "seconds": 77.7
+      "distance": 59.78,
+      "seconds": 30.083333333333332
     },
     {
       "bot": "adaptive",
@@ -12897,22 +12937,22 @@
       "seed": 126,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 30.76,
-      "seconds": 66.06666666666666
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 411.69,
+      "seconds": 184.91666666666666
     },
     {
       "bot": "human-touch",
       "seed": 126,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 30.67,
-      "seconds": 66.05
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 659.22,
+      "seconds": 274.46666666666664
     },
     {
       "bot": "adaptive",
@@ -12996,22 +13036,22 @@
       "seed": 127,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 33.85,
-      "seconds": 59.18333333333333
+      "failed": "hit",
+      "killer": "red-monitor",
+      "scene": "NIGHT SHOOT",
+      "distance": 537.64,
+      "seconds": 232.93333333333334
     },
     {
       "bot": "human-touch",
       "seed": 127,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 31.61,
-      "seconds": 58.733333333333334
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 226.74,
+      "seconds": 102.83333333333333
     },
     {
       "bot": "adaptive",
@@ -13022,7 +13062,7 @@
       "killer": null,
       "scene": "LONG TAKE",
       "distance": 672.55,
-      "seconds": 269.9166666666667
+      "seconds": 270.0833333333333
     },
     {
       "bot": "tracker",
@@ -13093,24 +13133,24 @@
     {
       "bot": "human-keys",
       "seed": 128,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 41.31,
-      "seconds": 60.61666666666667
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 671.7,
+      "seconds": 277.05
     },
     {
       "bot": "human-touch",
       "seed": 128,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 41.15,
-      "seconds": 60.583333333333336
+      "distance": 49.02,
+      "seconds": 22.166666666666668
     },
     {
       "bot": "adaptive",
@@ -13194,22 +13234,22 @@
       "seed": 129,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 48.98,
-      "seconds": 62.11666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 233.32,
+      "seconds": 108.21666666666667
     },
     {
       "bot": "human-touch",
       "seed": 129,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 45.95,
-      "seconds": 69.01666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 226.72,
+      "seconds": 98.8
     },
     {
       "bot": "adaptive",
@@ -13293,22 +13333,22 @@
       "seed": 130,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 36.06,
-      "seconds": 59.6
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 240.06,
+      "seconds": 108.11666666666666
     },
     {
       "bot": "human-touch",
       "seed": 130,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 36.06,
-      "seconds": 59.6
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 241.67,
+      "seconds": 106.95
     },
     {
       "bot": "adaptive",
@@ -13392,22 +13432,22 @@
       "seed": 131,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 40.56,
-      "seconds": 60.483333333333334
+      "distance": 48.53,
+      "seconds": 22.566666666666666
     },
     {
       "bot": "human-touch",
       "seed": 131,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 39.14,
-      "seconds": 60.2
+      "distance": 47.15,
+      "seconds": 22.466666666666665
     },
     {
       "bot": "adaptive",
@@ -13491,11 +13531,11 @@
       "seed": 132,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 42.17,
-      "seconds": 60.75
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 239.39,
+      "seconds": 104.23333333333333
     },
     {
       "bot": "human-touch",
@@ -13504,9 +13544,9 @@
       "timedOut": false,
       "failed": "out-of-film",
       "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 41.97,
-      "seconds": 68.21666666666667
+      "scene": "MINIATURE CITY",
+      "distance": 347.53,
+      "seconds": 157.46666666666667
     },
     {
       "bot": "adaptive",
@@ -13590,22 +13630,22 @@
       "seed": 133,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 35.15,
-      "seconds": 66.91666666666667
+      "distance": 43.1,
+      "seconds": 22.933333333333334
     },
     {
       "bot": "human-touch",
       "seed": 133,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 33.21,
-      "seconds": 66.53333333333333
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 227.97,
+      "seconds": 101.21666666666667
     },
     {
       "bot": "adaptive",
@@ -13615,8 +13655,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 665.38,
-      "seconds": 266.76666666666665
+      "distance": 665.28,
+      "seconds": 267
     },
     {
       "bot": "tracker",
@@ -13689,22 +13729,22 @@
       "seed": 134,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 41.06,
-      "seconds": 60.55
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 226.32,
+      "seconds": 101.21666666666667
     },
     {
       "bot": "human-touch",
       "seed": 134,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 39.53,
-      "seconds": 67.75
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 673.04,
+      "seconds": 290.6166666666667
     },
     {
       "bot": "adaptive",
@@ -13714,8 +13754,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 664.57,
-      "seconds": 266.4166666666667
+      "distance": 664.6,
+      "seconds": 266.6166666666667
     },
     {
       "bot": "tracker",
@@ -13786,24 +13826,24 @@
     {
       "bot": "human-keys",
       "seed": 135,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 35.55,
-      "seconds": 59.5
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 671.58,
+      "seconds": 283.98333333333335
     },
     {
       "bot": "human-touch",
       "seed": 135,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 35.47,
-      "seconds": 59.46666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 252.09,
+      "seconds": 113.26666666666667
     },
     {
       "bot": "adaptive",
@@ -13885,24 +13925,24 @@
     {
       "bot": "human-keys",
       "seed": 136,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 44.35,
-      "seconds": 61.18333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 658.91,
+      "seconds": 279.3333333333333
     },
     {
       "bot": "human-touch",
       "seed": 136,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 44.35,
-      "seconds": 61.18333333333333
+      "distance": 54.12,
+      "seconds": 23.966666666666665
     },
     {
       "bot": "adaptive",
@@ -13986,11 +14026,11 @@
       "seed": 137,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 42.46,
-      "seconds": 60.8
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 243.5,
+      "seconds": 109.25
     },
     {
       "bot": "human-touch",
@@ -13999,9 +14039,9 @@
       "timedOut": false,
       "failed": "out-of-film",
       "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 42.46,
-      "seconds": 60.8
+      "scene": "NIGHT SHOOT",
+      "distance": 529.34,
+      "seconds": 239.66666666666666
     },
     {
       "bot": "adaptive",
@@ -14085,22 +14125,22 @@
       "seed": 138,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 47.25,
-      "seconds": 69.26666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 239.25,
+      "seconds": 106
     },
     {
       "bot": "human-touch",
       "seed": 138,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 44.83,
-      "seconds": 68.78333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 662.94,
+      "seconds": 274.75
     },
     {
       "bot": "adaptive",
@@ -14182,13 +14222,13 @@
     {
       "bot": "human-keys",
       "seed": 139,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 48.67,
-      "seconds": 62.05
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 667.24,
+      "seconds": 281.6
     },
     {
       "bot": "human-touch",
@@ -14198,8 +14238,8 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "BACKLOT",
-      "distance": 48.26,
-      "seconds": 69.46666666666667
+      "distance": 193.32,
+      "seconds": 85.7
     },
     {
       "bot": "adaptive",
@@ -14209,8 +14249,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 645.06,
-      "seconds": 258.3833333333333
+      "distance": 645.01,
+      "seconds": 258.5833333333333
     },
     {
       "bot": "tracker",
@@ -14281,24 +14321,24 @@
     {
       "bot": "human-keys",
       "seed": 140,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 35.95,
-      "seconds": 59.56666666666667
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 646.84,
+      "seconds": 276.23333333333335
     },
     {
       "bot": "human-touch",
       "seed": 140,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 35.12,
-      "seconds": 59.4
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 649.86,
+      "seconds": 272.5833333333333
     },
     {
       "bot": "adaptive",
@@ -14382,22 +14422,22 @@
       "seed": 141,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 37.68,
-      "seconds": 59.916666666666664
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 443.29,
+      "seconds": 194.28333333333333
     },
     {
       "bot": "human-touch",
       "seed": 141,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 36.4,
-      "seconds": 59.666666666666664
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 225.75,
+      "seconds": 99.93333333333334
     },
     {
       "bot": "adaptive",
@@ -14481,22 +14521,22 @@
       "seed": 142,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 42.37,
-      "seconds": 68.33333333333333
+      "distance": 48.56,
+      "seconds": 22.233333333333334
     },
     {
       "bot": "human-touch",
       "seed": 142,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 42.37,
-      "seconds": 68.33333333333333
+      "distance": 50.5,
+      "seconds": 23.516666666666666
     },
     {
       "bot": "adaptive",
@@ -14578,24 +14618,24 @@
     {
       "bot": "human-keys",
       "seed": 143,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 45.98,
-      "seconds": 69
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 664.19,
+      "seconds": 280.8333333333333
     },
     {
       "bot": "human-touch",
       "seed": 143,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 46.72,
-      "seconds": 76.65
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 436.76,
+      "seconds": 197.75
     },
     {
       "bot": "adaptive",
@@ -14677,24 +14717,24 @@
     {
       "bot": "human-keys",
       "seed": 144,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 35.73,
-      "seconds": 59.53333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 655.86,
+      "seconds": 312.6166666666667
     },
     {
       "bot": "human-touch",
       "seed": 144,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 31.99,
-      "seconds": 66.28333333333333
+      "distance": 41.87,
+      "seconds": 19.15
     },
     {
       "bot": "adaptive",
@@ -14778,22 +14818,22 @@
       "seed": 145,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 40.65,
-      "seconds": 67.98333333333333
+      "distance": 48.57,
+      "seconds": 22.65
     },
     {
       "bot": "human-touch",
       "seed": 145,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 42.67,
-      "seconds": 60.88333333333333
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 237.28,
+      "seconds": 111.95
     },
     {
       "bot": "adaptive",
@@ -14877,22 +14917,22 @@
       "seed": 146,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 33.48,
-      "seconds": 59.1
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 242.79,
+      "seconds": 121.6
     },
     {
       "bot": "human-touch",
       "seed": 146,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 31.55,
-      "seconds": 66.21666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 433.57,
+      "seconds": 193.31666666666666
     },
     {
       "bot": "adaptive",
@@ -14987,11 +15027,11 @@
       "seed": 147,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 44.09,
-      "seconds": 68.66666666666667
+      "distance": 52.11,
+      "seconds": 24.666666666666668
     },
     {
       "bot": "adaptive",
@@ -15075,22 +15115,22 @@
       "seed": 148,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 36.95,
-      "seconds": 59.766666666666666
+      "distance": 44.99,
+      "seconds": 22.333333333333332
     },
     {
       "bot": "human-touch",
       "seed": 148,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 36.72,
-      "seconds": 59.71666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 230.18,
+      "seconds": 99.11666666666666
     },
     {
       "bot": "adaptive",
@@ -15174,22 +15214,22 @@
       "seed": 149,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 42.73,
-      "seconds": 68.36666666666666
+      "distance": 50.52,
+      "seconds": 26.9
     },
     {
       "bot": "human-touch",
       "seed": 149,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 40.79,
-      "seconds": 67.98333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 650.89,
+      "seconds": 267.8666666666667
     },
     {
       "bot": "adaptive",
@@ -15273,22 +15313,22 @@
       "seed": 150,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 38.64,
-      "seconds": 60.1
+      "distance": 46.63,
+      "seconds": 25.283333333333335
     },
     {
       "bot": "human-touch",
       "seed": 150,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 37.67,
-      "seconds": 59.916666666666664
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 649.63,
+      "seconds": 268.98333333333335
     },
     {
       "bot": "adaptive",
@@ -15299,7 +15339,7 @@
       "killer": null,
       "scene": "LONG TAKE",
       "distance": 642.15,
-      "seconds": 257.1666666666667
+      "seconds": 257.1
     },
     {
       "bot": "tracker",
@@ -15372,22 +15412,22 @@
       "seed": 151,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 40.68,
-      "seconds": 60.46666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 409.28,
+      "seconds": 174
     },
     {
       "bot": "human-touch",
       "seed": 151,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 40.68,
-      "seconds": 60.46666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 219.96,
+      "seconds": 93.68333333333334
     },
     {
       "bot": "adaptive",
@@ -15471,22 +15511,22 @@
       "seed": 152,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 46.09,
-      "seconds": 61.53333333333333
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 248.97,
+      "seconds": 114.56666666666666
     },
     {
       "bot": "human-touch",
       "seed": 152,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 46.09,
-      "seconds": 61.53333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 655.5,
+      "seconds": 275.76666666666665
     },
     {
       "bot": "adaptive",
@@ -15496,8 +15536,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 644.81,
-      "seconds": 259.26666666666665
+      "distance": 644.79,
+      "seconds": 259.96666666666664
     },
     {
       "bot": "tracker",
@@ -15568,24 +15608,24 @@
     {
       "bot": "human-keys",
       "seed": 153,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 45.12,
-      "seconds": 61.333333333333336
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 648.21,
+      "seconds": 279.0833333333333
     },
     {
       "bot": "human-touch",
       "seed": 153,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 45.12,
-      "seconds": 61.333333333333336
+      "distance": 54.8,
+      "seconds": 24.616666666666667
     },
     {
       "bot": "adaptive",
@@ -15667,24 +15707,24 @@
     {
       "bot": "human-keys",
       "seed": 154,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 34.47,
-      "seconds": 59.28333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 651.5,
+      "seconds": 287.7
     },
     {
       "bot": "human-touch",
       "seed": 154,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 31.18,
-      "seconds": 58.63333333333333
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 429.46,
+      "seconds": 184.85
     },
     {
       "bot": "adaptive",
@@ -15695,7 +15735,7 @@
       "killer": null,
       "scene": "LONG TAKE",
       "distance": 648.81,
-      "seconds": 259.76666666666665
+      "seconds": 259.78333333333336
     },
     {
       "bot": "tracker",
@@ -15766,24 +15806,24 @@
     {
       "bot": "human-keys",
       "seed": 155,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 44.86,
-      "seconds": 68.83333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 654.17,
+      "seconds": 272.76666666666665
     },
     {
       "bot": "human-touch",
       "seed": 155,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 42.92,
-      "seconds": 60.93333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 651.76,
+      "seconds": 279.96666666666664
     },
     {
       "bot": "adaptive",
@@ -15793,8 +15833,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 665.23,
-      "seconds": 266.85
+      "distance": 665.22,
+      "seconds": 266.6666666666667
     },
     {
       "bot": "tracker",
@@ -15865,24 +15905,24 @@
     {
       "bot": "human-keys",
       "seed": 156,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 35.58,
-      "seconds": 66.98333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 672.19,
+      "seconds": 283.68333333333334
     },
     {
       "bot": "human-touch",
       "seed": 156,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 36.92,
-      "seconds": 67.25
+      "distance": 44.87,
+      "seconds": 24.366666666666667
     },
     {
       "bot": "adaptive",
@@ -15968,20 +16008,20 @@
       "timedOut": false,
       "failed": "out-of-film",
       "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 50.04,
-      "seconds": 69.81666666666666
+      "scene": "MINIATURE CITY",
+      "distance": 377.31,
+      "seconds": 170.81666666666666
     },
     {
       "bot": "human-touch",
       "seed": 157,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 47.65,
-      "seconds": 61.833333333333336
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 658.28,
+      "seconds": 272.78333333333336
     },
     {
       "bot": "adaptive",
@@ -15992,7 +16032,7 @@
       "killer": null,
       "scene": "LONG TAKE",
       "distance": 658.04,
-      "seconds": 263.53333333333336
+      "seconds": 263.75
     },
     {
       "bot": "tracker",
@@ -16063,24 +16103,24 @@
     {
       "bot": "human-keys",
       "seed": 158,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 51.06,
-      "seconds": 62.53333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 667.79,
+      "seconds": 296.3
     },
     {
       "bot": "human-touch",
       "seed": 158,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 49.94,
-      "seconds": 69.8
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 248.31,
+      "seconds": 115.13333333333334
     },
     {
       "bot": "adaptive",
@@ -16164,22 +16204,22 @@
       "seed": 159,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 48.8,
-      "seconds": 69.58333333333333
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 425.7,
+      "seconds": 185.48333333333332
     },
     {
       "bot": "human-touch",
       "seed": 159,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 47.62,
-      "seconds": 69.33333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 663.96,
+      "seconds": 279.65
     },
     {
       "bot": "adaptive",
@@ -16263,22 +16303,22 @@
       "seed": 160,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 41.17,
-      "seconds": 68.08333333333333
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 424.59,
+      "seconds": 189.53333333333333
     },
     {
       "bot": "human-touch",
       "seed": 160,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 43.09,
-      "seconds": 68.46666666666667
+      "distance": 51.08,
+      "seconds": 24.9
     },
     {
       "bot": "adaptive",
@@ -16362,22 +16402,22 @@
       "seed": 161,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 39.99,
-      "seconds": 60.35
+      "failed": "hit",
+      "killer": "red-monitor",
+      "scene": "NIGHT SHOOT",
+      "distance": 530.19,
+      "seconds": 229.51666666666668
     },
     {
       "bot": "human-touch",
       "seed": 161,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 38.05,
-      "seconds": 59.95
+      "distance": 45.95,
+      "seconds": 20.633333333333333
     },
     {
       "bot": "adaptive",
@@ -16388,7 +16428,7 @@
       "killer": null,
       "scene": "LONG TAKE",
       "distance": 654.51,
-      "seconds": 262.4
+      "seconds": 262.35
     },
     {
       "bot": "tracker",
@@ -16461,22 +16501,22 @@
       "seed": 162,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 44.47,
-      "seconds": 68.7
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 228.04,
+      "seconds": 96.88333333333334
     },
     {
       "bot": "human-touch",
       "seed": 162,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 44.47,
-      "seconds": 68.7
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 230.03,
+      "seconds": 102.9
     },
     {
       "bot": "adaptive",
@@ -16486,8 +16526,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 652.68,
-      "seconds": 262.0833333333333
+      "distance": 652.67,
+      "seconds": 261.6166666666667
     },
     {
       "bot": "tracker",
@@ -16560,22 +16600,22 @@
       "seed": 163,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 52.23,
-      "seconds": 70.25
+      "distance": 60.01,
+      "seconds": 36.56666666666667
     },
     {
       "bot": "human-touch",
       "seed": 163,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 51.49,
-      "seconds": 70.11666666666666
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 247.2,
+      "seconds": 113.88333333333334
     },
     {
       "bot": "adaptive",
@@ -16657,24 +16697,24 @@
     {
       "bot": "human-keys",
       "seed": 164,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 49.76,
-      "seconds": 62.28333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 666.87,
+      "seconds": 280.1
     },
     {
       "bot": "human-touch",
       "seed": 164,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 47.37,
-      "seconds": 69.3
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 228.41,
+      "seconds": 98.85
     },
     {
       "bot": "adaptive",
@@ -16756,24 +16796,24 @@
     {
       "bot": "human-keys",
       "seed": 165,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 43.47,
-      "seconds": 61.03333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 656.34,
+      "seconds": 281.4166666666667
     },
     {
       "bot": "human-touch",
       "seed": 165,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 43.47,
-      "seconds": 68.53333333333333
+      "distance": 51.42,
+      "seconds": 25.316666666666666
     },
     {
       "bot": "adaptive",
@@ -16857,22 +16897,22 @@
       "seed": 166,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 33.18,
-      "seconds": 59.016666666666666
+      "distance": 41.13,
+      "seconds": 19.266666666666666
     },
     {
       "bot": "human-touch",
       "seed": 166,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 35.12,
-      "seconds": 59.4
+      "distance": 45,
+      "seconds": 25.383333333333333
     },
     {
       "bot": "adaptive",
@@ -16882,8 +16922,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 645.45,
-      "seconds": 258.8333333333333
+      "distance": 645.39,
+      "seconds": 258.78333333333336
     },
     {
       "bot": "tracker",
@@ -16954,24 +16994,24 @@
     {
       "bot": "human-keys",
       "seed": 167,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 43.82,
-      "seconds": 61.1
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 650.5,
+      "seconds": 277.46666666666664
     },
     {
       "bot": "human-touch",
       "seed": 167,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 45.82,
-      "seconds": 69
+      "distance": 55.59,
+      "seconds": 47.11666666666667
     },
     {
       "bot": "adaptive",
@@ -17055,22 +17095,22 @@
       "seed": 168,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 30.22,
-      "seconds": 58.43333333333333
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 418.99,
+      "seconds": 185.91666666666666
     },
     {
       "bot": "human-touch",
       "seed": 168,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 32.2,
-      "seconds": 58.833333333333336
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 667.15,
+      "seconds": 283.1666666666667
     },
     {
       "bot": "adaptive",
@@ -17152,24 +17192,24 @@
     {
       "bot": "human-keys",
       "seed": 169,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 31.67,
-      "seconds": 66.21666666666667
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 657.15,
+      "seconds": 273.51666666666665
     },
     {
       "bot": "human-touch",
       "seed": 169,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 31.62,
-      "seconds": 66.21666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 418.22,
+      "seconds": 175.93333333333334
     },
     {
       "bot": "adaptive",
@@ -17253,22 +17293,22 @@
       "seed": 170,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 38.16,
-      "seconds": 60
+      "distance": 44.86,
+      "seconds": 22.65
     },
     {
       "bot": "human-touch",
       "seed": 170,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 34.81,
-      "seconds": 66.83333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 662.09,
+      "seconds": 280.81666666666666
     },
     {
       "bot": "adaptive",
@@ -17279,7 +17319,7 @@
       "killer": null,
       "scene": "LONG TAKE",
       "distance": 656.36,
-      "seconds": 262.93333333333334
+      "seconds": 263.25
     },
     {
       "bot": "tracker",
@@ -17352,22 +17392,22 @@
       "seed": 171,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 46.32,
-      "seconds": 69.06666666666666
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 243.64,
+      "seconds": 104.96666666666667
     },
     {
       "bot": "human-touch",
       "seed": 171,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 44.39,
-      "seconds": 61.18333333333333
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 415.85,
+      "seconds": 178.8
     },
     {
       "bot": "adaptive",
@@ -17449,24 +17489,24 @@
     {
       "bot": "human-keys",
       "seed": 172,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 28.88,
-      "seconds": 58.18333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 662.59,
+      "seconds": 279.73333333333335
     },
     {
       "bot": "human-touch",
       "seed": 172,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 26.94,
-      "seconds": 57.8
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 244,
+      "seconds": 111.06666666666666
     },
     {
       "bot": "adaptive",
@@ -17548,24 +17588,24 @@
     {
       "bot": "human-keys",
       "seed": 173,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 43.68,
-      "seconds": 68.6
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 655.55,
+      "seconds": 288.5833333333333
     },
     {
       "bot": "human-touch",
       "seed": 173,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 42.29,
-      "seconds": 68.3
+      "distance": 50.48,
+      "seconds": 27.816666666666666
     },
     {
       "bot": "adaptive",
@@ -17575,8 +17615,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 658.09,
-      "seconds": 263.75
+      "distance": 658.12,
+      "seconds": 264
     },
     {
       "bot": "tracker",
@@ -17649,22 +17689,22 @@
       "seed": 174,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 38.27,
-      "seconds": 67.51666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 424.81,
+      "seconds": 196.83333333333334
     },
     {
       "bot": "human-touch",
       "seed": 174,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 34.38,
-      "seconds": 66.73333333333333
+      "distance": 44.28,
+      "seconds": 20.483333333333334
     },
     {
       "bot": "adaptive",
@@ -17674,8 +17714,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 644.12,
-      "seconds": 258.5
+      "distance": 644.16,
+      "seconds": 258.26666666666665
     },
     {
       "bot": "tracker",
@@ -17748,22 +17788,22 @@
       "seed": 175,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 40.6,
-      "seconds": 67.96666666666667
+      "distance": 48.56,
+      "seconds": 22.85
     },
     {
       "bot": "human-touch",
       "seed": 175,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 38.87,
-      "seconds": 67.63333333333334
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 648.65,
+      "seconds": 270.6666666666667
     },
     {
       "bot": "adaptive",
@@ -17847,22 +17887,22 @@
       "seed": 176,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 35.3,
-      "seconds": 66.91666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 415.76,
+      "seconds": 180.66666666666666
     },
     {
       "bot": "human-touch",
       "seed": 176,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 37.17,
-      "seconds": 67.28333333333333
+      "distance": 47.02,
+      "seconds": 24
     },
     {
       "bot": "adaptive",
@@ -17948,20 +17988,20 @@
       "timedOut": false,
       "failed": "out-of-film",
       "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 43.7,
-      "seconds": 61.083333333333336
+      "scene": "NIGHT SHOOT",
+      "distance": 546.73,
+      "seconds": 247.2
     },
     {
       "bot": "human-touch",
       "seed": 177,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 43.97,
-      "seconds": 68.63333333333334
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 419.7,
+      "seconds": 182.05
     },
     {
       "bot": "adaptive",
@@ -18045,22 +18085,22 @@
       "seed": 178,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 34.29,
-      "seconds": 59.25
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 226.88,
+      "seconds": 100.68333333333334
     },
     {
       "bot": "human-touch",
       "seed": 178,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 34.29,
-      "seconds": 59.25
+      "distance": 44.87,
+      "seconds": 24.766666666666666
     },
     {
       "bot": "adaptive",
@@ -18070,8 +18110,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 644.03,
-      "seconds": 259.2
+      "distance": 644.01,
+      "seconds": 258.65
     },
     {
       "bot": "tracker",
@@ -18142,24 +18182,24 @@
     {
       "bot": "human-keys",
       "seed": 179,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 47.43,
-      "seconds": 61.8
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 654.84,
+      "seconds": 278.56666666666666
     },
     {
       "bot": "human-touch",
       "seed": 179,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 45.49,
-      "seconds": 61.416666666666664
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 409.8,
+      "seconds": 185.28333333333333
     },
     {
       "bot": "adaptive",
@@ -18243,22 +18283,22 @@
       "seed": 180,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 42.72,
-      "seconds": 68.35
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 235.08,
+      "seconds": 111.06666666666666
     },
     {
       "bot": "human-touch",
       "seed": 180,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 42.72,
-      "seconds": 60.85
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 234.6,
+      "seconds": 106.41666666666667
     },
     {
       "bot": "adaptive",
@@ -18268,8 +18308,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 645.82,
-      "seconds": 258.53333333333336
+      "distance": 645.84,
+      "seconds": 258.56666666666666
     },
     {
       "bot": "tracker",
@@ -18342,22 +18382,22 @@
       "seed": 181,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.75,
-      "seconds": 58.166666666666664
+      "distance": 36.75,
+      "seconds": 18.666666666666668
     },
     {
       "bot": "human-touch",
       "seed": 181,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 26.82,
-      "seconds": 57.78333333333333
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 652.44,
+      "seconds": 275.1666666666667
     },
     {
       "bot": "adaptive",
@@ -18441,22 +18481,22 @@
       "seed": 182,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 31.98,
-      "seconds": 58.81666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 254.76,
+      "seconds": 126.46666666666667
     },
     {
       "bot": "human-touch",
       "seed": 182,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 30.41,
-      "seconds": 58.5
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 440.78,
+      "seconds": 203.15
     },
     {
       "bot": "adaptive",
@@ -18538,24 +18578,24 @@
     {
       "bot": "human-keys",
       "seed": 183,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 61.32,
-      "seconds": 72.05
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 656.73,
+      "seconds": 283
     },
     {
       "bot": "human-touch",
       "seed": 183,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 59.38,
-      "seconds": 71.65
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 656.71,
+      "seconds": 285.5
     },
     {
       "bot": "adaptive",
@@ -18565,8 +18605,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 662.79,
-      "seconds": 266.7
+      "distance": 662.68,
+      "seconds": 265.9
     },
     {
       "bot": "tracker",
@@ -18639,22 +18679,22 @@
       "seed": 184,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 66.19,
-      "seconds": 65.51666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 232.58,
+      "seconds": 102.91666666666667
     },
     {
       "bot": "human-touch",
       "seed": 184,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 66.27,
-      "seconds": 65.53333333333333
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 424.11,
+      "seconds": 189.06666666666666
     },
     {
       "bot": "adaptive",
@@ -18664,8 +18704,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 659.39,
-      "seconds": 264.31666666666666
+      "distance": 659.4,
+      "seconds": 264.81666666666666
     },
     {
       "bot": "tracker",
@@ -18736,24 +18776,24 @@
     {
       "bot": "human-keys",
       "seed": 185,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 40.81,
-      "seconds": 60.516666666666666
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 666.03,
+      "seconds": 283.48333333333335
     },
     {
       "bot": "human-touch",
       "seed": 185,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 40.81,
-      "seconds": 68.01666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 433.43,
+      "seconds": 188.11666666666667
     },
     {
       "bot": "adaptive",
@@ -18764,7 +18804,7 @@
       "killer": null,
       "scene": "LONG TAKE",
       "distance": 633.76,
-      "seconds": 253.88333333333333
+      "seconds": 254.13333333333333
     },
     {
       "bot": "tracker",
@@ -18837,22 +18877,22 @@
       "seed": 186,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 51.89,
-      "seconds": 62.68333333333333
+      "distance": 59.83,
+      "seconds": 31.4
     },
     {
       "bot": "human-touch",
       "seed": 186,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 51.44,
-      "seconds": 70.08333333333333
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 226.49,
+      "seconds": 98.63333333333334
     },
     {
       "bot": "adaptive",
@@ -18936,22 +18976,22 @@
       "seed": 187,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 34.42,
-      "seconds": 66.76666666666667
+      "distance": 41.99,
+      "seconds": 23.3
     },
     {
       "bot": "human-touch",
       "seed": 187,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 31.98,
-      "seconds": 66.26666666666667
+      "distance": 41.95,
+      "seconds": 25.066666666666666
     },
     {
       "bot": "adaptive",
@@ -18961,8 +19001,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 659.99,
-      "seconds": 264.51666666666665
+      "distance": 659.98,
+      "seconds": 264.71666666666664
     },
     {
       "bot": "tracker",
@@ -19035,22 +19075,22 @@
       "seed": 188,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 47.59,
-      "seconds": 61.85
+      "distance": 55.38,
+      "seconds": 26.883333333333333
     },
     {
       "bot": "human-touch",
       "seed": 188,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 46.92,
-      "seconds": 69.2
+      "distance": 53.51,
+      "seconds": 27.616666666666667
     },
     {
       "bot": "adaptive",
@@ -19134,22 +19174,22 @@
       "seed": 189,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 41.65,
-      "seconds": 60.666666666666664
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 424.68,
+      "seconds": 185.25
     },
     {
       "bot": "human-touch",
       "seed": 189,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 37.86,
-      "seconds": 59.9
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 647.44,
+      "seconds": 270.5
     },
     {
       "bot": "adaptive",
@@ -19233,22 +19273,22 @@
       "seed": 190,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 53.47,
-      "seconds": 63.016666666666666
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 230.81,
+      "seconds": 100.63333333333334
     },
     {
       "bot": "human-touch",
       "seed": 190,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 49.64,
-      "seconds": 77.23333333333333
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 227.24,
+      "seconds": 98.18333333333334
     },
     {
       "bot": "adaptive",
@@ -19332,22 +19372,22 @@
       "seed": 191,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 33.9,
-      "seconds": 66.68333333333334
+      "distance": 42.05,
+      "seconds": 23.716666666666665
     },
     {
       "bot": "human-touch",
       "seed": 191,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 32.57,
-      "seconds": 66.4
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 671.05,
+      "seconds": 285.01666666666665
     },
     {
       "bot": "adaptive",
@@ -19357,8 +19397,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 654.93,
-      "seconds": 262.5833333333333
+      "distance": 654.96,
+      "seconds": 262.4
     },
     {
       "bot": "tracker",
@@ -19431,22 +19471,22 @@
       "seed": 192,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 40.93,
-      "seconds": 60.53333333333333
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 411.34,
+      "seconds": 185.7
     },
     {
       "bot": "human-touch",
       "seed": 192,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 39,
-      "seconds": 67.65
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 662.23,
+      "seconds": 279.0833333333333
     },
     {
       "bot": "adaptive",
@@ -19530,22 +19570,22 @@
       "seed": 193,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 48.48,
-      "seconds": 62.016666666666666
+      "distance": 56.26,
+      "seconds": 27.116666666666667
     },
     {
       "bot": "human-touch",
       "seed": 193,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 48.25,
-      "seconds": 61.95
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 239.08,
+      "seconds": 103.55
     },
     {
       "bot": "adaptive",
@@ -19555,8 +19595,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 663.51,
-      "seconds": 267.55
+      "distance": 663.08,
+      "seconds": 265.65
     },
     {
       "bot": "tracker",
@@ -19631,20 +19671,20 @@
       "timedOut": false,
       "failed": "out-of-film",
       "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 42.71,
-      "seconds": 60.88333333333333
+      "scene": "NIGHT SHOOT",
+      "distance": 441.93,
+      "seconds": 205.06666666666666
     },
     {
       "bot": "human-touch",
       "seed": 194,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 41.13,
-      "seconds": 60.56666666666667
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 226.62,
+      "seconds": 94.73333333333333
     },
     {
       "bot": "adaptive",
@@ -19655,7 +19695,7 @@
       "killer": null,
       "scene": "LONG TAKE",
       "distance": 656.03,
-      "seconds": 262.98333333333335
+      "seconds": 263.23333333333335
     },
     {
       "bot": "tracker",
@@ -19728,22 +19768,22 @@
       "seed": 195,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 53.14,
-      "seconds": 62.916666666666664
+      "distance": 61.01,
+      "seconds": 30.683333333333334
     },
     {
       "bot": "human-touch",
       "seed": 195,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 51.73,
-      "seconds": 70.15
+      "distance": 61.57,
+      "seconds": 29.2
     },
     {
       "bot": "adaptive",
@@ -19754,7 +19794,7 @@
       "killer": null,
       "scene": "LONG TAKE",
       "distance": 643.28,
-      "seconds": 257.9166666666667
+      "seconds": 258.3666666666667
     },
     {
       "bot": "tracker",
@@ -19827,22 +19867,22 @@
       "seed": 196,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 33.75,
-      "seconds": 59.13333333333333
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 228.16,
+      "seconds": 99.43333333333334
     },
     {
       "bot": "human-touch",
       "seed": 196,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 34.09,
-      "seconds": 59.2
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 232.42,
+      "seconds": 100.86666666666666
     },
     {
       "bot": "adaptive",
@@ -19852,8 +19892,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 655.83,
-      "seconds": 262.8333333333333
+      "distance": 655.79,
+      "seconds": 263.21666666666664
     },
     {
       "bot": "tracker",
@@ -19926,22 +19966,22 @@
       "seed": 197,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 39.83,
-      "seconds": 60.3
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 227.99,
+      "seconds": 103.83333333333333
     },
     {
       "bot": "human-touch",
       "seed": 197,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 39.83,
-      "seconds": 67.8
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "MINIATURE CITY",
+      "distance": 231.11,
+      "seconds": 101.1
     },
     {
       "bot": "adaptive",
@@ -20025,22 +20065,22 @@
       "seed": 198,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 47.76,
-      "seconds": 69.36666666666666
+      "failed": "lost-talent",
+      "killer": "offscreen",
+      "scene": "NIGHT SHOOT",
+      "distance": 423.84,
+      "seconds": 196.23333333333332
     },
     {
       "bot": "human-touch",
       "seed": 198,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 47.76,
-      "seconds": 69.36666666666666
+      "distance": 55.59,
+      "seconds": 25.65
     },
     {
       "bot": "adaptive",
@@ -20124,22 +20164,22 @@
       "seed": 199,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 35.2,
-      "seconds": 66.91666666666667
+      "distance": 43.19,
+      "seconds": 46.38333333333333
     },
     {
       "bot": "human-touch",
       "seed": 199,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 33.26,
-      "seconds": 66.51666666666667
+      "distance": 43.52,
+      "seconds": 19.733333333333334
     },
     {
       "bot": "adaptive",
@@ -20221,24 +20261,24 @@
     {
       "bot": "human-keys",
       "seed": 200,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
-      "scene": "BACKLOT",
-      "distance": 43.5,
-      "seconds": 61.05
+      "failed": null,
+      "killer": null,
+      "scene": "LONG TAKE",
+      "distance": 662.44,
+      "seconds": 279.05
     },
     {
       "bot": "human-touch",
       "seed": 200,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 42.84,
-      "seconds": 60.916666666666664
+      "distance": 50.79,
+      "seconds": 28.483333333333334
     }
   ],
   "jitterWins": {
@@ -20493,7 +20533,7 @@
       "46": 8,
       "47": 8,
       "48": 8,
-      "49": 8,
+      "49": 7,
       "50": 8,
       "51": 8,
       "52": 8,
@@ -20636,7 +20676,7 @@
       "189": 8,
       "190": 8,
       "191": 8,
-      "192": 8,
+      "192": 6,
       "193": 8,
       "194": 8,
       "195": 8,

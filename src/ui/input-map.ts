@@ -1,6 +1,8 @@
 import { NEUTRAL_INPUT } from '../sim/step';
 import { TUNING } from '../sim/tuning';
 import type { InputFrame, SimState } from '../sim/types';
+import { cameraBasis } from '../sim/frame';
+import { lensAspect } from '../sim/lenses';
 import { easeZoomInput, heldZoomInput } from './zoom-control';
 
 // Device → InputFrame mapping shared by the browser (main.ts) and the human-like balance bots (src/bots/human.ts).
@@ -19,10 +21,38 @@ export function panFromKeys(keys: ReadonlySet<string>, holdButton: boolean): Inp
   return { ...NEUTRAL_INPUT, panX: x, panZ: z, zoom: 0, rotate: 0, hold: keys.has(' ') || holdButton, steady: keys.has('shift') };
 }
 
-/** One pointermove of a one-finger drag (px since the last move) → pan; the whole canvas width or height is full input. */
-export function pointerDragPan(dx: number, dy: number, width: number, height: number): Pick<InputFrame, 'panX' | 'panZ'> {
-  return { panX: Math.max(-127, Math.min(127, -dx / width * 127)), panZ: Math.max(-127, Math.min(127, dy / height * 127)) };
+/** A world point the camera is being dragged to; one-finger drags move it, and the camera chases it then stops. */
+export interface DragTarget { x: number; z: number; }
+
+/**
+ * One pointermove of a one-finger drag, 1:1: the world under the finger follows the finger. `dx`/`dy` are px since
+ * the last move on a `width`×`height` viewfinder; the target moves by the world distance those px span at this zoom/yaw.
+ */
+export function dragCameraTarget(target: DragTarget, dx: number, dy: number, width: number, height: number,
+  view: Pick<SimState, 'camera' | 'lens'>): DragTarget {
+  const { zoom, yaw } = view.camera;
+  const u = -dx / Math.max(1, width) * zoom * lensAspect(view.lens);
+  const v = dy / Math.max(1, height) * zoom / TUNING.projectionPitchScale;
+  const { cos, sin } = cameraBasis(yaw);
+  return { x: target.x + u * cos + v * sin, z: target.z - u * sin + v * cos };
 }
+
+/** Pan that drives the camera onto a drag target and brakes so it stops on it (no drift). Device parity: never faster than held keys. */
+export function panToward(view: Pick<SimState, 'camera' | 'lens'>, target: DragTarget): Pick<InputFrame, 'panX' | 'panZ'> {
+  const multiplier = view.lens === 'long-lens' ? 2 : 1;
+  const maxVelocity = view.camera.zoom * TUNING.panSpeed * multiplier;
+  const brake = TUNING.panAcceleration * view.camera.zoom * multiplier;
+  const axis = (error: number) => {
+    if (Math.abs(error) < DRAG_SETTLE * view.camera.zoom) return 0;
+    return Math.sign(error) * Math.min(1, Math.sqrt(2 * brake * Math.abs(error)) / maxVelocity) * KEY_PAN;
+  };
+  return { panX: axis(target.x - view.camera.x), panZ: axis(target.z - view.camera.z) };
+}
+
+/** A drag target closer than this (fraction of the frame width) counts as reached. */
+export const DRAG_SETTLE = 0.004;
+export const dragSettled = (view: Pick<SimState, 'camera'>, target: DragTarget) =>
+  Math.hypot(target.x - view.camera.x, target.z - view.camera.z) < DRAG_SETTLE * view.camera.zoom;
 
 export const clampZoom = (zoom: number) => Math.max(TUNING.minZoom, Math.min(TUNING.maxZoom, zoom));
 
@@ -35,8 +65,8 @@ export interface InputDevices {
   /** Held keys (lower-cased `event.key`). */
   keys: ReadonlySet<string>;
   holdButton: boolean;
-  /** Last drag delta while a finger is down, or null. */
-  pointerPan: Pick<InputFrame, 'panX' | 'panZ'> | null;
+  /** Where a one-finger drag has put the world (1:1), or null. */
+  dragTarget: DragTarget | null;
   /** A zoom key or − + button that is down, and for how long. */
   zoomPress: { direction: 1 | -1; heldSeconds: number } | null;
   /** Snap, pinch or slider zoom target, or null. */
@@ -47,10 +77,12 @@ export interface InputDevices {
 }
 
 /**
- * The per-tick InputFrame from every device, before the leash. Returns the zoom target too: a held zoom press drops it.
+ * The per-tick InputFrame from every device, before the lost-her assist. Returns the zoom target too: a held zoom press drops it.
  */
-export function composeInput(devices: InputDevices, zoom: number): { input: InputFrame; zoomTarget: number | null } {
-  const { frameInput, pointerPan, keys } = devices;
+export function composeInput(devices: InputDevices, view: Pick<SimState, 'camera' | 'lens'>): { input: InputFrame; zoomTarget: number | null } {
+  const { frameInput, keys } = devices;
+  const zoom = view.camera.zoom;
+  const pointerPan = devices.dragTarget ? panToward(view, devices.dragTarget) : null;
   const keyInput = panFromKeys(keys, devices.holdButton);
   const held = devices.zoomPress ? heldZoomInput(devices.zoomPress.direction, devices.zoomPress.heldSeconds) : 0;
   const zoomTarget = held ? null : devices.zoomTarget;
@@ -69,26 +101,37 @@ export function composeInput(devices: InputDevices, zoom: number): { input: Inpu
   };
 }
 
-/** Where the leash starts pulling, as a fraction of the half-frame from centre to edge. */
-export const LEASH_START = 0.34;
-/** Fraction of the half-frame over which the pull ramps up to full strength. */
-export const LEASH_RAMP = 0.22;
+/** The most the lost-her assist ever contributes to pan (fraction of full input). */
+export const ASSIST_MAX = 0.3;
+/** Hazards this far beyond the close-call radius of her count as "close" for suspending the assist. */
+export const ASSIST_HAZARD_MARGIN = 1;
+
+/** True while a deliberate pan should win outright: a defang gate is open or a hazard is within close-cut reach of her. */
+export function assistSuspended(state: Pick<SimState, 'talent' | 'entities' | 'shots'>): boolean {
+  if (state.shots?.some((shot) => shot.kind === 'defang' && !shot.done && state.talent.x >= shot.at - 0.35)) return true;
+  return state.entities.some((entity) => entity.spawned && !entity.cut && HAZARDS.has(entity.kind)
+    && Math.hypot(entity.x - state.talent.x, entity.z - state.talent.z) <= TUNING.closeCallRadius + ASSIST_HAZARD_MARGIN);
+}
+const HAZARDS = new Set(['urchin', 'boulder', 'swarm', 'stagehand']);
 
 /**
- * Pulls pan back toward the Talent once she drifts past LEASH_START of the half-frame. At full strength 90% of
- * the pan comes from the leash, so held player pan cannot push the camera much further.
+ * Soft lost-her assist (replaces the leash, loop review 2026-10-13). It does nothing while she is in frame, so it never
+ * fights a pan that keeps her in shot — including panning a close Urchin out right next to her. Once she is out of
+ * frame it blends toward her, ramping over the LOST HER grace to at most ASSIST_MAX, and it stays off while the
+ * player is actively panning near an open defang gate or a close hazard.
  */
-export function leashInput(input: InputFrame, state: Pick<SimState, 'talent' | 'camera'>): InputFrame {
+export function assistInput(input: InputFrame, state: Pick<SimState, 'talent' | 'camera' | 'entities' | 'shots'>): InputFrame {
+  const offscreen = state.talent.offscreenTicks;
+  if (offscreen <= 0) return input;
+  if ((input.panX || input.panZ) && assistSuspended(state)) return input;
   const dx = state.talent.x - state.camera.x;
   const dz = state.talent.z - state.camera.z;
-  const reach = Math.max(1, state.camera.zoom * 0.5);
-  const edge = Math.max(Math.abs(dx), Math.abs(dz) * TUNING.projectionPitchScale) / reach;
-  if (edge < LEASH_START) return input;
-  const blend = Math.min(1, (edge - LEASH_START) / LEASH_RAMP) * 0.9;
+  const length = Math.hypot(dx, dz) || 1;
+  const blend = ASSIST_MAX * Math.min(1, offscreen / Math.max(1, TUNING.offscreenGrace * TUNING.tickRate));
   return quantizeInput({
     ...input,
-    panX: input.panX * (1 - blend) + Math.sign(dx || 1) * 100 * blend,
-    panZ: input.panZ * (1 - blend) + Math.sign(dz || 1) * 100 * blend,
+    panX: input.panX * (1 - blend) + dx / length * 127 * blend,
+    panZ: input.panZ * (1 - blend) + dz / length * 127 * blend,
   });
 }
 

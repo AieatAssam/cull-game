@@ -6,7 +6,7 @@ import { updateRenderCamera } from './render/camera';
 import { cameraBasis, projectPoint } from './sim/frame';
 import { NEUTRAL_INPUT, lostProgress, step, talentLost } from './sim/step';
 import { lodTier } from './sim/lod';
-import { composeInput, leashInput, pinchZoomTarget, pointerDragPan } from './ui/input-map';
+import { assistInput, composeInput, dragCameraTarget, dragSettled, pinchZoomTarget, type DragTarget } from './ui/input-map';
 import { nextZoomStep } from './ui/zoom-control';
 import { TUNING } from './sim/tuning';
 import { createGeneratedState, createState } from './sim/world';
@@ -103,7 +103,9 @@ let sliderZoomTarget: number | null = null;
 // A zoom key or − + button that is down: a tap snaps a framing step, holding past the hold delay zooms at full speed.
 let zoomPress: { direction: 1 | -1; since: number } | null = null;
 let lastWheelStep = 0;
-let pointerPan: Pick<InputFrame, 'panX' | 'panZ'> | null = null;
+let dragTarget: DragTarget | null = null;
+/** A short HUD line after a far cut or a re-dressed stand-in; it overrides the toast until `until`. */
+let cutNote: { text: string; until: number } | null = null;
 let rotationPulse: -1 | 0 | 1 = 0;
 let simAccumulator = 0;
 let previousTime = 0;
@@ -909,7 +911,8 @@ function updateHud() {
   $('#status').textContent = tutorial.showing ? 'STANDING BY' : state.waiting ? 'HOLDING FOR SET…' : paused ? 'PAUSED' : state.camera.moving ? 'IN MOTION' : 'ROLLING';
   const copy = describeShot(state);
   $('#lod').textContent = copy.gate;
-  $('#message').textContent = !state.failed && invalidReplay ? 'INVALID REPLAY URL' : copy.toast;
+  const cutNoteLive = cutNote && performance.now() < cutNote.until && !state.failed && !talentLost(state);
+  $('#message').textContent = !state.failed && invalidReplay ? 'INVALID REPLAY URL' : cutNoteLive ? cutNote!.text : copy.toast;
   if (sliderZoomTarget !== null && Math.abs(sliderZoomTarget - state.camera.zoom) < 0.12) sliderZoomTarget = null;
   const zoomSlider = $('#zoom-slider') as HTMLInputElement;
   zoomSlider.value = String(Math.round(sliderZoomTarget ?? state.camera.zoom));
@@ -929,11 +932,13 @@ function updateHud() {
 
 function buildInput(): InputFrame {
   const composed = composeInput({
-    keys, holdButton, pointerPan, rotationPulse, frameInput, zoomTarget: sliderZoomTarget,
+    keys, holdButton, dragTarget, rotationPulse, frameInput, zoomTarget: sliderZoomTarget,
     zoomPress: zoomPress && { direction: zoomPress.direction, heldSeconds: (performance.now() - zoomPress.since) / 1000 },
-  }, state.camera.zoom);
+  }, state);
   sliderZoomTarget = composed.zoomTarget;
-  return leashInput(composed.input, state);
+  // A lifted drag settles onto where the finger left the world, then stops: no residual drift.
+  if (dragTarget && !pointer && dragSettled(state, dragTarget)) dragTarget = null;
+  return assistInput(composed.input, state);
 }
 function advanceTick(forcedInput?: InputFrame) {
   // A tutorial card blocks the take: no ticks run, so nothing can reach her while it is read.
@@ -974,10 +979,15 @@ function advanceTick(forcedInput?: InputFrame) {
       }
     }
     const cutHazard = newlyCut.find((entity) => !['reel', 'monitor', 'red-monitor', 'continuity'].includes(entity.kind));
+    const redressed = previousEntities.some((before) => before.cut && state.entities.some((after) => after.id === before.id && !after.cut && after.gate !== undefined));
+    if (redressed) cutNote = { text: 'Shot called: the stand-in is back on its mark. Cut it close to her.', until: performance.now() + 3000 };
     if (state.score > previousScore && !cutHazard) audio.playCue('reel');
     else if (cutHazard) {
       audio.playCue('cut');
-      showCut(cutHazard);
+      // Only a cut within close-call reach of her counts for the close-call bonus and the defang mark: say so when it was too far.
+      const far = state.closeCalls === previousCloseCalls;
+      showCut(cutHazard, far ? 'TOO FAR' : 'CUT');
+      if (far) cutNote = { text: 'Cut — but too far from her. Only a cut close to her scores or clears a defang mark.', until: performance.now() + 2500 };
     } else if (state.cuts.length > previousCuts) audio.playCue('cut');
     else if (state.entities.filter((entity) => entity.spawned && !entity.cut).length > previousSpawned) audio.playCue('pop');
     else if (state.talent.lodTier !== previousTalentTier || state.entities.some((entity) => entity.lodTier !== previousEntityTiers.get(entity.id))) audio.playCue('lod');
@@ -987,7 +997,8 @@ function advanceTick(forcedInput?: InputFrame) {
   frameInput = { ...NEUTRAL_INPUT };
   rotationPulse = 0;
 }
-function showCut(entity: { x: number; z: number }) {
+function showCut(entity: { x: number; z: number }, label: 'CUT' | 'TOO FAR') {
+  $('#cut-stamp').textContent = label;
   const projected = projectPoint(entity.x, entity.z, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, lensAspect(state.lens));
   const edge = Math.abs(projected.x) > Math.abs(projected.y) ? (projected.x < 0 ? 'left' : 'right') : (projected.y > 0 ? 'top' : 'bottom');
   const gate = $('#gate');
@@ -1070,9 +1081,12 @@ renderer.domElement.addEventListener('pointerdown', (event) => {
   try { renderer.domElement.setPointerCapture(event.pointerId); } catch { /* synthetic touch events have no browser pointer capture */ }
   if (touches.size >= 2) {
     // A second finger turns the drag into a pinch: the camera holds its pan while the spread sets the zoom.
-    pointer = null; pointerPan = null;
+    pointer = null; dragTarget = null;
     pinch = { distance: Math.max(1, touchSpread()), zoom: sliderZoomTarget ?? state.camera.zoom };
-  } else pointer = { id: event.pointerId, x: event.clientX, y: event.clientY };
+  } else {
+    pointer = { id: event.pointerId, x: event.clientX, y: event.clientY };
+    dragTarget = { x: state.camera.x, z: state.camera.z };
+  }
 });
 renderer.domElement.addEventListener('pointermove', (event) => {
   if (!touches.has(event.pointerId)) return;
@@ -1085,13 +1099,12 @@ renderer.domElement.addEventListener('pointermove', (event) => {
   const rect = renderer.domElement.getBoundingClientRect();
   const dx = event.clientX - pointer.x;
   const dy = event.clientY - pointer.y;
-  pointerPan = pointerDragPan(dx, dy, rect.width, rect.height);
+  dragTarget = dragCameraTarget(dragTarget ?? { x: state.camera.x, z: state.camera.z }, dx, dy, rect.width, rect.height, state);
   pointer.x = event.clientX; pointer.y = event.clientY;
 });
 for (const type of ['pointerup', 'pointercancel'] as const) {
   renderer.domElement.addEventListener(type, (event) => {
     touches.delete(event.pointerId);
-    pointerPan = null;
     if (touches.size < 2) pinch = null;
     // Lifting one finger of a pinch hands the drag back to the finger still down, from where it is now.
     const [rest] = [...touches.entries()];
@@ -1199,7 +1212,7 @@ $('#share').addEventListener('click', async () => {
 });
 
 if (query.has('debug')) {
-  Object.assign(window, { __cull: { step: (n = 1) => { for (let i = 0; i < n; i++) advanceTick(); render(); }, input: (input: InputFrame) => { frameInput = input; }, hash: () => stateHash(state), state: () => structuredClone(state), diagnostics: () => ({ paused, keys: [...keys], hidden: document.hidden, focused: document.hasFocus(), dprTier, pointerPan: pointerPan && { ...pointerPan } }), performance: () => ({ drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles }), lod: () => urchinBuckets.diagnostics(), load: (seed: number) => { state = createGeneratedState(seed); terrainTiles = null; urchinBuckets.reset(); }, loadShootScene: (sceneIndex: number) => { state = createShootSceneState(state.seed, sceneIndex); terrainTiles = null; urchinBuckets.reset(); render(); }, finishForShare: () => { state.failed = 'hit'; render(); }, loadLodDemo: () => { state = createGeneratedState(1, 0, 2); state.entities = [{ id: 'lod-demo-urchin', kind: 'urchin', x: 0, z: 2, vx: 0, vz: 0, spawned: true, cut: false, age: 0 }]; state.talent.x = -4; render(); }, setTier: (tier: number) => { const size = [64, 36, 17, 7, 2][tier] ?? 36; state.camera.zoom = TUNING.urchinRadius * 1000 / size; }, setCamera: (x: number, z: number, zoom: number) => { state.camera.x = x; state.camera.z = z; state.camera.zoom = zoom; }, poseDemo: (kind: 'flinch' | 'fall' | null = null) => { poseDemo = kind; render(); }, lostDemo: (seconds: number | null = null) => { lostDemoTicks = seconds === null ? null : Math.round(Math.max(0, seconds) * TUNING.tickRate); render(); }, talentScreen: () => { const rect = renderer.domElement.getBoundingClientRect(); const at = (v: THREE.Vector3) => { const p = v.clone().project(camera); return { x: rect.left + (p.x + 1) / 2 * rect.width, y: rect.top + (1 - p.y) / 2 * rect.height }; }; const foot = at(talent.getWorldPosition(new THREE.Vector3())); const head = at(talent.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0, renderedTalentHeight, 0))); return { foot, head, mark: at(shockMark.getWorldPosition(new THREE.Vector3())), lean: talentSprite.material.rotation, flip: talentSprite.scale.x < 0 }; }, lockDemo: (progress: number | null = null) => {
+  Object.assign(window, { __cull: { step: (n = 1) => { for (let i = 0; i < n; i++) advanceTick(); render(); }, input: (input: InputFrame) => { frameInput = input; }, hash: () => stateHash(state), state: () => structuredClone(state), diagnostics: () => ({ paused, keys: [...keys], hidden: document.hidden, focused: document.hasFocus(), dprTier, dragTarget: dragTarget && { ...dragTarget } }), performance: () => ({ drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles }), lod: () => urchinBuckets.diagnostics(), load: (seed: number) => { state = createGeneratedState(seed); terrainTiles = null; urchinBuckets.reset(); }, loadShootScene: (sceneIndex: number) => { state = createShootSceneState(state.seed, sceneIndex); terrainTiles = null; urchinBuckets.reset(); render(); }, finishForShare: () => { state.failed = 'hit'; render(); }, loadLodDemo: () => { state = createGeneratedState(1, 0, 2); state.entities = [{ id: 'lod-demo-urchin', kind: 'urchin', x: 0, z: 2, vx: 0, vz: 0, spawned: true, cut: false, age: 0 }]; state.talent.x = -4; render(); }, setTier: (tier: number) => { const size = [64, 36, 17, 7, 2][tier] ?? 36; state.camera.zoom = TUNING.urchinRadius * 1000 / size; }, setCamera: (x: number, z: number, zoom: number) => { state.camera.x = x; state.camera.z = z; state.camera.zoom = zoom; }, poseDemo: (kind: 'flinch' | 'fall' | null = null) => { poseDemo = kind; render(); }, lostDemo: (seconds: number | null = null) => { lostDemoTicks = seconds === null ? null : Math.round(Math.max(0, seconds) * TUNING.tickRate); render(); }, talentScreen: () => { const rect = renderer.domElement.getBoundingClientRect(); const at = (v: THREE.Vector3) => { const p = v.clone().project(camera); return { x: rect.left + (p.x + 1) / 2 * rect.width, y: rect.top + (1 - p.y) / 2 * rect.height }; }; const foot = at(talent.getWorldPosition(new THREE.Vector3())); const head = at(talent.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0, renderedTalentHeight, 0))); return { foot, head, mark: at(shockMark.getWorldPosition(new THREE.Vector3())), lean: talentSprite.material.rotation, flip: talentSprite.scale.x < 0 }; }, lockDemo: (progress: number | null = null) => {
     lockDemo = progress === null ? null : Math.max(0, Math.min(1, progress));
     demoMonitor = lockDemo === null ? null : { id: 'demo-red-monitor', kind: 'red-monitor', x: state.talent.x + 5, z: state.talent.z - 3.5, vx: 0, vz: 0, spawned: true, cut: false, age: 0, heading: Math.atan2(3.5, -5), range: 8, halfAngle: 0.45 };
     render();

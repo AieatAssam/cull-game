@@ -1,5 +1,5 @@
 import { inFrame, projectPoint, projectedAabb } from './frame';
-import { gateOpen, markShots, shotBlocksTalent } from './framing';
+import { markShots, shotBlocksTalent } from './framing';
 import { lodTier, type LodTier } from './lod';
 import { lensAspect, lensLodFactor } from './lenses';
 import { TUNING } from './tuning';
@@ -38,11 +38,11 @@ function monitorCone(entity: CastEntity): MonitorCone {
 
 /**
  * Framed out but not cut: far Glass is unloaded intact (it only shatters within reach of the Talent, where it was
- * just on screen), and a stand-in on a gate mark only leaves when its shot has been called.
+ * just on screen). Everything else framed out is cut, at any distance — including a gate's stand-in (loop review
+ * 2026-10-13: a deliberate far cut removes it; it is re-dressed on its mark when the shot is called, see markShots).
  */
 function unloadsIntact(state: SimState, entity: CastEntity) {
-  if (entity.kind === 'glass') return distance(entity.x, entity.z, state.talent.x, state.talent.z) > TUNING.glassShatterRadius;
-  return entity.gate !== undefined && !gateOpen(state, entity.gate);
+  return entity.kind === 'glass' && distance(entity.x, entity.z, state.talent.x, state.talent.z) > TUNING.glassShatterRadius;
 }
 
 /** Mirrors the HUD call sheet ("Coming in"): unspawned cast just past the gate edge. */

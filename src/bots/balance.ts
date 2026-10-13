@@ -263,7 +263,7 @@ export function stageGates(mode: BalanceMode, targets: StageTargets, bots: Recor
       pass: mode === 'shoot' ? sceneShare <= targets.sceneShareMax : null,
     },
     { name: 'chaos completions', value: String(bots.chaos!.completed), target: '0', pass: bots.chaos!.completed === 0 },
-    { name: 'adaptive is the ceiling (perfect-information reflexes, no leash)', value: pct(adaptive.completion), target: 'ceiling', pass: null },
+    { name: 'adaptive is the ceiling (perfect-information reflexes, no assist)', value: pct(adaptive.completion), target: 'ceiling', pass: null },
     ...HUMAN_BOTS.filter((bot) => bots[bot]).map((bot) => ({
       name: `${bot} ${mode === 'shoot' ? 'Backlot clear' : 'strip clear'}`, value: pct(mode === 'shoot' ? backlotClear(bots[bot]!) : bots[bot]!.completion),
       target: '60–80% (target, report-only)', pass: null,
