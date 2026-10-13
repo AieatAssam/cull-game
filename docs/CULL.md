@@ -328,7 +328,7 @@ data/archetypes.json, data/chunks/*.json
      - (d) a consumed spawn point never respawns (except RECURRING);
      - (e) SET reload is byte-identical.
 2. **State hashes.** Golden hashes for 5 seeds × 3 bots at ticks 600/3,600/18,000. Any change needs `UPDATE_HASHES=1` plus a reason in the PR.
-   - Current pinned fair-Adaptive Shoot hashes (`tests/m2.test.ts`): seed 1 `e0c89e0d`, seed 19 `a80d24ad`, seed 2026 `9951f3d0`. These were bumped 2026-10-13 (loop review) because a far cut now removes a gate stand-in, which is re-dressed on its mark when the shot is called, instead of unloading intact. See `DECISIONS.md`.
+   - Current pinned fair-Adaptive Shoot hashes (`tests/m2.test.ts`): seed 1 `9525b1c6`, seed 19 `6ece64b1`, seed 2026 `fe881e70`. These were last bumped 2026-10-13 (loop review round 2) for the defang ACTION beat (per scene), and the 1× film burn while a defang gate holds her. See `DECISIONS.md`.
 3. **Scenario tests.** Tiny hand-authored chunks with scripted inputs, e.g. "Urchin at W=30 touches the Talent → no fail", "Bridge at W=40 → FELL", "Stagehand doesn't move while camera speed < 0.6", "Rumour grows by exactly 0.3·t off-screen".
 4. **Bot players** (`src/bots`, also runnable in the browser via `?bot=`):
    - **TrackerBot** keeps the Talent centred at mid zoom (the passive baseline).
@@ -407,7 +407,8 @@ A cold playtest still watches five signals. The old M2 kill criterion and its pi
 | LOD thresholds | 48/24/10/4 lpx, 15% hysteresis |
 | Talent speeds | 2.0/2.5/3.2/3.6 u/s |
 | Talent radii | 0.30/0.40/0.60/0.75 |
-| film | start 90 s, Reel +15 s, scene +30 s, hold ×2 |
+| film | start 90 s, Reel +15 s, scene +30 s, hold ×2 (×1 while a defang gate or its ACTION beat holds her) |
+| defang ACTION beat | after the close cut she holds her mark under an "ACTION" cue and an exit arrow at her feet, then walks on: Backlot 0.35 s, City/Night/Long Take 0.9 s (`gateReleaseSecondsByScene`) |
 | urchin speed | 1.5 u/s |
 | boulder speed | 4 u/s |
 | extras speed | 0.8 u/s |

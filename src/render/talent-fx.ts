@@ -172,3 +172,26 @@ export function createDustPuff(): THREE.Sprite {
   sprite.visible = false;
   return sprite;
 }
+
+/**
+ * The ACTION exit telegraph (loop review 2026-10-13 round 2): three inked chevrons on the floor at her feet, pointing
+ * the way she will walk off her mark. A flat mesh in the floor plane, pointing +X; the caller turns it about Y.
+ */
+export function createExitArrow(): THREE.Mesh {
+  const map = inkCanvas(256, 96, (ctx) => {
+    const chevron = (x: number) => { ctx.beginPath(); ctx.moveTo(x, 18); ctx.lineTo(x + 34, 48); ctx.lineTo(x, 78); };
+    for (const x of [62, 122, 182]) {
+      ctx.lineWidth = 22; ctx.strokeStyle = PALETTE.ink; chevron(x); ctx.stroke();
+      ctx.lineWidth = 12; ctx.strokeStyle = PALETTE.brass; chevron(x); ctx.stroke();
+    }
+  });
+  const geometry = new THREE.PlaneGeometry(1, 0.375);
+  geometry.rotateX(-Math.PI / 2);
+  // The arrow starts at her feet and runs ahead of her.
+  geometry.translate(0.5, 0, 0);
+  const mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ map, transparent: true, alphaTest: 0.04, depthWrite: false, depthTest: false }));
+  // Over the floor and path, under her body (renderOrder 4).
+  mesh.renderOrder = 2;
+  mesh.visible = false;
+  return mesh;
+}

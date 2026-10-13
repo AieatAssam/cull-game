@@ -5,7 +5,8 @@ import fc from 'fast-check';
 import { inFrame, projectedAabb, overlapsFrame } from '../src/sim/frame';
 import { stateHash } from '../src/sim/hash';
 import { lodTier } from '../src/sim/lod';
-import { shotListForPath } from '../src/sim/framing';
+import { exitHeading, gateReleaseSeconds, releasing, shotListForPath } from '../src/sim/framing';
+import { createObserver } from '../src/bots/observe';
 import { step, NEUTRAL_INPUT, zoomLogRate } from '../src/sim/step';
 import { createGeneratedState, createState, loadWorld, reloadSet } from '../src/sim/world';
 import { TUNING } from '../src/sim/tuning';
@@ -414,8 +415,27 @@ describe('fixed step simulation and failure rules', () => {
     still.camera.x = still.talent.x - still.camera.zoom / 2 + 0.2;
     const cut = step(still);
     expect(cut.closeCalls).toBe(still.closeCalls + 1);
-    const wide = step(cut);
+    let wide = step(cut);
     expect(wide.shots?.find((shot) => shot.kind === 'defang')?.done).toBe(true);
+    // The ACTION beat: she holds her mark for the scene's gateReleaseSecondsByScene, burning film at 1× (the gate holds her, not HOLD), then walks on.
+    const beatFilm = wide.film;
+    const beatX = wide.talent.x;
+    for (let i = 0; i < Math.round(TUNING.gateReleaseSecondsByScene[0] * TUNING.tickRate) - 2; i++) wide = step(wide);
+    expect(wide.waiting).toBe(true);
+    expect(wide.talent.x).toBe(beatX);
+    // The exit telegraph points along the path she is about to walk; a bot sees it only while she is on screen.
+    expect(releasing(wide)).toBe(true);
+    const arrow = exitHeading(wide)!;
+    const nextNode = wide.path[wide.talent.pathIndex + 1]!;
+    expect(arrow.x * (nextNode.x - wide.talent.x) + arrow.z * (nextNode.z - wide.talent.z)).toBeGreaterThan(0);
+    expect(createObserver()(wide).action).toEqual(arrow);
+    expect(createObserver()({ ...wide, camera: { ...wide.camera, x: wide.talent.x + 500 } }).action).toBeNull();
+    // Per-scene beat: the strip plays as Backlot (scene 0); City and Night keep at least 0.6 s.
+    expect(gateReleaseSeconds(wide)).toBe(TUNING.gateReleaseSecondsByScene[0]);
+    for (const sceneIndex of [1, 2, 3]) expect(gateReleaseSeconds({ shoot: { ...wide.shoot!, sceneIndex } })).toBeGreaterThanOrEqual(0.6);
+    expect(beatFilm - wide.film).toBeCloseTo((Math.round(TUNING.gateReleaseSecondsByScene[0] * TUNING.tickRate) - 2) / TUNING.tickRate, 5);
+    wide = step(step(wide));
+    expect(wide.waiting).toBe(false);
     const portrait = wide.shots!.find((shot) => shot.kind === 'portrait')!;
     wide.talent.x = portrait.at;
     wide.camera.zoom = 48;
