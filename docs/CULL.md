@@ -2,7 +2,7 @@
 
 > **Nothing exists unless it's on screen. You hold the camera.**
 
-Draft for Aieat Assam, 12 Oct 2026. It builds on `RESEARCH.md` (mechanisms M1–M12) and `CONCEPTS.md` §4.
+Draft for Aieat Assam, 12 Oct 2026. Campaign milestones live in `docs/design/game-design.md`, which supersedes this draft where they conflict. This file stays the reference for the core rules (§2), LOD (§4) and tech (§13).
 **Every number marked ⚙ is an initial tuning guess**, and all of them are collected in the tuning table in §17 so an agent can change them in one place (`src/sim/tuning.ts`).
 
 ---
@@ -348,47 +348,21 @@ data/archetypes.json, data/chunks/*.json
 
 ---
 
-## 15. Milestones M0–M10 (each with acceptance tests)
+## 15. Campaign milestones
 
-| M | Deliverable | Acceptance (automated unless marked 👤) |
-|---|---|---|
-| **M0** | Scaffold: Vite+TS+three, Vitest, Playwright, fast-check, ESLint (sim purity), size-limit, GitHub Pages deploy, `tuning.ts` | CI green; the deployed page renders an empty gate with no console errors; the lint fails on a planted `Math.random` in `sim/` |
-| **M1** | Sim core: camera physics, gate projection, overlap, SET streaming, CAST lifecycle, call sheet, Talent path-follow and forks, HOLD, film, all 5 fail states | Unit plus property tests (a, c, d, e); scenario tests for each fail state; 10k-tick determinism hash ×3 seeds; sim-vs-three projection equality test |
-| **M2** | **Greybox prototype + fun test.** Flat cubes; pan/zoom on mouse, keys and touch; 3 entities (**Urchin with LOD, Boulder pop-in, Glass floor**); one hand-built 90 s scene plus 10 seeded strips; minimal cut and LOD feedback | Automated: TrackerBot and a scripted "skilled" path both run without errors; touch emulation pans and zooms. 👤 **Fun test and kill criterion (§16)** |
-| **M3** | Full LOD system: 4 tiers plus sub-pixel, hysteresis, Talent tiers, mesh-bucket swaps, LOD rings | Property test (b); tier-flip count ≤ 2 per entity during a 10 s oscillating zoom (hysteresis works); golden screenshots of the Urchin at each tier |
-| **M4** | Roster part 1: Extras, Swarm, Stagehand, Rope bridge, Reels (plus refine the M2 three) | One scenario test per entity rule from §5; Swarm size-culling test at the W threshold; Stagehand motion-gating test |
-| **M5** | Procedural generator plus ~40 chunk templates plus validator, and the bots (Tracker, Wide, Close, Adaptive, Chaos) | ≥ 95% AdaptiveBot completion over 200 seeds; design-health ratios (§14.4) pass; ChaosBot 1,000 runs with no crashes or NaNs; generation ≤ 50 ms per scene |
-| **M6** | Roster part 2: Rumour (LEDGER), Monitor and Red Monitor, Continuity Prop (RECURRING), the Wrap; full Shoot structure (3 scenes + finale, biome order, ramp) | Ledger growth/shrink exactness; Monitor-cone existence test; Prop sequence determinism; Wrap deletes SET; a full Shoot E2E with AdaptiveBot lasts 3–8 min of sim time on 20 seeds |
-| **M7** | Visual signature: clay set meshes per LOD, gate UI, bounding boxes, rings, margin and frustum lines, cut and pop-in effects, palette LUT, post pass, adaptive DPR tier | ~20 golden screenshots; perf budgets (§12) pass on the worst-case seed; a forced slow-frame mock steps the tier down once, never up |
-| **M8** | Audio: in-frame-only sources, LOD audio degradation, generative stems, signature sounds, settings | Unit test: the audible-source set equals the in-frame entity set each tick; the stem for a culled type is muted within 1 bar; no AudioContext before the first user gesture |
-| **M9** | Meta and share: filmography, lens unlocks by feat, grades, film-stock LUTs, daily seed, replay codec plus URL import, contact sheet PNG, text card, optional WebM | Replay round-trip: the imported URL reproduces the hash; malformed URLs are rejected (fuzz); the contact sheet is 1080×1350 with 9 frames (golden); daily seed is stable across timezones; unlock tests per feat; a lint/grep check confirms no streak or timer code paths |
-| **M10** | Polish and human gate: accessibility (reduced motion, colour-blind hatch on hazards, left-hand layout, 75% speed "Overcrank" assist labelled on share cards), onboarding hints, tuning pass | Automated: `prefers-reduced-motion` disables blur, shake and shimmer; a11y checks on menus. 👤 Assam plays on the weak no-WebGPU machine (≥ 55 fps median ⚙, no device loss) and on a phone (one-handed, notch-safe); the agent then tunes only `tuning.ts` |
+The build order is `docs/design/game-design.md`. The M0–M10 schedule that used to be listed here is retired. This draft still holds the core rules (§2), LOD (§4) and tech (§13).
 
----
+## 16. Playtest signals
 
-## 16. The M2 "is it fun?" test and kill criterion
+A cold playtest still watches five signals. The old M2 kill criterion and its pivot plan are retired; the campaign bible owns go and no-go.
 
-**Build:** a greybox only. No art and no meta, just the rule, pan, zoom, and three entities that cover all three pillars (Urchin = LOD, Boulder = pop-in, Glass = culling cuts both ways).
-
-**Human test (👤):** Assam plus 3–5 people who haven't seen the concept play cold for 10 minutes each with one line of instruction ("Keep them in the shot"). Observe without helping, then ask 3 questions.
-
-| Signal | Pass |
+| Signal | What to watch |
 |---|---|
-| Understanding | They can explain "off-screen = deleted" within **60 s** of play |
-| Agency | They **deliberately** cull a threat (pan away on purpose) by their 2nd run |
-| LOD discovery | They change zoom *for a LOD reason* (defang or collect) by **5 min**, unprompted or after one hint |
-| Pull | They **voluntarily start a 3rd run** without being asked |
+| Understanding | They can explain "off-screen = deleted" within 60 s of play |
+| Agency | They deliberately cull a threat by their second run |
+| LOD discovery | They change zoom for a LOD reason by 5 min |
+| Pull | They start a third run on their own |
 | Comfort | No one reports nausea that persists with reduced motion on |
-
-**Automated twin (runs at M2 on the 10 seeded strips):** a scripted "framing-aware" bot must beat TrackerBot's distance by ≥ 30% ⚙. If passive centring is as good as clever framing, the core rule isn't creating decisions.
-
-**Kill criterion.** Stop or pivot if **any** of these hold:
-1. fewer than half the testers voluntarily start a 3rd run;
-2. fewer than half deliberately use culling as a tool by run 2 (they just track the Talent);
-3. the automated twin fails (< 30% advantage) after one tuning pass;
-4. motion discomfort persists for any tester even with reduced motion.
-
-**Pivot options:** (a) **CULL: Stills**, slower discrete puzzle scenes (the Talent waits; you compose one frame per beat, Viewfinder-style); (b) shelve and build **AUTOPHAGE** (PICK.md). Cost of the test: about M0–M2, roughly 3–5 agent sessions ⚙.
 
 ---
 
@@ -397,7 +371,7 @@ data/archetypes.json, data/chunks/*.json
 **Risks**
 - **Motion sickness:** mitigated with critically damped camera, no gameplay shake, snap rotation, reduced-motion mode, an optional static-grid overlay and the speed assist. Tested at M2 and M10.
 - **Readability:** with debug lines plus clay it can get busy. Mitigations: lines only on CAST, hazard colour plus hatch, and a "clean frame" toggle. Checked by golden screenshots and human eyes.
-- **Passive play dominance:** guarded by the design-health bot ratios and the M2 kill criterion.
+- **Passive play dominance:** guarded by the design-health bot ratios in `docs/design/game-design.md`.
 - **"Hard to get from a thumbnail":** the contact sheet with a half-sliced hazard is the hook. The first 15 s must show a cut.
 - **Determinism across browsers:** the trig lookup tables and a cross-browser hash test; if it fails, replays fall back to "same seed" rather than "same run".
 - **Replay URL length:** quantise inputs to 30 Hz ⚙ if needed, or fall back to a downloadable `.cull` file.
