@@ -110,6 +110,12 @@ function noteFrameCut(state: SimState, entity: CastEntity) {
   state.score += TUNING.closeCallScore;
 }
 
+/** Log zoom speed per second for an input in −127…127 (positive tightens): gentle near zero, fast at full input. */
+export function zoomLogRate(zoomInput: number): number {
+  const u = Math.max(-1, Math.min(1, zoomInput / 127));
+  return u * (1 + TUNING.zoomBoost * u ** 4) * Math.log(TUNING.zoomRate);
+}
+
 export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): SimState {
   if (previous.failed) return previous;
   const state: SimState = {
@@ -139,7 +145,7 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
   cam.x += cam.vx * dt;
   cam.z += cam.vz * dt;
   cam.moving = Math.hypot(cam.vx, cam.vz) / cam.zoom > TUNING.motionThreshold;
-  if (input.zoom && state.lens !== 'long-lens') cam.zoom = Math.max(TUNING.minZoom, Math.min(TUNING.maxZoom, cam.zoom * Math.exp(-(input.zoom / 127) * Math.log(TUNING.zoomRate) * dt)));
+  if (input.zoom && state.lens !== 'long-lens') cam.zoom = Math.max(TUNING.minZoom, Math.min(TUNING.maxZoom, cam.zoom * Math.exp(-zoomLogRate(input.zoom) * dt)));
   if (input.rotate && cam.rotationTicksRemaining === 0) {
     cam.yawTarget = (cam.yawTarget + input.rotate + 8) % 8;
     cam.rotationTicksRemaining = Math.round(TUNING.rotationSeconds * TUNING.tickRate);

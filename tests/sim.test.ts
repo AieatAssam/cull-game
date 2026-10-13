@@ -6,7 +6,7 @@ import { inFrame, projectedAabb, overlapsFrame } from '../src/sim/frame';
 import { stateHash } from '../src/sim/hash';
 import { lodTier } from '../src/sim/lod';
 import { shotListForPath } from '../src/sim/framing';
-import { step, NEUTRAL_INPUT } from '../src/sim/step';
+import { step, NEUTRAL_INPUT, zoomLogRate } from '../src/sim/step';
 import { createGeneratedState, createState, loadWorld, reloadSet } from '../src/sim/world';
 import { TUNING } from '../src/sim/tuning';
 import { lensLodFactor, lensRenderTicks } from '../src/sim/lenses';
@@ -243,8 +243,10 @@ describe('fixed step simulation and failure rules', () => {
     expect(travelled).toBeLessThanOrEqual(30 * TUNING.panSpeed + 1e-6);
     expect(travelled).toBeGreaterThan(30 * TUNING.panSpeed * 0.7);
     state = createState(1, []);
-    for (let i = 0; i < 60; i++) state = step(state, { ...NEUTRAL_INPUT, zoom: 127 });
-    expect(state.camera.zoom).toBeCloseTo(30 / 1.6, 5);
+    for (let i = 0; i < 6; i++) state = step(state, { ...NEUTRAL_INPUT, zoom: 127 });
+    expect(state.camera.zoom).toBeCloseTo(30 / Math.exp(Math.log(TUNING.zoomRate) * (1 + TUNING.zoomBoost) * 0.1), 5);
+    // A light input (bot trims) stays near the base rate.
+    expect(zoomLogRate(32)).toBeCloseTo(Math.log(TUNING.zoomRate) * 32 / 127, 2);
   });
   it('fails after offscreenFailSeconds fully off-screen, burning extra film past the grace', () => {
     let state = createState(1, []); state.camera.x = 100;

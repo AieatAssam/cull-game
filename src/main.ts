@@ -6,6 +6,7 @@ import { updateRenderCamera } from './render/camera';
 import { cameraBasis, projectPoint } from './sim/frame';
 import { NEUTRAL_INPUT, lostProgress, step, talentLost } from './sim/step';
 import { lodTier } from './sim/lod';
+import { easeZoomInput, heldZoomInput, nextZoomStep } from './ui/zoom-control';
 import { TUNING } from './sim/tuning';
 import { createGeneratedState, createState } from './sim/world';
 import { createValidatedState } from './gen/validated';
@@ -98,8 +99,10 @@ let pointer: { id: number; x: number; y: number } | null = null;
 const keys = new Set<string>();
 let frameInput: InputFrame = { ...NEUTRAL_INPUT };
 let sliderZoomTarget: number | null = null;
+// A zoom key or − + button that is down: a tap snaps a framing step, holding past the hold delay zooms at full speed.
+let zoomPress: { direction: 1 | -1; since: number } | null = null;
+let lastWheelStep = 0;
 let pointerPan: Pick<InputFrame, 'panX' | 'panZ'> | null = null;
-let zoomPulse = 0;
 let rotationPulse: -1 | 0 | 1 = 0;
 let simAccumulator = 0;
 let previousTime = 0;
@@ -925,12 +928,14 @@ function updateHud() {
 
 function buildInput(): InputFrame {
   const keyInput = panFromKeys();
-  const sliderZoom = sliderZoomTarget === null ? 0 : Math.abs(sliderZoomTarget - state.camera.zoom) < 0.12 ? 0 : sliderZoomTarget > state.camera.zoom ? -127 : 127;
+  const held = zoomPress ? heldZoomInput(zoomPress.direction, (performance.now() - zoomPress.since) / 1000) : 0;
+  if (held) sliderZoomTarget = null;
+  const sliderZoom = held || (sliderZoomTarget === null ? 0 : easeZoomInput(state.camera.zoom, sliderZoomTarget));
   return leashInput(quantizeInput({
     ...frameInput, ...keyInput,
     panX: pointerPan?.panX ?? (keys.size ? keyInput.panX : frameInput.panX),
     panZ: pointerPan?.panZ ?? (keys.size ? keyInput.panZ : frameInput.panZ),
-    zoom: keyInput.zoom || zoomPulse || sliderZoom || frameInput.zoom,
+    zoom: sliderZoom || frameInput.zoom,
     rotate: rotationPulse || frameInput.rotate,
     hold: keyInput.hold || frameInput.hold,
     steady: keyInput.steady || frameInput.steady,
@@ -1003,7 +1008,6 @@ function advanceTick(forcedInput?: InputFrame) {
   }
   audio.update(state);
   frameInput = { ...NEUTRAL_INPUT };
-  zoomPulse = 0;
   rotationPulse = 0;
 }
 function showCut(entity: { x: number; z: number }) {
@@ -1057,7 +1061,7 @@ function panFromKeys(): InputFrame {
   if (keys.has('d') || keys.has('arrowright')) x += 90;
   if (keys.has('w') || keys.has('arrowup')) z -= 90;
   if (keys.has('s') || keys.has('arrowdown')) z += 90;
-  return { ...NEUTRAL_INPUT, panX: x, panZ: z, zoom: (keys.has('x') || keys.has('=') || keys.has('+') ? 60 : 0) - (keys.has('z') || keys.has('-') ? 60 : 0), rotate: 0, hold: keys.has(' ') || holdButton, steady: keys.has('shift') };
+  return { ...NEUTRAL_INPUT, panX: x, panZ: z, zoom: 0, rotate: 0, hold: keys.has(' ') || holdButton, steady: keys.has('shift') };
 }
 let holdButton = false;
 window.addEventListener('keydown', (event) => {
@@ -1068,15 +1072,30 @@ window.addEventListener('keydown', (event) => {
   }
   if ([' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) event.preventDefault();
   keys.add(event.key.toLowerCase());
+  const zoomDirection = zoomKeyDirection(event.key);
+  if (zoomDirection && !event.repeat) startZoomPress(zoomDirection);
   if (!event.repeat && event.key.toLowerCase() === 'q') rotationPulse = -1;
   if (!event.repeat && event.key.toLowerCase() === 'e') rotationPulse = 1;
   if (event.key === 'Escape' || event.key.toLowerCase() === 'p') paused = !paused;
 });
-window.addEventListener('keyup', (event) => { keys.delete(event.key.toLowerCase()); });
+window.addEventListener('keyup', (event) => {
+  keys.delete(event.key.toLowerCase());
+  if (zoomKeyDirection(event.key) === zoomPress?.direction) zoomPress = null;
+});
+window.addEventListener('blur', () => { zoomPress = null; });
 const touches = new Map<number, { x: number; y: number }>();
 let pinch: { distance: number; zoom: number } | null = null;
 const touchSpread = () => { const [a, b] = [...touches.values()]; return a && b ? Math.hypot(a.x - b.x, a.y - b.y) : 0; };
 const clampZoom = (zoom: number) => Math.max(TUNING.minZoom, Math.min(TUNING.maxZoom, zoom));
+const zoomKeyDirection = (key: string): 1 | -1 | 0 => (['x', '=', '+'].includes(key.toLowerCase()) ? 1 : ['z', '-', '_'].includes(key.toLowerCase()) ? -1 : 0);
+/** A tap: snap to the next framing step, chaining from a snap still in progress so a double tap goes two steps. */
+function stepZoom(direction: 1 | -1) {
+  if (state.lens !== 'long-lens') sliderZoomTarget = nextZoomStep(sliderZoomTarget ?? state.camera.zoom, direction);
+}
+function startZoomPress(direction: 1 | -1) {
+  stepZoom(direction);
+  zoomPress = { direction, since: performance.now() };
+}
 renderer.domElement.addEventListener('pointerdown', (event) => {
   unlockAudio();
   touches.set(event.pointerId, { x: event.clientX, y: event.clientY });
@@ -1111,15 +1130,25 @@ for (const type of ['pointerup', 'pointercancel'] as const) {
     pointer = rest && !pinch ? { id: rest[0], x: rest[1].x, y: rest[1].y } : null;
   });
 }
-renderer.domElement.addEventListener('wheel', (event) => { event.preventDefault(); zoomPulse = -Math.sign(event.deltaY) * 60; }, { passive: false });
+renderer.domElement.addEventListener('wheel', (event) => {
+  event.preventDefault();
+  // One framing step per wheel notch; a trackpad's burst of small deltas still steps at most every 120 ms.
+  if (!event.deltaY || performance.now() - lastWheelStep < 120) return;
+  lastWheelStep = performance.now();
+  stepZoom(event.deltaY < 0 ? 1 : -1);
+}, { passive: false });
 document.addEventListener('visibilitychange', () => { if (document.hidden) paused = true; });
 $('#hold').addEventListener('pointerdown', () => { holdButton = true; frameInput.hold = true; });
 for (const type of ['pointerup', 'pointercancel', 'pointerleave']) $('#hold').addEventListener(type, () => { holdButton = false; frameInput.hold = false; });
 $('#rotate-left').addEventListener('click', () => { rotationPulse = -1; });
 $('#rotate-right').addEventListener('click', () => { rotationPulse = 1; });
-const nudgeZoom = (delta: number) => { if (state.lens !== 'long-lens') sliderZoomTarget = clampZoom(Math.round(sliderZoomTarget ?? state.camera.zoom) + delta); };
-$('#zoom-in').addEventListener('click', () => nudgeZoom(-6));
-$('#zoom-out').addEventListener('click', () => nudgeZoom(6));
+for (const [id, direction] of [['#zoom-in', 1], ['#zoom-out', -1]] as const) {
+  const button = $(id);
+  button.addEventListener('pointerdown', (event) => { event.preventDefault(); unlockAudio(); startZoomPress(direction); });
+  for (const type of ['pointerup', 'pointercancel', 'pointerleave']) button.addEventListener(type, () => { if (zoomPress?.direction === direction) zoomPress = null; });
+  // Keyboard activation (Enter/Space on the focused button) has no pointer: treat it as a tap.
+  button.addEventListener('click', (event) => { if (event.detail === 0) stepZoom(direction); });
+}
 // Keep the page itself still: drags and pinches on the viewfinder and the camera controls belong to the camera, never to browser scroll or zoom.
 for (const surface of [$('#gate'), $('.controlbar')]) surface.addEventListener('touchmove', (event) => { event.preventDefault(); }, { passive: false });
 document.addEventListener('touchmove', (event) => { if (event.touches.length > 1) event.preventDefault(); }, { passive: false });

@@ -215,13 +215,13 @@ describe('bible M2: Adaptive policy helpers', () => {
   });
 });
 
-// Fixed replay hashes after the bible M2 rule changes (DECISIONS 2026-10-13, round 2) and the graded out-of-frame rule (DECISIONS 2026-10-13, LOST HER). Regenerate only with a decision entry.
+// Fixed replay hashes after the bible M2 rule changes (DECISIONS 2026-10-13, round 2) and the graded out-of-frame rule (DECISIONS 2026-10-13, LOST HER) and fast zoom (DECISIONS 2026-10-13, fast zoom). Regenerate only with a decision entry.
 describe('fixed replay hashes', () => {
   const frames = Array.from({ length: 10_000 }, (_, i) => ({ ...NEUTRAL_INPUT, panX: (i % 240 < 120 ? 30 : -30), zoom: i % 300 < 150 ? 0 : 1 }));
   const fixtures: Record<number, [string, string, string]> = {
-    1: ['4500bdc4', '4339a9ff', '6ebb4e8c'],
-    19: ['5f4a7114', 'af0d6135', 'ce00d1c4'],
-    2026: ['ec251869', '85774155', '38027c06'],
+    1: ['4500bdc4', '4339a9ff', 'cbfefb6f'],
+    19: ['5f4a7114', 'af0d6135', '46fc3197'],
+    2026: ['ec251869', '85774155', '9951f3d0'],
   };
   it.each(Object.entries(fixtures))('seed %s: strip world, generated strip and a full fair Adaptive Shoot', (seedText, [world, generated, shoot]) => {
     const seed = Number(seedText);
