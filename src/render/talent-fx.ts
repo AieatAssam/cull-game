@@ -90,7 +90,7 @@ export function springStep(spring: { x: number; v: number }, target: number, dt:
 function inkCanvas(width: number, height: number, draw: (ctx: CanvasRenderingContext2D) => void) {
   const canvas = document.createElement('canvas');
   canvas.width = width; canvas.height = height;
-  const ctx = canvas.getContext('2d')!;
+  const ctx = canvas.getContext('2d', { willReadFrequently: true })!;
   ctx.lineCap = 'round'; ctx.lineJoin = 'round';
   draw(ctx);
   const texture = new THREE.CanvasTexture(canvas);
