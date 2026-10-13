@@ -34,16 +34,31 @@ export const SCENE_LOOKS: SceneLook[] = [
 
 export interface DailiesCast extends SpriteAssets {
   walk: [THREE.Texture, THREE.Texture, THREE.Texture, THREE.Texture];
+  /** Breathing in, breathing out: plays while she waits. */
+  idle: [THREE.Texture, THREE.Texture];
+  /** Arms up, eyes wide: a hazard is inside the close-call radius. */
+  flinch: THREE.Texture;
+  /** Toppled over: the take failed on a hit or a fall. */
+  fall: THREE.Texture;
   plywood: THREE.Texture;
 }
 
-function texture(draw: (ctx: CanvasRenderingContext2D, size: number) => void, size = 128): THREE.CanvasTexture {
-  const canvas = document.createElement('canvas');
-  canvas.width = canvas.height = size;
+type Ctx = CanvasRenderingContext2D;
+type Rand = () => number;
+/** x, y, w, h in design units. */
+type Box = [number, number, number, number];
+
+/** Cast art is drawn in a 128-unit design space and rasterised at CAST_SIZE. */
+const U = 128;
+const CAST_SIZE = 256;
+
+function ctx2d(canvas: HTMLCanvasElement): Ctx {
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Canvas unavailable');
-  ctx.clearRect(0, 0, size, size);
-  draw(ctx, size);
+  return ctx;
+}
+
+function toTexture(canvas: HTMLCanvasElement): THREE.CanvasTexture {
   const map = new THREE.CanvasTexture(canvas);
   map.colorSpace = THREE.SRGBColorSpace;
   map.magFilter = THREE.LinearFilter;
@@ -53,149 +68,1540 @@ function texture(draw: (ctx: CanvasRenderingContext2D, size: number) => void, si
   return map;
 }
 
-function blot(ctx: CanvasRenderingContext2D, color: string, alpha = 0.18) {
-  ctx.save();
+/** Raw pixel-space texture, used for set dressing. */
+function texture(draw: (ctx: Ctx, size: number) => void, size = 128): THREE.CanvasTexture {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = size;
+  const ctx = ctx2d(canvas);
+  draw(ctx, size);
+  return toTexture(canvas);
+}
+
+function rng(seed: number): Rand {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function rgbOf(color: string): [number, number, number] {
+  if (color.startsWith('rgb')) {
+    const [r = 0, g = 0, b = 0] = color.replace(/[^\d,]/g, '').split(',').map(Number);
+    return [r, g, b];
+  }
+  const n = parseInt(color.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+/** Shade a palette colour toward ink (t < 0) or lift it toward paper (t > 0). */
+function tint(color: string, t: number): string {
+  const [r, g, b] = rgbOf(color);
+  const [tr, tg, tb] = rgbOf(t < 0 ? PALETTE.ink : PALETTE.paper);
+  const k = Math.abs(t);
+  return `rgb(${Math.round(r + (tr - r) * k)},${Math.round(g + (tg - g) * k)},${Math.round(b + (tb - b) * k)})`;
+}
+
+function rgba(color: string, alpha: number): string {
+  const [r, g, b] = rgbOf(color);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+interface Finish {
+  /** Outer ink outline, in design units. */
+  ink?: number;
+  /** Paper halo outside the ink so the cast lifts off every set. */
+  halo?: number;
+  haloAlpha?: number;
+  /** Soft contact shadow: cx, cy, rx, ry. */
+  shadow?: Box;
+  /** Fine parts (needles) drawn after the outline pass, tucked underneath, so their tips stay sharp. */
+  under?: (ctx: Ctx, r: Rand) => void;
+}
+
+function silhouette(src: HTMLCanvasElement, color: string, alpha: number) {
+  const canvas = document.createElement('canvas');
+  canvas.width = src.width;
+  canvas.height = src.height;
+  const ctx = ctx2d(canvas);
+  ctx.drawImage(src, 0, 0);
+  ctx.globalCompositeOperation = 'source-in';
   ctx.globalAlpha = alpha;
   ctx.fillStyle = color;
-  for (let i = 0; i < 18; i++) ctx.fillRect((i * 37) % 120, (i * 19) % 120, 8, 3);
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  return canvas;
+}
+
+/** One consistent outer ink line and paper halo for every cast member, by dilating the silhouette. */
+function finishCast(canvas: HTMLCanvasElement, f: Finish) {
+  const k = canvas.width / U;
+  const ctx = ctx2d(canvas);
+  const ink = (f.ink ?? 1.7) * k;
+  const halo = (f.halo ?? 1.3) * k;
+  const inkSil = silhouette(canvas, PALETTE.ink, 1);
+  const haloSil = halo > 0 ? silhouette(canvas, PALETTE.paper, f.haloAlpha ?? 0.92) : null;
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalCompositeOperation = 'destination-over';
+  const ring = (img: HTMLCanvasElement, r: number) => {
+    for (let i = 0; i < 16; i++) {
+      const a = (i / 16) * Math.PI * 2;
+      ctx.drawImage(img, Math.cos(a) * r, Math.sin(a) * r);
+    }
+  };
+  ring(inkSil, ink * 0.5);
+  ring(inkSil, ink);
+  if (haloSil) ring(haloSil, ink + halo);
+  if (f.shadow) {
+    const [cx, cy, rx, ry] = f.shadow;
+    ctx.translate(cx * k, cy * k);
+    ctx.scale(rx * k, ry * k);
+    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
+    g.addColorStop(0, rgba(PALETTE.ink, 0.42));
+    g.addColorStop(0.6, rgba(PALETTE.ink, 0.18));
+    g.addColorStop(1, rgba(PALETTE.ink, 0));
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(0, 0, 1, 0, Math.PI * 2);
+    ctx.fill();
+  }
   ctx.restore();
 }
 
-function talentFrame(step: number) {
-  return texture((ctx, s) => {
-    const swing = [0, -10, 0, 10][step] ?? 0;
-    ctx.translate(s / 2, s * 0.92);
-    ctx.strokeStyle = PALETTE.ink;
-    ctx.lineWidth = 5;
-    ctx.lineJoin = 'round';
-    const leg = (side: number) => {
-      ctx.save();
-      ctx.rotate((swing * side * Math.PI) / 180);
-      ctx.fillStyle = '#3a2a24';
-      ctx.fillRect(-7, -6, 12, 28);
-      ctx.strokeRect(-7, -6, 12, 28);
-      ctx.restore();
-    };
-    ctx.save(); ctx.translate(-12, -8); leg(1); ctx.restore();
-    ctx.save(); ctx.translate(8, -8); leg(-1); ctx.restore();
-    ctx.fillStyle = PALETTE.carmine;
-    ctx.beginPath();
-    ctx.moveTo(-28, -78); ctx.lineTo(28, -78); ctx.lineTo(34, -18); ctx.lineTo(-34, -18); ctx.closePath();
-    ctx.fill(); ctx.stroke();
-    ctx.fillStyle = '#f2c1a2';
-    ctx.beginPath(); ctx.arc(0, -96, 18, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-    ctx.fillStyle = PALETTE.ink;
-    ctx.fillRect(-16, -108, 32, 10);
-    ctx.fillStyle = '#2a1814';
-    ctx.fillRect(-6, -98, 3, 3); ctx.fillRect(4, -98, 3, 3);
-    blot(ctx, '#000', 0.05);
-  });
-}
-
-function rim(ctx: CanvasRenderingContext2D) {
+/**
+ * `aspect` is the width/height of the sprite this texture is shown on (SPRITE_SIZE). The art is drawn
+ * undistorted on a square canvas; the UV window is cropped or padded around the centre to match.
+ */
+function cast(draw: (ctx: Ctx, r: Rand) => void, finish: Finish | null = {}, seed = 7, aspect = 1): THREE.CanvasTexture {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = CAST_SIZE;
+  const ctx = ctx2d(canvas);
+  ctx.scale(CAST_SIZE / U, CAST_SIZE / U);
   ctx.lineJoin = 'round';
   ctx.lineCap = 'round';
-  ctx.strokeStyle = PALETTE.paper;
-  ctx.lineWidth = 12;
-  ctx.stroke();
-  ctx.strokeStyle = PALETTE.ink;
-  ctx.lineWidth = 5;
+  draw(ctx, rng(seed));
+  if (finish) finishCast(canvas, finish);
+  if (finish?.under) {
+    const layer = document.createElement('canvas');
+    layer.width = layer.height = CAST_SIZE;
+    const lctx = ctx2d(layer);
+    lctx.scale(CAST_SIZE / U, CAST_SIZE / U);
+    lctx.lineJoin = 'round';
+    lctx.lineCap = 'round';
+    finish.under(lctx, rng(seed + 1));
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.globalCompositeOperation = 'destination-over';
+    ctx.drawImage(layer, 0, 0);
+    ctx.restore();
+  }
+  const map = toTexture(canvas);
+  map.repeat.set(aspect, 1);
+  map.offset.set((1 - aspect) / 2, 0);
+  return map;
+}
+
+function rr(x: number, y: number, w: number, h: number, r: number, p = new Path2D()) {
+  p.moveTo(x + r, y);
+  p.arcTo(x + w, y, x + w, y + h, r);
+  p.arcTo(x + w, y + h, x, y + h, r);
+  p.arcTo(x, y + h, x, y, r);
+  p.arcTo(x, y, x + w, y, r);
+  p.closePath();
+  return p;
+}
+
+function oval(cx: number, cy: number, rx: number, ry: number, rot = 0) {
+  const p = new Path2D();
+  p.ellipse(cx, cy, rx, ry, rot, 0, Math.PI * 2);
+  return p;
+}
+
+/** Felt/wool nap: short light and dark fibres. */
+function fibre(ctx: Ctx, box: Box, r: Rand, n: number, alpha = 0.16, len = 2.2) {
+  const [x, y, w, h] = box;
+  ctx.lineWidth = 0.45;
+  for (let i = 0; i < n; i++) {
+    const px = x + r() * w;
+    const py = y + r() * h;
+    const a = r() * Math.PI;
+    const l = len * (0.5 + r());
+    ctx.strokeStyle = r() < 0.5 ? rgba(PALETTE.paper, alpha) : rgba(PALETTE.ink, alpha);
+    ctx.beginPath();
+    ctx.moveTo(px, py);
+    ctx.lineTo(px + Math.cos(a) * l, py + Math.sin(a) * l);
+    ctx.stroke();
+  }
+}
+
+/** Key light from the upper left, falling to a darker edge at the lower right. */
+function light(ctx: Ctx, box: Box, amount = 1, hx = 0.3, hy = 0.25) {
+  const [x, y, w, h] = box;
+  const cx = x + w * hx;
+  const cy = y + h * hy;
+  const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.hypot(w, h) * 0.85);
+  g.addColorStop(0, rgba(PALETTE.paper, 0.36 * amount));
+  g.addColorStop(0.4, rgba(PALETTE.paper, 0));
+  g.addColorStop(0.6, rgba(PALETTE.ink, 0));
+  g.addColorStop(1, rgba(PALETTE.ink, 0.46 * amount));
+  ctx.fillStyle = g;
+  ctx.fillRect(x - 1, y - 1, w + 2, h + 2);
+}
+
+interface PartOpts { line?: number; fibre?: number; light?: number; hx?: number; hy?: number }
+
+function part(ctx: Ctx, path: Path2D, base: string, box: Box, r: Rand, o: PartOpts = {}) {
+  ctx.fillStyle = base;
+  ctx.fill(path);
+  ctx.save();
+  ctx.clip(path);
+  light(ctx, box, o.light ?? 1, o.hx, o.hy);
+  const density = o.fibre ?? 0.35;
+  if (density > 0) fibre(ctx, box, r, Math.round(box[2] * box[3] * density));
+  ctx.restore();
+  const line = o.line ?? 1.4;
+  if (line > 0) {
+    ctx.lineWidth = line;
+    ctx.strokeStyle = PALETTE.ink;
+    ctx.stroke(path);
+  }
+}
+
+function stitch(ctx: Ctx, path: Path2D, color: string, width = 0.75) {
+  ctx.save();
+  ctx.setLineDash([1.7, 1.3]);
+  ctx.lineWidth = width;
+  ctx.strokeStyle = color;
+  ctx.stroke(path);
+  ctx.restore();
+}
+
+function line(ctx: Ctx, pts: number[], color: string, width: number) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.beginPath();
+  ctx.moveTo(pts[0]!, pts[1]!);
+  if (pts.length === 6) ctx.quadraticCurveTo(pts[2]!, pts[3]!, pts[4]!, pts[5]!);
+  else for (let i = 2; i < pts.length; i += 2) ctx.lineTo(pts[i]!, pts[i + 1]!);
   ctx.stroke();
 }
 
-function urchinTier(tier: number) {
-  return texture((ctx, s) => {
-    ctx.translate(s / 2, s / 2);
-    ctx.fillStyle = PALETTE.burn;
+/** A sewn fold: dark crease with a lit ridge beside it. */
+function fold(ctx: Ctx, pts: number[], base: string) {
+  line(ctx, pts, rgba(tint(base, -0.5), 0.8), 1.2);
+  line(ctx, pts.map((v, i) => (i % 2 === 0 ? v - 1 : v)), rgba(tint(base, 0.4), 0.6), 0.6);
+}
+
+/** Wood grain along the long axis of a box. */
+function grain(ctx: Ctx, box: Box, r: Rand, base: string, vertical = false) {
+  const [x, y, w, h] = box;
+  const across = vertical ? w : h;
+  ctx.lineWidth = 0.55;
+  for (let i = 0.8; i < across; i += 1.6 + r() * 1.4) {
+    ctx.strokeStyle = rgba(tint(base, -0.35), 0.35 + r() * 0.3);
     ctx.beginPath();
-    ctx.arc(0, 0, tier >= 2 ? 34 : 28, 0, Math.PI * 2);
-    ctx.fill();
-    rim(ctx);
-    if (tier >= 2) {
-      ctx.fillStyle = PALETTE.ink;
-      ctx.beginPath();
-      ctx.arc(0, 0, tier === 3 ? 8 : 12, 0, Math.PI * 2);
-      ctx.fill();
-      return;
+    const wob = r() * 6;
+    if (vertical) {
+      ctx.moveTo(x + i, y);
+      ctx.bezierCurveTo(x + i + wob * 0.2, y + h * 0.3, x + i - wob * 0.2, y + h * 0.6, x + i + 0.3, y + h);
+    } else {
+      ctx.moveTo(x, y + i);
+      ctx.bezierCurveTo(x + w * 0.3, y + i + wob * 0.2, x + w * 0.6, y + i - wob * 0.2, x + w, y + i + 0.3);
     }
-    const spikes = tier === 0 ? 10 : 6;
-    ctx.fillStyle = PALETTE.ink;
-    for (let i = 0; i < spikes; i++) {
+    ctx.stroke();
+  }
+  if (r() < 0.8) {
+    const kx = x + w * (0.2 + r() * 0.6);
+    const ky = y + h * (0.2 + r() * 0.6);
+    ctx.strokeStyle = rgba(tint(base, -0.45), 0.6);
+    ctx.beginPath();
+    ctx.ellipse(kx, ky, vertical ? 1 : 2.4, vertical ? 2.4 : 1, 0, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+}
+
+/** A strip of tape with torn ends. */
+function tape(ctx: Ctx, x: number, y: number, w: number, h: number, angle: number, color: string, r: Rand) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(angle);
+  const p = new Path2D();
+  p.moveTo(-w / 2, -h / 2);
+  p.lineTo(w / 2, -h / 2);
+  for (let i = 0; i <= 4; i++) p.lineTo(w / 2 + (i % 2 ? 1 : 0) * (0.6 + r()), -h / 2 + (h * i) / 4);
+  p.lineTo(-w / 2, h / 2);
+  for (let i = 4; i >= 0; i--) p.lineTo(-w / 2 - (i % 2 ? 1 : 0) * (0.6 + r()), -h / 2 + (h * i) / 4);
+  p.closePath();
+  ctx.fillStyle = color;
+  ctx.fill(p);
+  ctx.save();
+  ctx.clip(p);
+  light(ctx, [-w / 2, -h / 2, w, h], 0.6);
+  ctx.restore();
+  ctx.lineWidth = 0.6;
+  ctx.strokeStyle = rgba(PALETTE.ink, 0.55);
+  ctx.stroke(p);
+  ctx.restore();
+}
+
+function googlyEye(ctx: Ctx, x: number, y: number, rad: number, px: number, py: number, lid = 0, lidColor: string = PALETTE.ink) {
+  const eye = oval(x, y, rad, rad);
+  ctx.fillStyle = PALETTE.paper;
+  ctx.fill(eye);
+  ctx.save();
+  ctx.clip(eye);
+  light(ctx, [x - rad, y - rad, rad * 2, rad * 2], 0.5);
+  ctx.fillStyle = PALETTE.ink;
+  ctx.beginPath();
+  ctx.arc(x + px * rad * 0.45, y + py * rad * 0.45, rad * 0.5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = PALETTE.paper;
+  ctx.beginPath();
+  ctx.arc(x + px * rad * 0.45 - rad * 0.18, y + py * rad * 0.45 - rad * 0.2, rad * 0.14, 0, Math.PI * 2);
+  ctx.fill();
+  if (lid > 0) {
+    ctx.fillStyle = lidColor;
+    ctx.fillRect(x - rad, y - rad, rad * 2, rad * 2 * lid);
+    line(ctx, [x - rad, y - rad + rad * 2 * lid, x + rad, y - rad + rad * 2 * lid], PALETTE.ink, 1);
+  }
+  ctx.restore();
+  ctx.lineWidth = 1.1;
+  ctx.strokeStyle = PALETTE.ink;
+  ctx.stroke(eye);
+  // Domed plastic glint.
+  ctx.strokeStyle = rgba('#ffffff', 0.7);
+  ctx.lineWidth = 0.8;
+  ctx.beginPath();
+  ctx.arc(x, y, rad * 0.78, Math.PI * 1.1, Math.PI * 1.45);
+  ctx.stroke();
+}
+
+// ---------------------------------------------------------------------------
+// Talent: a felt stop-motion puppet in a carmine wool coat, three-quarter view facing right.
+
+const COAT = PALETTE.carmine;
+const COAT_D = tint(PALETTE.carmine, -0.35);
+const SKIN = tint(PALETTE.clay, 0.42);
+const TROUSER = tint(PALETTE.violet, -0.5);
+const BOOT = tint(PALETTE.earth, -0.5);
+const HAT = tint(PALETTE.earth, -0.3);
+
+interface Pose {
+  bob: number;
+  sy: number;
+  /** Back, front: radians from hanging straight; negative swings toward her facing (+x). */
+  legs: [number, number];
+  lift: [number, number];
+  arms: [number, number];
+  lean: number;
+  eyes: 'open' | 'wide' | 'x';
+  mouth: 'smile' | 'o' | 'wobble';
+  brows: number;
+  scarf: number;
+  fallen?: boolean;
+}
+
+function drawLeg(ctx: Ctx, r: Rand, hx: number, hy: number, angle: number, lift: number, back: boolean) {
+  ctx.save();
+  ctx.translate(hx, hy);
+  ctx.rotate(angle);
+  const len = 22 * (1 - lift);
+  const trouser = new Path2D();
+  trouser.moveTo(-5.6, -2);
+  trouser.lineTo(5.4, -2);
+  trouser.lineTo(4.8, len);
+  trouser.lineTo(-4.9, len);
+  trouser.closePath();
+  part(ctx, trouser, back ? tint(TROUSER, -0.25) : TROUSER, [-6, -2, 12, len + 2], r, { fibre: 0.6 });
+  if (!back) stitch(ctx, (() => { const p = new Path2D(); p.moveTo(2.6, 0); p.lineTo(2.3, len - 1); return p; })(), rgba(PALETTE.paper, 0.35), 0.5);
+  const by = len;
+  const boot = new Path2D();
+  boot.moveTo(-5.8, by - 1.5);
+  boot.lineTo(5.2, by - 1.5);
+  boot.quadraticCurveTo(6.5, by + 1.6, 10.5, by + 2.6);
+  boot.quadraticCurveTo(14, by + 3.6, 13.4, by + 7.8);
+  boot.lineTo(-6.4, by + 7.8);
+  boot.quadraticCurveTo(-7.4, by + 3, -5.8, by - 1.5);
+  boot.closePath();
+  part(ctx, boot, back ? tint(BOOT, -0.25) : BOOT, [-7, by - 2, 21, 10], r, { fibre: 0.15, hx: 0.45, hy: 0.1 });
+  ctx.fillStyle = tint(PALETTE.earth, 0.25);
+  ctx.fillRect(-6.3, by + 6.2, 19.4, 1.7);
+  line(ctx, [-6.3, by + 7.9, 13.2, by + 7.9], PALETTE.ink, 0.9);
+  line(ctx, [1.5, by + 0.6, 4.5, by + 0.2], rgba(PALETTE.paper, 0.75), 0.6);
+  line(ctx, [2.4, by + 2.2, 5.6, by + 1.6], rgba(PALETTE.paper, 0.75), 0.6);
+  ctx.restore();
+}
+
+function drawArm(ctx: Ctx, r: Rand, sx: number, sy: number, angle: number, back: boolean) {
+  ctx.save();
+  ctx.translate(sx, sy);
+  ctx.rotate(angle);
+  const sleeve = new Path2D();
+  sleeve.moveTo(-5, -3);
+  sleeve.quadraticCurveTo(0, -6.5, 5, -3);
+  sleeve.lineTo(4.4, 19);
+  sleeve.lineTo(-4.4, 19);
+  sleeve.closePath();
+  part(ctx, sleeve, back ? COAT_D : COAT, [-5, -6.5, 10, 26], r, { fibre: 0.1, light: 0 });
+  fold(ctx, [-3.2, 9, 0, 11.5, 3.2, 8.4], back ? COAT_D : COAT);
+  const cuff = rr(-4.8, 16.5, 9.6, 4.2, 1.2);
+  part(ctx, cuff, tint(COAT, -0.22), [-5, 16, 10, 5], r, { fibre: 0.3, line: 1 });
+  stitch(ctx, (() => { const p = new Path2D(); p.moveTo(-4, 18.6); p.lineTo(4, 18.6); return p; })(), rgba(PALETTE.paper, 0.6), 0.5);
+  const hand = new Path2D();
+  hand.ellipse(0, 24.4, 4.2, 4.7, 0, 0, Math.PI * 2);
+  hand.moveTo(5.4, 22.5);
+  hand.ellipse(3.6, 22.5, 1.8, 2.2, -0.5, 0, Math.PI * 2);
+  part(ctx, hand, back ? tint(SKIN, -0.15) : SKIN, [-4.5, 19.5, 10, 10], r, { fibre: 0.2, line: 1.1 });
+  ctx.restore();
+}
+
+function talentPuppet(p: Pose) {
+  return (ctx: Ctx, r: Rand) => {
+    if (p.fallen) {
+      ctx.translate(114, 102);
+      ctx.rotate(-Math.PI / 2 * 0.93);
+      ctx.scale(0.86, 0.86);
+    } else {
+      ctx.translate(62, 121);
+      ctx.scale(0.93, 0.93);
+    }
+    ctx.rotate(p.lean);
+    ctx.scale(1 + (1 - p.sy) * 0.9, p.sy);
+    const b = p.bob;
+    const f = p.scarf;
+    const hy = -93 + b;
+
+    // Short fringed scarf end fluttering off the back of the neck.
+    const tail = new Path2D();
+    tail.moveTo(-8, -80 + b);
+    tail.quadraticCurveTo(-14 - 2 * f, -83 + b - 2 * f, -20 - 3 * f, -80 + b - 3 * f);
+    tail.lineTo(-19 - 3 * f, -74.5 + b - 2 * f);
+    tail.quadraticCurveTo(-13 - f, -76 + b, -8, -73 + b);
+    tail.closePath();
+    part(ctx, tail, tint(PALETTE.brass, -0.18), [-24, -84 + b - 3 * f, 18, 12], r, { fibre: 0.4, line: 1.1 });
+    ctx.save();
+    ctx.clip(tail);
+    line(ctx, [-15 - f, -83 + b, -14.5 - f, -74 + b], COAT, 1.5);
+    ctx.restore();
+    for (let i = 0; i < 4; i++) {
+      const fx = -20 - 3 * f + i * 0.3;
+      const fy = -79.5 + b - 3 * f + i * 1.5;
+      line(ctx, [fx, fy, fx - 3.2 - f * (i % 2 ? 1 : 1.8), fy + (i % 2 ? 0.8 : -0.6) * (0.5 + f)], tint(PALETTE.brass, -0.3), 0.9);
+    }
+
+    drawArm(ctx, r, -11, -67 + b, p.arms[0], true);
+    drawLeg(ctx, r, -4.5, -30 + b, p.legs[0], p.lift[0], true);
+    drawLeg(ctx, r, 4, -30 + b, p.legs[1], p.lift[1], false);
+
+    // Coat.
+    const coat = new Path2D();
+    coat.moveTo(-13, -76 + b);
+    coat.quadraticCurveTo(-19, -75 + b, -20, -64 + b);
+    coat.lineTo(-27, -18 + b);
+    coat.quadraticCurveTo(-13, -13 + b, -2, -16 + b);
+    coat.quadraticCurveTo(10, -13 + b, 27, -18.5 + b);
+    coat.lineTo(20, -64 + b);
+    coat.quadraticCurveTo(19, -75 + b, 13, -76 + b);
+    coat.closePath();
+    part(ctx, coat, COAT, [-27, -77 + b, 54, 64], r, { fibre: 0.1, light: 0 });
+    ctx.save();
+    ctx.clip(coat);
+    const hem = new Path2D();
+    hem.moveTo(-24, -21 + b);
+    hem.quadraticCurveTo(-13, -16 + b, -2, -19 + b);
+    hem.quadraticCurveTo(10, -16 + b, 24, -21.5 + b);
+    stitch(ctx, hem, tint(COAT, 0.55));
+    const side = new Path2D();
+    side.moveTo(-16.5, -66 + b);
+    side.lineTo(-21.5, -22 + b);
+    stitch(ctx, side, tint(COAT, 0.5));
+    fold(ctx, [-16, -17 + b, -14.5, -26 + b, -13.5, -35 + b], COAT);
+    fold(ctx, [-6, -15.5 + b, -6, -24 + b, -4.5, -32 + b], COAT);
+    fold(ctx, [18, -17.5 + b, 16, -25 + b, 15, -33 + b], COAT);
+    fold(ctx, [-14, -60 + b, -10, -57 + b, -7, -61 + b], COAT);
+    // Placket and overlap.
+    line(ctx, [5, -73 + b, 7, -45 + b, 8.4, -15 + b], PALETTE.ink, 1.1);
+    line(ctx, [6.1, -73 + b, 8.1, -45 + b, 9.5, -15 + b], tint(COAT, 0.35), 0.6);
+    const placket = new Path2D();
+    placket.moveTo(3.4, -70 + b);
+    placket.quadraticCurveTo(5.2, -45 + b, 6.6, -18 + b);
+    stitch(ctx, placket, tint(COAT, 0.55));
+    // Self belt, cut from the coat cloth.
+    const belt = rr(-26, -49 + b, 52, 5.4, 1);
+    part(ctx, belt, COAT, [-26, -49 + b, 52, 6], r, { fibre: 0.1, line: 1, light: 0 });
+    const beltStitch = new Path2D();
+    beltStitch.moveTo(-26, -47.6 + b); beltStitch.lineTo(26, -47.6 + b);
+    beltStitch.moveTo(-26, -45 + b); beltStitch.lineTo(26, -45 + b);
+    stitch(ctx, beltStitch, tint(COAT, 0.35), 0.5);
+    // Pocket with flap.
+    const pocket = rr(-19, -40 + b, 11, 9, 1.5);
+    stitch(ctx, rr(-18, -39 + b, 9, 7, 1), tint(COAT, 0.55));
+    ctx.lineWidth = 0.8; ctx.strokeStyle = rgba(PALETTE.ink, 0.6); ctx.stroke(pocket);
+    part(ctx, rr(-19.5, -41.5 + b, 12, 3.6, 1), tint(COAT, -0.15), [-20, -42 + b, 12, 4], r, { fibre: 0.2, line: 0.9 });
+    ctx.restore();
+    // Buckle and buttons sit proud of the cloth.
+    const buckle = rr(4.6, -50 + b, 7, 7.4, 1.2);
+    part(ctx, buckle, PALETTE.brass, [4.6, -50 + b, 7, 7.4], r, { fibre: 0, line: 1 });
+    ctx.fillStyle = tint(COAT, -0.32);
+    ctx.fillRect(6.6, -48 + b, 3, 3.4);
+    for (const [bx, by] of [[10.6, -64], [11.2, -56], [11.8, -36]] as const) {
+      const btn = oval(bx, by + b, 2.1, 2.1);
+      part(ctx, btn, PALETTE.brass, [bx - 2, by + b - 2, 4, 4], r, { fibre: 0, line: 0.9 });
+      ctx.fillStyle = PALETTE.ink;
+      ctx.fillRect(bx - 0.9, by + b - 0.3, 0.6, 0.6);
+      ctx.fillRect(bx + 0.4, by + b - 0.3, 0.6, 0.6);
+    }
+    // Lapel.
+    const lapel = new Path2D();
+    lapel.moveTo(2.5, -71 + b); lapel.lineTo(8, -61 + b); lapel.lineTo(13.5, -71.5 + b); lapel.closePath();
+    part(ctx, lapel, tint(COAT, -0.12), [2, -72 + b, 12, 11], r, { fibre: 0.3, line: 1 });
+
+    // Scarf wrap and front tail.
+    const wrap = new Path2D();
+    wrap.moveTo(-14, -81 + b);
+    wrap.quadraticCurveTo(0, -75 + b, 15.5, -81 + b);
+    wrap.lineTo(15.5, -72.5 + b);
+    wrap.quadraticCurveTo(0, -66 + b, -14.5, -71.5 + b);
+    wrap.closePath();
+    const front = new Path2D();
+    front.moveTo(5.5, -73 + b);
+    front.lineTo(13, -73 + b);
+    front.quadraticCurveTo(14.5, -61 + b, 13.5 + f, -51 + b);
+    front.lineTo(6.5 + f * 0.6, -52 + b);
+    front.quadraticCurveTo(7, -62 + b, 5.5, -73 + b);
+    front.closePath();
+    part(ctx, front, PALETTE.brass, [5, -73 + b, 10, 22], r, { fibre: 0.4 });
+    ctx.save();
+    ctx.clip(front);
+    line(ctx, [4, -60 + b, 16, -60 + b], COAT, 1.7);
+    line(ctx, [4, -56.5 + b, 16, -56.5 + b], COAT, 1.7);
+    ctx.restore();
+    for (let i = 0; i < 4; i++) line(ctx, [7 + i * 1.9 + f * 0.6, -52 + b, 7 + i * 1.9 + f * 0.9, -48.5 + b], tint(PALETTE.brass, -0.3), 0.9);
+    part(ctx, wrap, PALETTE.brass, [-15, -82 + b, 31, 16], r, { fibre: 0.4 });
+    ctx.save();
+    ctx.clip(wrap);
+    for (let x = -13; x < 15; x += 2.4) {
+      const yy = -77 + b + Math.pow(x / 15, 2) * -3.5;
+      line(ctx, [x - 0.8, yy - 2, x, yy, x + 0.8, yy - 2], rgba(tint(PALETTE.brass, -0.45), 0.55), 0.6);
+      line(ctx, [x - 0.8, yy + 2, x, yy + 4, x + 0.8, yy + 2], rgba(tint(PALETTE.brass, -0.45), 0.55), 0.6);
+    }
+    ctx.restore();
+
+    // Head.
+    ctx.save();
+    if (p.fallen) { ctx.translate(2, hy); ctx.rotate(0.12); ctx.translate(-2, -hy); }
+    part(ctx, oval(-9, hy - 3, 7.5, 8.5), tint(PALETTE.earth, -0.55), [-17, hy - 12, 15, 17], r, { fibre: 0.8 });
+    const head = oval(2, hy, 16, 15.4);
+    part(ctx, head, SKIN, [-14, hy - 15.4, 32, 31], r, { fibre: 0.18, light: 0.75, hx: 0.55, hy: 0.3 });
+    part(ctx, oval(-8.5, hy + 1.5, 3.1, 4.1), tint(SKIN, -0.12), [-12, hy - 3, 7, 9], r, { fibre: 0, line: 1.1 });
+    line(ctx, [-8.8, hy - 0.4, -7.6, hy + 1.5, -8.8, hy + 3.4], rgba(tint(PALETTE.clay, -0.4), 0.8), 0.7);
+    // Rosy felt cheeks.
+    ctx.fillStyle = rgba(PALETTE.carmine, 0.3);
+    ctx.beginPath(); ctx.ellipse(3, hy + 7, 3, 2.2, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(16, hy + 6.5, 2, 2, 0, 0, Math.PI * 2); ctx.fill();
+    // Eyes.
+    const eyes: Array<[number, number, number]> = [[5, 4.1, 5], [13.4, 3.4, 4.4]];
+    for (const [ex, rx, ry] of eyes) {
+      const ey = hy + 0.5;
+      if (p.eyes === 'x') {
+        line(ctx, [ex - 2.3, ey - 2.3, ex + 2.3, ey + 2.3], PALETTE.ink, 1.4);
+        line(ctx, [ex + 2.3, ey - 2.3, ex - 2.3, ey + 2.3], PALETTE.ink, 1.4);
+        continue;
+      }
+      const wide = p.eyes === 'wide' ? 0.7 : 0;
+      const eye = oval(ex, ey, rx + wide, ry + wide);
+      ctx.fillStyle = PALETTE.paper;
+      ctx.fill(eye);
+      ctx.lineWidth = 0.9;
+      ctx.strokeStyle = PALETTE.ink;
+      ctx.stroke(eye);
+      const pr = p.eyes === 'wide' ? 1.6 : 2.3;
+      ctx.fillStyle = PALETTE.ink;
+      ctx.beginPath(); ctx.arc(ex + 1, ey + 0.6, pr, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath(); ctx.arc(ex + 0.2, ey - 0.4, 0.9, 0, Math.PI * 2); ctx.fill();
+    }
+    // Brows: positive lifts the inner ends (worry).
+    const br = p.brows;
+    line(ctx, [1.2, hy - 6 - br * 0.5, 4.5, hy - 7.3 - br * 1.1, 8, hy - 6.6 - br * 1.6], tint(PALETTE.earth, -0.55), 1.5);
+    line(ctx, [10.8, hy - 6.6 - br * 1.6, 13.5, hy - 7.2 - br * 1.1, 16.2, hy - 5.8 - br * 0.5], tint(PALETTE.earth, -0.55), 1.4);
+    // Nose pokes past the cheek: reads as three-quarter at a glance.
+    part(ctx, oval(17.6, hy + 3.4, 2.7, 2.3), tint(SKIN, -0.08), [15, hy + 1, 6, 5], r, { fibre: 0, line: 1, hx: 0.3, hy: 0.2 });
+    // Mouth.
+    if (p.mouth === 'smile') {
+      ctx.strokeStyle = PALETTE.ink; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.arc(11, hy + 6.8, 3.2, Math.PI * 0.2, Math.PI * 0.82); ctx.stroke();
+    } else if (p.mouth === 'o') {
+      ctx.fillStyle = PALETTE.ink;
+      ctx.beginPath(); ctx.ellipse(11, hy + 9.4, 1.9, 2.5, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = COAT_D;
+      ctx.beginPath(); ctx.ellipse(11, hy + 10.3, 1.1, 1.1, 0, 0, Math.PI * 2); ctx.fill();
+    } else line(ctx, [7.5, hy + 9, 9, hy + 8, 10.5, hy + 9.4, 12, hy + 8, 13.6, hy + 9.2], PALETTE.ink, 1.1);
+
+    // Felt hat, tipped back, with a carmine band and a felt-green feather.
+    ctx.save();
+    ctx.translate(2, hy - 11);
+    ctx.rotate(p.fallen ? -0.35 : -0.1);
+    const feather = new Path2D();
+    feather.moveTo(-9, -4);
+    feather.quadraticCurveTo(-18, -12, -17, -19);
+    feather.quadraticCurveTo(-11, -14, -7, -6);
+    feather.closePath();
+    part(ctx, feather, PALETTE.felt, [-18, -19, 11, 15], r, { fibre: 0.4, line: 1 });
+    line(ctx, [-8.5, -5, -15, -14, -16.5, -18], tint(PALETTE.felt, 0.4), 0.6);
+    part(ctx, oval(0.5, 0.5, 19, 3.8), tint(HAT, -0.15), [-19, -3.5, 39, 8], r, { fibre: 0.4 });
+    const crown = new Path2D();
+    crown.moveTo(-12, 0);
+    crown.quadraticCurveTo(-13, -14, -2, -14.5);
+    crown.quadraticCurveTo(1, -12.5, 4, -14.5);
+    crown.quadraticCurveTo(14, -14, 13, 0);
+    crown.closePath();
+    part(ctx, crown, HAT, [-13, -15, 27, 15], r, { fibre: 0.7 });
+    const band = new Path2D();
+    band.moveTo(-12.4, -4.2); band.lineTo(13.2, -4.2); band.lineTo(13, 0); band.lineTo(-12, 0); band.closePath();
+    part(ctx, band, COAT, [-13, -5, 27, 5], r, { fibre: 0.3, line: 1 });
+    const bandStitch = new Path2D();
+    bandStitch.moveTo(-11.5, -2.1); bandStitch.lineTo(12.5, -2.1);
+    stitch(ctx, bandStitch, tint(COAT, 0.55), 0.5);
+    line(ctx, [-2, -14.2, 1, -10.5, 4, -14.2], rgba(PALETTE.ink, 0.5), 0.8);
+    ctx.lineWidth = 1.2; ctx.strokeStyle = PALETTE.ink;
+    ctx.beginPath(); ctx.ellipse(0.5, 0.5, 19, 3.8, 0, 0.05 * Math.PI, 0.95 * Math.PI); ctx.stroke();
+    ctx.restore();
+    ctx.restore();
+
+    drawArm(ctx, r, 12, -67 + b, p.arms[1], false);
+  };
+}
+
+const STAND: Pose = { bob: 0, sy: 1, legs: [0.05, -0.05], lift: [0, 0], arms: [0.12, -0.08], lean: 0, eyes: 'open', mouth: 'smile', brows: 0, scarf: 0.3 };
+const WALK: Pose[] = [
+  { ...STAND, bob: 1.6, sy: 0.955, legs: [0.4, -0.4], arms: [-0.5, 0.5], scarf: 0.7 },
+  { ...STAND, bob: -1.2, sy: 1.04, legs: [0.05, -0.08], lift: [0.22, 0], arms: [-0.1, 0.12], scarf: 1 },
+  { ...STAND, bob: 1.6, sy: 0.955, legs: [-0.4, 0.4], arms: [0.5, -0.5], scarf: 0.6 },
+  { ...STAND, bob: -1.2, sy: 1.04, legs: [-0.08, 0.05], lift: [0, 0.22], arms: [0.12, -0.1], scarf: 1 },
+];
+const IDLE: Pose[] = [
+  { ...STAND },
+  { ...STAND, bob: -0.8, sy: 1.025, arms: [0.17, -0.13], scarf: 0.4 },
+];
+const FLINCH: Pose = { ...STAND, bob: 2, sy: 0.92, lean: -0.13, legs: [0.25, -0.15], arms: [-2.75, -2.45], eyes: 'wide', mouth: 'o', brows: 1.6, scarf: 0.9 };
+const FALL: Pose = { ...STAND, legs: [0.35, -0.2], arms: [-1.3, 0.9], eyes: 'x', mouth: 'wobble', brows: 1, scarf: 0.2, fallen: true };
+
+/** main.ts shows the Talent at 0.66 × height; the fall pose goes square. */
+export const TALENT_ASPECT = 0.66;
+
+function talentTexture(p: Pose, seed: number) {
+  return cast(talentPuppet(p), {
+    ink: 1.1,
+    halo: 0.9,
+    haloAlpha: 0.7,
+    shadow: p.fallen ? [64, 120, 50, 5] : [65, 121.5, 22, 4.2],
+  }, seed, p.fallen ? 1 : TALENT_ASPECT);
+}
+
+// ---------------------------------------------------------------------------
+// Hazards.
+
+/** One dressmaker pin pushed into the cushion: steel shaft, round glass head; bend tips it over as it dulls. */
+function pin(ctx: Ctx, x: number, y: number, a: number, len: number, head: string, bend = 0, halo = true) {
+  const bx = x + Math.cos(a) * len * 0.55;
+  const by = y + Math.sin(a) * len * 0.55;
+  const hx = x + Math.cos(a + bend) * len;
+  const hy = y + Math.sin(a + bend) * len;
+  const pts = bend ? [x, y, bx, by, hx, hy] : [x, y, hx, hy];
+  if (halo) {
+    line(ctx, pts, rgba(PALETTE.paper, 0.9), 4);
+    ctx.fillStyle = rgba(PALETTE.paper, 0.9);
+    ctx.beginPath(); ctx.arc(hx, hy, 4.4, 0, Math.PI * 2); ctx.fill();
+  }
+  line(ctx, pts, PALETTE.ink, 2.3);
+  line(ctx, pts, tint(PALETTE.paper, -0.3), 1.1);
+  line(ctx, [x + Math.cos(a) * len * 0.15, y + Math.sin(a) * len * 0.15 - 0.3, x + Math.cos(a) * len * 0.45, y + Math.sin(a) * len * 0.45 - 0.3], rgba('#ffffff', 0.85), 0.45);
+  const g = ctx.createRadialGradient(hx - 1, hy - 1.1, 0.2, hx, hy, 3.2);
+  g.addColorStop(0, tint(head, 0.6));
+  g.addColorStop(0.45, head);
+  g.addColorStop(1, tint(head, -0.45));
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(hx, hy, 3, 0, Math.PI * 2); ctx.fill();
+  ctx.lineWidth = 1; ctx.strokeStyle = PALETTE.ink; ctx.stroke();
+  ctx.fillStyle = rgba('#ffffff', 0.9);
+  ctx.beginPath(); ctx.arc(hx - 1, hy - 1.1, 0.75, 0, Math.PI * 2); ctx.fill();
+}
+
+const PIN_HEADS = [PALETTE.brass, PALETTE.carmine, PALETTE.paper, PALETTE.carmine, PALETTE.brass, PALETTE.violet];
+const CUSHION_RX = [27, 28, 29, 30];
+const CUSHION_RY = [21, 22, 23, 23.5];
+
+/** Pins bristling from the dome, drawn under the outline pass so their silhouette stays spiky. */
+function urchinPins(tier: number) {
+  return (ctx: Ctx, r: Rand) => {
+    ctx.translate(64, 70);
+    const rx = CUSHION_RX[tier]!;
+    const ry = CUSHION_RY[tier]!;
+    const count = [15, 9, 6][tier]!;
+    const reach = [27, 18, 17][tier]!;
+    // Upper arc only: nothing pokes out through the band or reads as legs.
+    const from = tier === 0 ? -Math.PI * 1.03 : -Math.PI * 0.94;
+    const to = tier === 0 ? Math.PI * 0.03 : -Math.PI * 0.06;
+    for (let i = 0; i < count; i++) {
+      const a = from + ((i + 0.5) / count) * (to - from) + (r() - 0.5) * 0.12;
+      const sx = Math.cos(a) * rx * 0.86;
+      const sy = Math.sin(a) * ry * 0.86;
+      const len = reach * (0.8 + r() * 0.35) + (tier === 0 && i % 2 ? 5 : 0);
+      const bend = tier === 0 ? 0 : tier === 1 ? (i % 3 === 1 ? 0.5 : 0) : (r() < 0.5 ? -1 : 1) * (0.5 + r() * 0.5);
+      pin(ctx, sx, sy, a, len, PIN_HEADS[(i + tier) % PIN_HEADS.length]!, bend);
+    }
+  };
+}
+
+/** Button-tufted felt pincushion: pins drop out and lie down as it dulls; the googly eyes get sleepy. */
+function urchinTier(tier: number) {
+  return cast((ctx, r) => {
+    ctx.translate(64, 70);
+    const rx = CUSHION_RX[tier]!;
+    const ry = CUSHION_RY[tier]!;
+    const fill = tier === 3 ? tint(PALETTE.burn, -0.1) : PALETTE.burn;
+    const bandColor = tint(PALETTE.clay, -0.18);
+    // Stitched felt band the dome sits in.
+    const band = new Path2D();
+    band.moveTo(-rx + 1, 8);
+    band.lineTo(-rx + 3, 18);
+    band.quadraticCurveTo(0, 23, rx - 3, 18);
+    band.lineTo(rx - 1, 8);
+    band.quadraticCurveTo(0, 14, -rx + 1, 8);
+    band.closePath();
+    part(ctx, band, bandColor, [-rx, 6, rx * 2, 17], r, { fibre: 0.6 });
+    ctx.save();
+    ctx.clip(band);
+    const seamTop = new Path2D(); seamTop.moveTo(-rx, 11.4); seamTop.quadraticCurveTo(0, 17, rx, 11.4);
+    const seamBot = new Path2D(); seamBot.moveTo(-rx, 16.6); seamBot.quadraticCurveTo(0, 21.6, rx, 16.6);
+    stitch(ctx, seamTop, rgba(PALETTE.paper, 0.8), 0.7);
+    stitch(ctx, seamBot, rgba(PALETTE.paper, 0.8), 0.7);
+    for (let x = -rx + 4; x < rx - 3; x += 5) line(ctx, [x, 8, x + 0.3, 21], rgba(tint(bandColor, -0.5), 0.35), 0.6);
+    ctx.restore();
+    // Plump dome, slightly lumpy where the tufts pull it in.
+    const dome = new Path2D();
+    const lobes = 6;
+    for (let i = 0; i <= 48; i++) {
+      const t = Math.PI + (i / 48) * Math.PI;
+      const pull = 1 - 0.035 * Math.pow(Math.cos(((t - Math.PI) / Math.PI) * lobes * Math.PI), 8);
+      const x = Math.cos(t) * rx * pull;
+      const y = 6 + Math.sin(t) * (ry + 6) * pull;
+      if (i === 0) dome.moveTo(x, y); else dome.lineTo(x, y);
+    }
+    dome.quadraticCurveTo(rx * 0.6, 15, 0, 15);
+    dome.quadraticCurveTo(-rx * 0.6, 15, -rx, 6);
+    dome.closePath();
+    part(ctx, dome, fill, [-rx, -ry, rx * 2, ry + 16], r, { fibre: 0.55, hx: 0.3, hy: 0.15 });
+    ctx.save();
+    ctx.clip(dome);
+    // Tufting: a top button pulling puckered seams out to the rim, with side buttons.
+    const top: [number, number] = [0, -ry * 0.62];
+    const tufts: Array<[number, number]> = [[-rx * 0.62, -ry * 0.28], [rx * 0.62, -ry * 0.28]];
+    const seamEnds = [-2.6, -2.1, -1.55, -1.0, -0.55];
+    for (const a of seamEnds) {
+      const ex = Math.cos(a - 0.0) * rx * 1.05;
+      const ey = 6 + Math.sin(a) * (ry + 6) * 1.05;
+      const p = new Path2D();
+      p.moveTo(top[0], top[1]);
+      p.quadraticCurveTo((top[0] + ex) / 2, (top[1] + ey) / 2 - 3, ex, ey);
+      ctx.strokeStyle = rgba(tint(PALETTE.burn, -0.5), 0.7); ctx.lineWidth = 1.5; ctx.stroke(p);
+      ctx.save(); ctx.translate(-0.8, -0.6); ctx.strokeStyle = rgba(tint(PALETTE.burn, 0.45), 0.5); ctx.lineWidth = 0.6; ctx.stroke(p); ctx.restore();
+    }
+    for (const [tx, ty] of tufts) {
+      for (const a of [-2.3, -0.8, 0.9, 2.4]) {
+        line(ctx, [tx, ty, tx + Math.cos(a) * 6, ty + Math.sin(a) * 4], rgba(tint(PALETTE.burn, -0.5), 0.55), 0.9);
+      }
+    }
+    // Dimple shading round each button.
+    for (const [tx, ty] of [top, ...tufts]) {
+      const g = ctx.createRadialGradient(tx, ty, 0, tx, ty, 6);
+      g.addColorStop(0, rgba(PALETTE.ink, 0.35));
+      g.addColorStop(1, rgba(PALETTE.ink, 0));
+      ctx.fillStyle = g;
+      ctx.fillRect(tx - 6, ty - 6, 12, 12);
+    }
+    if (tier === 3) for (let i = 0; i < 9; i++) {
+      // Empty pin holes.
+      const a = Math.PI + r() * Math.PI; const d = 0.45 + r() * 0.45;
+      ctx.fillStyle = rgba(PALETTE.ink, 0.55);
+      ctx.beginPath(); ctx.arc(Math.cos(a) * rx * d, 6 + Math.sin(a) * ry * d, 0.6, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.restore();
+    for (const [tx, ty] of [top, ...tufts]) {
+      part(ctx, oval(tx, ty, 2.6, 2.2), tint(PALETTE.clay, -0.3), [tx - 3, ty - 3, 6, 5], r, { fibre: 0, line: 0.9 });
+      ctx.fillStyle = PALETTE.ink;
+      for (const [dx, dy] of [[-0.8, -0.6], [0.8, -0.6], [-0.8, 0.6], [0.8, 0.6]]) ctx.fillRect(tx + dx! - 0.3, ty + dy! - 0.3, 0.6, 0.6);
+    }
+    // Face.
+    const lid = [0, 0.18, 0.45, 0.62][tier]!;
+    const look = [[0, 0.2], [0.55, 0.35], [0.1, 0.7], [0, 0.8]][tier]!;
+    const lidColor = tint(fill, -0.15);
+    const ey = 1;
+    googlyEye(ctx, -8.5, ey, 6.4, look[0]!, look[1]!, lid, lidColor);
+    googlyEye(ctx, 8.5, ey, 6.4, look[0]!, look[1]!, lid, lidColor);
+    if (tier === 0) {
+      line(ctx, [-15, -8, -9.5, -6.8, -3, -3.6], PALETTE.ink, 2.2);
+      line(ctx, [15, -8, 9.5, -6.8, 3, -3.6], PALETTE.ink, 2.2);
+      const m = new Path2D();
+      m.moveTo(-6, 10); m.lineTo(-3.5, 12.5); m.lineTo(-1.2, 10.2); m.lineTo(1.2, 12.5); m.lineTo(3.5, 10.2); m.lineTo(6, 12);
+      ctx.strokeStyle = PALETTE.ink; ctx.lineWidth = 1.4; ctx.stroke(m);
+    } else if (tier === 1) line(ctx, [-4, 11, 0, 10.2, 4, 11], PALETTE.ink, 1.3);
+    else if (tier === 2) line(ctx, [-4, 11, -1.5, 12, 1, 11, 3.5, 12], PALETTE.ink, 1.1);
+    else {
+      // Pins laid flat across the top, done for the day.
+      pin(ctx, -20, -10, -0.18, 17, PALETTE.brass, 0, false);
+      pin(ctx, 18, -12, Math.PI + 0.25, 15, PALETTE.carmine, 0, false);
+      pin(ctx, -4, -19, 0.08, 13, PALETTE.paper, 0, false);
+      ctx.fillStyle = PALETTE.ink;
+      ctx.beginPath(); ctx.ellipse(1, 11, 1.5, 1.8, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.font = 'bold 9px serif';
+      ctx.fillStyle = PALETTE.paper;
+      ctx.strokeStyle = PALETTE.ink; ctx.lineWidth = 2;
+      for (const [zx, zy, zs] of [[24, -26, 1], [32, -36, 0.75]] as const) {
+        ctx.save(); ctx.translate(zx, zy); ctx.scale(zs, zs);
+        ctx.strokeText('z', 0, 0); ctx.fillText('z', 0, 0);
+        ctx.restore();
+      }
+    }
+  }, { shadow: [66, 91, CUSHION_RX[tier]! * 0.95, 3.6], under: tier < 3 ? urchinPins(tier) : undefined }, 11 + tier);
+}
+
+const STONE = '#7b6c5c';
+
+function boulderSprite() {
+  return cast((ctx, r) => {
+    ctx.translate(64, 72);
+    // Papier-mache over a balloon.
+    // A standing stone: taller than wide, leaning, lumpy, flat where it sits.
+    const rock = new Path2D();
+    const pts: Array<[number, number]> = [
+      [-30, 34], [-36, 8], [-30, -24], [-18, -48], [2, -56], [18, -46],
+      [24, -26], [36, -6], [38, 18], [34, 34],
+    ].map(([x, y]) => [x * 0.75, y] as [number, number]);
+    const mid = (i: number) => {
+      const p = pts[i % pts.length]!; const q = pts[(i + 1) % pts.length]!;
+      return [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2] as const;
+    };
+    rock.moveTo(...mid(0));
+    for (let i = 1; i <= pts.length; i++) {
+      const [cx, cy] = pts[i % pts.length]!;
+      rock.quadraticCurveTo(cx, cy, ...mid(i));
+    }
+    rock.closePath();
+    const box: Box = [-29, -58, 59, 94];
+    ctx.fillStyle = tint(STONE, -0.1);
+    ctx.fill(rock);
+    ctx.save();
+    ctx.clip(rock);
+    // Torn newspaper strips laid round the form, each painted grey-brown with print ghosting through.
+    for (let i = 0; i < 70; i++) {
+      const cx = -52 + r() * 104;
+      const cy = -42 + r() * 80;
+      const ang = Math.atan2(cy / 38, cx / 52) + Math.PI / 2 + (r() - 0.5) * 0.6;
+      const w = 22 + r() * 16;
+      const h = 7 + r() * 4;
       ctx.save();
-      ctx.rotate((i / spikes) * Math.PI * 2);
-      ctx.beginPath();
-      ctx.moveTo(-7, -22);
-      ctx.lineTo(0, -58);
-      ctx.lineTo(7, -22);
-      ctx.closePath();
-      ctx.fill();
-      ctx.strokeStyle = PALETTE.paper;
-      ctx.lineWidth = 3;
-      ctx.stroke();
+      ctx.translate(cx, cy);
+      ctx.rotate(ang);
+      const s = new Path2D();
+      s.moveTo(-w / 2, -h / 2);
+      for (let x = -w / 2; x < w / 2; x += 2.2) s.lineTo(x, -h / 2 + (r() - 0.5) * 1.4);
+      s.lineTo(w / 2 + (r() - 0.5) * 2, 0);
+      for (let x = w / 2; x > -w / 2; x -= 2.2) s.lineTo(x, h / 2 + (r() - 0.5) * 1.4);
+      s.closePath();
+      ctx.fillStyle = tint(STONE, (r() - 0.5) * 0.18);
+      ctx.fill(s);
+      ctx.save();
+      ctx.clip(s);
+      ctx.strokeStyle = rgba(PALETTE.ink, 0.13);
+      ctx.lineWidth = 0.5;
+      for (let y = -h / 2 + 1.4; y < h / 2; y += 1.5) {
+        ctx.beginPath(); ctx.moveTo(-w / 2 + 1, y); ctx.lineTo(-w / 2 + 1 + (w - 2) * (0.6 + r() * 0.4), y); ctx.stroke();
+      }
+      ctx.restore();
+      // Lifted torn edge: dark under, light lip.
+      ctx.lineWidth = 0.8; ctx.strokeStyle = rgba(PALETTE.ink, 0.38); ctx.stroke(s);
+      ctx.save(); ctx.translate(-0.5, -0.5); ctx.lineWidth = 0.5; ctx.strokeStyle = rgba(PALETTE.paper, 0.25); ctx.stroke(s); ctx.restore();
       ctx.restore();
     }
-  });
-}
-
-function figure(color: string) {
-  return texture((ctx, s) => {
-    ctx.translate(s / 2, s * 0.9);
-    ctx.fillStyle = PALETTE.ink;
-    ctx.fillRect(-18, -18, 12, 28);
-    ctx.fillRect(6, -18, 12, 28);
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.rect(-26, -78, 52, 62);
-    ctx.fill();
-    rim(ctx);
-    ctx.fillStyle = PALETTE.clay;
-    ctx.beginPath();
-    ctx.arc(0, -96, 16, 0, Math.PI * 2);
-    ctx.fill();
-    rim(ctx);
-    blot(ctx, '#000', 0.06);
-  });
+    light(ctx, box, 1.2, 0.3, 0.22);
+    // Dry-brushed highlights on the key side.
+    for (let i = 0; i < 60; i++) {
+      const a = Math.PI * (1.05 + r() * 0.55);
+      const d = 0.35 + r() * 0.55;
+      const x = Math.cos(a) * 32 * d; const y = Math.sin(a) * 52 * d;
+      line(ctx, [x, y, x + 3 + r() * 7, y + (r() - 0.6) * 2.5], rgba(tint(PALETTE.paper, 0.2), 0.25 + r() * 0.35), 0.5 + r() * 0.9);
+    }
+    // Chipped spot: paint flaked off, raw newsprint underneath.
+    ctx.translate(-10, -8);
+    const chip = new Path2D();
+    chip.moveTo(18, 12); chip.lineTo(25, 8); chip.lineTo(33, 10); chip.lineTo(37, 15); chip.lineTo(34, 22); chip.lineTo(27, 24); chip.lineTo(21, 21); chip.lineTo(17, 17);
+    chip.closePath();
+    ctx.fillStyle = tint(PALETTE.paper, -0.04);
+    ctx.fill(chip);
+    ctx.save();
+    ctx.clip(chip);
+    ctx.fillStyle = rgba(PALETTE.ink, 0.6);
+    ctx.font = 'bold 5px serif';
+    ctx.fillText('DAILY', 18.5, 14.5);
+    ctx.strokeStyle = rgba(PALETTE.ink, 0.35);
+    ctx.lineWidth = 0.5;
+    for (let y = 16.5; y < 24; y += 1.4) { ctx.beginPath(); ctx.moveTo(17, y); ctx.lineTo(36, y); ctx.stroke(); }
+    ctx.restore();
+    ctx.lineWidth = 0.9; ctx.strokeStyle = rgba(PALETTE.ink, 0.75); ctx.stroke(chip);
+    ctx.save(); ctx.translate(0.8, 0.8); ctx.lineWidth = 0.7; ctx.strokeStyle = rgba(tint(STONE, -0.5), 0.6); ctx.stroke(chip); ctx.restore();
+    ctx.restore();
+    ctx.lineWidth = 1.6; ctx.strokeStyle = PALETTE.ink; ctx.stroke(rock);
+  }, { shadow: [66, 107, 38, 5] }, 23, 2.55 / 1.9);
 }
 
 function stagehandSprite() {
-  return texture((ctx, s) => {
-    ctx.translate(20, s * 0.9);
+  return cast((ctx, r) => {
+    ctx.translate(34, 120);
+    const black = tint(PALETTE.ink, 0.1);
+    const blackL = tint(PALETTE.ink, 0.2);
+    drawStagehandLeg(ctx, r, -4, -30, 0.25, blackL);
+    // Back arm reaching up to the plank.
+    ctx.save(); ctx.translate(-8, -66); ctx.rotate(2.6);
+    part(ctx, rr(-4, -2, 8, 22, 3), tint(PALETTE.ink, 0.05), [-4, -2, 8, 22], r, { fibre: 0.6 });
+    ctx.restore();
+    drawStagehandLeg(ctx, r, 4, -30, -0.25, black);
+    const body = new Path2D();
+    body.moveTo(-12, -74); body.quadraticCurveTo(-17, -72, -17, -62); body.lineTo(-18, -27);
+    body.quadraticCurveTo(0, -24, 18, -27); body.lineTo(16, -62); body.quadraticCurveTo(15, -73, 10, -74); body.closePath();
+    part(ctx, body, black, [-18, -75, 36, 50], r, { fibre: 0.9, light: 1.4 });
+    ctx.save(); ctx.clip(body);
+    fold(ctx, [-10, -28, -9, -36, -6, -42], blackL);
+    fold(ctx, [8, -27, 7, -34, 9, -40], blackL);
+    // Tool belt with gaffer roll.
+    part(ctx, rr(-20, -44, 40, 5, 1), tint(PALETTE.earth, -0.3), [-20, -44, 40, 5], r, { fibre: 0.2, line: 0.9 });
+    ctx.restore();
+    part(ctx, oval(-12, -36, 4.5, 4.5), tint(PALETTE.paper, -0.25), [-17, -41, 9, 9], r, { fibre: 0, line: 1 });
+    ctx.fillStyle = black; ctx.beginPath(); ctx.arc(-12, -36, 1.8, 0, Math.PI * 2); ctx.fill();
+    // Plank on the shoulder.
+    ctx.save();
+    ctx.translate(-14, -78);
+    ctx.rotate(-0.12);
+    const plank = rr(0, -5, 104, 10, 1.5);
+    part(ctx, plank, PALETTE.plywood, [0, -5, 104, 10], r, { fibre: 0, line: 1.4, hx: 0.2, hy: 0.1 });
+    ctx.save(); ctx.clip(plank); grain(ctx, [0, -5, 104, 10], r, PALETTE.plywood); ctx.restore();
+    ctx.fillStyle = tint(PALETTE.earth, -0.1); ctx.fillRect(101.5, -4.3, 1.8, 8.6);
+    tape(ctx, 70, 0, 6, 11, 0, tint(PALETTE.paper, -0.1), r);
     ctx.fillStyle = PALETTE.ink;
-    ctx.fillRect(-8, -16, 10, 26);
-    ctx.fillRect(8, -16, 10, 26);
-    ctx.fillStyle = PALETTE.paper;
-    ctx.beginPath();
-    ctx.moveTo(-22, -74);
-    ctx.lineTo(24, -74);
-    ctx.lineTo(28, -16);
-    ctx.lineTo(-18, -16);
-    ctx.closePath();
-    ctx.fill();
-    rim(ctx);
-    ctx.fillStyle = PALETTE.clay;
-    ctx.beginPath();
-    ctx.arc(2, -92, 14, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = PALETTE.ink;
-    ctx.lineWidth = 5;
-    ctx.stroke();
-    ctx.fillStyle = PALETTE.earth;
-    ctx.beginPath();
-    ctx.moveTo(18, -62);
-    ctx.lineTo(s - 28, -78);
-    ctx.lineTo(s - 28, -64);
-    ctx.lineTo(18, -48);
-    ctx.closePath();
-    ctx.fill();
-    rim(ctx);
-  });
+    for (const x of [8, 96]) { ctx.beginPath(); ctx.arc(x, -1, 0.8, 0, Math.PI * 2); ctx.fill(); }
+    ctx.restore();
+    // Head: beanie, headset, a tired puppet face.
+    const hy = -88;
+    part(ctx, oval(1, hy, 12.5, 12), tint(PALETTE.clay, 0.25), [-12, hy - 12, 26, 24], r, { fibre: 0.18, light: 0.8, hx: 0.55 });
+    const beanie = new Path2D();
+    beanie.moveTo(-13, hy - 2); beanie.quadraticCurveTo(-13, hy - 18, 1, hy - 18); beanie.quadraticCurveTo(15, hy - 18, 14, hy - 2); beanie.closePath();
+    part(ctx, beanie, black, [-13, hy - 19, 28, 18], r, { fibre: 0.8, light: 1.4 });
+    part(ctx, rr(-13.5, hy - 6.5, 28, 5, 2), blackL, [-14, hy - 7, 28, 5], r, { fibre: 0.6, line: 1, light: 1.3 });
+    ctx.save(); ctx.clip(beanie);
+    for (let x = -12; x < 14; x += 2.2) line(ctx, [x, hy - 7, x + 0.5, hy - 17], rgba(PALETTE.paper, 0.12), 0.6);
+    ctx.restore();
+    // Headset band, ear cup and mic.
+    ctx.strokeStyle = PALETTE.ink; ctx.lineWidth = 2.2;
+    ctx.beginPath(); ctx.arc(-1, hy - 2, 12.5, Math.PI * 1.05, Math.PI * 1.75); ctx.stroke();
+    ctx.strokeStyle = tint(PALETTE.ink, 0.45); ctx.lineWidth = 0.8; ctx.stroke();
+    line(ctx, [-7, hy + 3, 0, hy + 9, 9, hy + 7], PALETTE.ink, 1.6);
+    part(ctx, oval(9.6, hy + 7, 1.8, 1.6), tint(PALETTE.ink, 0.3), [8, hy + 5, 4, 4], r, { fibre: 0, line: 0.8 });
+    part(ctx, oval(-8, hy + 1, 4.6, 5.2), PALETTE.brass, [-13, hy - 4, 10, 11], r, { fibre: 0, line: 1.1 });
+    part(ctx, oval(-8, hy + 1, 2.2, 2.6), tint(PALETTE.brass, -0.35), [-10, hy - 2, 5, 6], r, { fibre: 0, line: 0 });
+    // Heavy-lidded eyes.
+    for (const ex of [4, 10.5]) {
+      ctx.fillStyle = PALETTE.ink; ctx.beginPath(); ctx.arc(ex, hy + 1, 1.5, 0, Math.PI * 2); ctx.fill();
+      line(ctx, [ex - 2.2, hy - 0.6, ex + 2.2, hy - 0.8], PALETTE.ink, 1.1);
+    }
+    line(ctx, [5.5, hy + 5.6, 9, hy + 5.4], PALETTE.ink, 0.9);
+    // Front arm up, gripping the plank.
+    ctx.save(); ctx.translate(10, -67); ctx.rotate(-2.75);
+    part(ctx, rr(-4.2, -2, 8.4, 20, 3), black, [-4.2, -2, 8.4, 20], r, { fibre: 0.6, light: 1.3 });
+    part(ctx, oval(0, 20, 4, 4.3), tint(PALETTE.ink, 0.28), [-4, 16, 8, 9], r, { fibre: 0.3, line: 1 });
+    ctx.restore();
+  }, { shadow: [36, 121, 22, 4] }, 31, 3.1 / 2.55);
+}
+
+function drawStagehandLeg(ctx: Ctx, r: Rand, hx: number, hy: number, angle: number, color: string) {
+  ctx.save(); ctx.translate(hx, hy); ctx.rotate(angle);
+  part(ctx, rr(-5, -2, 10, 25, 2), color, [-5, -2, 10, 25], r, { fibre: 0.7, light: 1.3 });
+  const shoe = new Path2D();
+  shoe.moveTo(-5.6, 21); shoe.lineTo(5, 21); shoe.quadraticCurveTo(12, 22, 12, 28); shoe.lineTo(-6, 28); shoe.closePath();
+  part(ctx, shoe, tint(PALETTE.ink, 0.15), [-6, 21, 18, 7], r, { fibre: 0.2 });
+  ctx.fillStyle = PALETTE.paper; ctx.fillRect(-6, 26.4, 18, 1.6);
+  line(ctx, [-6, 28.2, 12, 28.2], PALETTE.ink, 0.8);
+  ctx.restore();
+}
+
+interface Costume { body: string; legs: string | null; draw: (ctx: Ctx, r: Rand) => void }
+
+/** Felt extras: one stitched body, four costume trunks. */
+function extra(c: Costume, seed: number) {
+  return cast((ctx, r) => {
+    ctx.translate(64, 121);
+    ctx.scale(0.9, 0.9);
+    if (c.legs) {
+      for (const [x, a] of [[-6, 0.04], [6, -0.04]] as const) {
+        ctx.save(); ctx.translate(x, -30); ctx.rotate(a);
+        part(ctx, rr(-5, -2, 10, 25, 2), c.legs, [-5, -2, 10, 25], r, { fibre: 0.6 });
+        part(ctx, oval(0, 25.5, 7, 4), tint(PALETTE.earth, -0.5), [-7, 21, 14, 9], r, { fibre: 0.1, line: 1.1 });
+        ctx.restore();
+      }
+    }
+    for (const side of [-1, 1]) {
+      ctx.save(); ctx.translate(side * 15, -68); ctx.rotate(-side * 0.16);
+      part(ctx, rr(-4.4, -2, 8.8, 22, 3), tint(c.body, -0.15), [-4.4, -2, 8.8, 22], r, { fibre: 0.6 });
+      part(ctx, oval(0, 22.5, 4.2, 4.5), PALETTE.clay, [-4, 18, 8, 9], r, { fibre: 0.15, line: 1 });
+      ctx.restore();
+    }
+    c.draw(ctx, r);
+  }, { shadow: [66, 121.5, 21, 4] }, seed, 0.56);
+}
+
+function extraBody(ctx: Ctx, r: Rand, color: string, hem = -27, flare = 21) {
+  const body = new Path2D();
+  body.moveTo(-12, -75); body.quadraticCurveTo(-17, -74, -17, -64); body.lineTo(-flare, hem);
+  body.quadraticCurveTo(0, hem + 4, flare, hem); body.lineTo(17, -64); body.quadraticCurveTo(17, -74, 12, -75); body.closePath();
+  part(ctx, body, color, [-flare, -76, flare * 2, hem + 80], r, { fibre: 0.6 });
+  return body;
+}
+
+function extraHead(ctx: Ctx, r: Rand) {
+  const hy = -90;
+  part(ctx, oval(0, hy, 14, 13.6), PALETTE.clay, [-14, hy - 14, 28, 28], r, { fibre: 0.2, light: 0.8 });
+  // Button eyes sewn on with paper thread.
+  for (const ex of [-5, 5]) {
+    part(ctx, oval(ex, hy, 2.8, 2.8), PALETTE.ink, [ex - 3, hy - 3, 6, 6], r, { fibre: 0, line: 0.6, light: 1.5 });
+    line(ctx, [ex - 1, hy - 1, ex + 1, hy + 1], rgba(PALETTE.paper, 0.85), 0.6);
+    line(ctx, [ex + 1, hy - 1, ex - 1, hy + 1], rgba(PALETTE.paper, 0.85), 0.6);
+  }
+  const m = new Path2D(); m.moveTo(-3.5, hy + 6.5); m.quadraticCurveTo(0, hy + 8.3, 3.5, hy + 6.5);
+  ctx.save(); ctx.setLineDash([1.2, 0.9]); ctx.lineWidth = 1; ctx.strokeStyle = PALETTE.ink; ctx.stroke(m); ctx.restore();
+  ctx.fillStyle = rgba(PALETTE.carmine, 0.22);
+  for (const cx of [-8.5, 8.5]) { ctx.beginPath(); ctx.arc(cx, hy + 4.5, 2.4, 0, Math.PI * 2); ctx.fill(); }
+}
+
+const COSTUMES: Costume[] = [
+  // Magician: burn tailcoat, paper shirt front, bow tie, top hat.
+  { body: PALETTE.burn, legs: tint(PALETTE.ink, 0.15), draw: (ctx, r) => {
+    for (const s of [-1, 1]) {
+      const tail = new Path2D(); tail.moveTo(s * 6, -30); tail.lineTo(s * 20, -30); tail.lineTo(s * 15, -10); tail.closePath();
+      part(ctx, tail, tint(PALETTE.burn, -0.2), [s < 0 ? -20 : 6, -30, 14, 20], r, { fibre: 0.5 });
+    }
+    const body = extraBody(ctx, r, PALETTE.burn, -30, 19);
+    ctx.save(); ctx.clip(body);
+    const shirt = new Path2D(); shirt.moveTo(-7, -75); shirt.lineTo(7, -75); shirt.lineTo(0, -46); shirt.closePath();
+    part(ctx, shirt, PALETTE.paper, [-7, -75, 14, 29], r, { fibre: 0.2, line: 1 });
+    for (const y of [-40, -34]) part(ctx, oval(4, y, 1.7, 1.7), PALETTE.brass, [2, y - 2, 4, 4], r, { fibre: 0, line: 0.7 });
+    line(ctx, [-15, -40, -10, -36], rgba(tint(PALETTE.burn, -0.5), 0.8), 1);
+    ctx.restore();
+    const bow = new Path2D(); bow.moveTo(0, -73); bow.lineTo(-6, -76.5); bow.lineTo(-6, -69.5); bow.closePath(); bow.moveTo(0, -73); bow.lineTo(6, -76.5); bow.lineTo(6, -69.5); bow.closePath();
+    part(ctx, bow, PALETTE.ink, [-6, -77, 12, 8], r, { fibre: 0, line: 0.8, light: 1.5 });
+    extraHead(ctx, r);
+    part(ctx, oval(0, -101, 16, 3.4), tint(PALETTE.ink, 0.12), [-16, -105, 32, 7], r, { fibre: 0.3, light: 1.5 });
+    const crown = new Path2D(); crown.moveTo(-10, -102); crown.lineTo(-11, -124); crown.quadraticCurveTo(0, -126.5, 11, -124); crown.lineTo(10, -102); crown.closePath();
+    part(ctx, crown, tint(PALETTE.ink, 0.15), [-11, -126, 22, 24], r, { fibre: 0.4, light: 1.6 });
+    part(ctx, rr(-10.4, -108, 20.8, 4, 0.5), PALETTE.brass, [-11, -108, 22, 4], r, { fibre: 0, line: 0.9 });
+  } },
+  // Detective: belted earth trench and a check deerstalker.
+  { body: PALETTE.earth, legs: tint(PALETTE.earth, -0.5), draw: (ctx, r) => {
+    const body = extraBody(ctx, r, PALETTE.earth, -24, 22);
+    ctx.save(); ctx.clip(body);
+    for (const s of [-1, 1]) {
+      const lap = new Path2D(); lap.moveTo(s * 2, -75); lap.lineTo(s * 13, -74); lap.lineTo(s * 4, -56); lap.closePath();
+      part(ctx, lap, tint(PALETTE.earth, -0.2), [-13, -75, 26, 20], r, { fibre: 0.3, line: 1 });
+    }
+    part(ctx, rr(-24, -50, 48, 5, 1), tint(PALETTE.earth, -0.38), [-24, -50, 48, 5], r, { fibre: 0.3, line: 1 });
+    for (const [x, y] of [[-5, -42], [5, -42], [-5, -33], [5, -33]] as const) part(ctx, oval(x, y, 1.6, 1.6), tint(PALETTE.earth, -0.5), [x - 2, y - 2, 4, 4], r, { fibre: 0, line: 0.6 });
+    line(ctx, [0, -56, 0, -25], rgba(PALETTE.ink, 0.6), 0.9);
+    fold(ctx, [-14, -25, -12, -31, -13, -38], PALETTE.earth);
+    fold(ctx, [15, -25, 13, -31, 14, -38], PALETTE.earth);
+    ctx.restore();
+    part(ctx, rr(-3.5, -51, 7, 7, 1), PALETTE.brass, [-3.5, -51, 7, 7], r, { fibre: 0, line: 0.9 });
+    extraHead(ctx, r);
+    const cap = new Path2D(); cap.moveTo(-14, -94); cap.quadraticCurveTo(-14, -113, 0, -113); cap.quadraticCurveTo(14, -113, 14, -94); cap.closePath();
+    const plaid = tint(PALETTE.plywood, 0.15);
+    for (const s of [-1, 1]) {
+      const peak = new Path2D(); peak.moveTo(s * 10, -96); peak.quadraticCurveTo(s * 22, -96, s * 21, -92); peak.lineTo(s * 9, -93); peak.closePath();
+      part(ctx, peak, tint(plaid, -0.15), [s < 0 ? -22 : 9, -97, 13, 6], r, { fibre: 0.2, line: 1 });
+    }
+    part(ctx, cap, plaid, [-14, -113, 28, 19], r, { fibre: 0.4 });
+    ctx.save(); ctx.clip(cap);
+    for (let x = -14; x < 14; x += 4) line(ctx, [x, -113, x + 1, -94], rgba(tint(PALETTE.earth, -0.2), 0.55), 0.8);
+    for (let y = -111; y < -94; y += 4) line(ctx, [-14, y, 14, y], rgba(tint(PALETTE.earth, -0.2), 0.55), 0.8);
+    ctx.restore();
+    part(ctx, oval(0, -113.5, 3.5, 2), plaid, [-4, -116, 8, 4], r, { fibre: 0, line: 0.9 });
+  } },
+  // Archer: felt tunic with a zigzag hem, brass belt, feathered cap.
+  { body: PALETTE.felt, legs: tint(PALETTE.felt, -0.45), draw: (ctx, r) => {
+    const tunic = new Path2D();
+    tunic.moveTo(-12, -75); tunic.quadraticCurveTo(-17, -74, -17, -64); tunic.lineTo(-20, -30);
+    for (let i = 0; i <= 8; i++) tunic.lineTo(-20 + i * 5, i % 2 ? -22 : -29);
+    tunic.lineTo(17, -64); tunic.quadraticCurveTo(17, -74, 12, -75); tunic.closePath();
+    part(ctx, tunic, PALETTE.felt, [-20, -76, 40, 54], r, { fibre: 0.6 });
+    ctx.save(); ctx.clip(tunic);
+    const hemSt = new Path2D(); hemSt.moveTo(-20, -32); for (let i = 0; i <= 8; i++) hemSt.lineTo(-20 + i * 5, (i % 2 ? -25 : -32));
+    stitch(ctx, hemSt, rgba(PALETTE.paper, 0.6));
+    part(ctx, rr(-22, -49, 44, 4.5, 1), tint(PALETTE.earth, -0.3), [-22, -49, 44, 5], r, { fibre: 0.2, line: 1 });
+    line(ctx, [-3, -75, 0, -62, 3, -75], PALETTE.ink, 1);
+    for (let y = -72; y < -63; y += 3) line(ctx, [-2.5, y, 2.5, y + 2], PALETTE.paper, 0.7);
+    ctx.restore();
+    part(ctx, rr(-3, -50, 6, 6.4, 1), PALETTE.brass, [-3, -50, 6, 6.4], r, { fibre: 0, line: 0.9 });
+    extraHead(ctx, r);
+    const feather = new Path2D(); feather.moveTo(-8, -102); feather.quadraticCurveTo(-20, -116, -14, -126); feather.quadraticCurveTo(-8, -112, -4, -103); feather.closePath();
+    part(ctx, feather, PALETTE.brass, [-20, -126, 16, 24], r, { fibre: 0.3, line: 1 });
+    line(ctx, [-6, -103, -13, -114, -14, -124], tint(PALETTE.brass, -0.4), 0.7);
+    const cap = new Path2D();
+    cap.moveTo(-15, -97); cap.quadraticCurveTo(-12, -112, 2, -110); cap.quadraticCurveTo(14, -110, 24, -118); cap.quadraticCurveTo(20, -104, 15, -97); cap.closePath();
+    part(ctx, cap, tint(PALETTE.felt, -0.1), [-15, -118, 39, 21], r, { fibre: 0.5 });
+    const brim = new Path2D(); brim.moveTo(-16, -97); brim.quadraticCurveTo(0, -101, 16, -97); brim.lineTo(15, -94); brim.quadraticCurveTo(0, -97, -15, -94); brim.closePath();
+    part(ctx, brim, tint(PALETTE.felt, -0.25), [-16, -101, 32, 7], r, { fibre: 0.3, line: 1 });
+  } },
+  // Queen: violet gown to the floor, paper ruff, brass crown.
+  { body: PALETTE.violet, legs: null, draw: (ctx, r) => {
+    const gown = new Path2D();
+    gown.moveTo(-11, -75); gown.quadraticCurveTo(-16, -74, -15, -62); gown.quadraticCurveTo(-18, -40, -29, -3);
+    for (let i = 0; i <= 6; i++) gown.quadraticCurveTo(-29 + i * 9.6 + 4.8, 2, -29 + (i + 1) * 9.6 - (i === 6 ? 9.6 : 0), -3);
+    gown.lineTo(29, -3); gown.quadraticCurveTo(18, -40, 15, -62); gown.quadraticCurveTo(16, -74, 11, -75); gown.closePath();
+    part(ctx, gown, PALETTE.violet, [-30, -76, 60, 77], r, { fibre: 0.5 });
+    ctx.save(); ctx.clip(gown);
+    for (const x of [-16, -6, 6, 17]) fold(ctx, [x * 0.5, -48, x * 0.85, -26, x, -2], PALETTE.violet);
+    part(ctx, rr(-16, -54, 32, 5, 1.5), PALETTE.brass, [-16, -54, 32, 5], r, { fibre: 0, line: 1 });
+    const hemSt = new Path2D(); hemSt.moveTo(-28, -6); hemSt.quadraticCurveTo(0, -4, 28, -6);
+    stitch(ctx, hemSt, PALETTE.brass, 0.9);
+    ctx.restore();
+    const ruff = new Path2D();
+    for (let i = 0; i <= 16; i++) {
+      const a = Math.PI + (i / 16) * Math.PI;
+      const rad = i % 2 ? 17 : 13;
+      const x = Math.cos(a) * rad; const y = -76 - Math.sin(a) * rad * -0.35;
+      if (i === 0) ruff.moveTo(x, y); else ruff.lineTo(x, y);
+    }
+    ruff.quadraticCurveTo(0, -66, -13, -76); ruff.closePath();
+    part(ctx, ruff, PALETTE.paper, [-17, -82, 34, 16], r, { fibre: 0.15, line: 1 });
+    extraHead(ctx, r);
+    const crown = new Path2D();
+    crown.moveTo(-10, -100); crown.lineTo(-11, -113); crown.lineTo(-6, -106); crown.lineTo(-3, -116); crown.lineTo(0, -107); crown.lineTo(3, -116); crown.lineTo(6, -106); crown.lineTo(11, -113); crown.lineTo(10, -100); crown.closePath();
+    part(ctx, crown, PALETTE.brass, [-11, -116, 22, 16], r, { fibre: 0, line: 1.1, light: 1.3 });
+    for (const [x, c] of [[-5, PALETTE.felt], [0, PALETTE.carmine], [5, PALETTE.felt]] as const) part(ctx, oval(x, -103, 1.5, 1.5), c, [x - 2, -105, 4, 4], r, { fibre: 0, line: 0.6 });
+  } },
+];
+
+function rumourSprite() {
+  return cast((ctx, r) => {
+    // Violet whisper wisps behind the paper.
+    for (const [x, y, rx, ry] of [[52, 64, 26, 20], [74, 46, 22, 16], [40, 86, 16, 12], [78, 78, 16, 12]] as const) {
+      part(ctx, oval(x, y, rx, ry), tint(PALETTE.violet, 0.12), [x - rx, y - ry, rx * 2, ry * 2], r, { fibre: 0.5, line: 0, light: 0.8 });
+    }
+    const bubble = (cx: number, cy: number, rx: number, ry: number, tx: number, ty: number, rot: number, glyph: string) => {
+      ctx.save(); ctx.translate(cx, cy); ctx.rotate(rot);
+      const p = new Path2D();
+      p.ellipse(0, 0, rx, ry, 0, Math.PI * 0.62, Math.PI * 0.38 + Math.PI * 2);
+      p.lineTo(tx, ty);
+      p.closePath();
+      part(ctx, p, PALETTE.paper, [-rx, -ry, rx * 2, ry * 2 + 8], r, { fibre: 0.15, line: 1.4, light: 0.7 });
+      ctx.save(); ctx.clip(p);
+      // Crumpled paper facets.
+      for (let i = 0; i < 4; i++) {
+        const x0 = -rx + r() * rx * 2; const y0 = -ry; const x1 = x0 + (r() - 0.5) * rx; const y1 = ry;
+        line(ctx, [x0, y0, x1, y1], rgba(PALETTE.ink, 0.12), 0.7);
+        line(ctx, [x0 + 0.8, y0, x1 + 0.8, y1], rgba('#ffffff', 0.5), 0.5);
+      }
+      ctx.restore();
+      ctx.fillStyle = PALETTE.violet;
+      ctx.font = `italic bold ${Math.round(ry * 0.9)}px serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(glyph, 0, 0.5);
+      ctx.restore();
+    };
+    bubble(40, 34, 15, 11, -10, 17, -0.15, '…');
+    bubble(82, 54, 27, 18, -16, 26, 0.12, 'psst');
+    bubble(42, 92, 17, 12, 13, 19, 0.1, '?!');
+  }, { shadow: [62, 120, 30, 3.5] }, 41, 2.4 / 2.15);
+}
+
+function mothSprite() {
+  return cast((ctx, r) => {
+    ctx.translate(64, 74);
+    const wing = (s: number) => {
+      const fore = new Path2D();
+      fore.moveTo(s * 2, -6);
+      fore.quadraticCurveTo(s * 20, -50, s * 58, -64);
+      fore.quadraticCurveTo(s * 62, -42, s * 52, -26);
+      for (let i = 0; i < 4; i++) fore.quadraticCurveTo(s * (48 - i * 11), -16 + i * 2, s * (44 - i * 11), -20 + i * 3);
+      fore.lineTo(s * 3, 2);
+      fore.closePath();
+      part(ctx, fore, PALETTE.violet, [s < 0 ? -62 : 0, -66, 62, 68], r, { fibre: 0.55 });
+      ctx.save(); ctx.clip(fore);
+      for (const k of [0.25, 0.5, 0.75]) line(ctx, [s * 3, -4, s * 30 * k + s * 10, -40 * k - 8, s * 56 * k + s * 6, -58 * k - 4], rgba(tint(PALETTE.violet, -0.5), 0.6), 0.8);
+      line(ctx, [s * 40, -54, s * 50, -40, s * 46, -28], rgba(PALETTE.paper, 0.6), 2);
+      ctx.restore();
+      // Eyespot.
+      part(ctx, oval(s * 32, -32, 9, 8), PALETTE.brass, [s * 32 - 9, -40, 18, 16], r, { fibre: 0.3, line: 1.1 });
+      part(ctx, oval(s * 32, -32, 4.5, 4), PALETTE.ink, [s * 32 - 5, -36, 10, 8], r, { fibre: 0, line: 0, light: 1.4 });
+      ctx.fillStyle = PALETTE.paper; ctx.beginPath(); ctx.arc(s * 32 - 1.5, -33.5, 1.3, 0, Math.PI * 2); ctx.fill();
+      const hind = new Path2D();
+      hind.moveTo(s * 3, 0);
+      hind.quadraticCurveTo(s * 34, -14, s * 38, 6);
+      hind.quadraticCurveTo(s * 34, 24, s * 18, 24);
+      hind.quadraticCurveTo(s * 8, 22, s * 3, 8);
+      hind.closePath();
+      part(ctx, hind, tint(PALETTE.violet, -0.18), [s < 0 ? -38 : 0, -10, 38, 34], r, { fibre: 0.55 });
+      ctx.save(); ctx.clip(hind);
+      ctx.fillStyle = rgba(PALETTE.paper, 0.6);
+      for (let i = 0; i < 5; i++) { ctx.beginPath(); ctx.arc(s * (14 + i * 4.5), 16 - Math.abs(i - 2) * 2.5, 1.3, 0, Math.PI * 2); ctx.fill(); }
+      ctx.restore();
+    };
+    wing(-1); wing(1);
+    // Fuzzy body.
+    const body = oval(0, 0, 6.5, 20);
+    part(ctx, body, tint(PALETTE.brass, -0.25), [-7, -20, 14, 40], r, { fibre: 1.2 });
+    ctx.save(); ctx.clip(body);
+    for (const y of [-6, 2, 10]) line(ctx, [-7, y, 0, y + 2, 7, y], rgba(tint(PALETTE.earth, -0.4), 0.8), 1.4);
+    ctx.restore();
+    for (let i = 0; i < 70; i++) {
+      const a = r() * Math.PI * 2;
+      const x = Math.cos(a) * 6.5; const y = Math.sin(a) * 20;
+      line(ctx, [x, y, x + Math.cos(a) * (1 + r() * 1.6), y + Math.sin(a) * 1.2], rgba(tint(PALETTE.brass, r() < 0.5 ? 0.3 : -0.4), 0.9), 0.6);
+    }
+    const head = oval(0, -21, 6, 5.2);
+    part(ctx, head, tint(PALETTE.brass, -0.35), [-6, -26, 12, 10], r, { fibre: 1 });
+    googlyEye(ctx, -3, -22, 3.2, 0.2, 0.3);
+    googlyEye(ctx, 3.2, -22, 3.2, 0.2, 0.3);
+    // Feathery antennae.
+    for (const s of [-1, 1]) {
+      line(ctx, [s * 2, -26, s * 6, -40, s * 14, -46], PALETTE.ink, 1.1);
+      for (let i = 1; i < 7; i++) {
+        const t = i / 7; const x = s * (2 + 12 * t); const y = -26 - 20 * t + 4 * t * t;
+        line(ctx, [x, y, x - s * 1.8, y - 2], PALETTE.ink, 0.5);
+        line(ctx, [x, y, x + s * 1.8, y + 1], PALETTE.ink, 0.5);
+      }
+    }
+  }, { shadow: [66, 118, 20, 3] }, 53);
+}
+
+function monitorSprite(hostile: boolean) {
+  return cast((ctx, r) => {
+    ctx.translate(hostile ? 70 : 64, 120);
+    if (hostile) ctx.rotate(-0.06);
+    // Wooden tripod stand.
+    const wood = tint(PALETTE.earth, 0.12);
+    for (const [x0, x1] of [[-3, -20], [3, 20], [0, 2]] as const) {
+      const leg = new Path2D(); leg.moveTo(x0 - 2, -42); leg.lineTo(x0 + 2, -42); leg.lineTo(x1 + 2, 0); leg.lineTo(x1 - 2, 0); leg.closePath();
+      part(ctx, leg, x0 === 0 ? wood : tint(wood, -0.15), [Math.min(x0, x1) - 2, -42, Math.abs(x1 - x0) + 4, 42], r, { fibre: 0, line: 1.2 });
+    }
+    part(ctx, rr(-7, -48, 14, 7, 2), tint(PALETTE.ink, 0.25), [-7, -48, 14, 7], r, { fibre: 0, line: 1, light: 1.3 });
+    // Cabinet.
+    const cab = rr(-36, -98, 72, 54, 7);
+    part(ctx, cab, PALETTE.earth, [-36, -98, 72, 54], r, { fibre: 0, line: 1.5, hx: 0.2, hy: 0.15 });
+    ctx.save(); ctx.clip(cab); grain(ctx, [-36, -98, 72, 54], r, PALETTE.earth); ctx.restore();
+    // Bulging CRT glass.
+    const screenColor = hostile ? PALETTE.carmine : tint(PALETTE.felt, 0.12);
+    const bezel = rr(-30, -92, 48, 42, 8);
+    part(ctx, bezel, tint(PALETTE.ink, 0.12), [-30, -92, 48, 42], r, { fibre: 0, line: 1.2 });
+    const screen = rr(-27, -89, 42, 36, 9);
+    ctx.fillStyle = screenColor; ctx.fill(screen);
+    ctx.save(); ctx.clip(screen);
+    const g = ctx.createRadialGradient(-6, -71, 2, -6, -71, 30);
+    g.addColorStop(0, rgba(tint(screenColor, 0.45), 1)); g.addColorStop(0.6, rgba(screenColor, 1)); g.addColorStop(1, rgba(tint(screenColor, -0.55), 1));
+    ctx.fillStyle = g; ctx.fillRect(-27, -89, 42, 36);
+    for (let y = -88; y < -53; y += 1.8) line(ctx, [-27, y, 15, y], rgba(PALETTE.ink, 0.13), 0.6);
+    if (hostile) {
+      const eye = new Path2D(); eye.moveTo(-20, -71); eye.quadraticCurveTo(-6, -83, 8, -71); eye.quadraticCurveTo(-6, -61, -20, -71); eye.closePath();
+      part(ctx, eye, PALETTE.paper, [-20, -83, 28, 22], r, { fibre: 0, line: 1.3, light: 0.6 });
+      ctx.save(); ctx.clip(eye);
+      part(ctx, oval(-3, -71, 5.5, 5.5), PALETTE.ink, [-9, -77, 12, 12], r, { fibre: 0, line: 0, light: 1.5 });
+      ctx.fillStyle = PALETTE.carmine; ctx.beginPath(); ctx.arc(-3, -71, 2, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+      ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(-5, -73, 1.1, 0, Math.PI * 2); ctx.fill();
+      line(ctx, [-22, -82, -6, -76, 10, -80], PALETTE.ink, 2.6);
+    } else {
+      for (const ex of [-14, 2]) line(ctx, [ex - 3.5, -72, ex, -77, ex + 3.5, -72], PALETTE.paper, 2.2);
+      ctx.strokeStyle = PALETTE.paper; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(-6, -68, 6, Math.PI * 0.15, Math.PI * 0.85); ctx.stroke();
+    }
+    // Glass shine.
+    line(ctx, [-22, -66, -22, -82, -10, -85], rgba('#ffffff', 0.55), 2.2);
+    ctx.restore();
+    ctx.lineWidth = 1.1; ctx.strokeStyle = PALETTE.ink; ctx.stroke(screen);
+    // Knobs and speaker grille.
+    for (const y of [-86, -76]) {
+      part(ctx, oval(26, y, 3.6, 3.6), PALETTE.brass, [22, y - 4, 8, 8], r, { fibre: 0, line: 1 });
+      line(ctx, [26, y, 26 + 2.2, y - 2.2], PALETTE.ink, 0.8);
+    }
+    ctx.fillStyle = rgba(PALETTE.ink, 0.6);
+    for (let y = -67; y < -52; y += 3) for (let x = 23; x < 31; x += 3) { ctx.beginPath(); ctx.arc(x, y, 0.8, 0, Math.PI * 2); ctx.fill(); }
+    if (hostile) {
+      // Rabbit-ear antennae.
+      for (const [x, tx, ty] of [[-6, -24, -118], [6, 22, -116]] as const) {
+        line(ctx, [x, -98, tx, ty], PALETTE.ink, 1.4);
+        part(ctx, oval(tx, ty, 2.6, 2.6), PALETTE.brass, [tx - 3, ty - 3, 6, 6], r, { fibre: 0, line: 0.9 });
+      }
+      part(ctx, oval(0, -99, 6, 3), tint(PALETTE.ink, 0.2), [-6, -102, 12, 6], r, { fibre: 0, line: 1 });
+      // Record dot.
+      part(ctx, oval(-30, -94, 2.2, 2.2), PALETTE.carmine, [-32, -96, 4, 4], r, { fibre: 0, line: 0.8 });
+    } else tape(ctx, -24, -97, 14, 4.5, -0.12, tint(PALETTE.paper, -0.08), r);
+  }, { shadow: [hostile ? 70 : 64, 121, 24, 3.5] }, hostile ? 61 : 67, 1.85 / 2.7);
+}
+
+function glassSprite() {
+  return cast((ctx, r) => {
+    ctx.translate(64, 66);
+    ctx.rotate(-0.05);
+    const pane = rr(-52, -30, 104, 60, 2.5);
+    ctx.lineWidth = 6.5; ctx.strokeStyle = rgba(PALETTE.paper, 0.9); ctx.stroke(pane);
+    ctx.fillStyle = rgba(tint(PALETTE.felt, 0.93), 0.85); ctx.fill(pane);
+    ctx.save(); ctx.clip(pane);
+    const g = ctx.createLinearGradient(-52, -30, 52, 30);
+    g.addColorStop(0, rgba('#ffffff', 0.45)); g.addColorStop(0.5, rgba('#ffffff', 0)); g.addColorStop(1, rgba(PALETTE.ink, 0.18));
+    ctx.fillStyle = g; ctx.fillRect(-52, -30, 104, 60);
+    line(ctx, [-30, 34, 2, -34], rgba('#ffffff', 0.85), 6);
+    line(ctx, [-16, 34, 12, -34], rgba('#ffffff', 0.7), 2);
+    line(ctx, [28, 34, 48, -34], rgba('#ffffff', 0.5), 3);
+    // Hairline crack from the corner.
+    const cx = 36; const cy = 16;
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI * 2 + r() * 0.5; const len = 6 + r() * 12;
+      line(ctx, [cx, cy, cx + Math.cos(a) * len * 0.5 + 1, cy + Math.sin(a) * len * 0.5, cx + Math.cos(a) * len, cy + Math.sin(a) * len], rgba(PALETTE.ink, 0.55), 0.6);
+    }
+    ctx.restore();
+    ctx.lineWidth = 1.2; ctx.strokeStyle = rgba('#ffffff', 0.9); ctx.stroke(rr(-50, -28, 100, 56, 2));
+    ctx.lineWidth = 2.6; ctx.strokeStyle = PALETTE.ink; ctx.stroke(pane);
+    // Gaffer tape on the corners and a breakaway label.
+    tape(ctx, -48, -26, 16, 5, -0.75, PALETTE.burn, r);
+    tape(ctx, 48, 26, 16, 5, -0.75, PALETTE.burn, r);
+    tape(ctx, -24, 20, 30, 7, 0.04, tint(PALETTE.paper, -0.06), r);
+    ctx.fillStyle = PALETTE.ink; ctx.font = 'bold 5px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('BREAKAWAY', -24, 20.3);
+  }, null, 71, 3.4 / 3.05);
+}
+
+function reelSprite() {
+  return cast((ctx, r) => {
+    ctx.translate(64, 64);
+    const disc = new Path2D();
+    disc.arc(0, 0, 40, 0, Math.PI * 2);
+    for (let i = 0; i < 5; i++) {
+      const a = (i / 5) * Math.PI * 2 - Math.PI / 2;
+      disc.moveTo(Math.cos(a) * 26 + 9, Math.sin(a) * 26);
+      disc.arc(Math.cos(a) * 26, Math.sin(a) * 26, 9, 0, Math.PI * 2, true);
+    }
+    // Wound film visible through the holes.
+    part(ctx, oval(0, 0, 34, 34), tint(PALETTE.earth, -0.45), [-34, -34, 68, 68], r, { fibre: 0, line: 0 });
+    for (let rad = 14; rad < 34; rad += 2) { ctx.strokeStyle = rgba(PALETTE.paper, 0.12); ctx.lineWidth = 0.5; ctx.beginPath(); ctx.arc(0, 0, rad, 0, Math.PI * 2); ctx.stroke(); }
+    ctx.fillStyle = PALETTE.brass; ctx.fill(disc, 'evenodd');
+    ctx.save(); ctx.clip(disc, 'evenodd'); light(ctx, [-40, -40, 80, 80], 1.1); ctx.restore();
+    ctx.lineWidth = 1.5; ctx.strokeStyle = PALETTE.ink; ctx.stroke(disc);
+    ctx.strokeStyle = rgba(PALETTE.paper, 0.6); ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(0, 0, 36, Math.PI * 1.05, Math.PI * 1.45); ctx.stroke();
+    part(ctx, oval(0, 0, 9, 9), PALETTE.ink, [-9, -9, 18, 18], r, { fibre: 0, line: 0, light: 1.3 });
+    part(ctx, oval(0, 0, 3.4, 3.4), PALETTE.brass, [-4, -4, 8, 8], r, { fibre: 0, line: 0.9 });
+  }, { shadow: [67, 106, 30, 3.5] }, 79);
+}
+
+// ---------------------------------------------------------------------------
+// Continuity props: clapper, cone, ladder, crate.
+
+function clapperSprite() {
+  return cast((ctx, r) => {
+    ctx.translate(64, 96);
+    const slate = tint(PALETTE.ink, 0.14);
+    const board = rr(-42, -40, 84, 46, 3);
+    part(ctx, board, slate, [-42, -40, 84, 46], r, { fibre: 0.15, light: 1.5 });
+    ctx.save(); ctx.clip(board);
+    ctx.strokeStyle = rgba(PALETTE.paper, 0.75); ctx.lineWidth = 0.8;
+    for (const y of [-26, -12]) { ctx.beginPath(); ctx.moveTo(-40, y); ctx.lineTo(40, y); ctx.stroke(); }
+    ctx.beginPath(); ctx.moveTo(-6, -26); ctx.lineTo(-6, -12); ctx.moveTo(14, -26); ctx.lineTo(14, -12); ctx.stroke();
+    ctx.fillStyle = rgba(PALETTE.paper, 0.88); ctx.font = 'bold 7px sans-serif'; ctx.textBaseline = 'middle';
+    ctx.fillText('CULL', -38, -33);
+    ctx.font = '5px sans-serif';
+    ctx.fillText('SCENE', -38, -22); ctx.fillText('TAKE', -4, -22); ctx.fillText('ROLL', 16, -22);
+    ctx.font = 'bold 8px sans-serif';
+    ctx.fillText('01', -34, -16); ctx.fillText('3', 2, -16); ctx.fillText('A7', 22, -16);
+    ctx.font = '5px sans-serif'; ctx.fillText('DIR. — CAM 01', -38, -4);
+    for (let i = 0; i < 20; i++) line(ctx, [-40 + r() * 80, -38 + r() * 42, -40 + r() * 80, -38 + r() * 42], rgba(PALETTE.paper, 0.06), 2);
+    ctx.restore();
+    const stripes = (path: Path2D, box: Box) => {
+      ctx.fillStyle = PALETTE.paper; ctx.fill(path);
+      ctx.save(); ctx.clip(path);
+      ctx.fillStyle = PALETTE.ink;
+      for (let x = box[0] - 10; x < box[0] + box[2] + 10; x += 12) {
+        ctx.beginPath(); ctx.moveTo(x, box[1] + box[3]); ctx.lineTo(x + 6, box[1] + box[3]); ctx.lineTo(x + 12, box[1]); ctx.lineTo(x + 6, box[1]); ctx.closePath(); ctx.fill();
+      }
+      light(ctx, box, 0.8);
+      ctx.restore();
+      ctx.lineWidth = 1.3; ctx.strokeStyle = PALETTE.ink; ctx.stroke(path);
+    };
+    stripes(rr(-42, -48, 84, 8, 1.5), [-42, -48, 84, 8]);
+    ctx.save(); ctx.translate(-42, -48); ctx.rotate(-0.38);
+    stripes(rr(0, -9, 86, 8, 1.5), [0, -9, 86, 8]);
+    ctx.restore();
+    part(ctx, oval(-40, -48, 3.2, 3.2), PALETTE.brass, [-43, -51, 6, 6], r, { fibre: 0, line: 1 });
+  }, { shadow: [67, 102, 42, 4] }, 83, 1.9 / 2.35);
+}
+
+function coneSprite() {
+  return cast((ctx, r) => {
+    ctx.translate(64, 112);
+    part(ctx, rr(-38, -8, 76, 11, 2.5), tint(PALETTE.earth, -0.3), [-38, -8, 76, 11], r, { fibre: 0.3 });
+    const cone = new Path2D();
+    cone.moveTo(-5, -96); cone.quadraticCurveTo(0, -99, 5, -96); cone.lineTo(29, -6); cone.quadraticCurveTo(0, 0, -29, -6); cone.closePath();
+    part(ctx, cone, PALETTE.burn, [-29, -99, 58, 99], r, { fibre: 0.35, hx: 0.25 });
+    ctx.save(); ctx.clip(cone);
+    for (const [y, h] of [[-66, 9], [-38, 10]] as const) {
+      const band = new Path2D(); band.moveTo(-40, y); band.quadraticCurveTo(0, y + 4, 40, y); band.lineTo(40, y + h); band.quadraticCurveTo(0, y + h + 4, -40, y + h); band.closePath();
+      ctx.fillStyle = tint(PALETTE.paper, -0.04); ctx.fill(band);
+      ctx.save(); ctx.clip(band); light(ctx, [-29, -99, 58, 99], 0.9, 0.25); ctx.restore();
+      ctx.lineWidth = 0.9; ctx.strokeStyle = rgba(PALETTE.ink, 0.6); ctx.stroke(band);
+    }
+    line(ctx, [-10, -88, -16, -50, -21, -10], rgba(PALETTE.paper, 0.5), 2.4);
+    ctx.restore();
+    ctx.lineWidth = 1.4; ctx.strokeStyle = PALETTE.ink; ctx.stroke(cone);
+    tape(ctx, 16, -14, 14, 5, -0.5, tint(PALETTE.paper, -0.08), r);
+  }, { shadow: [68, 114, 40, 4.5] }, 89, (1.9 * 1.25) / 2.35);
+}
+
+function ladderSprite() {
+  return cast((ctx, r) => {
+    ctx.translate(64, 120);
+    const wood = PALETTE.plywood;
+    for (let i = 0; i < 4; i++) {
+      const y = -18 - i * 24;
+      const rung = rr(-34 + i * 1.5, y - 3.5, 68 - i * 3, 7, 1.5);
+      part(ctx, rung, tint(wood, -0.08), [-34, y - 3.5, 68, 7], r, { fibre: 0, line: 1.2, hy: 0.1 });
+      ctx.save(); ctx.clip(rung); grain(ctx, [-34, y - 3.5, 68, 7], r, wood); ctx.restore();
+    }
+    for (const s of [-1, 1]) {
+      const rail = new Path2D();
+      rail.moveTo(s * 40, 0); rail.lineTo(s * 30, 0); rail.lineTo(s * 26, -108); rail.lineTo(s * 34, -108); rail.closePath();
+      part(ctx, rail, wood, [s < 0 ? -40 : 26, -108, 14, 108], r, { fibre: 0, line: 1.4, hx: 0.2, hy: 0.1 });
+      ctx.save(); ctx.clip(rail); grain(ctx, [s < 0 ? -40 : 26, -108, 14, 108], r, wood, true); ctx.restore();
+      for (let i = 0; i < 4; i++) {
+        const y = -18 - i * 24; const x = s * (35 - i * 1.5 - (y / -108) * 0) ;
+        ctx.fillStyle = PALETTE.ink; ctx.beginPath(); ctx.arc(x - s * 1, y, 0.9, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+    tape(ctx, 33.5, -60, 12, 7, 0.06, PALETTE.burn, r);
+    tape(ctx, -30, -100, 12, 6, -0.04, tint(PALETTE.paper, -0.08), r);
+    // Paint drips.
+    for (const [x, y, l] of [[-36, -40, 6], [-35, -36, 3.5], [30, -88, 5]] as const) line(ctx, [x, y, x, y + l], rgba(PALETTE.paper, 0.75), 1.2);
+  }, { shadow: [68, 121, 44, 4] }, 97, 1.9 / 2.35);
+}
+
+function crateSprite() {
+  return cast((ctx, r) => {
+    ctx.translate(64, 104);
+    const face = rr(-38, -76, 76, 80, 2);
+    part(ctx, face, PALETTE.plywood, [-38, -76, 76, 80], r, { fibre: 0, line: 0, hx: 0.2, hy: 0.15 });
+    ctx.save(); ctx.clip(face);
+    for (let y = -76; y < 4; y += 16) {
+      grain(ctx, [-38, y, 76, 16], r, PALETTE.plywood);
+      line(ctx, [-38, y, 38, y], rgba(tint(PALETTE.earth, -0.4), 0.7), 1);
+    }
+    // Diagonal brace.
+    ctx.save(); ctx.rotate(-0.86);
+    const brace = rr(-56, -46, 112, 9, 1);
+    part(ctx, brace, tint(PALETTE.earth, 0.18), [-56, -46, 112, 9], r, { fibre: 0, line: 1.1 });
+    ctx.save(); ctx.clip(brace); grain(ctx, [-56, -46, 112, 9], r, tint(PALETTE.earth, 0.18)); ctx.restore();
+    ctx.restore();
+    ctx.fillStyle = rgba(PALETTE.ink, 0.42); ctx.font = 'bold 13px serif'; ctx.textAlign = 'center';
+    ctx.fillText('PROPS', 4, -14);
+    light(ctx, [-38, -76, 76, 80], 0.8, 0.2, 0.15);
+    ctx.restore();
+    // Frame boards with nails.
+    const frame = new Path2D();
+    rr(-40, -78, 80, 84, 2.5, frame);
+    rr(-31, -69, 62, 66, 1, frame);
+    ctx.fillStyle = tint(PALETTE.earth, 0.05); ctx.fill(frame, 'evenodd');
+    ctx.save(); ctx.clip(frame, 'evenodd'); grain(ctx, [-40, -78, 80, 9], r, PALETTE.earth); grain(ctx, [-40, -3, 80, 9], r, PALETTE.earth); grain(ctx, [-40, -78, 9, 84], r, PALETTE.earth, true); grain(ctx, [31, -78, 9, 84], r, PALETTE.earth, true); light(ctx, [-40, -78, 80, 84], 1, 0.2, 0.15); ctx.restore();
+    ctx.lineWidth = 1.4; ctx.strokeStyle = PALETTE.ink; ctx.stroke(frame);
+    ctx.fillStyle = PALETTE.ink;
+    for (const [x, y] of [[-35.5, -73.5], [35.5, -73.5], [-35.5, 1.5], [35.5, 1.5], [0, -73.5], [0, 1.5]] as const) { ctx.beginPath(); ctx.arc(x, y, 1, 0, Math.PI * 2); ctx.fill(); }
+    tape(ctx, 30, -70, 22, 7, 0.78, tint(PALETTE.paper, -0.08), r);
+  }, { shadow: [68, 110, 44, 4.5] }, 101, (1.9 * 1.25) / 2.35);
+}
+
+/** Plank-and-rope bridge laid flat: u runs along the 14-unit span, v across its 1.8-unit width. */
+function bridgeTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 132;
+  const ctx = ctx2d(canvas);
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  const r = rng(131);
+  const W = canvas.width;
+  const H = canvas.height;
+  const wood = tint(PALETTE.earth, 0.28);
+  // Planks, each a little uneven, gapped, with grain and nails.
+  let x = 4;
+  while (x < W - 30) {
+    const w = 30 + r() * 8;
+    const top = 20 + r() * 4;
+    const bot = H - 20 - r() * 4;
+    const skew = (r() - 0.5) * 4;
+    const plank = new Path2D();
+    plank.moveTo(x + skew, top); plank.lineTo(x + w + skew, top + (r() - 0.5) * 2);
+    plank.lineTo(x + w - skew, bot); plank.lineTo(x - skew, bot + (r() - 0.5) * 2);
+    plank.closePath();
+    ctx.fillStyle = tint(wood, (r() - 0.5) * 0.22);
+    ctx.fill(plank);
+    ctx.save();
+    ctx.clip(plank);
+    ctx.scale(2, 2);
+    grain(ctx, [x / 2 - 2, top / 2, w / 2 + 4, (bot - top) / 2], r, wood, true);
+    ctx.restore();
+    ctx.save(); ctx.clip(plank); light(ctx, [x, top, w, bot - top], 0.8, 0.3, 0.2); ctx.restore();
+    ctx.lineWidth = 2.4; ctx.strokeStyle = PALETTE.ink; ctx.stroke(plank);
+    ctx.fillStyle = tint(PALETTE.ink, 0.2);
+    for (const ny of [top + 14, bot - 14]) for (const nx of [x + 7, x + w - 7]) { ctx.beginPath(); ctx.arc(nx, ny, 1.8, 0, Math.PI * 2); ctx.fill(); }
+    x += w + 5 + r() * 3;
+  }
+  // Rope rails: twisted strands, knotted round every few planks.
+  const rope = tint(PALETTE.brass, -0.2);
+  for (const ry of [17, H - 17]) {
+    ctx.lineWidth = 10; ctx.strokeStyle = PALETTE.ink;
+    ctx.beginPath(); ctx.moveTo(0, ry); ctx.lineTo(W, ry); ctx.stroke();
+    ctx.lineWidth = 7; ctx.strokeStyle = rope;
+    ctx.beginPath(); ctx.moveTo(0, ry); ctx.lineTo(W, ry); ctx.stroke();
+    ctx.lineWidth = 1.2;
+    for (let t = 0; t < W; t += 6) {
+      ctx.strokeStyle = rgba(tint(rope, -0.5), 0.75);
+      ctx.beginPath(); ctx.moveTo(t, ry - 3.5); ctx.lineTo(t + 4, ry + 3.5); ctx.stroke();
+      ctx.strokeStyle = rgba(PALETTE.paper, 0.45);
+      ctx.beginPath(); ctx.moveTo(t + 2, ry - 3.2); ctx.lineTo(t + 4.5, ry + 0.5); ctx.stroke();
+    }
+    for (let k = 60; k < W - 20; k += 150 + Math.round(r() * 30)) {
+      const knot = oval(k, ry, 9, 8);
+      ctx.fillStyle = tint(rope, -0.08); ctx.fill(knot);
+      ctx.save(); ctx.clip(knot); light(ctx, [k - 9, ry - 8, 18, 16], 1, 0.3, 0.25);
+      for (const d of [-4, 0, 4]) { ctx.strokeStyle = rgba(tint(rope, -0.55), 0.8); ctx.lineWidth = 1.3; ctx.beginPath(); ctx.moveTo(k + d - 3, ry - 8); ctx.quadraticCurveTo(k + d + 2, ry, k + d - 3, ry + 8); ctx.stroke(); }
+      ctx.restore();
+      ctx.lineWidth = 2; ctx.strokeStyle = PALETTE.ink; ctx.stroke(knot);
+      // Lashing running down to the plank.
+      ctx.lineWidth = 2.6; ctx.strokeStyle = PALETTE.ink;
+      const dir = ry < H / 2 ? 1 : -1;
+      ctx.beginPath(); ctx.moveTo(k - 2, ry + dir * 7); ctx.lineTo(k - 5, ry + dir * 17); ctx.stroke();
+      ctx.lineWidth = 1.3; ctx.strokeStyle = rope;
+      ctx.beginPath(); ctx.moveTo(k - 2, ry + dir * 7); ctx.lineTo(k - 5, ry + dir * 17); ctx.stroke();
+    }
+  }
+  return toTexture(canvas);
 }
 
 export function createDailiesCast(): DailiesCast {
-  const walk: DailiesCast['walk'] = [talentFrame(0), talentFrame(1), talentFrame(2), talentFrame(3)];
+  const walk: DailiesCast['walk'] = [talentTexture(WALK[0]!, 1), talentTexture(WALK[1]!, 2), talentTexture(WALK[2]!, 3), talentTexture(WALK[3]!, 4)];
+  const idle: DailiesCast['idle'] = [talentTexture(IDLE[0]!, 5), talentTexture(IDLE[1]!, 6)];
   return {
     walk,
-    talent: walk[0],
+    idle,
+    flinch: talentTexture(FLINCH, 7),
+    fall: talentTexture(FALL, 8),
+    talent: idle[0],
     plywood: texture((ctx, s) => {
       ctx.fillStyle = '#d7b98a';
       ctx.fillRect(0, 0, s, s);
@@ -208,187 +1614,16 @@ export function createDailiesCast(): DailiesCast {
       ctx.strokeRect(2, 2, s - 4, s - 4);
     }, 64),
     stagehand: stagehandSprite(),
-    boulder: texture((ctx, s) => {
-      ctx.translate(s / 2, s * 0.62);
-      ctx.fillStyle = PALETTE.earth;
-      ctx.beginPath();
-      ctx.moveTo(-58, 18);
-      ctx.quadraticCurveTo(-48, -36, -8, -28);
-      ctx.quadraticCurveTo(20, -48, 54, -6);
-      ctx.quadraticCurveTo(62, 24, 20, 34);
-      ctx.quadraticCurveTo(-20, 42, -58, 18);
-      ctx.closePath();
-      ctx.fill();
-      rim(ctx);
-      ctx.fillStyle = PALETTE.paper;
-      ctx.beginPath();
-      ctx.ellipse(-16, -8, 14, 8, -0.6, 0, Math.PI * 2);
-      ctx.fill();
-    }),
-    reel: texture((ctx, s) => {
-      ctx.translate(s / 2, s / 2);
-      ctx.strokeStyle = PALETTE.ink; ctx.lineWidth = 5;
-      ctx.fillStyle = PALETTE.brass;
-      ctx.beginPath(); ctx.arc(0, 0, 40, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-      ctx.fillStyle = PALETTE.ink;
-      ctx.beginPath(); ctx.arc(0, 0, 14, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = '#1e1a17';
-      ctx.beginPath(); ctx.arc(0, 0, 28, 0.4, 2.2); ctx.stroke();
-    }),
-    rumour: texture((ctx, size) => {
-      ctx.fillStyle = PALETTE.violet;
-      ctx.beginPath();
-      ctx.ellipse(size * 0.42, size * 0.78, 16, 14, 0, 0, Math.PI * 2);
-      ctx.fill();
-      rim(ctx);
-      ctx.beginPath();
-      ctx.ellipse(size * 0.7, size * 0.5, 26, 16, 0.4, 0, Math.PI * 2);
-      ctx.fill();
-      rim(ctx);
-      ctx.beginPath();
-      ctx.ellipse(size * 0.38, size * 0.24, 14, 12, 0, 0, Math.PI * 2);
-      ctx.fill();
-      rim(ctx);
-    }),
-    swarmMoth: texture((ctx, size) => {
-      ctx.translate(size / 2, size * 0.72);
-      ctx.fillStyle = PALETTE.violet;
-      ctx.beginPath();
-      ctx.moveTo(0, 8);
-      ctx.quadraticCurveTo(-46, -10, -58, -70);
-      ctx.quadraticCurveTo(-18, -24, 0, -8);
-      ctx.quadraticCurveTo(18, -24, 58, -70);
-      ctx.quadraticCurveTo(46, -10, 0, 8);
-      ctx.closePath();
-      ctx.fill();
-      rim(ctx);
-      ctx.fillStyle = PALETTE.ink;
-      ctx.fillRect(-4, -16, 8, 28);
-    }),
-    monitorTeal: texture((ctx, s) => {
-      ctx.translate(s / 2, s * 0.86);
-      ctx.fillStyle = PALETTE.felt;
-      ctx.fillRect(-7, -48, 14, 52);
-      ctx.strokeStyle = PALETTE.ink;
-      ctx.lineWidth = 5;
-      ctx.strokeRect(-7, -48, 14, 52);
-      ctx.fillStyle = PALETTE.paper;
-      ctx.beginPath();
-      ctx.rect(-36, -92, 72, 46);
-      ctx.fill();
-      rim(ctx);
-      ctx.fillStyle = PALETTE.felt;
-      ctx.beginPath();
-      ctx.arc(0, -70, 10, 0, Math.PI * 2);
-      ctx.fill();
-    }),
-    monitorRed: texture((ctx, s) => {
-      ctx.translate(s * 0.62, s * 0.86);
-      ctx.fillStyle = PALETTE.felt;
-      ctx.fillRect(-7, -44, 14, 48);
-      ctx.strokeStyle = PALETTE.ink;
-      ctx.lineWidth = 5;
-      ctx.strokeRect(-7, -44, 14, 48);
-      ctx.fillStyle = PALETTE.paper;
-      ctx.beginPath();
-      ctx.rect(-34, -86, 62, 40);
-      ctx.fill();
-      rim(ctx);
-      ctx.fillStyle = PALETTE.carmine;
-      ctx.beginPath();
-      ctx.arc(-4, -66, 9, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = PALETTE.paper;
-      ctx.beginPath();
-      ctx.moveTo(-20, -86);
-      ctx.lineTo(-58, -118);
-      ctx.lineTo(-46, -78);
-      ctx.closePath();
-      ctx.fill();
-      rim(ctx);
-    }),
-    glass: texture((ctx, s) => {
-      ctx.fillStyle = PALETTE.paper;
-      ctx.beginPath();
-      ctx.rect(6, 40, s - 12, 52);
-      ctx.rect(22, 52, s - 44, 28);
-      ctx.fill('evenodd');
-      rim(ctx);
-      ctx.strokeStyle = PALETTE.burn;
-      ctx.lineWidth = 8;
-      ctx.beginPath();
-      ctx.moveTo(30, 48);
-      ctx.lineTo(64, 92);
-      ctx.lineTo(100, 46);
-      ctx.stroke();
-    }),
-    bridge: texture((ctx, s) => {
-      ctx.fillStyle = '#c9a46b';
-      for (let x = 6; x < s; x += 16) ctx.fillRect(x, 28, 12, s - 56);
-      ctx.strokeStyle = '#5a3a28'; ctx.lineWidth = 6;
-      ctx.beginPath(); ctx.moveTo(0, 24); ctx.lineTo(s, 24); ctx.moveTo(0, s - 24); ctx.lineTo(s, s - 24); ctx.stroke();
-    }, 256),
-    continuity: [
-      texture((ctx, s) => {
-        ctx.translate(s / 2, s * 0.78);
-        ctx.fillStyle = PALETTE.earth;
-        ctx.beginPath();
-        ctx.moveTo(-46, -10);
-        ctx.lineTo(46, -36);
-        ctx.lineTo(46, -18);
-        ctx.lineTo(-46, 8);
-        ctx.closePath();
-        ctx.fill();
-        rim(ctx);
-        ctx.beginPath();
-        ctx.moveTo(-46, 8);
-        ctx.lineTo(46, -8);
-        ctx.lineTo(46, 16);
-        ctx.lineTo(-46, 28);
-        ctx.closePath();
-        ctx.fill();
-        rim(ctx);
-      }),
-      texture((ctx, s) => {
-        ctx.translate(s / 2, s * 0.84);
-        ctx.fillStyle = PALETTE.earth;
-        ctx.beginPath();
-        ctx.moveTo(0, -96);
-        ctx.lineTo(36, 8);
-        ctx.lineTo(-36, 8);
-        ctx.closePath();
-        ctx.fill();
-        rim(ctx);
-      }),
-      texture((ctx, s) => {
-        ctx.translate(s / 2, s * 0.86);
-        ctx.fillStyle = PALETTE.earth;
-        ctx.beginPath();
-        ctx.rect(-40, -78, 10, 86);
-        ctx.rect(30, -78, 10, 86);
-        ctx.rect(-30, -70, 60, 8);
-        ctx.rect(-30, -36, 60, 8);
-        ctx.fill();
-        rim(ctx);
-      }),
-      texture((ctx, s) => {
-        ctx.translate(s / 2, s * 0.8);
-        ctx.fillStyle = PALETTE.earth;
-        ctx.beginPath();
-        ctx.rect(-34, -70, 68, 78);
-        ctx.fill();
-        rim(ctx);
-        ctx.strokeStyle = PALETTE.ink;
-        ctx.lineWidth = 5;
-        ctx.beginPath();
-        ctx.moveTo(-34, -70);
-        ctx.lineTo(34, 8);
-        ctx.moveTo(34, -70);
-        ctx.lineTo(-34, 8);
-        ctx.stroke();
-      }),
-    ],
+    boulder: boulderSprite(),
+    reel: reelSprite(),
+    rumour: rumourSprite(),
+    swarmMoth: mothSprite(),
+    monitorTeal: monitorSprite(false),
+    monitorRed: monitorSprite(true),
+    glass: glassSprite(),
+    bridge: bridgeTexture(),
+    continuity: [clapperSprite(), coneSprite(), ladderSprite(), crateSprite()],
     urchinTiers: [urchinTier(0), urchinTier(1), urchinTier(2), urchinTier(3)],
-    extras: [figure(PALETTE.burn), figure(PALETTE.earth), figure(PALETTE.felt), figure(PALETTE.violet)],
+    extras: [extra(COSTUMES[0]!, 111), extra(COSTUMES[1]!, 113), extra(COSTUMES[2]!, 117), extra(COSTUMES[3]!, 119)],
   };
 }

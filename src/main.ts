@@ -13,7 +13,7 @@ import { createShootState, createShootSceneState, stepShoot } from './sim/shoot'
 import { inputForBot, type BotKind } from './bots/players';
 import { mulberry32 } from './sim/rng';
 import { UrchinLodBuckets } from './render/lod-buckets';
-import { createDailiesCast, SCENE_LOOKS } from './render/dailies';
+import { createDailiesCast, SCENE_LOOKS, TALENT_ASPECT } from './render/dailies';
 import { measureSilhouettes } from './render/silhouettes';
 import { PATH_RISE, SPRITE_SIZE, createSetDressing, createTableTextures, raisedPathGeometry } from './render/set-dressing';
 import { DPR_SCALES, nextDprTier } from './render/adaptive-dpr';
@@ -323,17 +323,45 @@ talentSprite.scale.set(2.3, 3.5, 1);
 talent.add(talentSprite);
 scene.add(talent);
 let renderedTalentTier = -1;
+let renderedTalentHeight = 3.5;
 function syncTalentLod() {
   const tier = state.talent.lodTier ?? Math.min(lodTier(1000 / state.camera.zoom * detailFactor(state.talent.x, state.talent.z)), 3);
   if (tier !== renderedTalentTier) {
     renderedTalentTier = tier;
     talent.visible = tier < 4;
-    const height = tier <= 1 ? 3.5 : tier === 2 ? 2.8 : 2;
-    talentSprite.scale.set(height * 0.66, height, 1);
+    renderedTalentHeight = tier <= 1 ? 3.5 : tier === 2 ? 2.8 : 2;
   }
-  const frame = state.waiting ? 0 : Math.floor(state.tick / 8) % spriteAssets.walk.length;
-  const map = spriteAssets.walk[frame]!;
+  const map = talentPose();
   if (talentSprite.material.map !== map) talentSprite.material.map = map;
+  // The fall pose is drawn square; every other pose uses the usual 0.66 sprite. Flip to face her next path point on screen.
+  const width = renderedTalentHeight * (map === spriteAssets.fall ? 1 : TALENT_ASPECT);
+  talentSprite.scale.set(width * talentFacing(), renderedTalentHeight, 1);
+}
+
+/** Read-only pose pick: fall on a failed take, flinch when a hazard is within the close-call radius, idle while waiting. */
+function talentPose(): THREE.Texture {
+  if (state.failed === 'hit' || state.failed === 'fell') return spriteAssets.fall;
+  const danger = state.entities.some((entity) => entity.spawned && !entity.cut
+    && entity.kind !== 'reel' && entity.kind !== 'monitor' && entity.kind !== 'continuity'
+    && Math.hypot(entity.x - state.talent.x, entity.z - state.talent.z) <= TUNING.closeCallRadius);
+  if (danger && !state.failed) return spriteAssets.flinch;
+  if (state.waiting || state.failed) return spriteAssets.idle[Math.floor(state.tick / 40) % 2]!;
+  return spriteAssets.walk[Math.floor(state.tick / 8) % spriteAssets.walk.length]!;
+}
+
+const facingFrom = new THREE.Vector3();
+const facingTo = new THREE.Vector3();
+let talentFacingSign = 1;
+function talentFacing() {
+  const next = state.path[state.talent.pathIndex + 1];
+  if (!next) return talentFacingSign;
+  const here = displayPoint(state.talent.x, state.talent.z);
+  const there = displayPoint(next.x, next.z);
+  facingFrom.set(here.x, PATH_RISE, here.z).project(camera);
+  facingTo.set(there.x, PATH_RISE, there.z).project(camera);
+  const dx = facingTo.x - facingFrom.x;
+  if (Math.abs(dx) > 1e-4) talentFacingSign = dx < 0 ? -1 : 1;
+  return talentFacingSign;
 }
 
 const entityMeshes = new Map<string, THREE.Object3D>();
