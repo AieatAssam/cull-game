@@ -34,7 +34,7 @@ describe('diegetic audio rules', () => {
   it('stores clamped sound settings before audio starts', () => {
     const director = new AudioDirector(() => { throw new Error('AudioContext must remain lazy before a gesture'); });
     director.setSettings({ master: 1.2, music: -1, mono: true, calm: true });
-    expect(director.settings).toEqual({ master: 1, music: 0, sfx: 0.8, mono: true, calm: true });
+    expect(director.settings).toEqual({ master: 1, music: 0, sfx: 0.8, mono: true, calm: true, muted: false });
     expect(director.started).toBe(false);
   });
 });
