@@ -237,6 +237,11 @@ export function luckChecks(input: LuckInput): Check[] {
   return checks;
 }
 
+/** Share of runs that got past the first Shoot scene (died later or completed). */
+export function backlotClear(summary: BotSummary): number {
+  return summary.runs ? 1 - (summary.scenes.BACKLOT ?? 0) / summary.runs : 0;
+}
+
 export function stageGates(mode: BalanceMode, targets: StageTargets, bots: Record<string, BotSummary>, passiveBot: 'tracker' | 'gatekeeper'): Check[] {
   const adaptive = bots.adaptive!;
   const passive = bots[passiveBot]!;
@@ -258,6 +263,11 @@ export function stageGates(mode: BalanceMode, targets: StageTargets, bots: Recor
       pass: mode === 'shoot' ? sceneShare <= targets.sceneShareMax : null,
     },
     { name: 'chaos completions', value: String(bots.chaos!.completed), target: '0', pass: bots.chaos!.completed === 0 },
+    { name: 'adaptive is the ceiling (perfect-information reflexes, no leash)', value: pct(adaptive.completion), target: 'ceiling', pass: null },
+    ...HUMAN_BOTS.filter((bot) => bots[bot]).map((bot) => ({
+      name: `${bot} ${mode === 'shoot' ? 'Backlot clear' : 'strip clear'}`, value: pct(mode === 'shoot' ? backlotClear(bots[bot]!) : bots[bot]!.completion),
+      target: '60–80% (target, report-only)', pass: null,
+    })),
   ];
 }
 
@@ -287,7 +297,8 @@ export interface BalanceReport {
   jitterWins: Record<string, Record<number, number>>;
 }
 
-export const DEFAULT_BOTS: BalanceBot[] = ['adaptive', 'tracker', 'gatekeeper', 'metronome', 'wide', 'close', 'chaos'];
+export const DEFAULT_BOTS: BalanceBot[] = ['adaptive', 'tracker', 'gatekeeper', 'metronome', 'wide', 'close', 'chaos', 'human-keys', 'human-touch'];
+const HUMAN_BOTS = ['human-keys', 'human-touch'] as const;
 
 export function balanceTasks(options: BalanceOptions): RunTask[] {
   const tasks: RunTask[] = [];
@@ -367,10 +378,11 @@ export function formatReport(report: BalanceReport): string {
     const killers = Object.entries(summary.killers).sort((a, b) => b[1] - a[1]).map(([kind, count]) => `${kind} ${count}`).join(', ');
     lines.push(`${bot.padEnd(11)} ${pct(summary.completion).padStart(10)}  ${summary.meanDistance.toFixed(1).padStart(9)}  ${String(summary.timeouts).padStart(8)}  ${killers}`);
   }
-  const adaptive = report.bots.adaptive;
-  if (adaptive && report.mode === 'shoot') {
-    lines.push('adaptive deaths by scene × killer:');
-    for (const [scene, killers] of Object.entries(adaptive.sceneKillers)) lines.push(`  ${scene}: ${Object.entries(killers).map(([kind, count]) => `${kind} ${count}`).join(', ')}`);
+  for (const bot of ['adaptive', ...HUMAN_BOTS]) {
+    const summary = report.bots[bot];
+    if (!summary || (bot === 'adaptive' && report.mode !== 'shoot')) continue;
+    lines.push(`${bot} deaths by scene × killer:`);
+    for (const [scene, killers] of Object.entries(summary.sceneKillers)) lines.push(`  ${scene}: ${Object.entries(killers).sort((a, b) => b[1] - a[1]).map(([kind, count]) => `${kind} ${count}`).join(', ')}`);
   }
   for (const [bot, summary] of Object.entries(report.jitterBots)) lines.push(`jitter(${bot}, ${report.jitter}): ${pct(summary.completion)} of variants · wins histogram [${summary.winsHistogram.join(' ')}]`);
   const mark = (pass: boolean | null) => pass === null ? 'n/a ' : pass ? 'PASS' : 'FAIL';

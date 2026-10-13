@@ -6,7 +6,8 @@ import { updateRenderCamera } from './render/camera';
 import { cameraBasis, projectPoint } from './sim/frame';
 import { NEUTRAL_INPUT, lostProgress, step, talentLost } from './sim/step';
 import { lodTier } from './sim/lod';
-import { easeZoomInput, heldZoomInput, nextZoomStep } from './ui/zoom-control';
+import { composeInput, leashInput, pinchZoomTarget, pointerDragPan } from './ui/input-map';
+import { nextZoomStep } from './ui/zoom-control';
 import { TUNING } from './sim/tuning';
 import { createGeneratedState, createState } from './sim/world';
 import { createValidatedState } from './gen/validated';
@@ -927,36 +928,12 @@ function updateHud() {
 }
 
 function buildInput(): InputFrame {
-  const keyInput = panFromKeys();
-  const held = zoomPress ? heldZoomInput(zoomPress.direction, (performance.now() - zoomPress.since) / 1000) : 0;
-  if (held) sliderZoomTarget = null;
-  const sliderZoom = held || (sliderZoomTarget === null ? 0 : easeZoomInput(state.camera.zoom, sliderZoomTarget));
-  return leashInput(quantizeInput({
-    ...frameInput, ...keyInput,
-    panX: pointerPan?.panX ?? (keys.size ? keyInput.panX : frameInput.panX),
-    panZ: pointerPan?.panZ ?? (keys.size ? keyInput.panZ : frameInput.panZ),
-    zoom: sliderZoom || frameInput.zoom,
-    rotate: rotationPulse || frameInput.rotate,
-    hold: keyInput.hold || frameInput.hold,
-    steady: keyInput.steady || frameInput.steady,
-  }));
-}
-function leashInput(input: InputFrame): InputFrame {
-  const dx = state.talent.x - state.camera.x;
-  const dz = state.talent.z - state.camera.z;
-  const reach = Math.max(1, state.camera.zoom * 0.5);
-  const edge = Math.max(Math.abs(dx), Math.abs(dz) * TUNING.projectionPitchScale) / reach;
-  if (edge < 0.34) return input;
-  const blend = Math.min(1, (edge - 0.34) / 0.22) * 0.9;
-  return quantizeInput({
-    ...input,
-    panX: input.panX * (1 - blend) + Math.sign(dx || 1) * 100 * blend,
-    panZ: input.panZ * (1 - blend) + Math.sign(dz || 1) * 100 * blend,
-  });
-}
-function quantizeInput(input: InputFrame): InputFrame {
-  const axis = (value: number) => Math.max(-127, Math.min(127, Math.round(value)));
-  return { panX: axis(input.panX), panZ: axis(input.panZ), zoom: axis(input.zoom), rotate: input.rotate, hold: Boolean(input.hold), steady: Boolean(input.steady) };
+  const composed = composeInput({
+    keys, holdButton, pointerPan, rotationPulse, frameInput, zoomTarget: sliderZoomTarget,
+    zoomPress: zoomPress && { direction: zoomPress.direction, heldSeconds: (performance.now() - zoomPress.since) / 1000 },
+  }, state.camera.zoom);
+  sliderZoomTarget = composed.zoomTarget;
+  return leashInput(composed.input, state);
 }
 function advanceTick(forcedInput?: InputFrame) {
   // A tutorial card blocks the take: no ticks run, so nothing can reach her while it is read.
@@ -1055,14 +1032,6 @@ function loop(now: number) {
   }
   requestAnimationFrame(loop);
 }
-function panFromKeys(): InputFrame {
-  let x = 0; let z = 0;
-  if (keys.has('a') || keys.has('arrowleft')) x -= 90;
-  if (keys.has('d') || keys.has('arrowright')) x += 90;
-  if (keys.has('w') || keys.has('arrowup')) z -= 90;
-  if (keys.has('s') || keys.has('arrowdown')) z += 90;
-  return { ...NEUTRAL_INPUT, panX: x, panZ: z, zoom: 0, rotate: 0, hold: keys.has(' ') || holdButton, steady: keys.has('shift') };
-}
 let holdButton = false;
 window.addEventListener('keydown', (event) => {
   unlockAudio();
@@ -1086,7 +1055,6 @@ window.addEventListener('blur', () => { zoomPress = null; });
 const touches = new Map<number, { x: number; y: number }>();
 let pinch: { distance: number; zoom: number } | null = null;
 const touchSpread = () => { const [a, b] = [...touches.values()]; return a && b ? Math.hypot(a.x - b.x, a.y - b.y) : 0; };
-const clampZoom = (zoom: number) => Math.max(TUNING.minZoom, Math.min(TUNING.maxZoom, zoom));
 const zoomKeyDirection = (key: string): 1 | -1 | 0 => (['x', '=', '+'].includes(key.toLowerCase()) ? 1 : ['z', '-', '_'].includes(key.toLowerCase()) ? -1 : 0);
 /** A tap: snap to the next framing step, chaining from a snap still in progress so a double tap goes two steps. */
 function stepZoom(direction: 1 | -1) {
@@ -1110,14 +1078,14 @@ renderer.domElement.addEventListener('pointermove', (event) => {
   if (!touches.has(event.pointerId)) return;
   touches.set(event.pointerId, { x: event.clientX, y: event.clientY });
   if (pinch) {
-    if (state.lens !== 'long-lens') sliderZoomTarget = clampZoom(pinch.zoom * pinch.distance / Math.max(1, touchSpread()));
+    if (state.lens !== 'long-lens') sliderZoomTarget = pinchZoomTarget(pinch.zoom, pinch.distance, touchSpread());
     return;
   }
   if (!pointer || pointer.id !== event.pointerId) return;
   const rect = renderer.domElement.getBoundingClientRect();
   const dx = event.clientX - pointer.x;
   const dy = event.clientY - pointer.y;
-  pointerPan = { panX: Math.max(-127, Math.min(127, -dx / rect.width * 127)), panZ: Math.max(-127, Math.min(127, dy / rect.height * 127)) };
+  pointerPan = pointerDragPan(dx, dy, rect.width, rect.height);
   pointer.x = event.clientX; pointer.y = event.clientY;
 });
 for (const type of ['pointerup', 'pointercancel'] as const) {

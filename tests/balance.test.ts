@@ -113,7 +113,7 @@ describe('balance report', () => {
     expect(parseArgs([]).modes).toEqual(['strip', 'shoot']);
     expect(() => parseArgs(['--stage=3'])).toThrow(/not shipped/);
     expect(() => parseArgs(['--speed=2'])).toThrow(/Unknown option/);
-    expect(balanceTasks({ stage: 0, mode: 'strip', seeds: 2, jitter: 3, workers: 1 })).toHaveLength(2 * (7 + 2 * 3));
+    expect(balanceTasks({ stage: 0, mode: 'strip', seeds: 2, jitter: 3, workers: 1 })).toHaveLength(2 * (9 + 2 * 3));
   });
 
   it('is deterministic per task', () => {

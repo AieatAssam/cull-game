@@ -3,11 +3,13 @@ import { NEUTRAL_INPUT } from '../sim/step';
 import { TUNING } from '../sim/tuning';
 import type { InputFrame, SimState } from '../sim/types';
 import { createObserver, type PlayerView } from './observe';
+import { createHumanDriver, type HumanPersona } from './human';
 import { inputForBot, type AdaptiveMemory } from './players';
 
 /** Bots the balance harness runs. Every one of them sees the world only through `PlayerView`. */
-export type BalanceBot = 'adaptive' | 'tracker' | 'gatekeeper' | 'metronome' | 'wide' | 'close' | 'chaos';
-export const BALANCE_BOTS: readonly BalanceBot[] = ['adaptive', 'tracker', 'gatekeeper', 'metronome', 'wide', 'close', 'chaos'];
+export type BalanceBot = 'adaptive' | 'tracker' | 'gatekeeper' | 'metronome' | 'wide' | 'close' | 'chaos' | HumanPersona;
+export const BALANCE_BOTS: readonly BalanceBot[] = ['adaptive', 'tracker', 'gatekeeper', 'metronome', 'wide', 'close', 'chaos', 'human-keys', 'human-touch'];
+export const isHuman = (bot: BalanceBot): bot is HumanPersona => bot === 'human-keys' || bot === 'human-touch';
 
 export interface Policy { act(view: PlayerView): InputFrame; }
 
@@ -90,7 +92,7 @@ function delayed(policy: Policy, reactionTicks: number): Policy {
   };
 }
 
-export function createPolicy(bot: BalanceBot, seed: number, tuning: BotTuning = exact): Policy {
+export function createPolicy(bot: Exclude<BalanceBot, HumanPersona>, seed: number, tuning: BotTuning = exact): Policy {
   const base = bot === 'metronome' ? metronome(seed) : bot === 'gatekeeper' ? gatekeeper(tuning) : legacy(bot, seed, tuning);
   return delayed(base, tuning.reactionTicks);
 }
@@ -104,8 +106,12 @@ export function jitterTuning(seed: number, variant: number): BotTuning {
   };
 }
 
-/** A driver: feeds each tick's state through a fresh observer into the policy. */
+/**
+ * A driver: feeds each tick's state through a fresh observer into the policy.
+ * Human personas carry their own reaction delay and aim noise (`human.ts`), so `tuning` does not apply to them.
+ */
 export function createDriver(bot: BalanceBot, seed: number, tuning: BotTuning = exact): (state: SimState) => InputFrame {
+  if (isHuman(bot)) return createHumanDriver(bot, seed);
   const observe = createObserver();
   const policy = createPolicy(bot, seed, tuning);
   return (state) => policy.act(observe(state));

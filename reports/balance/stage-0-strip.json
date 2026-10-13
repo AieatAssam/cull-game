@@ -185,6 +185,50 @@
           "glass": 4
         }
       }
+    },
+    "human-keys": {
+      "runs": 200,
+      "completed": 0,
+      "completion": 0,
+      "meanDistance": 33.97,
+      "timeouts": 0,
+      "clearSeconds": null,
+      "failReasons": {
+        "out-of-film": 200
+      },
+      "killers": {
+        "film": 200
+      },
+      "scenes": {
+        "STRIP": 200
+      },
+      "sceneKillers": {
+        "STRIP": {
+          "film": 200
+        }
+      }
+    },
+    "human-touch": {
+      "runs": 200,
+      "completed": 0,
+      "completion": 0,
+      "meanDistance": 33.96,
+      "timeouts": 0,
+      "clearSeconds": null,
+      "failReasons": {
+        "out-of-film": 200
+      },
+      "killers": {
+        "film": 200
+      },
+      "scenes": {
+        "STRIP": 200
+      },
+      "sceneKillers": {
+        "STRIP": {
+          "film": 200
+        }
+      }
     }
   },
   "jitterBots": {
@@ -306,6 +350,24 @@
       "value": "0",
       "target": "0",
       "pass": true
+    },
+    {
+      "name": "adaptive is the ceiling (perfect-information reflexes, no leash)",
+      "value": "100%",
+      "target": "ceiling",
+      "pass": null
+    },
+    {
+      "name": "human-keys strip clear",
+      "value": "0%",
+      "target": "60–80% (target, report-only)",
+      "pass": null
+    },
+    {
+      "name": "human-touch strip clear",
+      "value": "0%",
+      "target": "60–80% (target, report-only)",
+      "pass": null
     }
   ],
   "luck": [
@@ -449,6 +511,28 @@
       "seconds": 13.1
     },
     {
+      "bot": "human-keys",
+      "seed": 1,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 36.69,
+      "seconds": 61.93333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 1,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 36.69,
+      "seconds": 61.93333333333333
+    },
+    {
       "bot": "adaptive",
       "seed": 2,
       "completed": true,
@@ -524,6 +608,28 @@
       "scene": "STRIP",
       "distance": 6.54,
       "seconds": 2.9166666666666665
+    },
+    {
+      "bot": "human-keys",
+      "seed": 2,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 47.5,
+      "seconds": 79.85
+    },
+    {
+      "bot": "human-touch",
+      "seed": 2,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 47.5,
+      "seconds": 79.25
     },
     {
       "bot": "adaptive",
@@ -603,6 +709,28 @@
       "seconds": 18.8
     },
     {
+      "bot": "human-keys",
+      "seed": 3,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34.83,
+      "seconds": 69.16666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 3,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34.83,
+      "seconds": 69.15
+    },
+    {
       "bot": "adaptive",
       "seed": 4,
       "completed": true,
@@ -678,6 +806,28 @@
       "scene": "STRIP",
       "distance": 26.74,
       "seconds": 15.183333333333334
+    },
+    {
+      "bot": "human-keys",
+      "seed": 4,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 51.37,
+      "seconds": 73.55
+    },
+    {
+      "bot": "human-touch",
+      "seed": 4,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 51.1,
+      "seconds": 73.85
     },
     {
       "bot": "adaptive",
@@ -757,6 +907,28 @@
       "seconds": 19.85
     },
     {
+      "bot": "human-keys",
+      "seed": 5,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 39.75,
+      "seconds": 63.75
+    },
+    {
+      "bot": "human-touch",
+      "seed": 5,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 39.7,
+      "seconds": 63.61666666666667
+    },
+    {
       "bot": "adaptive",
       "seed": 6,
       "completed": true,
@@ -832,6 +1004,28 @@
       "scene": "STRIP",
       "distance": 23,
       "seconds": 13.233333333333333
+    },
+    {
+      "bot": "human-keys",
+      "seed": 6,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 28.17,
+      "seconds": 60.733333333333334
+    },
+    {
+      "bot": "human-touch",
+      "seed": 6,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 28.17,
+      "seconds": 60.35
     },
     {
       "bot": "adaptive",
@@ -911,6 +1105,28 @@
       "seconds": 19.866666666666667
     },
     {
+      "bot": "human-keys",
+      "seed": 7,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 28.92,
+      "seconds": 60.9
+    },
+    {
+      "bot": "human-touch",
+      "seed": 7,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 28.92,
+      "seconds": 68.01666666666667
+    },
+    {
       "bot": "adaptive",
       "seed": 8,
       "completed": true,
@@ -986,6 +1202,28 @@
       "scene": "STRIP",
       "distance": 25.5,
       "seconds": 13.25
+    },
+    {
+      "bot": "human-keys",
+      "seed": 8,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 29.35,
+      "seconds": 67.86666666666666
+    },
+    {
+      "bot": "human-touch",
+      "seed": 8,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 29.34,
+      "seconds": 67.88333333333334
     },
     {
       "bot": "adaptive",
@@ -1065,6 +1303,28 @@
       "seconds": 2.9166666666666665
     },
     {
+      "bot": "human-keys",
+      "seed": 9,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 23.47,
+      "seconds": 58.85
+    },
+    {
+      "bot": "human-touch",
+      "seed": 9,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 23.47,
+      "seconds": 59.15
+    },
+    {
       "bot": "adaptive",
       "seed": 10,
       "completed": true,
@@ -1140,6 +1400,28 @@
       "scene": "STRIP",
       "distance": 6.54,
       "seconds": 2.9166666666666665
+    },
+    {
+      "bot": "human-keys",
+      "seed": 10,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 36.96,
+      "seconds": 62.75
+    },
+    {
+      "bot": "human-touch",
+      "seed": 10,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 36.96,
+      "seconds": 77.31666666666666
     },
     {
       "bot": "adaptive",
@@ -1219,6 +1501,28 @@
       "seconds": 14.066666666666666
     },
     {
+      "bot": "human-keys",
+      "seed": 11,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 46,
+      "seconds": 80.2
+    },
+    {
+      "bot": "human-touch",
+      "seed": 11,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 46,
+      "seconds": 73
+    },
+    {
       "bot": "adaptive",
       "seed": 12,
       "completed": true,
@@ -1294,6 +1598,28 @@
       "scene": "STRIP",
       "distance": 21,
       "seconds": 12.733333333333333
+    },
+    {
+      "bot": "human-keys",
+      "seed": 12,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 24.04,
+      "seconds": 59.38333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 12,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 24.04,
+      "seconds": 58.983333333333334
     },
     {
       "bot": "adaptive",
@@ -1373,6 +1699,28 @@
       "seconds": 2.933333333333333
     },
     {
+      "bot": "human-keys",
+      "seed": 13,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 29.5,
+      "seconds": 60.38333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 13,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 29.5,
+      "seconds": 67.68333333333334
+    },
+    {
       "bot": "adaptive",
       "seed": 14,
       "completed": true,
@@ -1448,6 +1796,28 @@
       "scene": "STRIP",
       "distance": 30.29,
       "seconds": 15.233333333333333
+    },
+    {
+      "bot": "human-keys",
+      "seed": 14,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 36.58,
+      "seconds": 61.88333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 14,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 36.58,
+      "seconds": 69.28333333333333
     },
     {
       "bot": "adaptive",
@@ -1527,6 +1897,28 @@
       "seconds": 11.633333333333333
     },
     {
+      "bot": "human-keys",
+      "seed": 15,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 45.35,
+      "seconds": 79.41666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 15,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 45.35,
+      "seconds": 79.41666666666667
+    },
+    {
       "bot": "adaptive",
       "seed": 16,
       "completed": true,
@@ -1602,6 +1994,28 @@
       "scene": "STRIP",
       "distance": 22.87,
       "seconds": 13.033333333333333
+    },
+    {
+      "bot": "human-keys",
+      "seed": 16,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 44.04,
+      "seconds": 71.16666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 16,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 44.04,
+      "seconds": 71.16666666666667
     },
     {
       "bot": "adaptive",
@@ -1681,6 +2095,28 @@
       "seconds": 2.933333333333333
     },
     {
+      "bot": "human-keys",
+      "seed": 17,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 46.19,
+      "seconds": 65.1
+    },
+    {
+      "bot": "human-touch",
+      "seed": 17,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 46.21,
+      "seconds": 72.66666666666667
+    },
+    {
       "bot": "adaptive",
       "seed": 18,
       "completed": true,
@@ -1756,6 +2192,28 @@
       "scene": "STRIP",
       "distance": 6.4,
       "seconds": 3.0833333333333335
+    },
+    {
+      "bot": "human-keys",
+      "seed": 18,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 43.42,
+      "seconds": 80.46666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 18,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 43.42,
+      "seconds": 72.21666666666667
     },
     {
       "bot": "adaptive",
@@ -1835,6 +2293,28 @@
       "seconds": 15.516666666666667
     },
     {
+      "bot": "human-keys",
+      "seed": 19,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 25.38,
+      "seconds": 59.416666666666664
+    },
+    {
+      "bot": "human-touch",
+      "seed": 19,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 25.38,
+      "seconds": 67.01666666666667
+    },
+    {
       "bot": "adaptive",
       "seed": 20,
       "completed": true,
@@ -1910,6 +2390,28 @@
       "scene": "STRIP",
       "distance": 15.03,
       "seconds": 10.45
+    },
+    {
+      "bot": "human-keys",
+      "seed": 20,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 39.71,
+      "seconds": 63.28333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 20,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 39.71,
+      "seconds": 70.78333333333333
     },
     {
       "bot": "adaptive",
@@ -1989,6 +2491,28 @@
       "seconds": 16.916666666666668
     },
     {
+      "bot": "human-keys",
+      "seed": 21,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34.25,
+      "seconds": 76.33333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 21,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34.25,
+      "seconds": 76.21666666666667
+    },
+    {
       "bot": "adaptive",
       "seed": 22,
       "completed": true,
@@ -2064,6 +2588,28 @@
       "scene": "STRIP",
       "distance": 29.5,
       "seconds": 17.033333333333335
+    },
+    {
+      "bot": "human-keys",
+      "seed": 22,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30.67,
+      "seconds": 61.78333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 22,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30.95,
+      "seconds": 61.56666666666667
     },
     {
       "bot": "adaptive",
@@ -2143,6 +2689,28 @@
       "seconds": 15.65
     },
     {
+      "bot": "human-keys",
+      "seed": 23,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 25.92,
+      "seconds": 59.81666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 23,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 25.92,
+      "seconds": 59.81666666666667
+    },
+    {
       "bot": "adaptive",
       "seed": 24,
       "completed": true,
@@ -2218,6 +2786,28 @@
       "scene": "STRIP",
       "distance": 17.13,
       "seconds": 9.766666666666667
+    },
+    {
+      "bot": "human-keys",
+      "seed": 24,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34.5,
+      "seconds": 68.95
+    },
+    {
+      "bot": "human-touch",
+      "seed": 24,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34.5,
+      "seconds": 76.05
     },
     {
       "bot": "adaptive",
@@ -2297,6 +2887,28 @@
       "seconds": 15.366666666666667
     },
     {
+      "bot": "human-keys",
+      "seed": 25,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30.25,
+      "seconds": 60.68333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 25,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30.25,
+      "seconds": 68.18333333333334
+    },
+    {
       "bot": "adaptive",
       "seed": 26,
       "completed": true,
@@ -2372,6 +2984,28 @@
       "scene": "STRIP",
       "distance": 16.87,
       "seconds": 10.516666666666667
+    },
+    {
+      "bot": "human-keys",
+      "seed": 26,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 27.83,
+      "seconds": 67.36666666666666
+    },
+    {
+      "bot": "human-touch",
+      "seed": 26,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 27.83,
+      "seconds": 66.96666666666667
     },
     {
       "bot": "adaptive",
@@ -2451,6 +3085,28 @@
       "seconds": 2.933333333333333
     },
     {
+      "bot": "human-keys",
+      "seed": 27,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 29.55,
+      "seconds": 61.88333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 27,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 29.83,
+      "seconds": 61.4
+    },
+    {
       "bot": "adaptive",
       "seed": 28,
       "completed": true,
@@ -2526,6 +3182,28 @@
       "scene": "STRIP",
       "distance": 43.79,
       "seconds": 22.633333333333333
+    },
+    {
+      "bot": "human-keys",
+      "seed": 28,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 31.17,
+      "seconds": 60.85
+    },
+    {
+      "bot": "human-touch",
+      "seed": 28,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 31.17,
+      "seconds": 61.083333333333336
     },
     {
       "bot": "adaptive",
@@ -2605,6 +3283,28 @@
       "seconds": 14.8
     },
     {
+      "bot": "human-keys",
+      "seed": 29,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 24.33,
+      "seconds": 59.15
+    },
+    {
+      "bot": "human-touch",
+      "seed": 29,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 24.33,
+      "seconds": 58.93333333333333
+    },
+    {
       "bot": "adaptive",
       "seed": 30,
       "completed": true,
@@ -2680,6 +3380,28 @@
       "scene": "STRIP",
       "distance": 27.76,
       "seconds": 15.733333333333333
+    },
+    {
+      "bot": "human-keys",
+      "seed": 30,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 53.35,
+      "seconds": 82
+    },
+    {
+      "bot": "human-touch",
+      "seed": 30,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 53.35,
+      "seconds": 74.63333333333334
     },
     {
       "bot": "adaptive",
@@ -2759,6 +3481,28 @@
       "seconds": 13.516666666666667
     },
     {
+      "bot": "human-keys",
+      "seed": 31,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 46.17,
+      "seconds": 79.05
+    },
+    {
+      "bot": "human-touch",
+      "seed": 31,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 46.17,
+      "seconds": 71.55
+    },
+    {
       "bot": "adaptive",
       "seed": 32,
       "completed": true,
@@ -2834,6 +3578,28 @@
       "scene": "STRIP",
       "distance": 6.58,
       "seconds": 2.9166666666666665
+    },
+    {
+      "bot": "human-keys",
+      "seed": 32,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 40.75,
+      "seconds": 63.55
+    },
+    {
+      "bot": "human-touch",
+      "seed": 32,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 40.75,
+      "seconds": 71.11666666666666
     },
     {
       "bot": "adaptive",
@@ -2913,6 +3679,28 @@
       "seconds": 18.1
     },
     {
+      "bot": "human-keys",
+      "seed": 33,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 41.47,
+      "seconds": 64.15
+    },
+    {
+      "bot": "human-touch",
+      "seed": 33,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 41.47,
+      "seconds": 64.36666666666666
+    },
+    {
       "bot": "adaptive",
       "seed": 34,
       "completed": true,
@@ -2988,6 +3776,28 @@
       "scene": "STRIP",
       "distance": 26.91,
       "seconds": 15.566666666666666
+    },
+    {
+      "bot": "human-keys",
+      "seed": 34,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 35.97,
+      "seconds": 62.05
+    },
+    {
+      "bot": "human-touch",
+      "seed": 34,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 35.96,
+      "seconds": 69.53333333333333
     },
     {
       "bot": "adaptive",
@@ -3067,6 +3877,28 @@
       "seconds": 2.9
     },
     {
+      "bot": "human-keys",
+      "seed": 35,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 19.58,
+      "seconds": 58.18333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 35,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 19.58,
+      "seconds": 58
+    },
+    {
       "bot": "adaptive",
       "seed": 36,
       "completed": true,
@@ -3142,6 +3974,28 @@
       "scene": "STRIP",
       "distance": 24.67,
       "seconds": 13.133333333333333
+    },
+    {
+      "bot": "human-keys",
+      "seed": 36,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 46.21,
+      "seconds": 80.25
+    },
+    {
+      "bot": "human-touch",
+      "seed": 36,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 46.21,
+      "seconds": 79.98333333333333
     },
     {
       "bot": "adaptive",
@@ -3221,6 +4075,28 @@
       "seconds": 12.833333333333334
     },
     {
+      "bot": "human-keys",
+      "seed": 37,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 31.41,
+      "seconds": 61.483333333333334
+    },
+    {
+      "bot": "human-touch",
+      "seed": 37,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 31.41,
+      "seconds": 68.58333333333333
+    },
+    {
       "bot": "adaptive",
       "seed": 38,
       "completed": true,
@@ -3296,6 +4172,28 @@
       "scene": "STRIP",
       "distance": 24.71,
       "seconds": 13.166666666666666
+    },
+    {
+      "bot": "human-keys",
+      "seed": 38,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 32.62,
+      "seconds": 61.266666666666666
+    },
+    {
+      "bot": "human-touch",
+      "seed": 38,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 32.62,
+      "seconds": 68.36666666666666
     },
     {
       "bot": "adaptive",
@@ -3375,6 +4273,28 @@
       "seconds": 9.666666666666666
     },
     {
+      "bot": "human-keys",
+      "seed": 39,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 17.54,
+      "seconds": 58.05
+    },
+    {
+      "bot": "human-touch",
+      "seed": 39,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 17.54,
+      "seconds": 57.516666666666666
+    },
+    {
       "bot": "adaptive",
       "seed": 40,
       "completed": true,
@@ -3450,6 +4370,28 @@
       "scene": "STRIP",
       "distance": 19,
       "seconds": 10.9
+    },
+    {
+      "bot": "human-keys",
+      "seed": 40,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 28.83,
+      "seconds": 68.21666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 40,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 28.83,
+      "seconds": 67.7
     },
     {
       "bot": "adaptive",
@@ -3529,6 +4471,28 @@
       "seconds": 19.75
     },
     {
+      "bot": "human-keys",
+      "seed": 41,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 50.58,
+      "seconds": 65.98333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 41,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 50.58,
+      "seconds": 65.98333333333333
+    },
+    {
       "bot": "adaptive",
       "seed": 42,
       "completed": true,
@@ -3604,6 +4568,28 @@
       "scene": "STRIP",
       "distance": 6.54,
       "seconds": 2.9166666666666665
+    },
+    {
+      "bot": "human-keys",
+      "seed": 42,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30,
+      "seconds": 60.88333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 42,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30,
+      "seconds": 60.68333333333333
     },
     {
       "bot": "adaptive",
@@ -3683,6 +4669,28 @@
       "seconds": 20.9
     },
     {
+      "bot": "human-keys",
+      "seed": 43,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 47.33,
+      "seconds": 71.78333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 43,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 47.33,
+      "seconds": 71.46666666666667
+    },
+    {
       "bot": "adaptive",
       "seed": 44,
       "completed": true,
@@ -3758,6 +4766,28 @@
       "scene": "STRIP",
       "distance": 27.88,
       "seconds": 14.733333333333333
+    },
+    {
+      "bot": "human-keys",
+      "seed": 44,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 43.32,
+      "seconds": 72.28333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 44,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 43.32,
+      "seconds": 79.46666666666667
     },
     {
       "bot": "adaptive",
@@ -3837,6 +4867,28 @@
       "seconds": 23.616666666666667
     },
     {
+      "bot": "human-keys",
+      "seed": 45,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 32.04,
+      "seconds": 61.56666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 45,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 32.04,
+      "seconds": 69.13333333333334
+    },
+    {
       "bot": "adaptive",
       "seed": 46,
       "completed": true,
@@ -3912,6 +4964,28 @@
       "scene": "STRIP",
       "distance": 18.23,
       "seconds": 12.7
+    },
+    {
+      "bot": "human-keys",
+      "seed": 46,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 18.25,
+      "seconds": 57.46666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 46,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 18.25,
+      "seconds": 57.46666666666667
     },
     {
       "bot": "adaptive",
@@ -3991,6 +5065,28 @@
       "seconds": 12.45
     },
     {
+      "bot": "human-keys",
+      "seed": 47,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 31.04,
+      "seconds": 60.333333333333336
+    },
+    {
+      "bot": "human-touch",
+      "seed": 47,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 31.04,
+      "seconds": 67.83333333333333
+    },
+    {
       "bot": "adaptive",
       "seed": 48,
       "completed": true,
@@ -4066,6 +5162,28 @@
       "scene": "STRIP",
       "distance": 32.42,
       "seconds": 17.116666666666667
+    },
+    {
+      "bot": "human-keys",
+      "seed": 48,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 35.27,
+      "seconds": 69.31666666666666
+    },
+    {
+      "bot": "human-touch",
+      "seed": 48,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 35.27,
+      "seconds": 69.31666666666666
     },
     {
       "bot": "adaptive",
@@ -4145,6 +5263,28 @@
       "seconds": 16.283333333333335
     },
     {
+      "bot": "human-keys",
+      "seed": 49,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 29.71,
+      "seconds": 60.516666666666666
+    },
+    {
+      "bot": "human-touch",
+      "seed": 49,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 29.71,
+      "seconds": 68.01666666666667
+    },
+    {
       "bot": "adaptive",
       "seed": 50,
       "completed": true,
@@ -4220,6 +5360,28 @@
       "scene": "STRIP",
       "distance": 6.58,
       "seconds": 2.9166666666666665
+    },
+    {
+      "bot": "human-keys",
+      "seed": 50,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 44.87,
+      "seconds": 71.85
+    },
+    {
+      "bot": "human-touch",
+      "seed": 50,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 44.87,
+      "seconds": 71.96666666666667
     },
     {
       "bot": "adaptive",
@@ -4299,6 +5461,28 @@
       "seconds": 2.9
     },
     {
+      "bot": "human-keys",
+      "seed": 51,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34.18,
+      "seconds": 69.6
+    },
+    {
+      "bot": "human-touch",
+      "seed": 51,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34.18,
+      "seconds": 69.5
+    },
+    {
       "bot": "adaptive",
       "seed": 52,
       "completed": true,
@@ -4374,6 +5558,28 @@
       "scene": "STRIP",
       "distance": 6.43,
       "seconds": 3.066666666666667
+    },
+    {
+      "bot": "human-keys",
+      "seed": 52,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 23,
+      "seconds": 66.35
+    },
+    {
+      "bot": "human-touch",
+      "seed": 52,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 23,
+      "seconds": 66.43333333333334
     },
     {
       "bot": "adaptive",
@@ -4453,6 +5659,28 @@
       "seconds": 13.466666666666667
     },
     {
+      "bot": "human-keys",
+      "seed": 53,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 28,
+      "seconds": 59.96666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 53,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 28,
+      "seconds": 67.08333333333333
+    },
+    {
       "bot": "adaptive",
       "seed": 54,
       "completed": true,
@@ -4528,6 +5756,28 @@
       "scene": "STRIP",
       "distance": 19.83,
       "seconds": 11.266666666666667
+    },
+    {
+      "bot": "human-keys",
+      "seed": 54,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 22.75,
+      "seconds": 59.05
+    },
+    {
+      "bot": "human-touch",
+      "seed": 54,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 22.76,
+      "seconds": 58.333333333333336
     },
     {
       "bot": "adaptive",
@@ -4607,6 +5857,28 @@
       "seconds": 12.95
     },
     {
+      "bot": "human-keys",
+      "seed": 55,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30.13,
+      "seconds": 60.45
+    },
+    {
+      "bot": "human-touch",
+      "seed": 55,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30.13,
+      "seconds": 67.95
+    },
+    {
       "bot": "adaptive",
       "seed": 56,
       "completed": true,
@@ -4682,6 +5954,28 @@
       "scene": "STRIP",
       "distance": 34.68,
       "seconds": 18.833333333333332
+    },
+    {
+      "bot": "human-keys",
+      "seed": 56,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 24.25,
+      "seconds": 59.233333333333334
+    },
+    {
+      "bot": "human-touch",
+      "seed": 56,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 24.25,
+      "seconds": 59.1
     },
     {
       "bot": "adaptive",
@@ -4761,6 +6055,28 @@
       "seconds": 2.9166666666666665
     },
     {
+      "bot": "human-keys",
+      "seed": 57,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30.77,
+      "seconds": 60.43333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 57,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30.77,
+      "seconds": 60.733333333333334
+    },
+    {
       "bot": "adaptive",
       "seed": 58,
       "completed": true,
@@ -4836,6 +6152,28 @@
       "scene": "STRIP",
       "distance": 26.15,
       "seconds": 15.516666666666667
+    },
+    {
+      "bot": "human-keys",
+      "seed": 58,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 26.15,
+      "seconds": 59.55
+    },
+    {
+      "bot": "human-touch",
+      "seed": 58,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 26.15,
+      "seconds": 67.48333333333333
     },
     {
       "bot": "adaptive",
@@ -4915,6 +6253,28 @@
       "seconds": 17.3
     },
     {
+      "bot": "human-keys",
+      "seed": 59,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34.54,
+      "seconds": 61.8
+    },
+    {
+      "bot": "human-touch",
+      "seed": 59,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34.54,
+      "seconds": 69.18333333333334
+    },
+    {
       "bot": "adaptive",
       "seed": 60,
       "completed": true,
@@ -4990,6 +6350,28 @@
       "scene": "STRIP",
       "distance": 20.71,
       "seconds": 12.033333333333333
+    },
+    {
+      "bot": "human-keys",
+      "seed": 60,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 26.82,
+      "seconds": 59.983333333333334
+    },
+    {
+      "bot": "human-touch",
+      "seed": 60,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 26.82,
+      "seconds": 59.6
     },
     {
       "bot": "adaptive",
@@ -5069,6 +6451,28 @@
       "seconds": 2.933333333333333
     },
     {
+      "bot": "human-keys",
+      "seed": 61,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 41.93,
+      "seconds": 71.61666666666666
+    },
+    {
+      "bot": "human-touch",
+      "seed": 61,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 41.95,
+      "seconds": 78.93333333333334
+    },
+    {
       "bot": "adaptive",
       "seed": 62,
       "completed": true,
@@ -5144,6 +6548,28 @@
       "scene": "STRIP",
       "distance": 6.58,
       "seconds": 2.9
+    },
+    {
+      "bot": "human-keys",
+      "seed": 62,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30.33,
+      "seconds": 61.43333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 62,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30.33,
+      "seconds": 68.93333333333334
     },
     {
       "bot": "adaptive",
@@ -5223,6 +6649,28 @@
       "seconds": 14.6
     },
     {
+      "bot": "human-keys",
+      "seed": 63,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 37.64,
+      "seconds": 69.76666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 63,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 37.37,
+      "seconds": 69.73333333333333
+    },
+    {
       "bot": "adaptive",
       "seed": 64,
       "completed": true,
@@ -5298,6 +6746,28 @@
       "scene": "STRIP",
       "distance": 26.74,
       "seconds": 14.316666666666666
+    },
+    {
+      "bot": "human-keys",
+      "seed": 64,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 42.8,
+      "seconds": 70.86666666666666
+    },
+    {
+      "bot": "human-touch",
+      "seed": 64,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 42.8,
+      "seconds": 70.86666666666666
     },
     {
       "bot": "adaptive",
@@ -5377,6 +6847,28 @@
       "seconds": 20.766666666666666
     },
     {
+      "bot": "human-keys",
+      "seed": 65,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 28.54,
+      "seconds": 61.56666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 65,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 28.57,
+      "seconds": 61.583333333333336
+    },
+    {
       "bot": "adaptive",
       "seed": 66,
       "completed": true,
@@ -5452,6 +6944,28 @@
       "scene": "STRIP",
       "distance": 6.87,
       "seconds": 3.15
+    },
+    {
+      "bot": "human-keys",
+      "seed": 66,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 25.28,
+      "seconds": 60.5
+    },
+    {
+      "bot": "human-touch",
+      "seed": 66,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 25.55,
+      "seconds": 60.13333333333333
     },
     {
       "bot": "adaptive",
@@ -5531,6 +7045,28 @@
       "seconds": 3
     },
     {
+      "bot": "human-keys",
+      "seed": 67,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 44.87,
+      "seconds": 72.41666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 67,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 44.87,
+      "seconds": 79.45
+    },
+    {
       "bot": "adaptive",
       "seed": 68,
       "completed": true,
@@ -5606,6 +7142,28 @@
       "scene": "STRIP",
       "distance": 21.42,
       "seconds": 12.033333333333333
+    },
+    {
+      "bot": "human-keys",
+      "seed": 68,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 27.71,
+      "seconds": 60.233333333333334
+    },
+    {
+      "bot": "human-touch",
+      "seed": 68,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 27.71,
+      "seconds": 60.06666666666667
     },
     {
       "bot": "adaptive",
@@ -5685,6 +7243,28 @@
       "seconds": 13.633333333333333
     },
     {
+      "bot": "human-keys",
+      "seed": 69,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34.58,
+      "seconds": 61.95
+    },
+    {
+      "bot": "human-touch",
+      "seed": 69,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34.58,
+      "seconds": 69.25
+    },
+    {
       "bot": "adaptive",
       "seed": 70,
       "completed": true,
@@ -5760,6 +7340,28 @@
       "scene": "STRIP",
       "distance": 6.5,
       "seconds": 2.966666666666667
+    },
+    {
+      "bot": "human-keys",
+      "seed": 70,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 46.08,
+      "seconds": 71.2
+    },
+    {
+      "bot": "human-touch",
+      "seed": 70,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 46.08,
+      "seconds": 71.06666666666666
     },
     {
       "bot": "adaptive",
@@ -5839,6 +7441,28 @@
       "seconds": 9.8
     },
     {
+      "bot": "human-keys",
+      "seed": 71,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 42.91,
+      "seconds": 72.15
+    },
+    {
+      "bot": "human-touch",
+      "seed": 71,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 42.91,
+      "seconds": 64.65
+    },
+    {
       "bot": "adaptive",
       "seed": 72,
       "completed": true,
@@ -5914,6 +7538,28 @@
       "scene": "STRIP",
       "distance": 6.47,
       "seconds": 3.033333333333333
+    },
+    {
+      "bot": "human-keys",
+      "seed": 72,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 23.56,
+      "seconds": 59.21666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 72,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 23.29,
+      "seconds": 59.083333333333336
     },
     {
       "bot": "adaptive",
@@ -5993,6 +7639,28 @@
       "seconds": 17.233333333333334
     },
     {
+      "bot": "human-keys",
+      "seed": 73,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 52.79,
+      "seconds": 75.2
+    },
+    {
+      "bot": "human-touch",
+      "seed": 73,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 52.79,
+      "seconds": 82.11666666666666
+    },
+    {
       "bot": "adaptive",
       "seed": 74,
       "completed": true,
@@ -6068,6 +7736,28 @@
       "scene": "STRIP",
       "distance": 6.58,
       "seconds": 2.9
+    },
+    {
+      "bot": "human-keys",
+      "seed": 74,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 20.04,
+      "seconds": 58.46666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 74,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 20.04,
+      "seconds": 58.38333333333333
     },
     {
       "bot": "adaptive",
@@ -6147,6 +7837,28 @@
       "seconds": 12.816666666666666
     },
     {
+      "bot": "human-keys",
+      "seed": 75,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 35.09,
+      "seconds": 61.46666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 75,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 35.09,
+      "seconds": 61.46666666666667
+    },
+    {
       "bot": "adaptive",
       "seed": 76,
       "completed": true,
@@ -6222,6 +7934,28 @@
       "scene": "STRIP",
       "distance": 6.58,
       "seconds": 2.9166666666666665
+    },
+    {
+      "bot": "human-keys",
+      "seed": 76,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 43.5,
+      "seconds": 80.36666666666666
+    },
+    {
+      "bot": "human-touch",
+      "seed": 76,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 43.5,
+      "seconds": 73.53333333333333
     },
     {
       "bot": "adaptive",
@@ -6301,6 +8035,28 @@
       "seconds": 10.983333333333333
     },
     {
+      "bot": "human-keys",
+      "seed": 77,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 40.87,
+      "seconds": 70.06666666666666
+    },
+    {
+      "bot": "human-touch",
+      "seed": 77,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 40.87,
+      "seconds": 70.33333333333333
+    },
+    {
       "bot": "adaptive",
       "seed": 78,
       "completed": true,
@@ -6376,6 +8132,28 @@
       "scene": "STRIP",
       "distance": 23.17,
       "seconds": 11.883333333333333
+    },
+    {
+      "bot": "human-keys",
+      "seed": 78,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34.33,
+      "seconds": 69.23333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 78,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34.33,
+      "seconds": 69.23333333333333
     },
     {
       "bot": "adaptive",
@@ -6455,6 +8233,28 @@
       "seconds": 11.016666666666667
     },
     {
+      "bot": "human-keys",
+      "seed": 79,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 18,
+      "seconds": 57.733333333333334
+    },
+    {
+      "bot": "human-touch",
+      "seed": 79,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 18,
+      "seconds": 57.63333333333333
+    },
+    {
       "bot": "adaptive",
       "seed": 80,
       "completed": true,
@@ -6530,6 +8330,28 @@
       "scene": "STRIP",
       "distance": 42.25,
       "seconds": 22.316666666666666
+    },
+    {
+      "bot": "human-keys",
+      "seed": 80,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 32.33,
+      "seconds": 61.333333333333336
+    },
+    {
+      "bot": "human-touch",
+      "seed": 80,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 32.33,
+      "seconds": 61.21666666666667
     },
     {
       "bot": "adaptive",
@@ -6609,6 +8431,28 @@
       "seconds": 18.233333333333334
     },
     {
+      "bot": "human-keys",
+      "seed": 81,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 46.58,
+      "seconds": 65.31666666666666
+    },
+    {
+      "bot": "human-touch",
+      "seed": 81,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 46.58,
+      "seconds": 79.96666666666667
+    },
+    {
       "bot": "adaptive",
       "seed": 82,
       "completed": true,
@@ -6684,6 +8528,28 @@
       "scene": "STRIP",
       "distance": 6.58,
       "seconds": 2.9166666666666665
+    },
+    {
+      "bot": "human-keys",
+      "seed": 82,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 39.15,
+      "seconds": 69.76666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 82,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 39.15,
+      "seconds": 62.65
     },
     {
       "bot": "adaptive",
@@ -6763,6 +8629,28 @@
       "seconds": 2.9
     },
     {
+      "bot": "human-keys",
+      "seed": 83,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 29.37,
+      "seconds": 68.86666666666666
+    },
+    {
+      "bot": "human-touch",
+      "seed": 83,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 29.37,
+      "seconds": 68.26666666666667
+    },
+    {
       "bot": "adaptive",
       "seed": 84,
       "completed": true,
@@ -6838,6 +8726,28 @@
       "scene": "STRIP",
       "distance": 40.87,
       "seconds": 21.633333333333333
+    },
+    {
+      "bot": "human-keys",
+      "seed": 84,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 31.65,
+      "seconds": 61.833333333333336
+    },
+    {
+      "bot": "human-touch",
+      "seed": 84,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 31.65,
+      "seconds": 60.88333333333333
     },
     {
       "bot": "adaptive",
@@ -6917,6 +8827,28 @@
       "seconds": 2.9
     },
     {
+      "bot": "human-keys",
+      "seed": 85,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 31.04,
+      "seconds": 61.05
+    },
+    {
+      "bot": "human-touch",
+      "seed": 85,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 31.04,
+      "seconds": 67.88333333333334
+    },
+    {
       "bot": "adaptive",
       "seed": 86,
       "completed": true,
@@ -6992,6 +8924,28 @@
       "scene": "STRIP",
       "distance": 26.83,
       "seconds": 17.716666666666665
+    },
+    {
+      "bot": "human-keys",
+      "seed": 86,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 26.83,
+      "seconds": 59.71666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 86,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 26.83,
+      "seconds": 59.71666666666667
     },
     {
       "bot": "adaptive",
@@ -7071,6 +9025,28 @@
       "seconds": 15.416666666666666
     },
     {
+      "bot": "human-keys",
+      "seed": 87,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34.5,
+      "seconds": 61.63333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 87,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34.5,
+      "seconds": 69.13333333333334
+    },
+    {
       "bot": "adaptive",
       "seed": 88,
       "completed": true,
@@ -7146,6 +9122,28 @@
       "scene": "STRIP",
       "distance": 28.38,
       "seconds": 16.75
+    },
+    {
+      "bot": "human-keys",
+      "seed": 88,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 44.17,
+      "seconds": 79.43333333333334
+    },
+    {
+      "bot": "human-touch",
+      "seed": 88,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 44.17,
+      "seconds": 79.43333333333334
     },
     {
       "bot": "adaptive",
@@ -7225,6 +9223,28 @@
       "seconds": 2.9
     },
     {
+      "bot": "human-keys",
+      "seed": 89,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 38.47,
+      "seconds": 63.233333333333334
+    },
+    {
+      "bot": "human-touch",
+      "seed": 89,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 38.21,
+      "seconds": 63.25
+    },
+    {
       "bot": "adaptive",
       "seed": 90,
       "completed": true,
@@ -7300,6 +9320,28 @@
       "scene": "STRIP",
       "distance": 41.25,
       "seconds": 22.933333333333334
+    },
+    {
+      "bot": "human-keys",
+      "seed": 90,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 31.21,
+      "seconds": 61.25
+    },
+    {
+      "bot": "human-touch",
+      "seed": 90,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 31.21,
+      "seconds": 68.43333333333334
     },
     {
       "bot": "adaptive",
@@ -7379,6 +9421,28 @@
       "seconds": 10.05
     },
     {
+      "bot": "human-keys",
+      "seed": 91,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 33.04,
+      "seconds": 68.7
+    },
+    {
+      "bot": "human-touch",
+      "seed": 91,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 33.04,
+      "seconds": 68.78333333333333
+    },
+    {
       "bot": "adaptive",
       "seed": 92,
       "completed": true,
@@ -7454,6 +9518,28 @@
       "scene": "STRIP",
       "distance": 11.24,
       "seconds": 8.366666666666667
+    },
+    {
+      "bot": "human-keys",
+      "seed": 92,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 22.24,
+      "seconds": 65.91666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 92,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 22.24,
+      "seconds": 65.91666666666667
     },
     {
       "bot": "adaptive",
@@ -7533,6 +9619,28 @@
       "seconds": 20.283333333333335
     },
     {
+      "bot": "human-keys",
+      "seed": 93,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 20.73,
+      "seconds": 59.083333333333336
+    },
+    {
+      "bot": "human-touch",
+      "seed": 93,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 20.73,
+      "seconds": 58.63333333333333
+    },
+    {
       "bot": "adaptive",
       "seed": 94,
       "completed": true,
@@ -7608,6 +9716,28 @@
       "scene": "STRIP",
       "distance": 22.93,
       "seconds": 13.016666666666667
+    },
+    {
+      "bot": "human-keys",
+      "seed": 94,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34.04,
+      "seconds": 61.25
+    },
+    {
+      "bot": "human-touch",
+      "seed": 94,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34.04,
+      "seconds": 61.25
     },
     {
       "bot": "adaptive",
@@ -7687,6 +9817,28 @@
       "seconds": 14
     },
     {
+      "bot": "human-keys",
+      "seed": 95,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 27.23,
+      "seconds": 67.51666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 95,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 27.24,
+      "seconds": 67.25
+    },
+    {
       "bot": "adaptive",
       "seed": 96,
       "completed": true,
@@ -7762,6 +9914,28 @@
       "scene": "STRIP",
       "distance": 39.65,
       "seconds": 23.433333333333334
+    },
+    {
+      "bot": "human-keys",
+      "seed": 96,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 26.38,
+      "seconds": 59.95
+    },
+    {
+      "bot": "human-touch",
+      "seed": 96,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 26.38,
+      "seconds": 59.55
     },
     {
       "bot": "adaptive",
@@ -7841,6 +10015,28 @@
       "seconds": 3.1
     },
     {
+      "bot": "human-keys",
+      "seed": 97,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 40.33,
+      "seconds": 71.13333333333334
+    },
+    {
+      "bot": "human-touch",
+      "seed": 97,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 40.33,
+      "seconds": 71.13333333333334
+    },
+    {
       "bot": "adaptive",
       "seed": 98,
       "completed": true,
@@ -7916,6 +10112,28 @@
       "scene": "STRIP",
       "distance": 21.13,
       "seconds": 12.116666666666667
+    },
+    {
+      "bot": "human-keys",
+      "seed": 98,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 44.19,
+      "seconds": 64.36666666666666
+    },
+    {
+      "bot": "human-touch",
+      "seed": 98,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 43.9,
+      "seconds": 64.56666666666666
     },
     {
       "bot": "adaptive",
@@ -7995,6 +10213,28 @@
       "seconds": 12.666666666666666
     },
     {
+      "bot": "human-keys",
+      "seed": 99,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 24.13,
+      "seconds": 66.63333333333334
+    },
+    {
+      "bot": "human-touch",
+      "seed": 99,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 23.84,
+      "seconds": 59.18333333333333
+    },
+    {
       "bot": "adaptive",
       "seed": 100,
       "completed": true,
@@ -8070,6 +10310,28 @@
       "scene": "STRIP",
       "distance": 34.79,
       "seconds": 18.233333333333334
+    },
+    {
+      "bot": "human-keys",
+      "seed": 100,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 35.07,
+      "seconds": 61.983333333333334
+    },
+    {
+      "bot": "human-touch",
+      "seed": 100,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34.79,
+      "seconds": 61.266666666666666
     },
     {
       "bot": "adaptive",
@@ -8149,6 +10411,28 @@
       "seconds": 11.333333333333334
     },
     {
+      "bot": "human-keys",
+      "seed": 101,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 24.79,
+      "seconds": 59.28333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 101,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 24.79,
+      "seconds": 66.38333333333334
+    },
+    {
       "bot": "adaptive",
       "seed": 102,
       "completed": true,
@@ -8224,6 +10508,28 @@
       "scene": "STRIP",
       "distance": 26.59,
       "seconds": 14.55
+    },
+    {
+      "bot": "human-keys",
+      "seed": 102,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 45.91,
+      "seconds": 79.93333333333334
+    },
+    {
+      "bot": "human-touch",
+      "seed": 102,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 45.91,
+      "seconds": 72.05
     },
     {
       "bot": "adaptive",
@@ -8303,6 +10609,28 @@
       "seconds": 19.75
     },
     {
+      "bot": "human-keys",
+      "seed": 103,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 27.29,
+      "seconds": 59.95
+    },
+    {
+      "bot": "human-touch",
+      "seed": 103,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 27.29,
+      "seconds": 59.55
+    },
+    {
       "bot": "adaptive",
       "seed": 104,
       "completed": true,
@@ -8378,6 +10706,28 @@
       "scene": "STRIP",
       "distance": 6.54,
       "seconds": 2.933333333333333
+    },
+    {
+      "bot": "human-keys",
+      "seed": 104,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30.46,
+      "seconds": 61.38333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 104,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30.46,
+      "seconds": 60.983333333333334
     },
     {
       "bot": "adaptive",
@@ -8457,6 +10807,28 @@
       "seconds": 12.433333333333334
     },
     {
+      "bot": "human-keys",
+      "seed": 105,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30.04,
+      "seconds": 61.11666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 105,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30.04,
+      "seconds": 60.85
+    },
+    {
       "bot": "adaptive",
       "seed": 106,
       "completed": true,
@@ -8532,6 +10904,28 @@
       "scene": "STRIP",
       "distance": 38.46,
       "seconds": 22.766666666666666
+    },
+    {
+      "bot": "human-keys",
+      "seed": 106,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30.09,
+      "seconds": 61.2
+    },
+    {
+      "bot": "human-touch",
+      "seed": 106,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 29.83,
+      "seconds": 60.6
     },
     {
       "bot": "adaptive",
@@ -8611,6 +11005,28 @@
       "seconds": 11.783333333333333
     },
     {
+      "bot": "human-keys",
+      "seed": 107,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 49.13,
+      "seconds": 64.56666666666666
+    },
+    {
+      "bot": "human-touch",
+      "seed": 107,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 49.13,
+      "seconds": 79.66666666666667
+    },
+    {
       "bot": "adaptive",
       "seed": 108,
       "completed": true,
@@ -8686,6 +11102,28 @@
       "scene": "STRIP",
       "distance": 35.45,
       "seconds": 18.083333333333332
+    },
+    {
+      "bot": "human-keys",
+      "seed": 108,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 35.7,
+      "seconds": 62.35
+    },
+    {
+      "bot": "human-touch",
+      "seed": 108,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 35.7,
+      "seconds": 61.63333333333333
     },
     {
       "bot": "adaptive",
@@ -8765,6 +11203,28 @@
       "seconds": 3.05
     },
     {
+      "bot": "human-keys",
+      "seed": 109,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 48.58,
+      "seconds": 73.63333333333334
+    },
+    {
+      "bot": "human-touch",
+      "seed": 109,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 48.58,
+      "seconds": 65.65
+    },
+    {
       "bot": "adaptive",
       "seed": 110,
       "completed": true,
@@ -8840,6 +11300,28 @@
       "scene": "STRIP",
       "distance": 6.58,
       "seconds": 2.9166666666666665
+    },
+    {
+      "bot": "human-keys",
+      "seed": 110,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 20.17,
+      "seconds": 58.56666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 110,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 20.17,
+      "seconds": 58.333333333333336
     },
     {
       "bot": "adaptive",
@@ -8919,6 +11401,28 @@
       "seconds": 3.0833333333333335
     },
     {
+      "bot": "human-keys",
+      "seed": 111,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 47.17,
+      "seconds": 79.93333333333334
+    },
+    {
+      "bot": "human-touch",
+      "seed": 111,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 47.17,
+      "seconds": 72.11666666666666
+    },
+    {
       "bot": "adaptive",
       "seed": 112,
       "completed": true,
@@ -8994,6 +11498,28 @@
       "scene": "STRIP",
       "distance": 26.5,
       "seconds": 13.883333333333333
+    },
+    {
+      "bot": "human-keys",
+      "seed": 112,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30.24,
+      "seconds": 60.9
+    },
+    {
+      "bot": "human-touch",
+      "seed": 112,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30.24,
+      "seconds": 68.01666666666667
     },
     {
       "bot": "adaptive",
@@ -9073,6 +11599,28 @@
       "seconds": 9.983333333333333
     },
     {
+      "bot": "human-keys",
+      "seed": 113,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 45.29,
+      "seconds": 63.78333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 113,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 45.29,
+      "seconds": 71.28333333333333
+    },
+    {
       "bot": "adaptive",
       "seed": 114,
       "completed": true,
@@ -9148,6 +11696,28 @@
       "scene": "STRIP",
       "distance": 26.33,
       "seconds": 14.266666666666667
+    },
+    {
+      "bot": "human-keys",
+      "seed": 114,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 37.29,
+      "seconds": 70.48333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 114,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 37.29,
+      "seconds": 70.6
     },
     {
       "bot": "adaptive",
@@ -9227,6 +11797,28 @@
       "seconds": 19.283333333333335
     },
     {
+      "bot": "human-keys",
+      "seed": 115,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 29.71,
+      "seconds": 60.416666666666664
+    },
+    {
+      "bot": "human-touch",
+      "seed": 115,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 29.71,
+      "seconds": 60.416666666666664
+    },
+    {
       "bot": "adaptive",
       "seed": 116,
       "completed": true,
@@ -9302,6 +11894,28 @@
       "scene": "STRIP",
       "distance": 30.18,
       "seconds": 15.866666666666667
+    },
+    {
+      "bot": "human-keys",
+      "seed": 116,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34.37,
+      "seconds": 61.85
+    },
+    {
+      "bot": "human-touch",
+      "seed": 116,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34.37,
+      "seconds": 61.6
     },
     {
       "bot": "adaptive",
@@ -9381,6 +11995,28 @@
       "seconds": 2.9166666666666665
     },
     {
+      "bot": "human-keys",
+      "seed": 117,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 25.5,
+      "seconds": 67.13333333333334
+    },
+    {
+      "bot": "human-touch",
+      "seed": 117,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 25.5,
+      "seconds": 59.56666666666667
+    },
+    {
       "bot": "adaptive",
       "seed": 118,
       "completed": true,
@@ -9456,6 +12092,28 @@
       "scene": "STRIP",
       "distance": 43.5,
       "seconds": 24.766666666666666
+    },
+    {
+      "bot": "human-keys",
+      "seed": 118,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 29.58,
+      "seconds": 61.916666666666664
+    },
+    {
+      "bot": "human-touch",
+      "seed": 118,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 29.58,
+      "seconds": 61.31666666666667
     },
     {
       "bot": "adaptive",
@@ -9535,6 +12193,28 @@
       "seconds": 18.95
     },
     {
+      "bot": "human-keys",
+      "seed": 119,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 35.62,
+      "seconds": 69.41666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 119,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 35.62,
+      "seconds": 69.03333333333333
+    },
+    {
       "bot": "adaptive",
       "seed": 120,
       "completed": true,
@@ -9610,6 +12290,28 @@
       "scene": "STRIP",
       "distance": 6.58,
       "seconds": 2.9166666666666665
+    },
+    {
+      "bot": "human-keys",
+      "seed": 120,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30.79,
+      "seconds": 61.06666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 120,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30.79,
+      "seconds": 68.18333333333334
     },
     {
       "bot": "adaptive",
@@ -9689,6 +12391,28 @@
       "seconds": 17.983333333333334
     },
     {
+      "bot": "human-keys",
+      "seed": 121,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 32.96,
+      "seconds": 61.53333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 121,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 32.96,
+      "seconds": 69.11666666666666
+    },
+    {
       "bot": "adaptive",
       "seed": 122,
       "completed": true,
@@ -9764,6 +12488,28 @@
       "scene": "STRIP",
       "distance": 6.54,
       "seconds": 2.933333333333333
+    },
+    {
+      "bot": "human-keys",
+      "seed": 122,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30.18,
+      "seconds": 60.93333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 122,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30.11,
+      "seconds": 67.93333333333334
     },
     {
       "bot": "adaptive",
@@ -9843,6 +12589,28 @@
       "seconds": 16.966666666666665
     },
     {
+      "bot": "human-keys",
+      "seed": 123,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 38.79,
+      "seconds": 69.83333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 123,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 38.79,
+      "seconds": 69.56666666666666
+    },
+    {
       "bot": "adaptive",
       "seed": 124,
       "completed": true,
@@ -9918,6 +12686,28 @@
       "scene": "STRIP",
       "distance": 20.34,
       "seconds": 11.9
+    },
+    {
+      "bot": "human-keys",
+      "seed": 124,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 45.25,
+      "seconds": 71.81666666666666
+    },
+    {
+      "bot": "human-touch",
+      "seed": 124,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 45.25,
+      "seconds": 79.31666666666666
     },
     {
       "bot": "adaptive",
@@ -9997,6 +12787,28 @@
       "seconds": 10.183333333333334
     },
     {
+      "bot": "human-keys",
+      "seed": 125,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 55.33,
+      "seconds": 82.16666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 125,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 55,
+      "seconds": 74.35
+    },
+    {
       "bot": "adaptive",
       "seed": 126,
       "completed": true,
@@ -10072,6 +12884,28 @@
       "scene": "STRIP",
       "distance": 6.53,
       "seconds": 2.9833333333333334
+    },
+    {
+      "bot": "human-keys",
+      "seed": 126,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 25.25,
+      "seconds": 59.266666666666666
+    },
+    {
+      "bot": "human-touch",
+      "seed": 126,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 25.25,
+      "seconds": 59.45
     },
     {
       "bot": "adaptive",
@@ -10151,6 +12985,28 @@
       "seconds": 2.9166666666666665
     },
     {
+      "bot": "human-keys",
+      "seed": 127,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 21.17,
+      "seconds": 59.016666666666666
+    },
+    {
+      "bot": "human-touch",
+      "seed": 127,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 21.17,
+      "seconds": 58.68333333333333
+    },
+    {
       "bot": "adaptive",
       "seed": 128,
       "completed": true,
@@ -10226,6 +13082,28 @@
       "scene": "STRIP",
       "distance": 25.92,
       "seconds": 15.316666666666666
+    },
+    {
+      "bot": "human-keys",
+      "seed": 128,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 31.29,
+      "seconds": 69.11666666666666
+    },
+    {
+      "bot": "human-touch",
+      "seed": 128,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 31.29,
+      "seconds": 69.08333333333333
     },
     {
       "bot": "adaptive",
@@ -10305,6 +13183,28 @@
       "seconds": 10.583333333333334
     },
     {
+      "bot": "human-keys",
+      "seed": 129,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34,
+      "seconds": 68.88333333333334
+    },
+    {
+      "bot": "human-touch",
+      "seed": 129,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34,
+      "seconds": 61.05
+    },
+    {
       "bot": "adaptive",
       "seed": 130,
       "completed": true,
@@ -10380,6 +13280,28 @@
       "scene": "STRIP",
       "distance": 6.58,
       "seconds": 2.9166666666666665
+    },
+    {
+      "bot": "human-keys",
+      "seed": 130,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 29.25,
+      "seconds": 60.55
+    },
+    {
+      "bot": "human-touch",
+      "seed": 130,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 29.25,
+      "seconds": 68.05
     },
     {
       "bot": "adaptive",
@@ -10459,6 +13381,28 @@
       "seconds": 9.05
     },
     {
+      "bot": "human-keys",
+      "seed": 131,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 26.79,
+      "seconds": 67.76666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 131,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 26.79,
+      "seconds": 67.48333333333333
+    },
+    {
       "bot": "adaptive",
       "seed": 132,
       "completed": true,
@@ -10534,6 +13478,28 @@
       "scene": "STRIP",
       "distance": 7.74,
       "seconds": 3.45
+    },
+    {
+      "bot": "human-keys",
+      "seed": 132,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34.67,
+      "seconds": 69.01666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 132,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34.67,
+      "seconds": 76.48333333333333
     },
     {
       "bot": "adaptive",
@@ -10613,6 +13579,28 @@
       "seconds": 2.9166666666666665
     },
     {
+      "bot": "human-keys",
+      "seed": 133,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 28.29,
+      "seconds": 60.45
+    },
+    {
+      "bot": "human-touch",
+      "seed": 133,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 28.29,
+      "seconds": 67.56666666666666
+    },
+    {
       "bot": "adaptive",
       "seed": 134,
       "completed": true,
@@ -10688,6 +13676,28 @@
       "scene": "STRIP",
       "distance": 20.08,
       "seconds": 11.3
+    },
+    {
+      "bot": "human-keys",
+      "seed": 134,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 35.86,
+      "seconds": 62.8
+    },
+    {
+      "bot": "human-touch",
+      "seed": 134,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 35.86,
+      "seconds": 62.45
     },
     {
       "bot": "adaptive",
@@ -10767,6 +13777,28 @@
       "seconds": 16.733333333333334
     },
     {
+      "bot": "human-keys",
+      "seed": 135,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 31.46,
+      "seconds": 69.53333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 135,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 31.46,
+      "seconds": 61.61666666666667
+    },
+    {
       "bot": "adaptive",
       "seed": 136,
       "completed": true,
@@ -10842,6 +13874,28 @@
       "scene": "STRIP",
       "distance": 33.92,
       "seconds": 16.566666666666666
+    },
+    {
+      "bot": "human-keys",
+      "seed": 136,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 37.29,
+      "seconds": 76.4
+    },
+    {
+      "bot": "human-touch",
+      "seed": 136,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 37.29,
+      "seconds": 76.4
     },
     {
       "bot": "adaptive",
@@ -10921,6 +13975,28 @@
       "seconds": 12.5
     },
     {
+      "bot": "human-keys",
+      "seed": 137,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 47.12,
+      "seconds": 72.25
+    },
+    {
+      "bot": "human-touch",
+      "seed": 137,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 47.12,
+      "seconds": 79.75
+    },
+    {
       "bot": "adaptive",
       "seed": 138,
       "completed": true,
@@ -10996,6 +14072,28 @@
       "scene": "STRIP",
       "distance": 16.67,
       "seconds": 10.816666666666666
+    },
+    {
+      "bot": "human-keys",
+      "seed": 138,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 28.17,
+      "seconds": 68.91666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 138,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 28.21,
+      "seconds": 68.35
     },
     {
       "bot": "adaptive",
@@ -11075,6 +14173,28 @@
       "seconds": 16.55
     },
     {
+      "bot": "human-keys",
+      "seed": 139,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 39.67,
+      "seconds": 63.68333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 139,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 39.67,
+      "seconds": 71.1
+    },
+    {
       "bot": "adaptive",
       "seed": 140,
       "completed": true,
@@ -11150,6 +14270,28 @@
       "scene": "STRIP",
       "distance": 25.21,
       "seconds": 15.05
+    },
+    {
+      "bot": "human-keys",
+      "seed": 140,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 25.21,
+      "seconds": 66.65
+    },
+    {
+      "bot": "human-touch",
+      "seed": 140,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 25.21,
+      "seconds": 66.65
     },
     {
       "bot": "adaptive",
@@ -11229,6 +14371,28 @@
       "seconds": 17.216666666666665
     },
     {
+      "bot": "human-keys",
+      "seed": 141,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 32.96,
+      "seconds": 69.26666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 141,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 32.95,
+      "seconds": 69.13333333333334
+    },
+    {
       "bot": "adaptive",
       "seed": 142,
       "completed": true,
@@ -11304,6 +14468,28 @@
       "scene": "STRIP",
       "distance": 11.05,
       "seconds": 7.433333333333334
+    },
+    {
+      "bot": "human-keys",
+      "seed": 142,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 28.25,
+      "seconds": 60.416666666666664
+    },
+    {
+      "bot": "human-touch",
+      "seed": 142,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 28.25,
+      "seconds": 67.91666666666667
     },
     {
       "bot": "adaptive",
@@ -11383,6 +14569,28 @@
       "seconds": 11.75
     },
     {
+      "bot": "human-keys",
+      "seed": 143,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 53.12,
+      "seconds": 89.58333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 143,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 53.12,
+      "seconds": 89.4
+    },
+    {
       "bot": "adaptive",
       "seed": 144,
       "completed": true,
@@ -11458,6 +14666,28 @@
       "scene": "STRIP",
       "distance": 20.71,
       "seconds": 11.316666666666666
+    },
+    {
+      "bot": "human-keys",
+      "seed": 144,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 21.58,
+      "seconds": 66.65
+    },
+    {
+      "bot": "human-touch",
+      "seed": 144,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 21.29,
+      "seconds": 65.75
     },
     {
       "bot": "adaptive",
@@ -11537,6 +14767,28 @@
       "seconds": 18.65
     },
     {
+      "bot": "human-keys",
+      "seed": 145,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 28.29,
+      "seconds": 68.38333333333334
+    },
+    {
+      "bot": "human-touch",
+      "seed": 145,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 28.29,
+      "seconds": 61.016666666666666
+    },
+    {
       "bot": "adaptive",
       "seed": 146,
       "completed": true,
@@ -11612,6 +14864,28 @@
       "scene": "STRIP",
       "distance": 6.58,
       "seconds": 2.9166666666666665
+    },
+    {
+      "bot": "human-keys",
+      "seed": 146,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 19.35,
+      "seconds": 58.5
+    },
+    {
+      "bot": "human-touch",
+      "seed": 146,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 19.35,
+      "seconds": 58.1
     },
     {
       "bot": "adaptive",
@@ -11691,6 +14965,28 @@
       "seconds": 3.25
     },
     {
+      "bot": "human-keys",
+      "seed": 147,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 26.56,
+      "seconds": 60
+    },
+    {
+      "bot": "human-touch",
+      "seed": 147,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 26.94,
+      "seconds": 60
+    },
+    {
       "bot": "adaptive",
       "seed": 148,
       "completed": true,
@@ -11766,6 +15062,28 @@
       "scene": "STRIP",
       "distance": 25.36,
       "seconds": 14.616666666666667
+    },
+    {
+      "bot": "human-keys",
+      "seed": 148,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 31.5,
+      "seconds": 69
+    },
+    {
+      "bot": "human-touch",
+      "seed": 148,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 31.5,
+      "seconds": 68.95
     },
     {
       "bot": "adaptive",
@@ -11845,6 +15163,28 @@
       "seconds": 16.15
     },
     {
+      "bot": "human-keys",
+      "seed": 149,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 35.38,
+      "seconds": 62.5
+    },
+    {
+      "bot": "human-touch",
+      "seed": 149,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 35.38,
+      "seconds": 69.6
+    },
+    {
       "bot": "adaptive",
       "seed": 150,
       "completed": true,
@@ -11920,6 +15260,28 @@
       "scene": "STRIP",
       "distance": 6.54,
       "seconds": 2.9166666666666665
+    },
+    {
+      "bot": "human-keys",
+      "seed": 150,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34.56,
+      "seconds": 69.53333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 150,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34.56,
+      "seconds": 61.55
     },
     {
       "bot": "adaptive",
@@ -11999,6 +15361,28 @@
       "seconds": 11.65
     },
     {
+      "bot": "human-keys",
+      "seed": 151,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30.88,
+      "seconds": 68.16666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 151,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30.88,
+      "seconds": 68.06666666666666
+    },
+    {
       "bot": "adaptive",
       "seed": 152,
       "completed": true,
@@ -12074,6 +15458,28 @@
       "scene": "STRIP",
       "distance": 37,
       "seconds": 20.666666666666668
+    },
+    {
+      "bot": "human-keys",
+      "seed": 152,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 39.58,
+      "seconds": 71.08333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 152,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 39.58,
+      "seconds": 70.81666666666666
     },
     {
       "bot": "adaptive",
@@ -12153,6 +15559,28 @@
       "seconds": 11.916666666666666
     },
     {
+      "bot": "human-keys",
+      "seed": 153,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30.54,
+      "seconds": 59.9
+    },
+    {
+      "bot": "human-touch",
+      "seed": 153,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30.54,
+      "seconds": 59.9
+    },
+    {
       "bot": "adaptive",
       "seed": 154,
       "completed": true,
@@ -12228,6 +15656,28 @@
       "scene": "STRIP",
       "distance": 33.96,
       "seconds": 18.133333333333333
+    },
+    {
+      "bot": "human-keys",
+      "seed": 154,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 27.47,
+      "seconds": 67.91666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 154,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 27.47,
+      "seconds": 67.5
     },
     {
       "bot": "adaptive",
@@ -12307,6 +15757,28 @@
       "seconds": 2.9
     },
     {
+      "bot": "human-keys",
+      "seed": 155,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 25.39,
+      "seconds": 60.35
+    },
+    {
+      "bot": "human-touch",
+      "seed": 155,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 25.42,
+      "seconds": 59.56666666666667
+    },
+    {
       "bot": "adaptive",
       "seed": 156,
       "completed": true,
@@ -12382,6 +15854,28 @@
       "scene": "STRIP",
       "distance": 6.54,
       "seconds": 2.933333333333333
+    },
+    {
+      "bot": "human-keys",
+      "seed": 156,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 32.83,
+      "seconds": 61.083333333333336
+    },
+    {
+      "bot": "human-touch",
+      "seed": 156,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 32.83,
+      "seconds": 61.35
     },
     {
       "bot": "adaptive",
@@ -12461,6 +15955,28 @@
       "seconds": 2.9166666666666665
     },
     {
+      "bot": "human-keys",
+      "seed": 157,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 35.06,
+      "seconds": 70.16666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 157,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 35.06,
+      "seconds": 69.68333333333334
+    },
+    {
       "bot": "adaptive",
       "seed": 158,
       "completed": true,
@@ -12536,6 +16052,28 @@
       "scene": "STRIP",
       "distance": 28.5,
       "seconds": 15.4
+    },
+    {
+      "bot": "human-keys",
+      "seed": 158,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 32.04,
+      "seconds": 61.65
+    },
+    {
+      "bot": "human-touch",
+      "seed": 158,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 32.04,
+      "seconds": 61.25
     },
     {
       "bot": "adaptive",
@@ -12615,6 +16153,28 @@
       "seconds": 2.933333333333333
     },
     {
+      "bot": "human-keys",
+      "seed": 159,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 27.18,
+      "seconds": 68.28333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 159,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 27.18,
+      "seconds": 67.66666666666667
+    },
+    {
       "bot": "adaptive",
       "seed": 160,
       "completed": true,
@@ -12690,6 +16250,28 @@
       "scene": "STRIP",
       "distance": 25.25,
       "seconds": 14.9
+    },
+    {
+      "bot": "human-keys",
+      "seed": 160,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 37.06,
+      "seconds": 70.01666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 160,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 37.06,
+      "seconds": 70.4
     },
     {
       "bot": "adaptive",
@@ -12769,6 +16351,28 @@
       "seconds": 18.233333333333334
     },
     {
+      "bot": "human-keys",
+      "seed": 161,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 28.21,
+      "seconds": 60.03333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 161,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 28.21,
+      "seconds": 59.63333333333333
+    },
+    {
       "bot": "adaptive",
       "seed": 162,
       "completed": true,
@@ -12844,6 +16448,28 @@
       "scene": "STRIP",
       "distance": 19.3,
       "seconds": 11.066666666666666
+    },
+    {
+      "bot": "human-keys",
+      "seed": 162,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 47.39,
+      "seconds": 72.55
+    },
+    {
+      "bot": "human-touch",
+      "seed": 162,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 47.66,
+      "seconds": 72.33333333333333
     },
     {
       "bot": "adaptive",
@@ -12923,6 +16549,28 @@
       "seconds": 15.133333333333333
     },
     {
+      "bot": "human-keys",
+      "seed": 163,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 39.47,
+      "seconds": 63.333333333333336
+    },
+    {
+      "bot": "human-touch",
+      "seed": 163,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 39.47,
+      "seconds": 62.85
+    },
+    {
       "bot": "adaptive",
       "seed": 164,
       "completed": true,
@@ -12998,6 +16646,28 @@
       "scene": "STRIP",
       "distance": 6.58,
       "seconds": 2.9166666666666665
+    },
+    {
+      "bot": "human-keys",
+      "seed": 164,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 32.71,
+      "seconds": 61.11666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 164,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 32.71,
+      "seconds": 60.63333333333333
     },
     {
       "bot": "adaptive",
@@ -13077,6 +16747,28 @@
       "seconds": 3.033333333333333
     },
     {
+      "bot": "human-keys",
+      "seed": 165,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 35.21,
+      "seconds": 61.71666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 165,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 35.21,
+      "seconds": 61.71666666666667
+    },
+    {
       "bot": "adaptive",
       "seed": 166,
       "completed": true,
@@ -13152,6 +16844,28 @@
       "scene": "STRIP",
       "distance": 19.4,
       "seconds": 11.016666666666667
+    },
+    {
+      "bot": "human-keys",
+      "seed": 166,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 32.79,
+      "seconds": 68.16666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 166,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 32.79,
+      "seconds": 61.2
     },
     {
       "bot": "adaptive",
@@ -13231,6 +16945,28 @@
       "seconds": 18.55
     },
     {
+      "bot": "human-keys",
+      "seed": 167,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 44.62,
+      "seconds": 63.833333333333336
+    },
+    {
+      "bot": "human-touch",
+      "seed": 167,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 44.62,
+      "seconds": 79.23333333333333
+    },
+    {
       "bot": "adaptive",
       "seed": 168,
       "completed": true,
@@ -13306,6 +17042,28 @@
       "scene": "STRIP",
       "distance": 32.46,
       "seconds": 17.4
+    },
+    {
+      "bot": "human-keys",
+      "seed": 168,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 22.04,
+      "seconds": 58.666666666666664
+    },
+    {
+      "bot": "human-touch",
+      "seed": 168,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 22.04,
+      "seconds": 58.88333333333333
     },
     {
       "bot": "adaptive",
@@ -13385,6 +17143,28 @@
       "seconds": 2.9
     },
     {
+      "bot": "human-keys",
+      "seed": 169,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 27.46,
+      "seconds": 68.16666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 169,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 27.46,
+      "seconds": 68.15
+    },
+    {
       "bot": "adaptive",
       "seed": 170,
       "completed": true,
@@ -13460,6 +17240,28 @@
       "scene": "STRIP",
       "distance": 35.09,
       "seconds": 20.183333333333334
+    },
+    {
+      "bot": "human-keys",
+      "seed": 170,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 36.94,
+      "seconds": 63.583333333333336
+    },
+    {
+      "bot": "human-touch",
+      "seed": 170,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 36.94,
+      "seconds": 70.33333333333333
     },
     {
       "bot": "adaptive",
@@ -13539,6 +17341,28 @@
       "seconds": 18.466666666666665
     },
     {
+      "bot": "human-keys",
+      "seed": 171,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 42.82,
+      "seconds": 71.6
+    },
+    {
+      "bot": "human-touch",
+      "seed": 171,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 42.82,
+      "seconds": 71.4
+    },
+    {
       "bot": "adaptive",
       "seed": 172,
       "completed": true,
@@ -13614,6 +17438,28 @@
       "scene": "STRIP",
       "distance": 17.68,
       "seconds": 12.166666666666666
+    },
+    {
+      "bot": "human-keys",
+      "seed": 172,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 17.68,
+      "seconds": 57.71666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 172,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 17.68,
+      "seconds": 57.333333333333336
     },
     {
       "bot": "adaptive",
@@ -13693,6 +17539,28 @@
       "seconds": 22.366666666666667
     },
     {
+      "bot": "human-keys",
+      "seed": 173,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 24.25,
+      "seconds": 59.88333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 173,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 24.25,
+      "seconds": 59.483333333333334
+    },
+    {
       "bot": "adaptive",
       "seed": 174,
       "completed": true,
@@ -13768,6 +17636,28 @@
       "scene": "STRIP",
       "distance": 25.43,
       "seconds": 14.7
+    },
+    {
+      "bot": "human-keys",
+      "seed": 174,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 32.04,
+      "seconds": 69.61666666666666
+    },
+    {
+      "bot": "human-touch",
+      "seed": 174,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 32.04,
+      "seconds": 68.83333333333333
     },
     {
       "bot": "adaptive",
@@ -13847,6 +17737,28 @@
       "seconds": 14.983333333333333
     },
     {
+      "bot": "human-keys",
+      "seed": 175,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34.71,
+      "seconds": 69.7
+    },
+    {
+      "bot": "human-touch",
+      "seed": 175,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34.71,
+      "seconds": 69.35
+    },
+    {
       "bot": "adaptive",
       "seed": 176,
       "completed": true,
@@ -13922,6 +17834,28 @@
       "scene": "STRIP",
       "distance": 7,
       "seconds": 3.2333333333333334
+    },
+    {
+      "bot": "human-keys",
+      "seed": 176,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 23.91,
+      "seconds": 58.916666666666664
+    },
+    {
+      "bot": "human-touch",
+      "seed": 176,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 23.91,
+      "seconds": 59.28333333333333
     },
     {
       "bot": "adaptive",
@@ -14001,6 +17935,28 @@
       "seconds": 13.116666666666667
     },
     {
+      "bot": "human-keys",
+      "seed": 177,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30.03,
+      "seconds": 67.86666666666666
+    },
+    {
+      "bot": "human-touch",
+      "seed": 177,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30.33,
+      "seconds": 67.7
+    },
+    {
       "bot": "adaptive",
       "seed": 178,
       "completed": true,
@@ -14076,6 +18032,28 @@
       "scene": "STRIP",
       "distance": 33.33,
       "seconds": 18.416666666666668
+    },
+    {
+      "bot": "human-keys",
+      "seed": 178,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34.62,
+      "seconds": 62.65
+    },
+    {
+      "bot": "human-touch",
+      "seed": 178,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 34.62,
+      "seconds": 70.13333333333334
     },
     {
       "bot": "adaptive",
@@ -14155,6 +18133,28 @@
       "seconds": 13.45
     },
     {
+      "bot": "human-keys",
+      "seed": 179,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 45.17,
+      "seconds": 72
+    },
+    {
+      "bot": "human-touch",
+      "seed": 179,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 45.17,
+      "seconds": 71.61666666666666
+    },
+    {
       "bot": "adaptive",
       "seed": 180,
       "completed": true,
@@ -14230,6 +18230,28 @@
       "scene": "STRIP",
       "distance": 28.04,
       "seconds": 14.75
+    },
+    {
+      "bot": "human-keys",
+      "seed": 180,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 48.96,
+      "seconds": 72.78333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 180,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 48.96,
+      "seconds": 72.78333333333333
     },
     {
       "bot": "adaptive",
@@ -14309,6 +18331,28 @@
       "seconds": 15.883333333333333
     },
     {
+      "bot": "human-keys",
+      "seed": 181,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 22.13,
+      "seconds": 59.1
+    },
+    {
+      "bot": "human-touch",
+      "seed": 181,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 22.13,
+      "seconds": 58.56666666666667
+    },
+    {
       "bot": "adaptive",
       "seed": 182,
       "completed": true,
@@ -14384,6 +18428,28 @@
       "scene": "STRIP",
       "distance": 6.43,
       "seconds": 3.066666666666667
+    },
+    {
+      "bot": "human-keys",
+      "seed": 182,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 28.92,
+      "seconds": 60.88333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 182,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 28.92,
+      "seconds": 67.9
     },
     {
       "bot": "adaptive",
@@ -14463,6 +18529,28 @@
       "seconds": 16.983333333333334
     },
     {
+      "bot": "human-keys",
+      "seed": 183,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 33.53,
+      "seconds": 61.75
+    },
+    {
+      "bot": "human-touch",
+      "seed": 183,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 33.53,
+      "seconds": 68.86666666666666
+    },
+    {
       "bot": "adaptive",
       "seed": 184,
       "completed": true,
@@ -14538,6 +18626,28 @@
       "scene": "STRIP",
       "distance": 6.63,
       "seconds": 2.95
+    },
+    {
+      "bot": "human-keys",
+      "seed": 184,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 33.37,
+      "seconds": 61.916666666666664
+    },
+    {
+      "bot": "human-touch",
+      "seed": 184,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 33.37,
+      "seconds": 61.516666666666666
     },
     {
       "bot": "adaptive",
@@ -14617,6 +18727,28 @@
       "seconds": 20.366666666666667
     },
     {
+      "bot": "human-keys",
+      "seed": 185,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 43.21,
+      "seconds": 71.63333333333334
+    },
+    {
+      "bot": "human-touch",
+      "seed": 185,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 43.21,
+      "seconds": 71.63333333333334
+    },
+    {
       "bot": "adaptive",
       "seed": 186,
       "completed": true,
@@ -14692,6 +18824,28 @@
       "scene": "STRIP",
       "distance": 6.54,
       "seconds": 2.933333333333333
+    },
+    {
+      "bot": "human-keys",
+      "seed": 186,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 47.08,
+      "seconds": 72.36666666666666
+    },
+    {
+      "bot": "human-touch",
+      "seed": 186,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 47.08,
+      "seconds": 72.26666666666667
     },
     {
       "bot": "adaptive",
@@ -14771,6 +18925,28 @@
       "seconds": 12.666666666666666
     },
     {
+      "bot": "human-keys",
+      "seed": 187,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 35.09,
+      "seconds": 62.083333333333336
+    },
+    {
+      "bot": "human-touch",
+      "seed": 187,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 35.41,
+      "seconds": 69.3
+    },
+    {
       "bot": "adaptive",
       "seed": 188,
       "completed": true,
@@ -14846,6 +19022,28 @@
       "scene": "STRIP",
       "distance": 6.57,
       "seconds": 2.966666666666667
+    },
+    {
+      "bot": "human-keys",
+      "seed": 188,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 38.5,
+      "seconds": 69.91666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 188,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 38.5,
+      "seconds": 70.26666666666667
     },
     {
       "bot": "adaptive",
@@ -14925,6 +19123,28 @@
       "seconds": 13.633333333333333
     },
     {
+      "bot": "human-keys",
+      "seed": 189,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 19.83,
+      "seconds": 58.56666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 189,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 19.83,
+      "seconds": 57.8
+    },
+    {
       "bot": "adaptive",
       "seed": 190,
       "completed": true,
@@ -15000,6 +19220,28 @@
       "scene": "STRIP",
       "distance": 6.58,
       "seconds": 2.9166666666666665
+    },
+    {
+      "bot": "human-keys",
+      "seed": 190,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 46.17,
+      "seconds": 79.95
+    },
+    {
+      "bot": "human-touch",
+      "seed": 190,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 46.17,
+      "seconds": 79.18333333333334
     },
     {
       "bot": "adaptive",
@@ -15079,6 +19321,28 @@
       "seconds": 14.266666666666667
     },
     {
+      "bot": "human-keys",
+      "seed": 191,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 20.28,
+      "seconds": 58.8
+    },
+    {
+      "bot": "human-touch",
+      "seed": 191,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 20.28,
+      "seconds": 58.11666666666667
+    },
+    {
       "bot": "adaptive",
       "seed": 192,
       "completed": true,
@@ -15154,6 +19418,28 @@
       "scene": "STRIP",
       "distance": 16.5,
       "seconds": 10.316666666666666
+    },
+    {
+      "bot": "human-keys",
+      "seed": 192,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30.33,
+      "seconds": 62.083333333333336
+    },
+    {
+      "bot": "human-touch",
+      "seed": 192,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30.33,
+      "seconds": 61.45
     },
     {
       "bot": "adaptive",
@@ -15233,6 +19519,28 @@
       "seconds": 11.816666666666666
     },
     {
+      "bot": "human-keys",
+      "seed": 193,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 44.71,
+      "seconds": 72.36666666666666
+    },
+    {
+      "bot": "human-touch",
+      "seed": 193,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 44.71,
+      "seconds": 72.36666666666666
+    },
+    {
       "bot": "adaptive",
       "seed": 194,
       "completed": true,
@@ -15308,6 +19616,28 @@
       "scene": "STRIP",
       "distance": 32.12,
       "seconds": 16.933333333333334
+    },
+    {
+      "bot": "human-keys",
+      "seed": 194,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 39.31,
+      "seconds": 63.266666666666666
+    },
+    {
+      "bot": "human-touch",
+      "seed": 194,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 39.04,
+      "seconds": 63.21666666666667
     },
     {
       "bot": "adaptive",
@@ -15387,6 +19717,28 @@
       "seconds": 15.45
     },
     {
+      "bot": "human-keys",
+      "seed": 195,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 54.46,
+      "seconds": 81.26666666666667
+    },
+    {
+      "bot": "human-touch",
+      "seed": 195,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 54.46,
+      "seconds": 81.26666666666667
+    },
+    {
       "bot": "adaptive",
       "seed": 196,
       "completed": true,
@@ -15462,6 +19814,28 @@
       "scene": "STRIP",
       "distance": 38,
       "seconds": 21.616666666666667
+    },
+    {
+      "bot": "human-keys",
+      "seed": 196,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 32.08,
+      "seconds": 61.25
+    },
+    {
+      "bot": "human-touch",
+      "seed": 196,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 32.08,
+      "seconds": 61.53333333333333
     },
     {
       "bot": "adaptive",
@@ -15541,6 +19915,28 @@
       "seconds": 27
     },
     {
+      "bot": "human-keys",
+      "seed": 197,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30,
+      "seconds": 60.93333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 197,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 30,
+      "seconds": 60.93333333333333
+    },
+    {
       "bot": "adaptive",
       "seed": 198,
       "completed": true,
@@ -15616,6 +20012,28 @@
       "scene": "STRIP",
       "distance": 6.5,
       "seconds": 2.933333333333333
+    },
+    {
+      "bot": "human-keys",
+      "seed": 198,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 48.21,
+      "seconds": 63.93333333333333
+    },
+    {
+      "bot": "human-touch",
+      "seed": 198,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 48.21,
+      "seconds": 71.43333333333334
     },
     {
       "bot": "adaptive",
@@ -15695,6 +20113,28 @@
       "seconds": 7.9
     },
     {
+      "bot": "human-keys",
+      "seed": 199,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 37.07,
+      "seconds": 70.43333333333334
+    },
+    {
+      "bot": "human-touch",
+      "seed": 199,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 37.07,
+      "seconds": 70.03333333333333
+    },
+    {
       "bot": "adaptive",
       "seed": 200,
       "completed": true,
@@ -15770,6 +20210,28 @@
       "scene": "STRIP",
       "distance": 25.92,
       "seconds": 13.45
+    },
+    {
+      "bot": "human-keys",
+      "seed": 200,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 27.03,
+      "seconds": 59.8
+    },
+    {
+      "bot": "human-touch",
+      "seed": 200,
+      "completed": false,
+      "timedOut": false,
+      "failed": "out-of-film",
+      "killer": "film",
+      "scene": "STRIP",
+      "distance": 26.75,
+      "seconds": 59.666666666666664
     }
   ],
   "jitterWins": {
