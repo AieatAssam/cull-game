@@ -20,7 +20,7 @@ import { measureSilhouettes } from './render/silhouettes';
 import { PATH_RISE, SPRITE_SIZE, createSetDressing, createTableTextures, raisedPathGeometry } from './render/set-dressing';
 import { DPR_SCALES, nextDprTier } from './render/adaptive-dpr';
 import { LockOverlay, lockFan, updateLockFan, type LockMark } from './render/hostile-lock';
-import { createDustPuff, createShockMark, flinchPlay, restPlay, walkPlay } from './render/talent-fx';
+import { createDustPuff, createShockMark, fallPlay, flinchPlay2, idlePlay, springStep, walkPlay } from './render/talent-fx';
 import { AudioDirector, type AudioSettings } from './audio/director';
 import { dailySeed } from './meta/daily';
 import { loadFilmography, personalBest, recordResult } from './meta/filmography';
@@ -343,15 +343,31 @@ const talentSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: spriteAsse
 talentSprite.center.set(0.5, 0);
 talentSprite.scale.set(2.3, 3.5, 1);
 talentSprite.renderOrder = 4;
+// Ponytail layer behind the body, picked from pre-drawn swings by a spring so it lags and overshoots.
+const tailSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: spriteAssets.tails[4], transparent: true, alphaTest: 0.04, depthWrite: false }));
+tailSprite.center.set(0.5, 0);
+tailSprite.renderOrder = 3;
+talent.add(tailSprite);
 const shockMark = createShockMark();
 const dustPuff = createDustPuff();
 talent.add(talentSprite, shockMark, dustPuff);
 scene.add(talent);
-/** Render frames spent in the current pose kind, so a flinch pops once on entry and the dust settles. */
+/** Real-time pose clock and the springs behind her secondary motion. All render-only. */
 let talentPoseKind = '';
-let talentPoseAge = 0;
+let talentPoseStart = 0;
+let talentClock = 0;
 let renderedTalentTier = -1;
 let renderedTalentHeight = 3.5;
+let walkCycle = 0;
+let lastFoot: { x: number; z: number } | null = null;
+let smoothSpeed = 0;
+const tailSpring = { x: 0, v: 0 };
+const leanSpring = { x: 0, v: 0 };
+const hemSpring = { x: 0, v: 0 };
+/** Body pivot as a fraction of sprite height: about where her coat is belted. */
+const WAIST = 0.44;
+/** Metres per full stride (two steps): the walk phase advances with distance, so feet don't skate. */
+const STRIDE = 1.5;
 function syncTalentLod() {
   const tier = state.talent.lodTier ?? Math.min(lodTier(1000 / state.camera.zoom * detailFactor(state.talent.x, state.talent.z)), 3);
   if (tier !== renderedTalentTier) {
@@ -359,48 +375,80 @@ function syncTalentLod() {
     talent.visible = tier < 4;
     renderedTalentHeight = tier <= 1 ? 3.5 : tier === 2 ? 2.8 : 2;
   }
-  const map = talentPose();
-  if (talentSprite.material.map !== map) talentSprite.material.map = map;
+  const now = performance.now() / 1000;
+  const dt = talentClock ? Math.min(0.1, Math.max(0, now - talentClock)) : 1 / 60;
+  talentClock = now;
+  const moved = lastFoot ? Math.hypot(state.talent.x - lastFoot.x, state.talent.z - lastFoot.z) : 0;
+  lastFoot = { x: state.talent.x, z: state.talent.z };
+  const step = moved > 2 ? 0 : moved;
+  const kind = talentPose();
+  if (kind === 'walk') walkCycle = (walkCycle + step / STRIDE) % 1;
+  smoothSpeed += ((dt > 0 ? step / dt : 0) - smoothSpeed) * Math.min(1, dt * 10);
+  if (kind !== talentPoseKind) { talentPoseKind = kind; talentPoseStart = now; }
+  const age = now - talentPoseStart;
   const height = renderedTalentHeight;
   const facing = talentFacing();
-  const walkFrame = spriteAssets.walk.indexOf(map);
-  const kind = map === spriteAssets.fall ? 'fall' : map === spriteAssets.flinch ? 'flinch' : walkFrame >= 0 ? 'walk' : 'idle';
-  if (kind !== talentPoseKind) { talentPoseKind = kind; talentPoseAge = 0; } else talentPoseAge++;
-  // The debug pose stills show the flinch at the top of its hop and the dust fully out.
-  const age = poseDemo ? (kind === 'flinch' ? 4 : 12) : talentPoseAge;
-  // Squash, stretch, bob and recoil are applied here, on the sprite transform, so the drawn frames stay as authored.
-  const play = kind === 'walk' ? walkPlay(state.tick / 8, height) : kind === 'flinch' ? flinchPlay(age, height, facing) : restPlay();
-  // The fall pose is drawn square; every other pose uses the usual 0.66 sprite. Flip to face her next path point on screen.
+  const map = kind === 'walk' ? spriteAssets.walkCycle[Math.floor(walkCycle * spriteAssets.walkCycle.length) % spriteAssets.walkCycle.length]!
+    : kind === 'idle' ? spriteAssets.standBody : spriteAssets[kind];
+  if (talentSprite.material.map !== map) talentSprite.material.map = map;
+  // Squash, stretch, bob, recoil and topple are eased transforms on the rig, so the drawn parts stay as authored.
+  const play = kind === 'walk' ? walkPlay(walkCycle * 4, height) : kind === 'flinch' ? flinchPlay2(age, height, facing)
+    : kind === 'fall' ? fallPlay(age, height, facing) : idlePlay(now, height);
+  // Follow-through: she leans into her pace and rocks back past upright when she stops.
+  const pace = Math.min(1, smoothSpeed / 3);
+  const lean = springStep(leanSpring, kind === 'walk' ? 0.05 * pace : 0, dt, 60, 6);
+  // The ponytail is thrown back by speed and swings with the stride a beat behind her steps.
+  const tailTarget = kind === 'walk' ? 0.35 * pace + 0.55 * Math.sin(walkCycle * Math.PI * 4 - 1.1) : 0;
+  const sway = springStep(tailSpring, tailTarget, dt, 90, 5);
+  // Coat hem: the body swings a hair about the waist, trailing her pace and the stride, and swinging past on stops.
+  const upright = kind === 'walk' || kind === 'idle';
+  const hemTarget = kind === 'walk' ? 0.03 * pace + 0.008 * Math.sin(walkCycle * Math.PI * 4 - 0.6) : 0;
+  const hem = springStep(hemSpring, hemTarget, dt, 70, 4);
   const width = height * (kind === 'fall' ? 1 : TALENT_ASPECT);
   talentSprite.scale.set(width * facing * play.sx, height * play.sy, 1);
-  talentSprite.position.y = play.lift;
-  talentSprite.material.rotation = play.lean;
+  // Lean still pivots at her feet; the sprite is centred on the waist so the hem swing pivots there.
+  const bodyLean = play.lean - facing * lean;
+  const waist = WAIST * height * play.sy;
+  talentSprite.center.set(0.5, WAIST);
+  talentSprite.position.set(-Math.sin(bodyLean) * waist, play.lift + Math.cos(bodyLean) * waist, 0).applyQuaternion(camera.quaternion);
+  talentSprite.material.rotation = bodyLean - (upright ? facing * hem : 0);
+  tailSprite.visible = kind === 'walk' || kind === 'idle';
+  if (tailSprite.visible) {
+    const tails = spriteAssets.tails;
+    const index = Math.round((Math.max(-1.4, Math.min(1.4, sway)) + 1.4) / 2.8 * (tails.length - 1));
+    if (tailSprite.material.map !== tails[index]) tailSprite.material.map = tails[index]!;
+    tailSprite.scale.copy(talentSprite.scale);
+    tailSprite.center.copy(talentSprite.center);
+    tailSprite.position.copy(talentSprite.position);
+    tailSprite.material.rotation = talentSprite.material.rotation;
+  }
   shockMark.visible = kind === 'flinch';
   if (shockMark.visible) {
-    const jitter = age % 6 < 3 ? 1 : 0.92;
-    shockMark.scale.set(height * 0.5 * jitter, height * 0.5 * jitter, 1);
+    const jitter = Math.sin(age * 26) > 0 ? 1 : 0.92;
+    const pop = Math.min(1, age / 0.18);
+    shockMark.scale.set(height * 0.5 * jitter * pop, height * 0.5 * jitter * pop, 1);
     // Follow her head through the lean, then float clear above it and a touch behind, away from what she's recoiling from.
     const headX = -Math.sin(play.lean) * height * 0.9;
     // Sprites stand in the camera plane, so the offset is built in view space too.
     shockMark.position.set(headX - facing * height * 0.1, play.lift + Math.cos(play.lean) * height * 0.88, 0).applyQuaternion(camera.quaternion);
   }
-  dustPuff.visible = kind === 'fall';
+  dustPuff.visible = kind === 'fall' && age > 0.38;
   if (dustPuff.visible) {
-    const spread = 0.75 + 0.25 * Math.min(age / 12, 1);
+    const spread = 0.6 + 0.4 * Math.min((age - 0.38) / 0.35, 1);
     dustPuff.scale.set(width * 1.75 * spread, width * 0.42 * spread, 1);
   }
 }
 
 /** Read-only pose pick: fall on a failed take, flinch when a hazard is within the close-call radius, idle while waiting. */
-function talentPose(): THREE.Texture {
-  if (poseDemo) return spriteAssets[poseDemo];
-  if (state.failed === 'hit' || state.failed === 'fell') return spriteAssets.fall;
+function talentPose(): 'walk' | 'idle' | 'flinch' | 'fall' {
+  if (poseDemo) return poseDemo;
+  if (state.failed === 'hit' || state.failed === 'fell') return 'fall';
   const danger = state.entities.some((entity) => entity.spawned && !entity.cut
     && entity.kind !== 'reel' && entity.kind !== 'monitor' && entity.kind !== 'continuity'
     && Math.hypot(entity.x - state.talent.x, entity.z - state.talent.z) <= TUNING.closeCallRadius);
-  if (danger && !state.failed) return spriteAssets.flinch;
-  if (state.waiting || state.failed) return spriteAssets.idle[Math.floor(state.tick / 40) % 2]!;
-  return spriteAssets.walk[Math.floor(state.tick / 8) % spriteAssets.walk.length]!;
+  if (danger && !state.failed) return 'flinch';
+  if (state.waiting || state.failed) return 'idle';
+  return 'walk';
 }
 
 const facingFrom = new THREE.Vector3();
@@ -545,6 +593,58 @@ function advanceTally(now: number) {
   tallyOn = lockDemo !== null && demoMonitor ? true : tallyPhase < 0.5;
   if (tallyOn && !wasOn && lockDemo === null) audio.playLockBeep(progress);
 }
+/** Stable per-entity phase so idle breathing never beats in unison. */
+function entityPhase(id: string) {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
+  return (h >>> 0) % 1000 / 1000 * Math.PI * 2;
+}
+/** 0..1 over the last ~250 ms before a hazard's current heading brings it into contact with her. */
+function anticipation(entity: CastEntity, reach: number) {
+  const dx = state.talent.x - entity.x, dz = state.talent.z - entity.z;
+  const distance = Math.hypot(dx, dz);
+  const closing = distance > 1e-6 ? (dx * entity.vx + dz * entity.vz) / distance : 0;
+  if (closing <= 0.05 || state.failed) return 0;
+  const contact = Math.max(0, distance - reach) / closing;
+  return contact < 0.25 ? 1 - contact / 0.25 : 0;
+}
+function urchinPose(entity: CastEntity) {
+  const now = performance.now() / 1000;
+  const breath = Math.sin(now * 2.4 + entityPhase(entity.id)) * 0.03;
+  const ready = anticipation(entity, TUNING.urchinRadius + 0.35);
+  const wind = Math.sin(Math.PI * Math.min(1, ready * 1.15));
+  return {
+    sx: 1 + breath + 0.16 * wind,
+    sy: 1 - breath - 0.2 * wind,
+    spin: Math.sin(now * 55) * 0.09 * ready,
+    lift: -SPRITE_SIZE.urchin * 0.08 * wind,
+  };
+}
+/** Render-only acting on non-urchin cast: breathing, hop squash for rollers, lean and shudder as a lock fills. */
+function actEntity(entity: CastEntity, object: THREE.Object3D) {
+  const now = performance.now() / 1000;
+  const phase = entityPhase(entity.id);
+  const breath = 1 + 0.03 * Math.sin(now * 2.2 + phase);
+  if (entity.kind === 'glass' || entity.kind === 'bridge') return;
+  if (entity.kind === 'boulder' || entity.kind === 'stagehand') {
+    // A small hop per metre travelled; it squashes on each landing and stretches at the top.
+    const hop = Math.abs(Math.sin((entity.x + entity.z) * (entity.kind === 'boulder' ? 1.4 : 2.2) + phase));
+    const landing = (1 - hop) ** 6;
+    const moving = Math.min(1, Math.hypot(entity.vx, entity.vz));
+    object.position.y += (entity.kind === 'boulder' ? 0.22 : 0.12) * hop * moving;
+    const ready = anticipation(entity, (entity.kind === 'boulder' ? TUNING.boulderRadius : 0.5) + 0.35);
+    object.scale.set(object.scale.x * (breath + 0.12 * landing * moving + 0.08 * ready), object.scale.y * (2 - breath - 0.16 * landing * moving - 0.1 * ready), object.scale.z);
+    return;
+  }
+  if (entity.kind === 'red-monitor') {
+    const progress = lockProgress(entity);
+    const eased = progress * progress * (3 - 2 * progress);
+    object.rotation.x = 0.16 * eased;
+    object.position.x += Math.sin(now * 61 + phase) * 0.05 * progress * progress;
+    object.position.z += Math.sin(now * 47 + phase * 2) * 0.04 * progress * progress;
+  }
+  object.scale.multiplyScalar(breath);
+}
 function syncEntities(showTransientRings = true) {
   const marks: LockMark[] = [];
   for (const entity of renderEntities()) {
@@ -556,6 +656,7 @@ function syncEntities(showTransientRings = true) {
     const spriteEntity = entity.kind === 'boulder' || entity.kind === 'stagehand' || entity.kind === 'reel' || entity.kind === 'extras' || entity.kind === 'continuity';
     object.position.set(point.x, entity.kind === 'swarm' ? 0.55 : PATH_RISE, point.z);
     object.rotation.y = spriteEntity ? 0 : entity.age * 0.015;
+    object.scale.set(1, 1, 1);
     if (entity.kind === 'rumour') object.scale.setScalar(Math.max(0.1, entity.radius ?? 0.5));
     if (entity.kind === 'monitor' || entity.kind === 'red-monitor') {
       object.rotation.y = -(entity.heading ?? 0) + Math.PI / 2;
@@ -622,6 +723,7 @@ function syncEntities(showTransientRings = true) {
       const tier = entity.lodTier ?? lodTier(1000 / state.camera.zoom * detailFactor(entity.x, entity.z));
       planks.visible = tier <= 1;
     }
+    actEntity(entity, object);
     object.visible = true;
   }
   lockOverlay.update(marks);
@@ -629,7 +731,7 @@ function syncEntities(showTransientRings = true) {
     const found = renderEntities().find((entity) => entity.id === id);
     if (!found || found.cut || !found.spawned) object.visible = false;
   }
-  urchinBuckets.update(state.entities, state.camera.zoom, state.tick, showTransientRings && !window.matchMedia('(prefers-reduced-motion: reduce)').matches, detailFactor, displayPoint, camera.quaternion);
+  urchinBuckets.update(state.entities, state.camera.zoom, state.tick, showTransientRings && !window.matchMedia('(prefers-reduced-motion: reduce)').matches, detailFactor, displayPoint, camera.quaternion, urchinPose);
   let shade = 0;
   const putShade = (x: number, z: number, width: number, depth: number) => {
     if (shade >= 512) return;
@@ -835,12 +937,47 @@ async function renderReplayContactFrames(): Promise<ScoredFrame[]> {
     renderViewfinder();
   }
 }
-function render() {
+/** `draw = false` lets the real-time loop draw once per display frame, interpolated, instead of once per tick. */
+function render(draw = true) {
   audio.update(state);
   advanceTally(performance.now());
-  renderViewfinder();
-  captureContactFrame();
+  if (draw) { renderViewfinder(); captureContactFrame(); } else captureDue = true;
   updateHud();
+}
+let captureDue = false;
+/** Positions before the latest tick, so a display frame can draw between ticks (render alpha). Render-only. */
+const lerpFrom = new Map<string, { x: number; z: number }>();
+const lerpTalent = { x: 0, z: 0 };
+const lerpCamera = { x: 0, z: 0, zoom: 1 };
+function snapshotForLerp() {
+  for (const entity of state.entities) {
+    const from = lerpFrom.get(entity.id);
+    if (from) { from.x = entity.x; from.z = entity.z; } else lerpFrom.set(entity.id, { x: entity.x, z: entity.z });
+  }
+  lerpTalent.x = state.talent.x; lerpTalent.z = state.talent.z;
+  lerpCamera.x = state.camera.x; lerpCamera.z = state.camera.z; lerpCamera.zoom = state.camera.zoom;
+}
+/** Draws the viewfinder `alpha` of the way from the previous tick to this one, then puts the sim state back untouched. */
+function drawInterpolated(alpha: number) {
+  const mix = (a: number, b: number) => (Math.abs(b - a) > 3 ? b : a + (b - a) * alpha);
+  const saved = state.entities.map((entity) => [entity.x, entity.z] as const);
+  const talentAt = [state.talent.x, state.talent.z] as const;
+  const cameraAt = [state.camera.x, state.camera.z, state.camera.zoom] as const;
+  for (const entity of state.entities) {
+    const from = lerpFrom.get(entity.id);
+    if (from) { entity.x = mix(from.x, entity.x); entity.z = mix(from.z, entity.z); }
+  }
+  state.talent.x = mix(lerpTalent.x, state.talent.x); state.talent.z = mix(lerpTalent.z, state.talent.z);
+  state.camera.x = mix(lerpCamera.x, state.camera.x); state.camera.z = mix(lerpCamera.z, state.camera.z);
+  state.camera.zoom = lerpCamera.zoom + (state.camera.zoom - lerpCamera.zoom) * alpha;
+  try {
+    renderViewfinder();
+    if (captureDue) { captureDue = false; captureContactFrame(); }
+  } finally {
+    state.entities.forEach((entity, index) => { const at = saved[index]; if (at) { entity.x = at[0]; entity.z = at[1]; } });
+    state.talent.x = talentAt[0]; state.talent.z = talentAt[1];
+    state.camera.x = cameraAt[0]; state.camera.z = cameraAt[1]; state.camera.zoom = cameraAt[2];
+  }
 }
 const CAST_NAMES: Record<string, string> = {
   urchin: 'spiny ball', boulder: 'rolling rock', glass: 'glass floor', reel: 'film reel', extras: 'crowd',
@@ -1009,8 +1146,9 @@ function showCut(entity: { x: number; z: number }, label: 'CUT' | 'TOO FAR') {
   if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) hitStopUntil = performance.now() + 70;
 }
 function stepFrame() {
+  snapshotForLerp();
   advanceTick();
-  render();
+  render(false);
 }
 function loop(now: number) {
   if (!previousTime) previousTime = now;
@@ -1041,6 +1179,9 @@ function loop(now: number) {
     }
     simAccumulator -= tickInterval; ticks++;
   }
+  // Super 8 keeps its deliberate stutter; every other lens draws at display rate between ticks.
+  if (ticksPerRender === 1) drawInterpolated(Math.min(1, simAccumulator / tickInterval));
+  else if (captureDue) { captureDue = false; renderViewfinder(); captureContactFrame(); }
   requestAnimationFrame(loop);
 }
 let holdButton = false;
