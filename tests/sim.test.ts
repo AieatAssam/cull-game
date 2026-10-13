@@ -246,11 +246,27 @@ describe('fixed step simulation and failure rules', () => {
     for (let i = 0; i < 60; i++) state = step(state, { ...NEUTRAL_INPUT, zoom: 127 });
     expect(state.camera.zoom).toBeCloseTo(30 / 1.6, 5);
   });
-  it('fails after 60 fully off-screen ticks', () => {
+  it('fails after offscreenFailSeconds fully off-screen, burning extra film past the grace', () => {
     let state = createState(1, []); state.camera.x = 100;
-    for (let i = 0; i < 59; i++) state = step(state);
+    const failTicks = TUNING.offscreenFailSeconds * TUNING.tickRate;
+    const graceTicks = TUNING.offscreenGrace * TUNING.tickRate;
+    const film0 = state.film;
+    for (let i = 0; i < graceTicks; i++) state = step(state);
+    expect(state.film).toBeCloseTo(film0 - TUNING.offscreenGrace, 5);
+    for (let i = graceTicks; i < failTicks - 1; i++) state = step(state);
     expect(state.failed).toBeNull();
+    const lostSeconds = (failTicks - 1 - graceTicks) / TUNING.tickRate;
+    expect(state.film).toBeCloseTo(film0 - (failTicks - 1) / TUNING.tickRate - lostSeconds * TUNING.offscreenFilmDrainPerSecond, 3);
     expect(step(state).failed).toBe('lost-talent');
+  });
+  it('reframing the Talent resets the lost counter', () => {
+    let state = createState(1, []); const homeX = state.camera.x; state.camera.x = 100;
+    for (let i = 0; i < 120; i++) state = step(state);
+    expect(state.talent.offscreenTicks).toBe(120);
+    state.camera.x = homeX;
+    state = step(state);
+    expect(state.talent.offscreenTicks).toBe(0);
+    expect(state.failed).toBeNull();
   });
   it('fails on a lethal close urchin', () => {
     const state = createState(1, []); state.camera.zoom = 10; entity(state, 'urchin', 0.1);

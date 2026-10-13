@@ -290,9 +290,9 @@ function line(ctx: Ctx, pts: number[], color: string, width: number) {
 }
 
 /** A sewn fold: dark crease with a lit ridge beside it. */
-function fold(ctx: Ctx, pts: number[], base: string) {
-  line(ctx, pts, rgba(tint(base, -0.5), 0.8), 1.2);
-  line(ctx, pts.map((v, i) => (i % 2 === 0 ? v - 1 : v)), rgba(tint(base, 0.4), 0.6), 0.6);
+function fold(ctx: Ctx, pts: number[], base: string, alpha = 1) {
+  line(ctx, pts, rgba(tint(base, -0.5), 0.8 * alpha), 1.2);
+  line(ctx, pts.map((v, i) => (i % 2 === 0 ? v - 1 : v)), rgba(tint(base, 0.4), 0.6 * alpha), 0.6);
 }
 
 /** Wood grain along the long axis of a box. */
@@ -380,14 +380,16 @@ function googlyEye(ctx: Ctx, x: number, y: number, rad: number, px: number, py: 
 }
 
 // ---------------------------------------------------------------------------
-// Talent: a felt stop-motion puppet in a carmine wool coat, three-quarter view facing right.
+// Talent: a felt stop-motion puppet in a fitted carmine coat-dress, three-quarter view facing right.
 
 const COAT = PALETTE.carmine;
 const COAT_D = tint(PALETTE.carmine, -0.35);
 const SKIN = tint(PALETTE.clay, 0.42);
-const TROUSER = tint(PALETTE.violet, -0.5);
+const TIGHTS = tint(PALETTE.violet, -0.5);
 const BOOT = tint(PALETTE.earth, -0.5);
-const HAT = tint(PALETTE.earth, -0.3);
+const HAIR = tint(PALETTE.earth, -0.62);
+const HAIR_LIT = tint(PALETTE.earth, 0.1);
+const LIP = tint(PALETTE.carmine, 0.08);
 
 interface Pose {
   bob: number;
@@ -400,7 +402,8 @@ interface Pose {
   eyes: 'open' | 'wide' | 'x';
   mouth: 'smile' | 'o' | 'wobble';
   brows: number;
-  scarf: number;
+  /** Ponytail swing: positive throws it back and up, negative lets it swing in behind her. */
+  sway: number;
   fallen?: boolean;
 }
 
@@ -408,30 +411,33 @@ function drawLeg(ctx: Ctx, r: Rand, hx: number, hy: number, angle: number, lift:
   ctx.save();
   ctx.translate(hx, hy);
   ctx.rotate(angle);
-  const len = 22 * (1 - lift);
-  const trouser = new Path2D();
-  trouser.moveTo(-5.6, -2);
-  trouser.lineTo(5.4, -2);
-  trouser.lineTo(4.8, len);
-  trouser.lineTo(-4.9, len);
-  trouser.closePath();
-  part(ctx, trouser, back ? tint(TROUSER, -0.25) : TROUSER, [-6, -2, 12, len + 2], r, { fibre: 0.6 });
-  if (!back) stitch(ctx, (() => { const p = new Path2D(); p.moveTo(2.6, 0); p.lineTo(2.3, len - 1); return p; })(), rgba(PALETTE.paper, 0.35), 0.5);
+  const len = 23 * (1 - lift);
+  const leg = new Path2D();
+  leg.moveTo(-3.6, -2);
+  leg.lineTo(3.4, -2);
+  leg.quadraticCurveTo(3.4, len * 0.5, 2.4, len);
+  leg.lineTo(-2.6, len);
+  leg.quadraticCurveTo(-4, len * 0.45, -3.6, -2);
+  leg.closePath();
+  part(ctx, leg, back ? tint(TIGHTS, -0.25) : TIGHTS, [-4, -2, 8, len + 2], r, { fibre: 0.3, light: 0.5, line: 0.9 });
+  // Heeled ankle boot: slim shaft, pointed toe, block heel under the back.
   const by = len;
   const boot = new Path2D();
-  boot.moveTo(-5.8, by - 1.5);
-  boot.lineTo(5.2, by - 1.5);
-  boot.quadraticCurveTo(6.5, by + 1.6, 10.5, by + 2.6);
-  boot.quadraticCurveTo(14, by + 3.6, 13.4, by + 7.8);
-  boot.lineTo(-6.4, by + 7.8);
-  boot.quadraticCurveTo(-7.4, by + 3, -5.8, by - 1.5);
+  boot.moveTo(-3.4, by - 5.5);
+  boot.lineTo(3.2, by - 5.5);
+  boot.lineTo(3.3, by + 1.2);
+  boot.quadraticCurveTo(7.5, by + 3, 10.5, by + 6.6);
+  boot.lineTo(10.2, by + 7.6);
+  boot.lineTo(1.8, by + 7.6);
+  boot.quadraticCurveTo(0, by + 5.4, -1.4, by + 5.6);
+  boot.lineTo(-1.6, by + 8.4);
+  boot.lineTo(-4.4, by + 8.4);
+  boot.lineTo(-4, by + 3);
   boot.closePath();
-  part(ctx, boot, back ? tint(BOOT, -0.25) : BOOT, [-7, by - 2, 21, 10], r, { fibre: 0.15, hx: 0.45, hy: 0.1 });
-  ctx.fillStyle = tint(PALETTE.earth, 0.25);
-  ctx.fillRect(-6.3, by + 6.2, 19.4, 1.7);
-  line(ctx, [-6.3, by + 7.9, 13.2, by + 7.9], PALETTE.ink, 0.9);
-  line(ctx, [1.5, by + 0.6, 4.5, by + 0.2], rgba(PALETTE.paper, 0.75), 0.6);
-  line(ctx, [2.4, by + 2.2, 5.6, by + 1.6], rgba(PALETTE.paper, 0.75), 0.6);
+  part(ctx, boot, back ? tint(BOOT, -0.25) : BOOT, [-5, by - 6, 16, 15], r, { fibre: 0.15, line: 1.2, hx: 0.45, hy: 0.1 });
+  line(ctx, [-3.3, by - 3.8, 3.2, by - 3.8], rgba(PALETTE.paper, 0.45), 0.5);
+  line(ctx, [-4.3, by + 7.4, -1.7, by + 7.4], tint(PALETTE.earth, 0.25), 1);
+  line(ctx, [4.4, by + 2.4, 7, by + 4.2], rgba(PALETTE.paper, 0.6), 0.6);
   ctx.restore();
 }
 
@@ -440,21 +446,38 @@ function drawArm(ctx: Ctx, r: Rand, sx: number, sy: number, angle: number, back:
   ctx.translate(sx, sy);
   ctx.rotate(angle);
   const sleeve = new Path2D();
-  sleeve.moveTo(-5, -3);
-  sleeve.quadraticCurveTo(0, -6.5, 5, -3);
-  sleeve.lineTo(4.4, 19);
-  sleeve.lineTo(-4.4, 19);
+  sleeve.moveTo(-4.2, -2.5);
+  sleeve.quadraticCurveTo(0, -6.5, 4.2, -2.5);
+  sleeve.quadraticCurveTo(3.8, 8, 3.2, 18.5);
+  sleeve.lineTo(-3.2, 18.5);
+  sleeve.quadraticCurveTo(-3.9, 8, -4.2, -2.5);
   sleeve.closePath();
-  part(ctx, sleeve, back ? COAT_D : COAT, [-5, -6.5, 10, 26], r, { fibre: 0.1, light: 0 });
-  fold(ctx, [-3.2, 9, 0, 11.5, 3.2, 8.4], back ? COAT_D : COAT);
-  const cuff = rr(-4.8, 16.5, 9.6, 4.2, 1.2);
-  part(ctx, cuff, tint(COAT, -0.22), [-5, 16, 10, 5], r, { fibre: 0.3, line: 1 });
-  stitch(ctx, (() => { const p = new Path2D(); p.moveTo(-4, 18.6); p.lineTo(4, 18.6); return p; })(), rgba(PALETTE.paper, 0.6), 0.5);
+  part(ctx, sleeve, COAT, [-4.5, -6.5, 9, 25], r, { fibre: 0, light: 0, line: back ? 1.1 : 0.9 });
+  fold(ctx, [-2.4, 9, 0, 11, 2.4, 8.6], COAT, 0.5);
+  const cuff = rr(-3.6, 16, 7.2, 3.6, 1.1);
+  part(ctx, cuff, tint(COAT, -0.22), [-4, 16, 8, 4], r, { fibre: 0.3, line: 0.9 });
   const hand = new Path2D();
-  hand.ellipse(0, 24.4, 4.2, 4.7, 0, 0, Math.PI * 2);
-  hand.moveTo(5.4, 22.5);
-  hand.ellipse(3.6, 22.5, 1.8, 2.2, -0.5, 0, Math.PI * 2);
-  part(ctx, hand, back ? tint(SKIN, -0.15) : SKIN, [-4.5, 19.5, 10, 10], r, { fibre: 0.2, line: 1.1 });
+  hand.ellipse(0, 22.4, 3.2, 3.7, 0, 0, Math.PI * 2);
+  hand.moveTo(4.2, 21);
+  hand.ellipse(2.8, 21, 1.4, 1.8, -0.5, 0, Math.PI * 2);
+  part(ctx, hand, back ? tint(SKIN, -0.15) : SKIN, [-3.5, 18.5, 8, 8], r, { fibre: 0.2, line: 1 });
+  ctx.restore();
+}
+
+/** High ponytail from the crown, long enough to fall past her shoulders; `s` swings the tip. */
+function ponytail(ctx: Ctx, r: Rand, hy: number, s: number) {
+  const tx = -24 - 5 * s;
+  const ty = hy + 34 - 7 * s;
+  const tail = new Path2D();
+  tail.moveTo(-4, hy - 17);
+  tail.bezierCurveTo(-24 - 2 * s, hy - 20 - 3 * s, -28 - 4 * s, hy + 8 - 4 * s, tx - 2, ty - 2);
+  tail.quadraticCurveTo(tx + 1, ty + 4, tx + 4.5, ty + 1);
+  tail.bezierCurveTo(-17 - 3 * s, hy + 18 - 4 * s, -15 - s, hy - 2, -9, hy - 7);
+  tail.closePath();
+  part(ctx, tail, HAIR, [-32, hy - 21, 30, 58], r, { fibre: 0.12, line: 1, light: 0.2, hx: 0.6, hy: 0.15 });
+  ctx.save();
+  ctx.clip(tail);
+  line(ctx, [-9, hy - 15, -24 - 3 * s + 2, hy + 4 - 4 * s, tx + 2, ty - 4], rgba(tint(HAIR, -0.35), 0.7), 0.8);
   ctx.restore();
 }
 
@@ -471,231 +494,206 @@ function talentPuppet(p: Pose) {
     ctx.rotate(p.lean);
     ctx.scale(1 + (1 - p.sy) * 0.9, p.sy);
     const b = p.bob;
-    const f = p.scarf;
     const hy = -93 + b;
 
-    // Short fringed scarf end fluttering off the back of the neck.
-    const tail = new Path2D();
-    tail.moveTo(-8, -80 + b);
-    tail.quadraticCurveTo(-14 - 2 * f, -83 + b - 2 * f, -20 - 3 * f, -80 + b - 3 * f);
-    tail.lineTo(-19 - 3 * f, -74.5 + b - 2 * f);
-    tail.quadraticCurveTo(-13 - f, -76 + b, -8, -73 + b);
-    tail.closePath();
-    part(ctx, tail, tint(PALETTE.brass, -0.18), [-24, -84 + b - 3 * f, 18, 12], r, { fibre: 0.4, line: 1.1 });
-    ctx.save();
-    ctx.clip(tail);
-    line(ctx, [-15 - f, -83 + b, -14.5 - f, -74 + b], COAT, 1.5);
-    ctx.restore();
-    for (let i = 0; i < 4; i++) {
-      const fx = -20 - 3 * f + i * 0.3;
-      const fy = -79.5 + b - 3 * f + i * 1.5;
-      line(ctx, [fx, fy, fx - 3.2 - f * (i % 2 ? 1 : 1.8), fy + (i % 2 ? 0.8 : -0.6) * (0.5 + f)], tint(PALETTE.brass, -0.3), 0.9);
-    }
+    ponytail(ctx, r, hy, p.sway);
+    drawArm(ctx, r, -9, -68 + b, p.arms[0], true);
+    drawLeg(ctx, r, -3.5, -30 + b, p.legs[0], p.lift[0], true);
+    drawLeg(ctx, r, 3.5, -30 + b, p.legs[1], p.lift[1], false);
 
-    drawArm(ctx, r, -11, -67 + b, p.arms[0], true);
-    drawLeg(ctx, r, -4.5, -30 + b, p.legs[0], p.lift[0], true);
-    drawLeg(ctx, r, 4, -30 + b, p.legs[1], p.lift[1], false);
+    // Neck.
+    part(ctx, rr(-3, -83 + b, 8, 10, 2.5), tint(SKIN, -0.1), [-3, -83 + b, 8, 10], r, { fibre: 0, line: 1 });
 
-    // Coat.
+    // Coat-dress: fitted bodice, cinched waist, flared skirt.
     const coat = new Path2D();
-    coat.moveTo(-13, -76 + b);
-    coat.quadraticCurveTo(-19, -75 + b, -20, -64 + b);
-    coat.lineTo(-27, -18 + b);
-    coat.quadraticCurveTo(-13, -13 + b, -2, -16 + b);
-    coat.quadraticCurveTo(10, -13 + b, 27, -18.5 + b);
-    coat.lineTo(20, -64 + b);
-    coat.quadraticCurveTo(19, -75 + b, 13, -76 + b);
+    coat.moveTo(-9, -77 + b);
+    coat.quadraticCurveTo(-14, -77 + b, -14, -70 + b);
+    coat.quadraticCurveTo(-11.5, -60 + b, -9.5, -52 + b);
+    coat.quadraticCurveTo(-20, -38 + b, -28, -22 + b);
+    coat.quadraticCurveTo(-20, -18 + b, -13, -21 + b);
+    coat.quadraticCurveTo(-7, -17.5 + b, 0, -20.5 + b);
+    coat.quadraticCurveTo(7, -17 + b, 13.5, -20.5 + b);
+    coat.quadraticCurveTo(21, -17.5 + b, 28.5, -22.5 + b);
+    coat.quadraticCurveTo(20, -38 + b, 10.5, -52 + b);
+    coat.bezierCurveTo(14.5, -57 + b, 17, -65 + b, 14, -71 + b);
+    coat.quadraticCurveTo(13, -77 + b, 9, -77 + b);
     coat.closePath();
-    part(ctx, coat, COAT, [-27, -77 + b, 54, 64], r, { fibre: 0.1, light: 0 });
+    part(ctx, coat, COAT, [-26, -78 + b, 53, 61], r, { fibre: 0, light: 0, line: 0.9 });
     ctx.save();
     ctx.clip(coat);
     const hem = new Path2D();
-    hem.moveTo(-24, -21 + b);
-    hem.quadraticCurveTo(-13, -16 + b, -2, -19 + b);
-    hem.quadraticCurveTo(10, -16 + b, 24, -21.5 + b);
+    hem.moveTo(-26, -24 + b);
+    hem.quadraticCurveTo(-20, -21 + b, -13, -24 + b);
+    hem.quadraticCurveTo(-7, -20.5 + b, 0, -23.5 + b);
+    hem.quadraticCurveTo(7, -20 + b, 13.5, -23.5 + b);
+    hem.quadraticCurveTo(21, -20.5 + b, 27, -25 + b);
     stitch(ctx, hem, tint(COAT, 0.55));
-    const side = new Path2D();
-    side.moveTo(-16.5, -66 + b);
-    side.lineTo(-21.5, -22 + b);
-    stitch(ctx, side, tint(COAT, 0.5));
-    fold(ctx, [-16, -17 + b, -14.5, -26 + b, -13.5, -35 + b], COAT);
-    fold(ctx, [-6, -15.5 + b, -6, -24 + b, -4.5, -32 + b], COAT);
-    fold(ctx, [18, -17.5 + b, 16, -25 + b, 15, -33 + b], COAT);
-    fold(ctx, [-14, -60 + b, -10, -57 + b, -7, -61 + b], COAT);
-    // Placket and overlap.
-    line(ctx, [5, -73 + b, 7, -45 + b, 8.4, -15 + b], PALETTE.ink, 1.1);
-    line(ctx, [6.1, -73 + b, 8.1, -45 + b, 9.5, -15 + b], tint(COAT, 0.35), 0.6);
-    const placket = new Path2D();
-    placket.moveTo(3.4, -70 + b);
-    placket.quadraticCurveTo(5.2, -45 + b, 6.6, -18 + b);
-    stitch(ctx, placket, tint(COAT, 0.55));
-    // Self belt, cut from the coat cloth.
-    const belt = rr(-26, -49 + b, 52, 5.4, 1);
-    part(ctx, belt, COAT, [-26, -49 + b, 52, 6], r, { fibre: 0.1, line: 1, light: 0 });
+    // Godet folds fan out from the waist to each scallop of the hem.
+    fold(ctx, [-6, -48 + b, -10, -34 + b, -13, -21 + b], COAT, 0.5);
+    fold(ctx, [1, -48 + b, 0.5, -34 + b, 0, -20 + b], COAT, 0.5);
+    fold(ctx, [7, -48 + b, 10, -34 + b, 13.5, -20.5 + b], COAT, 0.5);
+    // Princess seam and bust dart.
+    const seam = new Path2D();
+    seam.moveTo(-5, -76 + b);
+    seam.quadraticCurveTo(-7, -64 + b, -5, -54 + b);
+    stitch(ctx, seam, tint(COAT, 0.5));
+    fold(ctx, [7, -66 + b, 10.5, -62 + b, 13, -64 + b], COAT, 0.5);
+    // Placket.
+    line(ctx, [5.5, -76 + b, 6.6, -64 + b, 7.4, -54 + b], tint(COAT, -0.4), 0.8);
+    // Narrow belt cinching the waist.
+    const belt = rr(-20, -55.5 + b, 40, 4.6, 1);
+    part(ctx, belt, COAT, [-20, -56 + b, 40, 5], r, { fibre: 0, line: 0.7, light: 0 });
     const beltStitch = new Path2D();
-    beltStitch.moveTo(-26, -47.6 + b); beltStitch.lineTo(26, -47.6 + b);
-    beltStitch.moveTo(-26, -45 + b); beltStitch.lineTo(26, -45 + b);
+    beltStitch.moveTo(-20, -53.2 + b); beltStitch.lineTo(20, -53.2 + b);
     stitch(ctx, beltStitch, tint(COAT, 0.35), 0.5);
-    // Pocket with flap.
-    const pocket = rr(-19, -40 + b, 11, 9, 1.5);
-    stitch(ctx, rr(-18, -39 + b, 9, 7, 1), tint(COAT, 0.55));
-    ctx.lineWidth = 0.8; ctx.strokeStyle = rgba(PALETTE.ink, 0.6); ctx.stroke(pocket);
-    part(ctx, rr(-19.5, -41.5 + b, 12, 3.6, 1), tint(COAT, -0.15), [-20, -42 + b, 12, 4], r, { fibre: 0.2, line: 0.9 });
     ctx.restore();
     // Buckle and buttons sit proud of the cloth.
-    const buckle = rr(4.6, -50 + b, 7, 7.4, 1.2);
-    part(ctx, buckle, PALETTE.brass, [4.6, -50 + b, 7, 7.4], r, { fibre: 0, line: 1 });
-    ctx.fillStyle = tint(COAT, -0.32);
-    ctx.fillRect(6.6, -48 + b, 3, 3.4);
-    for (const [bx, by] of [[10.6, -64], [11.2, -56], [11.8, -36]] as const) {
-      const btn = oval(bx, by + b, 2.1, 2.1);
-      part(ctx, btn, PALETTE.brass, [bx - 2, by + b - 2, 4, 4], r, { fibre: 0, line: 0.9 });
-      ctx.fillStyle = PALETTE.ink;
-      ctx.fillRect(bx - 0.9, by + b - 0.3, 0.6, 0.6);
-      ctx.fillRect(bx + 0.4, by + b - 0.3, 0.6, 0.6);
+    part(ctx, rr(3.6, -56.6 + b, 5.6, 6.4, 1.2), PALETTE.brass, [3.6, -56.6 + b, 6, 6.4], r, { fibre: 0, line: 0.9 });
+    ctx.fillStyle = COAT_D;
+    ctx.fillRect(5.3, -54.8 + b, 2.2, 2.8);
+    for (const [bx, by] of [[8.2, -70], [8.8, -63]] as const) {
+      part(ctx, oval(bx, by + b, 1.7, 1.7), PALETTE.brass, [bx - 2, by + b - 2, 4, 4], r, { fibre: 0, line: 0.8 });
     }
-    // Lapel.
-    const lapel = new Path2D();
-    lapel.moveTo(2.5, -71 + b); lapel.lineTo(8, -61 + b); lapel.lineTo(13.5, -71.5 + b); lapel.closePath();
-    part(ctx, lapel, tint(COAT, -0.12), [2, -72 + b, 12, 11], r, { fibre: 0.3, line: 1 });
-
-    // Scarf wrap and front tail.
-    const wrap = new Path2D();
-    wrap.moveTo(-14, -81 + b);
-    wrap.quadraticCurveTo(0, -75 + b, 15.5, -81 + b);
-    wrap.lineTo(15.5, -72.5 + b);
-    wrap.quadraticCurveTo(0, -66 + b, -14.5, -71.5 + b);
-    wrap.closePath();
-    const front = new Path2D();
-    front.moveTo(5.5, -73 + b);
-    front.lineTo(13, -73 + b);
-    front.quadraticCurveTo(14.5, -61 + b, 13.5 + f, -51 + b);
-    front.lineTo(6.5 + f * 0.6, -52 + b);
-    front.quadraticCurveTo(7, -62 + b, 5.5, -73 + b);
-    front.closePath();
-    part(ctx, front, PALETTE.brass, [5, -73 + b, 10, 22], r, { fibre: 0.4 });
-    ctx.save();
-    ctx.clip(front);
-    line(ctx, [4, -60 + b, 16, -60 + b], COAT, 1.7);
-    line(ctx, [4, -56.5 + b, 16, -56.5 + b], COAT, 1.7);
-    ctx.restore();
-    for (let i = 0; i < 4; i++) line(ctx, [7 + i * 1.9 + f * 0.6, -52 + b, 7 + i * 1.9 + f * 0.9, -48.5 + b], tint(PALETTE.brass, -0.3), 0.9);
-    part(ctx, wrap, PALETTE.brass, [-15, -82 + b, 31, 16], r, { fibre: 0.4 });
-    ctx.save();
-    ctx.clip(wrap);
-    for (let x = -13; x < 15; x += 2.4) {
-      const yy = -77 + b + Math.pow(x / 15, 2) * -3.5;
-      line(ctx, [x - 0.8, yy - 2, x, yy, x + 0.8, yy - 2], rgba(tint(PALETTE.brass, -0.45), 0.55), 0.6);
-      line(ctx, [x - 0.8, yy + 2, x, yy + 4, x + 0.8, yy + 2], rgba(tint(PALETTE.brass, -0.45), 0.55), 0.6);
-    }
-    ctx.restore();
+    // Rounded collar points.
+    const collar = new Path2D();
+    collar.moveTo(-7, -78 + b);
+    collar.quadraticCurveTo(-4, -71 + b, 2, -72 + b);
+    collar.quadraticCurveTo(4, -76 + b, 2, -78.5 + b);
+    collar.moveTo(2, -78.5 + b);
+    collar.quadraticCurveTo(5, -71 + b, 10, -72.5 + b);
+    collar.quadraticCurveTo(12, -76 + b, 9.5, -78.5 + b);
+    collar.closePath();
+    part(ctx, collar, COAT, [-7, -79 + b, 19, 8], r, { fibre: 0, light: 0, line: 0.8 });
 
     // Head.
     ctx.save();
     if (p.fallen) { ctx.translate(2, hy); ctx.rotate(0.12); ctx.translate(-2, -hy); }
-    part(ctx, oval(-9, hy - 3, 7.5, 8.5), tint(PALETTE.earth, -0.55), [-17, hy - 12, 15, 17], r, { fibre: 0.8 });
-    const head = oval(2, hy, 16, 15.4);
-    part(ctx, head, SKIN, [-14, hy - 15.4, 32, 31], r, { fibre: 0.18, light: 0.75, hx: 0.55, hy: 0.3 });
-    part(ctx, oval(-8.5, hy + 1.5, 3.1, 4.1), tint(SKIN, -0.12), [-12, hy - 3, 7, 9], r, { fibre: 0, line: 1.1 });
-    line(ctx, [-8.8, hy - 0.4, -7.6, hy + 1.5, -8.8, hy + 3.4], rgba(tint(PALETTE.clay, -0.4), 0.8), 0.7);
+    // Hair volume behind the skull: a soft rim at the crown and the back.
+    part(ctx, oval(0.5, hy - 2, 17.4, 16.8), HAIR, [-17, hy - 19, 35, 34], r, { fibre: 0.12, line: 1, light: 0.2 });
+    const head = oval(2.5, hy + 0.5, 15.6, 15);
+    part(ctx, head, SKIN, [-13, hy - 14.5, 31, 30], r, { fibre: 0.18, light: 0.75, hx: 0.55, hy: 0.3 });
+    // Hair cap with a side-swept fringe, cut by the hairline.
+    const cap = new Path2D();
+    cap.moveTo(19, hy - 6);
+    cap.quadraticCurveTo(12, hy - 6.5, 8, hy - 9.5);
+    cap.quadraticCurveTo(5, hy - 4, -1, hy - 6);
+    cap.quadraticCurveTo(-4, hy - 3, -4, hy + 3);
+    cap.quadraticCurveTo(-6, hy + 10, -9, hy + 14);
+    cap.lineTo(-22, hy + 14); cap.lineTo(-22, hy - 22); cap.lineTo(22, hy - 22);
+    cap.closePath();
+    ctx.save();
+    ctx.clip(head);
+    part(ctx, cap, HAIR, [-14, hy - 16, 33, 30], r, { fibre: 0.12, line: 1, light: 0.2, hx: 0.6, hy: 0.15 });
+    // One glossy streak across the crown.
+    line(ctx, [-5, hy - 11, 4, hy - 14, 13, hy - 10], rgba(HAIR_LIT, 0.85), 1.3);
+    ctx.restore();
+    // Ear peeking out under the hair.
+    part(ctx, oval(-2.6, hy + 3.4, 2.5, 3.4), tint(SKIN, -0.12), [-5, hy, 5, 7], r, { fibre: 0, line: 1 });
     // Rosy felt cheeks.
-    ctx.fillStyle = rgba(PALETTE.carmine, 0.3);
-    ctx.beginPath(); ctx.ellipse(3, hy + 7, 3, 2.2, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(16, hy + 6.5, 2, 2, 0, 0, Math.PI * 2); ctx.fill();
-    // Eyes.
-    const eyes: Array<[number, number, number]> = [[5, 4.1, 5], [13.4, 3.4, 4.4]];
-    for (const [ex, rx, ry] of eyes) {
-      const ey = hy + 0.5;
+    ctx.fillStyle = rgba(PALETTE.carmine, 0.42);
+    ctx.beginPath(); ctx.ellipse(4, hy + 7, 3.2, 2.3, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(16.4, hy + 6.5, 2, 2, 0, 0, Math.PI * 2); ctx.fill();
+    // Small almond eyes: dark iris, one catchlight, an inked top lash line flicking off the outer corner.
+    const eyes: Array<[number, number, number, number]> = [[6, 2.8, 2, -1], [13.6, 2.3, 1.85, 1]];
+    for (const [ex, rx, ry, out] of eyes) {
+      const ey = hy + 1;
       if (p.eyes === 'x') {
         line(ctx, [ex - 2.3, ey - 2.3, ex + 2.3, ey + 2.3], PALETTE.ink, 1.4);
         line(ctx, [ex + 2.3, ey - 2.3, ex - 2.3, ey + 2.3], PALETTE.ink, 1.4);
+        line(ctx, [ex + out * 2.4, ey - 2.6, ex + out * 4.2, ey - 4], PALETTE.ink, 0.8);
         continue;
       }
-      const wide = p.eyes === 'wide' ? 0.7 : 0;
-      const eye = oval(ex, ey, rx + wide, ry + wide);
+      const ay = ry + (p.eyes === 'wide' ? 0.8 : 0);
+      const ix = ex - out * rx;
+      const ox = ex + out * rx;
+      const almond = new Path2D();
+      almond.moveTo(ix, ey + 0.3);
+      almond.quadraticCurveTo(ex, ey - ay * 2, ox, ey - 0.5);
+      almond.quadraticCurveTo(ex, ey + ay * 1.6, ix, ey + 0.3);
+      almond.closePath();
       ctx.fillStyle = PALETTE.paper;
-      ctx.fill(eye);
-      ctx.lineWidth = 0.9;
-      ctx.strokeStyle = PALETTE.ink;
-      ctx.stroke(eye);
-      const pr = p.eyes === 'wide' ? 1.6 : 2.3;
-      ctx.fillStyle = PALETTE.ink;
-      ctx.beginPath(); ctx.arc(ex + 1, ey + 0.6, pr, 0, Math.PI * 2); ctx.fill();
+      ctx.fill(almond);
+      ctx.save();
+      ctx.clip(almond);
+      ctx.fillStyle = tint(PALETTE.earth, -0.75);
+      ctx.beginPath(); ctx.arc(ex + 0.4, ey - 0.1, ay * 0.95, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = '#ffffff';
-      ctx.beginPath(); ctx.arc(ex + 0.2, ey - 0.4, 0.9, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(ex - 0.2, ey - ay * 0.4, 0.5, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+      line(ctx, [ix, ey + 0.3, ex, ey - ay * 2, ox, ey - 0.5], PALETTE.ink, 1.1);
+      for (const [t, len] of [[0.62, 1.4], [0.8, 1.8], [0.96, 2]] as const) {
+        const lx = (1 - t) ** 2 * ix + 2 * (1 - t) * t * ex + t * t * ox;
+        const ly = (1 - t) ** 2 * (ey + 0.3) + 2 * (1 - t) * t * (ey - ay * 2) + t * t * (ey - 0.5);
+        line(ctx, [lx, ly, lx + out * len * 0.75, ly - len * 0.7], PALETTE.ink, 0.6);
+      }
     }
-    // Brows: positive lifts the inner ends (worry).
+    // Brows: thin defined arches; positive lifts the inner ends (worry).
     const br = p.brows;
-    line(ctx, [1.2, hy - 6 - br * 0.5, 4.5, hy - 7.3 - br * 1.1, 8, hy - 6.6 - br * 1.6], tint(PALETTE.earth, -0.55), 1.5);
-    line(ctx, [10.8, hy - 6.6 - br * 1.6, 13.5, hy - 7.2 - br * 1.1, 16.2, hy - 5.8 - br * 0.5], tint(PALETTE.earth, -0.55), 1.4);
-    // Nose pokes past the cheek: reads as three-quarter at a glance.
-    part(ctx, oval(17.6, hy + 3.4, 2.7, 2.3), tint(SKIN, -0.08), [15, hy + 1, 6, 5], r, { fibre: 0, line: 1, hx: 0.3, hy: 0.2 });
-    // Mouth.
+    const BROW = tint(HAIR, -0.35);
+    line(ctx, [2.4, hy - 4.6 - br * 0.4, 5.4, hy - 7.4 - br * 1.1, 8.8, hy - 6.4 - br * 1.6], BROW, 1.1);
+    line(ctx, [11.4, hy - 6.4 - br * 1.6, 14, hy - 7.6 - br * 1.1, 16.6, hy - 5 - br * 0.4], BROW, 1);
+    // Small button nose pokes past the cheek: reads as three-quarter at a glance.
+    part(ctx, oval(17.8, hy + 4, 2, 1.8), tint(SKIN, -0.08), [15.5, hy + 2, 5, 4], r, { fibre: 0, line: 0.9, hx: 0.3, hy: 0.2 });
+    // Painted lips.
     if (p.mouth === 'smile') {
-      ctx.strokeStyle = PALETTE.ink; ctx.lineWidth = 1.2;
-      ctx.beginPath(); ctx.arc(11, hy + 6.8, 3.2, Math.PI * 0.2, Math.PI * 0.82); ctx.stroke();
+      const lips = new Path2D();
+      lips.moveTo(8.2, hy + 8.2);
+      lips.quadraticCurveTo(11.2, hy + 7.2, 14.4, hy + 8);
+      lips.quadraticCurveTo(11.4, hy + 12, 8.2, hy + 8.2);
+      lips.closePath();
+      ctx.fillStyle = LIP; ctx.fill(lips);
+      ctx.lineWidth = 0.7; ctx.strokeStyle = PALETTE.ink; ctx.stroke(lips);
+      line(ctx, [9.6, hy + 8.4, 11.3, hy + 9, 13, hy + 8.3], rgba(PALETTE.ink, 0.7), 0.6);
     } else if (p.mouth === 'o') {
+      ctx.fillStyle = LIP;
+      ctx.beginPath(); ctx.ellipse(11.4, hy + 9.6, 2.5, 3, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.lineWidth = 0.7; ctx.strokeStyle = PALETTE.ink; ctx.stroke();
       ctx.fillStyle = PALETTE.ink;
-      ctx.beginPath(); ctx.ellipse(11, hy + 9.4, 1.9, 2.5, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = COAT_D;
-      ctx.beginPath(); ctx.ellipse(11, hy + 10.3, 1.1, 1.1, 0, 0, Math.PI * 2); ctx.fill();
-    } else line(ctx, [7.5, hy + 9, 9, hy + 8, 10.5, hy + 9.4, 12, hy + 8, 13.6, hy + 9.2], PALETTE.ink, 1.1);
-
-    // Felt hat, tipped back, with a carmine band and a felt-green feather.
+      ctx.beginPath(); ctx.ellipse(11.4, hy + 9.8, 1.3, 1.8, 0, 0, Math.PI * 2); ctx.fill();
+    } else {
+      line(ctx, [7.8, hy + 9.2, 9.3, hy + 8.2, 10.8, hy + 9.6, 12.3, hy + 8.2, 13.8, hy + 9.4], LIP, 2);
+      line(ctx, [7.8, hy + 9.2, 9.3, hy + 8.2, 10.8, hy + 9.6, 12.3, hy + 8.2, 13.8, hy + 9.4], PALETTE.ink, 0.6);
+    }
+    // Carmine ribbon bow tying the ponytail at the crown.
     ctx.save();
-    ctx.translate(2, hy - 11);
-    ctx.rotate(p.fallen ? -0.35 : -0.1);
-    const feather = new Path2D();
-    feather.moveTo(-9, -4);
-    feather.quadraticCurveTo(-18, -12, -17, -19);
-    feather.quadraticCurveTo(-11, -14, -7, -6);
-    feather.closePath();
-    part(ctx, feather, PALETTE.felt, [-18, -19, 11, 15], r, { fibre: 0.4, line: 1 });
-    line(ctx, [-8.5, -5, -15, -14, -16.5, -18], tint(PALETTE.felt, 0.4), 0.6);
-    part(ctx, oval(0.5, 0.5, 19, 3.8), tint(HAT, -0.15), [-19, -3.5, 39, 8], r, { fibre: 0.4 });
-    const crown = new Path2D();
-    crown.moveTo(-12, 0);
-    crown.quadraticCurveTo(-13, -14, -2, -14.5);
-    crown.quadraticCurveTo(1, -12.5, 4, -14.5);
-    crown.quadraticCurveTo(14, -14, 13, 0);
-    crown.closePath();
-    part(ctx, crown, HAT, [-13, -15, 27, 15], r, { fibre: 0.7 });
-    const band = new Path2D();
-    band.moveTo(-12.4, -4.2); band.lineTo(13.2, -4.2); band.lineTo(13, 0); band.lineTo(-12, 0); band.closePath();
-    part(ctx, band, COAT, [-13, -5, 27, 5], r, { fibre: 0.3, line: 1 });
-    const bandStitch = new Path2D();
-    bandStitch.moveTo(-11.5, -2.1); bandStitch.lineTo(12.5, -2.1);
-    stitch(ctx, bandStitch, tint(COAT, 0.55), 0.5);
-    line(ctx, [-2, -14.2, 1, -10.5, 4, -14.2], rgba(PALETTE.ink, 0.5), 0.8);
-    ctx.lineWidth = 1.2; ctx.strokeStyle = PALETTE.ink;
-    ctx.beginPath(); ctx.ellipse(0.5, 0.5, 19, 3.8, 0, 0.05 * Math.PI, 0.95 * Math.PI); ctx.stroke();
+    ctx.translate(-7, hy - 14);
+    ctx.rotate(p.fallen ? -0.3 : -0.35);
+    const bow = new Path2D();
+    bow.moveTo(0, 0);
+    bow.quadraticCurveTo(-5, -6.5, -7.5, -1.5);
+    bow.quadraticCurveTo(-6, 3.5, 0, 0);
+    bow.quadraticCurveTo(5, -6.5, 7.5, -1.5);
+    bow.quadraticCurveTo(6, 3.5, 0, 0);
+    bow.closePath();
+    part(ctx, bow, COAT, [-8, -6, 16, 10], r, { fibre: 0.25, line: 1 });
+    part(ctx, oval(0, -0.6, 2, 2.2), COAT_D, [-2, -3, 4, 5], r, { fibre: 0, line: 0.9 });
     ctx.restore();
     ctx.restore();
 
-    drawArm(ctx, r, 12, -67 + b, p.arms[1], false);
+    drawArm(ctx, r, 10.5, -68 + b, p.arms[1], false);
   };
 }
 
-const STAND: Pose = { bob: 0, sy: 1, legs: [0.05, -0.05], lift: [0, 0], arms: [0.12, -0.08], lean: 0, eyes: 'open', mouth: 'smile', brows: 0, scarf: 0.3 };
+const STAND: Pose = { bob: 0, sy: 1, legs: [0.05, -0.05], lift: [0, 0], arms: [0.12, -0.08], lean: 0, eyes: 'open', mouth: 'smile', brows: 0, sway: 0 };
 const WALK: Pose[] = [
-  { ...STAND, bob: 1.6, sy: 0.955, legs: [0.4, -0.4], arms: [-0.5, 0.5], scarf: 0.7 },
-  { ...STAND, bob: -1.2, sy: 1.04, legs: [0.05, -0.08], lift: [0.22, 0], arms: [-0.1, 0.12], scarf: 1 },
-  { ...STAND, bob: 1.6, sy: 0.955, legs: [-0.4, 0.4], arms: [0.5, -0.5], scarf: 0.6 },
-  { ...STAND, bob: -1.2, sy: 1.04, legs: [-0.08, 0.05], lift: [0, 0.22], arms: [0.12, -0.1], scarf: 1 },
+  { ...STAND, bob: 1.6, sy: 0.955, legs: [0.4, -0.4], arms: [-0.5, 0.5], sway: -0.6 },
+  { ...STAND, bob: -1.2, sy: 1.04, legs: [0.05, -0.08], lift: [0.22, 0], arms: [-0.1, 0.12], sway: 0.5 },
+  { ...STAND, bob: 1.6, sy: 0.955, legs: [-0.4, 0.4], arms: [0.5, -0.5], sway: 1 },
+  { ...STAND, bob: -1.2, sy: 1.04, legs: [-0.08, 0.05], lift: [0, 0.22], arms: [0.12, -0.1], sway: -0.1 },
 ];
 const IDLE: Pose[] = [
   { ...STAND },
-  { ...STAND, bob: -0.8, sy: 1.025, arms: [0.17, -0.13], scarf: 0.4 },
+  { ...STAND, bob: -0.8, sy: 1.025, arms: [0.17, -0.13], sway: 0.2 },
 ];
-const FLINCH: Pose = { ...STAND, bob: 2, sy: 0.92, lean: -0.13, legs: [0.25, -0.15], arms: [-2.75, -2.45], eyes: 'wide', mouth: 'o', brows: 1.6, scarf: 0.9 };
-const FALL: Pose = { ...STAND, legs: [0.35, -0.2], arms: [-1.3, 0.9], eyes: 'x', mouth: 'wobble', brows: 1, scarf: 0.2, fallen: true };
+const FLINCH: Pose = { ...STAND, bob: 2, sy: 0.92, lean: -0.13, legs: [0.25, -0.15], arms: [-2.75, -2.45], eyes: 'wide', mouth: 'o', brows: 1.6, sway: 1.4 };
+const FALL: Pose = { ...STAND, legs: [0.35, -0.2], arms: [-1.3, 0.9], eyes: 'x', mouth: 'wobble', brows: 1, sway: -0.4, fallen: true };
 
 /** main.ts shows the Talent at 0.66 × height; the fall pose goes square. */
 export const TALENT_ASPECT = 0.66;
 
 function talentTexture(p: Pose, seed: number) {
   return cast(talentPuppet(p), {
-    ink: 1.1,
+    ink: 1,
     halo: 0.9,
     haloAlpha: 0.7,
     shadow: p.fallen ? [64, 120, 50, 5] : [65, 121.5, 22, 4.2],

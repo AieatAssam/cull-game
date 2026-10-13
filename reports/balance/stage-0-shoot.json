@@ -6,7 +6,7 @@
     200
   ],
   "jitter": 8,
-  "command": "npm run balance -- --stage=0 --mode=both --seeds=200 --jitter=8 --workers=8 --out=/tmp/bal",
+  "command": "npm run balance -- --stage=0 --mode=both --seeds=200 --jitter=8 --workers=8",
   "note": "Report-only. Raw seeds. Bots read only player-visible state (src/bots/observe.ts). §5 targets are for the full Shoot; strip gates are informational.",
   "passive": {
     "bot": "gatekeeper",
@@ -83,7 +83,7 @@
       "runs": 200,
       "completed": 0,
       "completion": 0,
-      "meanDistance": 27.89,
+      "meanDistance": 32.46,
       "timeouts": 0,
       "clearSeconds": null,
       "failReasons": {
@@ -152,7 +152,7 @@
       "runs": 200,
       "completed": 0,
       "completion": 0,
-      "meanDistance": 29.85,
+      "meanDistance": 37.89,
       "timeouts": 0,
       "clearSeconds": null,
       "failReasons": {
@@ -413,8 +413,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.69,
-      "seconds": 10.866666666666667
+      "distance": 32.81,
+      "seconds": 12.866666666666667
     },
     {
       "bot": "wide",
@@ -446,8 +446,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.21,
-      "seconds": 11.683333333333334
+      "distance": 34.33,
+      "seconds": 13.683333333333334
     },
     {
       "bot": "adaptive",
@@ -490,8 +490,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.62,
-      "seconds": 10.85
+      "distance": 32.83,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -523,8 +523,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 33.81,
-      "seconds": 13.383333333333333
+      "distance": 39.01,
+      "seconds": 15.383333333333333
     },
     {
       "bot": "adaptive",
@@ -567,8 +567,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.95,
-      "seconds": 11
+      "distance": 33.14,
+      "seconds": 13
     },
     {
       "bot": "wide",
@@ -600,8 +600,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 30.5,
-      "seconds": 12.083333333333334
+      "distance": 43.61,
+      "seconds": 17.45
     },
     {
       "bot": "adaptive",
@@ -644,8 +644,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.78,
-      "seconds": 10.9
+      "distance": 33.03,
+      "seconds": 12.9
     },
     {
       "bot": "wide",
@@ -677,8 +677,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 31.61,
-      "seconds": 12.45
+      "distance": 36.69,
+      "seconds": 14.45
     },
     {
       "bot": "adaptive",
@@ -721,8 +721,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.93,
-      "seconds": 11.366666666666667
+      "distance": 34.18,
+      "seconds": 13.366666666666667
     },
     {
       "bot": "wide",
@@ -754,8 +754,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 30.2,
-      "seconds": 11.983333333333333
+      "distance": 35.37,
+      "seconds": 13.983333333333333
     },
     {
       "bot": "adaptive",
@@ -798,8 +798,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.62,
-      "seconds": 10.85
+      "distance": 30.49,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -831,8 +831,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.05,
-      "seconds": 11.583333333333334
+      "distance": 32.43,
+      "seconds": 13.583333333333334
     },
     {
       "bot": "adaptive",
@@ -875,8 +875,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.65,
-      "seconds": 10.85
+      "distance": 32.86,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -908,8 +908,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 32.83,
-      "seconds": 13.016666666666667
+      "distance": 42.75,
+      "seconds": 17.6
     },
     {
       "bot": "adaptive",
@@ -952,8 +952,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.61,
-      "seconds": 10.85
+      "distance": 32.76,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -986,7 +986,7 @@
       "killer": "offscreen",
       "scene": "BACKLOT",
       "distance": 43.33,
-      "seconds": 17.45
+      "seconds": 19.45
     },
     {
       "bot": "adaptive",
@@ -1029,8 +1029,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.12,
-      "seconds": 11.033333333333333
+      "distance": 31.98,
+      "seconds": 13.033333333333333
     },
     {
       "bot": "wide",
@@ -1062,8 +1062,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 31.57,
-      "seconds": 12.45
+      "distance": 39.6,
+      "seconds": 22.083333333333332
     },
     {
       "bot": "adaptive",
@@ -1106,8 +1106,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.24,
-      "seconds": 11.1
+      "distance": 33.4,
+      "seconds": 13.1
     },
     {
       "bot": "wide",
@@ -1139,8 +1139,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 31.22,
-      "seconds": 12.316666666666666
+      "distance": 36.38,
+      "seconds": 14.316666666666666
     },
     {
       "bot": "adaptive",
@@ -1183,8 +1183,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.41,
-      "seconds": 10.766666666666667
+      "distance": 32.56,
+      "seconds": 12.766666666666667
     },
     {
       "bot": "wide",
@@ -1216,8 +1216,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 30.66,
-      "seconds": 12.133333333333333
+      "distance": 35.74,
+      "seconds": 14.133333333333333
     },
     {
       "bot": "adaptive",
@@ -1260,8 +1260,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.36,
-      "seconds": 10.733333333333333
+      "distance": 31.4,
+      "seconds": 12.733333333333333
     },
     {
       "bot": "wide",
@@ -1293,8 +1293,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.19,
-      "seconds": 11.233333333333333
+      "distance": 31.4,
+      "seconds": 13.233333333333333
     },
     {
       "bot": "adaptive",
@@ -1337,8 +1337,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.06,
-      "seconds": 11.433333333333334
+      "distance": 34.1,
+      "seconds": 13.433333333333334
     },
     {
       "bot": "wide",
@@ -1370,8 +1370,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 30.75,
-      "seconds": 12.25
+      "distance": 48.44,
+      "seconds": 22.2
     },
     {
       "bot": "adaptive",
@@ -1414,8 +1414,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.44,
-      "seconds": 10.783333333333333
+      "distance": 32.6,
+      "seconds": 12.783333333333333
     },
     {
       "bot": "wide",
@@ -1447,8 +1447,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 33.39,
-      "seconds": 13.2
+      "distance": 43.58,
+      "seconds": 17.183333333333334
     },
     {
       "bot": "adaptive",
@@ -1491,8 +1491,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.74,
-      "seconds": 10.866666666666667
+      "distance": 32.86,
+      "seconds": 12.866666666666667
     },
     {
       "bot": "wide",
@@ -1524,8 +1524,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 25.82,
-      "seconds": 10.233333333333333
+      "distance": 41.57,
+      "seconds": 16.416666666666668
     },
     {
       "bot": "adaptive",
@@ -1568,8 +1568,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.86,
-      "seconds": 10.933333333333334
+      "distance": 33.02,
+      "seconds": 12.933333333333334
     },
     {
       "bot": "wide",
@@ -1601,8 +1601,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.19,
-      "seconds": 11.55
+      "distance": 37.1,
+      "seconds": 14.683333333333334
     },
     {
       "bot": "adaptive",
@@ -1645,8 +1645,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.62,
-      "seconds": 10.85
+      "distance": 32.78,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -1678,8 +1678,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 30.27,
-      "seconds": 12.05
+      "distance": 41.26,
+      "seconds": 16.4
     },
     {
       "bot": "adaptive",
@@ -1722,8 +1722,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.7,
-      "seconds": 10.883333333333333
+      "distance": 32.87,
+      "seconds": 12.883333333333333
     },
     {
       "bot": "wide",
@@ -1755,8 +1755,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 25.29,
-      "seconds": 10.016666666666667
+      "distance": 30.49,
+      "seconds": 12.016666666666667
     },
     {
       "bot": "adaptive",
@@ -1799,8 +1799,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.62,
-      "seconds": 10.85
+      "distance": 32.83,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -1833,7 +1833,7 @@
       "killer": "offscreen",
       "scene": "BACKLOT",
       "distance": 36.08,
-      "seconds": 14.55
+      "seconds": 16.55
     },
     {
       "bot": "adaptive",
@@ -1876,8 +1876,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.44,
-      "seconds": 10.766666666666667
+      "distance": 32.61,
+      "seconds": 12.766666666666667
     },
     {
       "bot": "wide",
@@ -1909,8 +1909,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 26.99,
-      "seconds": 10.733333333333333
+      "distance": 32.11,
+      "seconds": 12.733333333333333
     },
     {
       "bot": "adaptive",
@@ -1953,8 +1953,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.48,
-      "seconds": 11.166666666666666
+      "distance": 33.64,
+      "seconds": 13.166666666666666
     },
     {
       "bot": "wide",
@@ -1986,8 +1986,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 31.4,
-      "seconds": 12.433333333333334
+      "distance": 36.52,
+      "seconds": 14.433333333333334
     },
     {
       "bot": "adaptive",
@@ -2030,8 +2030,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.57,
-      "seconds": 11.233333333333333
+      "distance": 33.73,
+      "seconds": 13.233333333333333
     },
     {
       "bot": "wide",
@@ -2063,8 +2063,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 22.71,
-      "seconds": 9.05
+      "distance": 33.7,
+      "seconds": 15.7
     },
     {
       "bot": "adaptive",
@@ -2107,8 +2107,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.69,
-      "seconds": 10.866666666666667
+      "distance": 32.9,
+      "seconds": 12.866666666666667
     },
     {
       "bot": "wide",
@@ -2140,8 +2140,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.36,
-      "seconds": 11.716666666666667
+      "distance": 37.39,
+      "seconds": 16.416666666666668
     },
     {
       "bot": "adaptive",
@@ -2184,8 +2184,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.77,
-      "seconds": 10.9
+      "distance": 32.93,
+      "seconds": 12.9
     },
     {
       "bot": "wide",
@@ -2217,8 +2217,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 21.36,
-      "seconds": 8.516666666666667
+      "distance": 36,
+      "seconds": 14.333333333333334
     },
     {
       "bot": "adaptive",
@@ -2261,8 +2261,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.44,
-      "seconds": 10.783333333333333
+      "distance": 32.6,
+      "seconds": 12.783333333333333
     },
     {
       "bot": "wide",
@@ -2295,7 +2295,7 @@
       "killer": "offscreen",
       "scene": "BACKLOT",
       "distance": 42.22,
-      "seconds": 16.716666666666665
+      "seconds": 18.716666666666665
     },
     {
       "bot": "adaptive",
@@ -2338,8 +2338,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.65,
-      "seconds": 10.85
+      "distance": 31.36,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -2371,8 +2371,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 25.92,
-      "seconds": 10.3
+      "distance": 31.05,
+      "seconds": 12.3
     },
     {
       "bot": "adaptive",
@@ -2415,8 +2415,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.87,
-      "seconds": 10.966666666666667
+      "distance": 33.06,
+      "seconds": 12.966666666666667
     },
     {
       "bot": "wide",
@@ -2448,8 +2448,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.64,
-      "seconds": 11.766666666666667
+      "distance": 34.77,
+      "seconds": 13.766666666666667
     },
     {
       "bot": "adaptive",
@@ -2492,8 +2492,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.57,
-      "seconds": 10.816666666666666
+      "distance": 32.73,
+      "seconds": 12.816666666666666
     },
     {
       "bot": "wide",
@@ -2525,8 +2525,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 39.51,
-      "seconds": 15.966666666666667
+      "distance": 48.51,
+      "seconds": 21.483333333333334
     },
     {
       "bot": "adaptive",
@@ -2569,8 +2569,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.45,
-      "seconds": 11.183333333333334
+      "distance": 33.07,
+      "seconds": 13.183333333333334
     },
     {
       "bot": "wide",
@@ -2602,8 +2602,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 36.57,
-      "seconds": 14.783333333333333
+      "distance": 45.73,
+      "seconds": 18.366666666666667
     },
     {
       "bot": "adaptive",
@@ -2646,8 +2646,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.12,
-      "seconds": 11.033333333333333
+      "distance": 33.23,
+      "seconds": 13.033333333333333
     },
     {
       "bot": "wide",
@@ -2679,8 +2679,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.67,
-      "seconds": 11.416666666666666
+      "distance": 36.57,
+      "seconds": 14.483333333333333
     },
     {
       "bot": "adaptive",
@@ -2723,8 +2723,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.4,
-      "seconds": 10.766666666666667
+      "distance": 32.56,
+      "seconds": 12.766666666666667
     },
     {
       "bot": "wide",
@@ -2756,8 +2756,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 39.81,
-      "seconds": 15.8
+      "distance": 44.97,
+      "seconds": 17.8
     },
     {
       "bot": "adaptive",
@@ -2800,8 +2800,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.52,
-      "seconds": 11.6
+      "distance": 34.73,
+      "seconds": 13.6
     },
     {
       "bot": "wide",
@@ -2833,8 +2833,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 38.44,
-      "seconds": 15.15
+      "distance": 48.22,
+      "seconds": 19.066666666666666
     },
     {
       "bot": "adaptive",
@@ -2877,8 +2877,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.57,
-      "seconds": 10.816666666666666
+      "distance": 32.73,
+      "seconds": 12.816666666666666
     },
     {
       "bot": "wide",
@@ -2910,8 +2910,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 43.85,
-      "seconds": 17.283333333333335
+      "distance": 44.69,
+      "seconds": 19.283333333333335
     },
     {
       "bot": "adaptive",
@@ -2954,8 +2954,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.45,
-      "seconds": 10.8
+      "distance": 32.61,
+      "seconds": 12.8
     },
     {
       "bot": "wide",
@@ -2987,8 +2987,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.21,
-      "seconds": 10.816666666666666
+      "distance": 42.45,
+      "seconds": 16.883333333333333
     },
     {
       "bot": "adaptive",
@@ -3031,8 +3031,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.99,
-      "seconds": 11
+      "distance": 29.16,
+      "seconds": 13
     },
     {
       "bot": "wide",
@@ -3064,8 +3064,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.28,
-      "seconds": 11.166666666666666
+      "distance": 36.82,
+      "seconds": 16.233333333333334
     },
     {
       "bot": "adaptive",
@@ -3108,8 +3108,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.69,
-      "seconds": 10.866666666666667
+      "distance": 32.84,
+      "seconds": 12.866666666666667
     },
     {
       "bot": "wide",
@@ -3141,8 +3141,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.03,
-      "seconds": 11.066666666666666
+      "distance": 33.09,
+      "seconds": 13.066666666666666
     },
     {
       "bot": "adaptive",
@@ -3185,8 +3185,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.06,
-      "seconds": 11.433333333333334
+      "distance": 32.34,
+      "seconds": 13.433333333333334
     },
     {
       "bot": "wide",
@@ -3218,8 +3218,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.09,
-      "seconds": 11.233333333333333
+      "distance": 32.32,
+      "seconds": 13.233333333333333
     },
     {
       "bot": "adaptive",
@@ -3262,8 +3262,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.83,
-      "seconds": 10.933333333333334
+      "distance": 32.98,
+      "seconds": 12.933333333333334
     },
     {
       "bot": "wide",
@@ -3295,8 +3295,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 36.43,
-      "seconds": 14.683333333333334
+      "distance": 41.58,
+      "seconds": 16.683333333333334
     },
     {
       "bot": "adaptive",
@@ -3340,7 +3340,7 @@
       "killer": "offscreen",
       "scene": "BACKLOT",
       "distance": 26.73,
-      "seconds": 11.016666666666667
+      "seconds": 13.016666666666667
     },
     {
       "bot": "wide",
@@ -3372,8 +3372,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 26.73,
-      "seconds": 10.8
+      "distance": 34.77,
+      "seconds": 15.7
     },
     {
       "bot": "adaptive",
@@ -3416,8 +3416,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.62,
-      "seconds": 10.85
+      "distance": 32.78,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -3449,8 +3449,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 24.31,
-      "seconds": 9.683333333333334
+      "distance": 35.47,
+      "seconds": 14.05
     },
     {
       "bot": "adaptive",
@@ -3493,8 +3493,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.62,
-      "seconds": 10.85
+      "distance": 32.78,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -3526,8 +3526,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.1,
-      "seconds": 11.45
+      "distance": 43.55,
+      "seconds": 17.633333333333333
     },
     {
       "bot": "adaptive",
@@ -3570,8 +3570,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.99,
-      "seconds": 11
+      "distance": 32.78,
+      "seconds": 13
     },
     {
       "bot": "wide",
@@ -3603,8 +3603,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 26.6,
-      "seconds": 10.55
+      "distance": 31.76,
+      "seconds": 12.55
     },
     {
       "bot": "adaptive",
@@ -3647,8 +3647,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.58,
-      "seconds": 10.833333333333334
+      "distance": 32.73,
+      "seconds": 12.833333333333334
     },
     {
       "bot": "wide",
@@ -3680,8 +3680,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 38.13,
-      "seconds": 15.05
+      "distance": 42.59,
+      "seconds": 21.7
     },
     {
       "bot": "adaptive",
@@ -3724,8 +3724,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.93,
-      "seconds": 11.366666666666667
+      "distance": 34.08,
+      "seconds": 13.366666666666667
     },
     {
       "bot": "wide",
@@ -3757,8 +3757,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 24.32,
-      "seconds": 9.666666666666666
+      "distance": 34.04,
+      "seconds": 13.466666666666667
     },
     {
       "bot": "adaptive",
@@ -3801,8 +3801,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.91,
-      "seconds": 10.966666666666667
+      "distance": 33.07,
+      "seconds": 12.966666666666667
     },
     {
       "bot": "wide",
@@ -3834,8 +3834,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 32.15,
-      "seconds": 12.716666666666667
+      "distance": 46.51,
+      "seconds": 23.233333333333334
     },
     {
       "bot": "adaptive",
@@ -3878,8 +3878,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.86,
-      "seconds": 10.933333333333334
+      "distance": 27.94,
+      "seconds": 12.933333333333334
     },
     {
       "bot": "wide",
@@ -3911,8 +3911,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 30.44,
-      "seconds": 12.35
+      "distance": 38.64,
+      "seconds": 15.533333333333333
     },
     {
       "bot": "adaptive",
@@ -3955,8 +3955,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.77,
-      "seconds": 10.9
+      "distance": 32.93,
+      "seconds": 12.9
     },
     {
       "bot": "wide",
@@ -3988,8 +3988,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 26.36,
-      "seconds": 10.433333333333334
+      "distance": 31.39,
+      "seconds": 12.433333333333334
     },
     {
       "bot": "adaptive",
@@ -4032,8 +4032,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.49,
-      "seconds": 10.783333333333333
+      "distance": 32.01,
+      "seconds": 12.783333333333333
     },
     {
       "bot": "wide",
@@ -4065,8 +4065,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.57,
-      "seconds": 11.4
+      "distance": 46.25,
+      "seconds": 19.8
     },
     {
       "bot": "adaptive",
@@ -4109,8 +4109,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.36,
-      "seconds": 10.733333333333333
+      "distance": 32.53,
+      "seconds": 12.733333333333333
     },
     {
       "bot": "wide",
@@ -4142,8 +4142,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.32,
-      "seconds": 11.616666666666667
+      "distance": 40.81,
+      "seconds": 16.2
     },
     {
       "bot": "adaptive",
@@ -4186,8 +4186,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.7,
-      "seconds": 10.883333333333333
+      "distance": 32.85,
+      "seconds": 12.883333333333333
     },
     {
       "bot": "wide",
@@ -4219,8 +4219,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 32.86,
-      "seconds": 13.033333333333333
+      "distance": 37.88,
+      "seconds": 15.033333333333333
     },
     {
       "bot": "adaptive",
@@ -4263,8 +4263,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.91,
-      "seconds": 10.966666666666667
+      "distance": 33.11,
+      "seconds": 12.966666666666667
     },
     {
       "bot": "wide",
@@ -4296,8 +4296,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 25.39,
-      "seconds": 10.033333333333333
+      "distance": 30.34,
+      "seconds": 12.033333333333333
     },
     {
       "bot": "adaptive",
@@ -4340,8 +4340,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.78,
-      "seconds": 10.916666666666666
+      "distance": 30.49,
+      "seconds": 12.916666666666666
     },
     {
       "bot": "wide",
@@ -4373,8 +4373,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 32.43,
-      "seconds": 13.616666666666667
+      "distance": 45.54,
+      "seconds": 20.016666666666666
     },
     {
       "bot": "adaptive",
@@ -4417,8 +4417,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.78,
-      "seconds": 10.916666666666666
+      "distance": 32.94,
+      "seconds": 12.916666666666666
     },
     {
       "bot": "wide",
@@ -4450,8 +4450,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.07,
-      "seconds": 11.516666666666667
+      "distance": 44.6,
+      "seconds": 19.933333333333334
     },
     {
       "bot": "adaptive",
@@ -4494,8 +4494,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.06,
-      "seconds": 11.016666666666667
+      "distance": 30.93,
+      "seconds": 13.016666666666667
     },
     {
       "bot": "wide",
@@ -4527,8 +4527,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 23.34,
-      "seconds": 9.316666666666666
+      "distance": 28.42,
+      "seconds": 11.316666666666666
     },
     {
       "bot": "adaptive",
@@ -4572,7 +4572,7 @@
       "killer": "offscreen",
       "scene": "BACKLOT",
       "distance": 26.87,
-      "seconds": 10.983333333333333
+      "seconds": 12.983333333333333
     },
     {
       "bot": "wide",
@@ -4604,8 +4604,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.33,
-      "seconds": 13.516666666666667
+      "distance": 46.7,
+      "seconds": 20.316666666666666
     },
     {
       "bot": "adaptive",
@@ -4648,8 +4648,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.61,
-      "seconds": 10.816666666666666
+      "distance": 32.76,
+      "seconds": 12.816666666666666
     },
     {
       "bot": "wide",
@@ -4682,7 +4682,7 @@
       "killer": "offscreen",
       "scene": "BACKLOT",
       "distance": 36.48,
-      "seconds": 15.783333333333333
+      "seconds": 17.783333333333335
     },
     {
       "bot": "adaptive",
@@ -4725,8 +4725,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.62,
-      "seconds": 10.85
+      "distance": 32.78,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -4758,8 +4758,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.34,
-      "seconds": 10.8
+      "distance": 32.38,
+      "seconds": 12.8
     },
     {
       "bot": "adaptive",
@@ -4802,8 +4802,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.99,
-      "seconds": 11
+      "distance": 31.98,
+      "seconds": 13
     },
     {
       "bot": "wide",
@@ -4835,8 +4835,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 24.63,
-      "seconds": 9.8
+      "distance": 31.95,
+      "seconds": 13.833333333333334
     },
     {
       "bot": "adaptive",
@@ -4879,8 +4879,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.82,
-      "seconds": 10.916666666666666
+      "distance": 32.98,
+      "seconds": 12.916666666666666
     },
     {
       "bot": "wide",
@@ -4912,8 +4912,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.44,
-      "seconds": 11.266666666666667
+      "distance": 41.23,
+      "seconds": 16.316666666666666
     },
     {
       "bot": "adaptive",
@@ -4956,8 +4956,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.65,
-      "seconds": 10.85
+      "distance": 32.82,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -4989,8 +4989,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.67,
-      "seconds": 11.366666666666667
+      "distance": 33.71,
+      "seconds": 13.366666666666667
     },
     {
       "bot": "adaptive",
@@ -5033,8 +5033,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.37,
-      "seconds": 11.15
+      "distance": 33.57,
+      "seconds": 13.15
     },
     {
       "bot": "wide",
@@ -5066,8 +5066,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 26.3,
-      "seconds": 10.483333333333333
+      "distance": 31.42,
+      "seconds": 12.483333333333333
     },
     {
       "bot": "adaptive",
@@ -5111,7 +5111,7 @@
       "killer": "offscreen",
       "scene": "BACKLOT",
       "distance": 27.16,
-      "seconds": 10.916666666666666
+      "seconds": 12.916666666666666
     },
     {
       "bot": "wide",
@@ -5143,8 +5143,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.66,
-      "seconds": 11.85
+      "distance": 61.81,
+      "seconds": 24.583333333333332
     },
     {
       "bot": "adaptive",
@@ -5187,8 +5187,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.77,
-      "seconds": 10.9
+      "distance": 32.93,
+      "seconds": 12.9
     },
     {
       "bot": "wide",
@@ -5220,8 +5220,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 31.93,
-      "seconds": 12.583333333333334
+      "distance": 37.05,
+      "seconds": 14.583333333333334
     },
     {
       "bot": "adaptive",
@@ -5264,8 +5264,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.61,
-      "seconds": 10.85
+      "distance": 32.76,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -5297,8 +5297,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 31.01,
-      "seconds": 12.35
+      "distance": 41.58,
+      "seconds": 17.25
     },
     {
       "bot": "adaptive",
@@ -5341,8 +5341,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.06,
-      "seconds": 11.433333333333334
+      "distance": 34.23,
+      "seconds": 13.433333333333334
     },
     {
       "bot": "wide",
@@ -5374,8 +5374,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.71,
-      "seconds": 11.433333333333334
+      "distance": 42.15,
+      "seconds": 16.716666666666665
     },
     {
       "bot": "adaptive",
@@ -5418,8 +5418,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.58,
-      "seconds": 10.833333333333334
+      "distance": 32.7,
+      "seconds": 12.833333333333334
     },
     {
       "bot": "wide",
@@ -5451,8 +5451,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 31.66,
-      "seconds": 12.65
+      "distance": 41.69,
+      "seconds": 19.233333333333334
     },
     {
       "bot": "adaptive",
@@ -5495,8 +5495,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.66,
-      "seconds": 10.883333333333333
+      "distance": 32.81,
+      "seconds": 12.883333333333333
     },
     {
       "bot": "wide",
@@ -5528,8 +5528,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.23,
-      "seconds": 11.633333333333333
+      "distance": 34.27,
+      "seconds": 13.633333333333333
     },
     {
       "bot": "adaptive",
@@ -5572,8 +5572,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.78,
-      "seconds": 10.916666666666666
+      "distance": 32.95,
+      "seconds": 12.916666666666666
     },
     {
       "bot": "wide",
@@ -5605,8 +5605,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 25.59,
-      "seconds": 10.116666666666667
+      "distance": 30.66,
+      "seconds": 12.116666666666667
     },
     {
       "bot": "adaptive",
@@ -5649,8 +5649,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.65,
-      "seconds": 10.85
+      "distance": 32.73,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -5682,8 +5682,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.34,
-      "seconds": 11.683333333333334
+      "distance": 42.42,
+      "seconds": 16.866666666666667
     },
     {
       "bot": "adaptive",
@@ -5726,8 +5726,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.62,
-      "seconds": 10.85
+      "distance": 32.77,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -5759,8 +5759,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 31.02,
-      "seconds": 12.383333333333333
+      "distance": 44.59,
+      "seconds": 17.933333333333334
     },
     {
       "bot": "adaptive",
@@ -5803,8 +5803,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.39,
-      "seconds": 11.566666666666666
+      "distance": 34.55,
+      "seconds": 13.566666666666666
     },
     {
       "bot": "wide",
@@ -5836,8 +5836,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 20.99,
-      "seconds": 8.35
+      "distance": 30.1,
+      "seconds": 12
     },
     {
       "bot": "adaptive",
@@ -5880,8 +5880,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.27,
-      "seconds": 11.516666666666667
+      "distance": 33.25,
+      "seconds": 13.516666666666667
     },
     {
       "bot": "wide",
@@ -5913,8 +5913,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 33.24,
-      "seconds": 13.583333333333334
+      "distance": 42.13,
+      "seconds": 19.933333333333334
     },
     {
       "bot": "adaptive",
@@ -5957,8 +5957,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.69,
-      "seconds": 10.866666666666667
+      "distance": 32.81,
+      "seconds": 12.866666666666667
     },
     {
       "bot": "wide",
@@ -5990,8 +5990,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 26.74,
-      "seconds": 10.633333333333333
+      "distance": 31.81,
+      "seconds": 12.633333333333333
     },
     {
       "bot": "adaptive",
@@ -6034,8 +6034,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.7,
-      "seconds": 10.883333333333333
+      "distance": 31.45,
+      "seconds": 12.883333333333333
     },
     {
       "bot": "wide",
@@ -6111,8 +6111,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.03,
-      "seconds": 11.016666666666667
+      "distance": 33.22,
+      "seconds": 13.016666666666667
     },
     {
       "bot": "wide",
@@ -6144,8 +6144,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.39,
-      "seconds": 11.3
+      "distance": 37.95,
+      "seconds": 15
     },
     {
       "bot": "adaptive",
@@ -6188,8 +6188,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.37,
-      "seconds": 11.15
+      "distance": 33.57,
+      "seconds": 13.15
     },
     {
       "bot": "wide",
@@ -6221,8 +6221,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.04,
-      "seconds": 11.45
+      "distance": 34.12,
+      "seconds": 13.45
     },
     {
       "bot": "adaptive",
@@ -6265,8 +6265,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.34,
-      "seconds": 11.133333333333333
+      "distance": 33.51,
+      "seconds": 13.133333333333333
     },
     {
       "bot": "wide",
@@ -6298,8 +6298,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 24.98,
-      "seconds": 9.883333333333333
+      "distance": 30.05,
+      "seconds": 11.883333333333333
     },
     {
       "bot": "adaptive",
@@ -6342,8 +6342,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.94,
-      "seconds": 10.966666666666667
+      "distance": 33.1,
+      "seconds": 12.966666666666667
     },
     {
       "bot": "wide",
@@ -6375,8 +6375,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 23.57,
-      "seconds": 9.383333333333333
+      "distance": 33.56,
+      "seconds": 13.283333333333333
     },
     {
       "bot": "adaptive",
@@ -6420,7 +6420,7 @@
       "killer": "offscreen",
       "scene": "BACKLOT",
       "distance": 28.98,
-      "seconds": 11.483333333333333
+      "seconds": 13.483333333333333
     },
     {
       "bot": "wide",
@@ -6452,8 +6452,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 24,
-      "seconds": 9.533333333333333
+      "distance": 40.83,
+      "seconds": 20.866666666666667
     },
     {
       "bot": "adaptive",
@@ -6496,8 +6496,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.86,
-      "seconds": 10.933333333333334
+      "distance": 31.94,
+      "seconds": 12.933333333333334
     },
     {
       "bot": "wide",
@@ -6529,8 +6529,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 35.1,
-      "seconds": 14.533333333333333
+      "distance": 53.17,
+      "seconds": 21.683333333333334
     },
     {
       "bot": "adaptive",
@@ -6573,8 +6573,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.24,
-      "seconds": 10.683333333333334
+      "distance": 32.44,
+      "seconds": 12.683333333333334
     },
     {
       "bot": "wide",
@@ -6606,8 +6606,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.69,
-      "seconds": 11
+      "distance": 32.78,
+      "seconds": 13
     },
     {
       "bot": "adaptive",
@@ -6650,8 +6650,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.66,
-      "seconds": 10.883333333333333
+      "distance": 32.82,
+      "seconds": 12.883333333333333
     },
     {
       "bot": "wide",
@@ -6683,8 +6683,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 35.35,
-      "seconds": 13.966666666666667
+      "distance": 40.39,
+      "seconds": 15.966666666666667
     },
     {
       "bot": "adaptive",
@@ -6727,8 +6727,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.62,
-      "seconds": 10.85
+      "distance": 30.08,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -6760,8 +6760,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 32.64,
-      "seconds": 15.1
+      "distance": 57.21,
+      "seconds": 24.933333333333334
     },
     {
       "bot": "adaptive",
@@ -6804,8 +6804,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.86,
-      "seconds": 11.35
+      "distance": 34.01,
+      "seconds": 13.35
     },
     {
       "bot": "wide",
@@ -6837,8 +6837,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 33.02,
-      "seconds": 13.066666666666666
+      "distance": 50.15,
+      "seconds": 21.916666666666668
     },
     {
       "bot": "adaptive",
@@ -6881,8 +6881,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.49,
-      "seconds": 10.8
+      "distance": 32.66,
+      "seconds": 12.8
     },
     {
       "bot": "wide",
@@ -6914,8 +6914,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 31.95,
-      "seconds": 12.583333333333334
+      "distance": 36.95,
+      "seconds": 14.583333333333334
     },
     {
       "bot": "adaptive",
@@ -6958,8 +6958,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.57,
-      "seconds": 10.816666666666666
+      "distance": 32.72,
+      "seconds": 12.816666666666666
     },
     {
       "bot": "wide",
@@ -6991,8 +6991,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 32.53,
-      "seconds": 12.95
+      "distance": 42.84,
+      "seconds": 17.75
     },
     {
       "bot": "adaptive",
@@ -7035,8 +7035,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.82,
-      "seconds": 10.9
+      "distance": 32.94,
+      "seconds": 12.9
     },
     {
       "bot": "wide",
@@ -7068,8 +7068,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.82,
-      "seconds": 11
+      "distance": 32.86,
+      "seconds": 13
     },
     {
       "bot": "adaptive",
@@ -7112,8 +7112,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.65,
-      "seconds": 10.85
+      "distance": 32.8,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -7145,8 +7145,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 37.25,
-      "seconds": 14.716666666666667
+      "distance": 47.75,
+      "seconds": 20.066666666666666
     },
     {
       "bot": "adaptive",
@@ -7189,8 +7189,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.58,
-      "seconds": 10.833333333333334
+      "distance": 32.74,
+      "seconds": 12.833333333333334
     },
     {
       "bot": "wide",
@@ -7222,8 +7222,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 23.79,
-      "seconds": 9.4
+      "distance": 36.12,
+      "seconds": 14.233333333333333
     },
     {
       "bot": "adaptive",
@@ -7266,8 +7266,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.9,
-      "seconds": 10.966666666666667
+      "distance": 33.02,
+      "seconds": 12.966666666666667
     },
     {
       "bot": "wide",
@@ -7299,8 +7299,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 32.03,
-      "seconds": 12.7
+      "distance": 46.26,
+      "seconds": 18.333333333333332
     },
     {
       "bot": "adaptive",
@@ -7343,8 +7343,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.86,
-      "seconds": 10.95
+      "distance": 33.05,
+      "seconds": 12.95
     },
     {
       "bot": "wide",
@@ -7376,8 +7376,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 25.57,
-      "seconds": 10.116666666666667
+      "distance": 30.64,
+      "seconds": 12.116666666666667
     },
     {
       "bot": "adaptive",
@@ -7420,8 +7420,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.61,
-      "seconds": 10.85
+      "distance": 27.69,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -7453,8 +7453,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 18.07,
-      "seconds": 7.15
+      "distance": 27.69,
+      "seconds": 12.366666666666667
     },
     {
       "bot": "adaptive",
@@ -7498,7 +7498,7 @@
       "killer": "offscreen",
       "scene": "BACKLOT",
       "distance": 28.24,
-      "seconds": 11.116666666666667
+      "seconds": 13.116666666666667
     },
     {
       "bot": "wide",
@@ -7530,8 +7530,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 36.34,
-      "seconds": 15.983333333333333
+      "distance": 41.5,
+      "seconds": 17.983333333333334
     },
     {
       "bot": "adaptive",
@@ -7574,8 +7574,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.44,
-      "seconds": 10.766666666666667
+      "distance": 32.59,
+      "seconds": 12.766666666666667
     },
     {
       "bot": "wide",
@@ -7607,8 +7607,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 32.59,
-      "seconds": 12.883333333333333
+      "distance": 37.7,
+      "seconds": 14.883333333333333
     },
     {
       "bot": "adaptive",
@@ -7651,8 +7651,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.91,
-      "seconds": 10.966666666666667
+      "distance": 29.49,
+      "seconds": 12.966666666666667
     },
     {
       "bot": "wide",
@@ -7684,8 +7684,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 25.87,
-      "seconds": 10.25
+      "distance": 36.94,
+      "seconds": 14.933333333333334
     },
     {
       "bot": "adaptive",
@@ -7728,8 +7728,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.77,
-      "seconds": 10.9
+      "distance": 32.93,
+      "seconds": 12.9
     },
     {
       "bot": "wide",
@@ -7761,8 +7761,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 34.72,
-      "seconds": 13.75
+      "distance": 55.58,
+      "seconds": 22.55
     },
     {
       "bot": "adaptive",
@@ -7805,8 +7805,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.9,
-      "seconds": 10.966666666666667
+      "distance": 33.02,
+      "seconds": 12.966666666666667
     },
     {
       "bot": "wide",
@@ -7838,8 +7838,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 33.74,
-      "seconds": 13.366666666666667
+      "distance": 45.26,
+      "seconds": 17.916666666666668
     },
     {
       "bot": "adaptive",
@@ -7882,8 +7882,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.78,
-      "seconds": 10.916666666666666
+      "distance": 32.91,
+      "seconds": 12.916666666666666
     },
     {
       "bot": "wide",
@@ -7915,8 +7915,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 20.74,
-      "seconds": 8.183333333333334
+      "distance": 25.79,
+      "seconds": 10.183333333333334
     },
     {
       "bot": "adaptive",
@@ -7959,8 +7959,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.69,
-      "seconds": 10.866666666666667
+      "distance": 32.86,
+      "seconds": 12.866666666666667
     },
     {
       "bot": "wide",
@@ -7992,8 +7992,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.11,
-      "seconds": 10.7
+      "distance": 32.23,
+      "seconds": 12.7
     },
     {
       "bot": "adaptive",
@@ -8036,8 +8036,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.7,
-      "seconds": 10.883333333333333
+      "distance": 32.91,
+      "seconds": 12.883333333333333
     },
     {
       "bot": "wide",
@@ -8069,8 +8069,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 37.7,
-      "seconds": 14.9
+      "distance": 42.83,
+      "seconds": 16.9
     },
     {
       "bot": "adaptive",
@@ -8113,8 +8113,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.98,
-      "seconds": 10.966666666666667
+      "distance": 33.15,
+      "seconds": 12.966666666666667
     },
     {
       "bot": "wide",
@@ -8146,8 +8146,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 23.32,
-      "seconds": 9.383333333333333
+      "distance": 33.85,
+      "seconds": 13.433333333333334
     },
     {
       "bot": "adaptive",
@@ -8190,8 +8190,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.86,
-      "seconds": 10.933333333333334
+      "distance": 33.06,
+      "seconds": 12.933333333333334
     },
     {
       "bot": "wide",
@@ -8223,8 +8223,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 31.58,
-      "seconds": 12.6
+      "distance": 45.37,
+      "seconds": 19.35
     },
     {
       "bot": "adaptive",
@@ -8267,8 +8267,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.48,
-      "seconds": 10.783333333333333
+      "distance": 32.63,
+      "seconds": 12.783333333333333
     },
     {
       "bot": "wide",
@@ -8300,8 +8300,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 40.16,
-      "seconds": 15.866666666666667
+      "distance": 45.2,
+      "seconds": 17.866666666666667
     },
     {
       "bot": "adaptive",
@@ -8344,8 +8344,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.61,
-      "seconds": 10.85
+      "distance": 28.78,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -8377,8 +8377,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 24.81,
-      "seconds": 9.933333333333334
+      "distance": 30.72,
+      "seconds": 14.716666666666667
     },
     {
       "bot": "adaptive",
@@ -8421,8 +8421,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.78,
-      "seconds": 10.9
+      "distance": 33.03,
+      "seconds": 12.9
     },
     {
       "bot": "wide",
@@ -8454,8 +8454,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 31.23,
-      "seconds": 12.283333333333333
+      "distance": 36.44,
+      "seconds": 14.283333333333333
     },
     {
       "bot": "adaptive",
@@ -8498,8 +8498,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.98,
-      "seconds": 10.983333333333333
+      "distance": 33.14,
+      "seconds": 12.983333333333333
     },
     {
       "bot": "wide",
@@ -8531,8 +8531,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 48.94,
-      "seconds": 21.766666666666666
+      "distance": 57,
+      "seconds": 24.966666666666665
     },
     {
       "bot": "adaptive",
@@ -8575,8 +8575,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.65,
-      "seconds": 10.85
+      "distance": 32.8,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -8608,8 +8608,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 25.11,
-      "seconds": 9.966666666666667
+      "distance": 34.47,
+      "seconds": 13.616666666666667
     },
     {
       "bot": "adaptive",
@@ -8652,8 +8652,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.11,
-      "seconds": 11.45
+      "distance": 34.27,
+      "seconds": 13.45
     },
     {
       "bot": "wide",
@@ -8685,8 +8685,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.83,
-      "seconds": 11.5
+      "distance": 43.81,
+      "seconds": 18.066666666666666
     },
     {
       "bot": "adaptive",
@@ -8729,8 +8729,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.91,
-      "seconds": 10.966666666666667
+      "distance": 33.07,
+      "seconds": 12.966666666666667
     },
     {
       "bot": "wide",
@@ -8762,8 +8762,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.46,
-      "seconds": 11.65
+      "distance": 39.08,
+      "seconds": 15.466666666666667
     },
     {
       "bot": "adaptive",
@@ -8806,8 +8806,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.62,
-      "seconds": 10.85
+      "distance": 29.83,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -8839,8 +8839,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.56,
-      "seconds": 11.316666666666666
+      "distance": 29.81,
+      "seconds": 13.316666666666666
     },
     {
       "bot": "adaptive",
@@ -8883,8 +8883,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.49,
-      "seconds": 10.8
+      "distance": 32.66,
+      "seconds": 12.8
     },
     {
       "bot": "wide",
@@ -8916,8 +8916,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 33.66,
-      "seconds": 13.25
+      "distance": 38.61,
+      "seconds": 15.25
     },
     {
       "bot": "adaptive",
@@ -8960,8 +8960,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.83,
-      "seconds": 10.933333333333334
+      "distance": 32.98,
+      "seconds": 12.933333333333334
     },
     {
       "bot": "wide",
@@ -8993,8 +8993,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.14,
-      "seconds": 10.866666666666667
+      "distance": 39.19,
+      "seconds": 15.833333333333334
     },
     {
       "bot": "adaptive",
@@ -9037,8 +9037,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.86,
-      "seconds": 10.933333333333334
+      "distance": 33.02,
+      "seconds": 12.933333333333334
     },
     {
       "bot": "wide",
@@ -9070,8 +9070,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.38,
-      "seconds": 10.883333333333333
+      "distance": 32.46,
+      "seconds": 12.883333333333333
     },
     {
       "bot": "adaptive",
@@ -9114,8 +9114,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.41,
-      "seconds": 11.15
+      "distance": 33.57,
+      "seconds": 13.15
     },
     {
       "bot": "wide",
@@ -9147,8 +9147,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 32.47,
-      "seconds": 12.866666666666667
+      "distance": 37.63,
+      "seconds": 14.866666666666667
     },
     {
       "bot": "adaptive",
@@ -9191,8 +9191,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.65,
-      "seconds": 10.85
+      "distance": 32.81,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -9224,8 +9224,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 35.68,
-      "seconds": 14.183333333333334
+      "distance": 40.37,
+      "seconds": 16.183333333333334
     },
     {
       "bot": "adaptive",
@@ -9268,8 +9268,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.48,
-      "seconds": 10.783333333333333
+      "distance": 32.6,
+      "seconds": 12.783333333333333
     },
     {
       "bot": "wide",
@@ -9301,8 +9301,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 26.98,
-      "seconds": 10.733333333333333
+      "distance": 32.73,
+      "seconds": 17.283333333333335
     },
     {
       "bot": "adaptive",
@@ -9345,8 +9345,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.83,
-      "seconds": 10.933333333333334
+      "distance": 32.99,
+      "seconds": 12.933333333333334
     },
     {
       "bot": "wide",
@@ -9378,8 +9378,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.85,
-      "seconds": 11.116666666666667
+      "distance": 32.97,
+      "seconds": 13.116666666666667
     },
     {
       "bot": "adaptive",
@@ -9422,8 +9422,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.99,
-      "seconds": 11
+      "distance": 33.14,
+      "seconds": 13
     },
     {
       "bot": "wide",
@@ -9455,8 +9455,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 35.7,
-      "seconds": 14.066666666666666
+      "distance": 66.51,
+      "seconds": 26.333333333333332
     },
     {
       "bot": "adaptive",
@@ -9499,8 +9499,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.44,
-      "seconds": 10.766666666666667
+      "distance": 32.57,
+      "seconds": 12.766666666666667
     },
     {
       "bot": "wide",
@@ -9532,8 +9532,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 40.52,
-      "seconds": 16.833333333333332
+      "distance": 45.52,
+      "seconds": 18.833333333333332
     },
     {
       "bot": "adaptive",
@@ -9576,8 +9576,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.58,
-      "seconds": 10.833333333333334
+      "distance": 28.28,
+      "seconds": 12.833333333333334
     },
     {
       "bot": "wide",
@@ -9609,8 +9609,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 22.87,
-      "seconds": 9.116666666666667
+      "distance": 27.87,
+      "seconds": 11.116666666666667
     },
     {
       "bot": "adaptive",
@@ -9653,8 +9653,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.91,
-      "seconds": 10.966666666666667
+      "distance": 33.07,
+      "seconds": 12.966666666666667
     },
     {
       "bot": "wide",
@@ -9686,8 +9686,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 32.95,
-      "seconds": 13.05
+      "distance": 43.55,
+      "seconds": 17.2
     },
     {
       "bot": "adaptive",
@@ -9730,8 +9730,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.74,
-      "seconds": 10.916666666666666
+      "distance": 30.19,
+      "seconds": 12.916666666666666
     },
     {
       "bot": "wide",
@@ -9764,7 +9764,7 @@
       "killer": "offscreen",
       "scene": "BACKLOT",
       "distance": 30.21,
-      "seconds": 17.933333333333334
+      "seconds": 24.466666666666665
     },
     {
       "bot": "adaptive",
@@ -9807,8 +9807,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.8,
-      "seconds": 11.316666666666666
+      "distance": 33.95,
+      "seconds": 13.316666666666666
     },
     {
       "bot": "wide",
@@ -9840,8 +9840,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 32.41,
-      "seconds": 12.916666666666666
+      "distance": 40.89,
+      "seconds": 16.916666666666668
     },
     {
       "bot": "adaptive",
@@ -9884,8 +9884,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.65,
-      "seconds": 10.85
+      "distance": 32.8,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -9917,8 +9917,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 26.15,
-      "seconds": 10.316666666666666
+      "distance": 31.22,
+      "seconds": 12.316666666666666
     },
     {
       "bot": "adaptive",
@@ -9961,8 +9961,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.12,
-      "seconds": 11.033333333333333
+      "distance": 33.24,
+      "seconds": 13.033333333333333
     },
     {
       "bot": "wide",
@@ -9994,8 +9994,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.2,
-      "seconds": 10.833333333333334
+      "distance": 32.28,
+      "seconds": 12.833333333333334
     },
     {
       "bot": "adaptive",
@@ -10038,8 +10038,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.62,
-      "seconds": 10.85
+      "distance": 27.66,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -10071,8 +10071,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 24.54,
-      "seconds": 9.8
+      "distance": 27.63,
+      "seconds": 11.8
     },
     {
       "bot": "adaptive",
@@ -10115,8 +10115,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.1,
-      "seconds": 11.45
+      "distance": 30.8,
+      "seconds": 13.45
     },
     {
       "bot": "wide",
@@ -10148,8 +10148,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 25.06,
-      "seconds": 9.983333333333333
+      "distance": 30.17,
+      "seconds": 11.983333333333333
     },
     {
       "bot": "adaptive",
@@ -10192,8 +10192,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.62,
-      "seconds": 10.85
+      "distance": 32.74,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -10225,8 +10225,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 33.92,
-      "seconds": 13.5
+      "distance": 48.87,
+      "seconds": 20.016666666666666
     },
     {
       "bot": "adaptive",
@@ -10269,8 +10269,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.58,
-      "seconds": 10.833333333333334
+      "distance": 32.73,
+      "seconds": 12.833333333333334
     },
     {
       "bot": "wide",
@@ -10302,8 +10302,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 24.56,
-      "seconds": 9.833333333333334
+      "distance": 41.07,
+      "seconds": 16.283333333333335
     },
     {
       "bot": "adaptive",
@@ -10346,8 +10346,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.98,
-      "seconds": 11.4
+      "distance": 34.13,
+      "seconds": 13.4
     },
     {
       "bot": "wide",
@@ -10379,8 +10379,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 34.37,
-      "seconds": 13.616666666666667
+      "distance": 43.51,
+      "seconds": 17.666666666666668
     },
     {
       "bot": "adaptive",
@@ -10423,8 +10423,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.19,
-      "seconds": 11.483333333333333
+      "distance": 34.34,
+      "seconds": 13.483333333333333
     },
     {
       "bot": "wide",
@@ -10456,8 +10456,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 25.83,
-      "seconds": 10.25
+      "distance": 30.92,
+      "seconds": 12.25
     },
     {
       "bot": "adaptive",
@@ -10500,8 +10500,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.91,
-      "seconds": 10.966666666666667
+      "distance": 33.07,
+      "seconds": 12.966666666666667
     },
     {
       "bot": "wide",
@@ -10533,8 +10533,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 32.16,
-      "seconds": 12.733333333333333
+      "distance": 37.28,
+      "seconds": 14.733333333333333
     },
     {
       "bot": "adaptive",
@@ -10577,8 +10577,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.7,
-      "seconds": 10.883333333333333
+      "distance": 31.36,
+      "seconds": 12.883333333333333
     },
     {
       "bot": "wide",
@@ -10610,8 +10610,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.6,
-      "seconds": 11.366666666666667
+      "distance": 33.3,
+      "seconds": 13.366666666666667
     },
     {
       "bot": "adaptive",
@@ -10654,8 +10654,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.62,
-      "seconds": 10.85
+      "distance": 32.77,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -10687,8 +10687,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 32.9,
-      "seconds": 13.066666666666666
+      "distance": 38.01,
+      "seconds": 15.066666666666666
     },
     {
       "bot": "adaptive",
@@ -10731,8 +10731,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.62,
-      "seconds": 10.85
+      "distance": 32.74,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -10764,8 +10764,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.83,
-      "seconds": 11.8
+      "distance": 33.58,
+      "seconds": 19.283333333333335
     },
     {
       "bot": "adaptive",
@@ -10808,8 +10808,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.44,
-      "seconds": 10.766666666666667
+      "distance": 32.57,
+      "seconds": 12.766666666666667
     },
     {
       "bot": "wide",
@@ -10841,8 +10841,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 33.9,
-      "seconds": 13.4
+      "distance": 42.06,
+      "seconds": 16.566666666666666
     },
     {
       "bot": "adaptive",
@@ -10885,8 +10885,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.86,
-      "seconds": 10.933333333333334
+      "distance": 33.01,
+      "seconds": 12.933333333333334
     },
     {
       "bot": "wide",
@@ -10918,8 +10918,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 33.76,
-      "seconds": 13.383333333333333
+      "distance": 42.46,
+      "seconds": 16.9
     },
     {
       "bot": "adaptive",
@@ -10962,8 +10962,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.97,
-      "seconds": 11.383333333333333
+      "distance": 34.22,
+      "seconds": 13.383333333333333
     },
     {
       "bot": "wide",
@@ -10995,8 +10995,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.01,
-      "seconds": 10.683333333333334
+      "distance": 32.18,
+      "seconds": 12.683333333333334
     },
     {
       "bot": "adaptive",
@@ -11039,8 +11039,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.79,
-      "seconds": 10.916666666666666
+      "distance": 32.94,
+      "seconds": 12.916666666666666
     },
     {
       "bot": "wide",
@@ -11072,8 +11072,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 35.29,
-      "seconds": 14.033333333333333
+      "distance": 40.4,
+      "seconds": 16.033333333333335
     },
     {
       "bot": "adaptive",
@@ -11116,8 +11116,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.72,
-      "seconds": 11.283333333333333
+      "distance": 33.87,
+      "seconds": 13.283333333333333
     },
     {
       "bot": "wide",
@@ -11149,8 +11149,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.93,
-      "seconds": 11.583333333333334
+      "distance": 35.12,
+      "seconds": 14.95
     },
     {
       "bot": "adaptive",
@@ -11193,8 +11193,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.39,
-      "seconds": 11.566666666666666
+      "distance": 34.55,
+      "seconds": 13.566666666666666
     },
     {
       "bot": "wide",
@@ -11226,8 +11226,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 26.36,
-      "seconds": 10.5
+      "distance": 34.51,
+      "seconds": 16.366666666666667
     },
     {
       "bot": "adaptive",
@@ -11270,8 +11270,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.65,
-      "seconds": 10.85
+      "distance": 32.82,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -11303,8 +11303,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 33.61,
-      "seconds": 13.266666666666667
+      "distance": 38.61,
+      "seconds": 15.266666666666667
     },
     {
       "bot": "adaptive",
@@ -11347,8 +11347,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.61,
-      "seconds": 10.816666666666666
+      "distance": 32.76,
+      "seconds": 12.816666666666666
     },
     {
       "bot": "wide",
@@ -11380,8 +11380,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 26.53,
-      "seconds": 10.433333333333334
+      "distance": 35.71,
+      "seconds": 14.05
     },
     {
       "bot": "adaptive",
@@ -11424,8 +11424,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.83,
-      "seconds": 10.933333333333334
+      "distance": 31.94,
+      "seconds": 12.933333333333334
     },
     {
       "bot": "wide",
@@ -11457,8 +11457,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 23.5,
-      "seconds": 9.35
+      "distance": 28.67,
+      "seconds": 11.35
     },
     {
       "bot": "adaptive",
@@ -11501,8 +11501,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.62,
-      "seconds": 10.85
+      "distance": 32.78,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -11534,8 +11534,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.19,
-      "seconds": 11.583333333333334
+      "distance": 38.77,
+      "seconds": 15.366666666666667
     },
     {
       "bot": "adaptive",
@@ -11578,8 +11578,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.78,
-      "seconds": 10.916666666666666
+      "distance": 29.7,
+      "seconds": 12.916666666666666
     },
     {
       "bot": "wide",
@@ -11611,8 +11611,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.62,
-      "seconds": 10.983333333333333
+      "distance": 29.66,
+      "seconds": 12.983333333333333
     },
     {
       "bot": "adaptive",
@@ -11655,8 +11655,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.7,
-      "seconds": 10.883333333333333
+      "distance": 32.87,
+      "seconds": 12.883333333333333
     },
     {
       "bot": "wide",
@@ -11688,8 +11688,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.21,
-      "seconds": 11.1
+      "distance": 39.17,
+      "seconds": 15.5
     },
     {
       "bot": "adaptive",
@@ -11732,8 +11732,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.62,
-      "seconds": 10.85
+      "distance": 32.74,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -11765,8 +11765,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 31.9,
-      "seconds": 12.733333333333333
+      "distance": 36.32,
+      "seconds": 16.216666666666665
     },
     {
       "bot": "adaptive",
@@ -11809,8 +11809,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.69,
-      "seconds": 10.85
+      "distance": 32.85,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -11842,8 +11842,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 33.81,
-      "seconds": 13.416666666666666
+      "distance": 39,
+      "seconds": 15.416666666666666
     },
     {
       "bot": "adaptive",
@@ -11886,8 +11886,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.91,
-      "seconds": 10.966666666666667
+      "distance": 33.06,
+      "seconds": 12.966666666666667
     },
     {
       "bot": "wide",
@@ -11919,8 +11919,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 26.68,
-      "seconds": 10.616666666666667
+      "distance": 34.83,
+      "seconds": 17.05
     },
     {
       "bot": "adaptive",
@@ -11963,8 +11963,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.94,
-      "seconds": 10.966666666666667
+      "distance": 33.1,
+      "seconds": 12.966666666666667
     },
     {
       "bot": "wide",
@@ -11996,8 +11996,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 26.36,
-      "seconds": 10.433333333333334
+      "distance": 31.48,
+      "seconds": 12.433333333333334
     },
     {
       "bot": "adaptive",
@@ -12040,8 +12040,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.23,
-      "seconds": 10.7
+      "distance": 32.39,
+      "seconds": 12.7
     },
     {
       "bot": "wide",
@@ -12073,8 +12073,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 41.05,
-      "seconds": 16.316666666666666
+      "distance": 46.05,
+      "seconds": 18.316666666666666
     },
     {
       "bot": "adaptive",
@@ -12117,8 +12117,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.86,
-      "seconds": 10.933333333333334
+      "distance": 33.01,
+      "seconds": 12.933333333333334
     },
     {
       "bot": "wide",
@@ -12150,8 +12150,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 31.22,
-      "seconds": 12.333333333333334
+      "distance": 36.3,
+      "seconds": 14.333333333333334
     },
     {
       "bot": "adaptive",
@@ -12194,8 +12194,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.48,
-      "seconds": 10.783333333333333
+      "distance": 30.97,
+      "seconds": 12.783333333333333
     },
     {
       "bot": "wide",
@@ -12227,8 +12227,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 21.11,
-      "seconds": 8.333333333333334
+      "distance": 30.97,
+      "seconds": 14.566666666666666
     },
     {
       "bot": "adaptive",
@@ -12271,8 +12271,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.12,
-      "seconds": 11.033333333333333
+      "distance": 33.24,
+      "seconds": 13.033333333333333
     },
     {
       "bot": "wide",
@@ -12304,8 +12304,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 30.16,
-      "seconds": 11.833333333333334
+      "distance": 35.24,
+      "seconds": 13.833333333333334
     },
     {
       "bot": "adaptive",
@@ -12348,8 +12348,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.7,
-      "seconds": 10.883333333333333
+      "distance": 32.86,
+      "seconds": 12.883333333333333
     },
     {
       "bot": "wide",
@@ -12381,8 +12381,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 23.66,
-      "seconds": 9.416666666666666
+      "distance": 28.78,
+      "seconds": 11.416666666666666
     },
     {
       "bot": "adaptive",
@@ -12425,8 +12425,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.78,
-      "seconds": 10.916666666666666
+      "distance": 32.94,
+      "seconds": 12.916666666666666
     },
     {
       "bot": "wide",
@@ -12458,8 +12458,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 34.47,
-      "seconds": 13.616666666666667
+      "distance": 39.54,
+      "seconds": 15.616666666666667
     },
     {
       "bot": "adaptive",
@@ -12502,8 +12502,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.03,
-      "seconds": 11.033333333333333
+      "distance": 33.23,
+      "seconds": 13.033333333333333
     },
     {
       "bot": "wide",
@@ -12535,8 +12535,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 22.1,
-      "seconds": 8.766666666666667
+      "distance": 38.82,
+      "seconds": 15.35
     },
     {
       "bot": "adaptive",
@@ -12579,8 +12579,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.49,
-      "seconds": 10.8
+      "distance": 32.66,
+      "seconds": 12.8
     },
     {
       "bot": "wide",
@@ -12612,8 +12612,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 40.8,
-      "seconds": 16.216666666666665
+      "distance": 44.89,
+      "seconds": 18.216666666666665
     },
     {
       "bot": "adaptive",
@@ -12656,8 +12656,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.7,
-      "seconds": 10.883333333333333
+      "distance": 32.87,
+      "seconds": 12.883333333333333
     },
     {
       "bot": "wide",
@@ -12689,8 +12689,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 37.76,
-      "seconds": 15.016666666666667
+      "distance": 52.29,
+      "seconds": 21.383333333333333
     },
     {
       "bot": "adaptive",
@@ -12733,8 +12733,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.77,
-      "seconds": 10.9
+      "distance": 32.93,
+      "seconds": 12.9
     },
     {
       "bot": "wide",
@@ -12766,8 +12766,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 36.89,
-      "seconds": 14.6
+      "distance": 38.05,
+      "seconds": 16.6
     },
     {
       "bot": "adaptive",
@@ -12810,8 +12810,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.77,
-      "seconds": 10.9
+      "distance": 32.93,
+      "seconds": 12.9
     },
     {
       "bot": "wide",
@@ -12843,8 +12843,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 35.72,
-      "seconds": 14.15
+      "distance": 40.93,
+      "seconds": 16.15
     },
     {
       "bot": "adaptive",
@@ -12887,8 +12887,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.94,
-      "seconds": 10.95
+      "distance": 33.06,
+      "seconds": 12.95
     },
     {
       "bot": "wide",
@@ -12920,8 +12920,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 23.86,
-      "seconds": 9.533333333333333
+      "distance": 36.02,
+      "seconds": 14.333333333333334
     },
     {
       "bot": "adaptive",
@@ -12964,8 +12964,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.98,
-      "seconds": 11.4
+      "distance": 34.13,
+      "seconds": 13.4
     },
     {
       "bot": "wide",
@@ -12997,8 +12997,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 24.17,
-      "seconds": 9.633333333333333
+      "distance": 35.26,
+      "seconds": 14.033333333333333
     },
     {
       "bot": "adaptive",
@@ -13041,8 +13041,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.87,
-      "seconds": 10.933333333333334
+      "distance": 32.99,
+      "seconds": 12.933333333333334
     },
     {
       "bot": "wide",
@@ -13074,8 +13074,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 26.94,
-      "seconds": 10.633333333333333
+      "distance": 32.1,
+      "seconds": 12.633333333333333
     },
     {
       "bot": "adaptive",
@@ -13118,8 +13118,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.95,
-      "seconds": 11
+      "distance": 33.14,
+      "seconds": 13
     },
     {
       "bot": "wide",
@@ -13151,8 +13151,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 30,
-      "seconds": 11.933333333333334
+      "distance": 33.17,
+      "seconds": 13.933333333333334
     },
     {
       "bot": "adaptive",
@@ -13195,8 +13195,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.1,
-      "seconds": 11.45
+      "distance": 34.25,
+      "seconds": 13.45
     },
     {
       "bot": "wide",
@@ -13228,8 +13228,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 25,
-      "seconds": 9.95
+      "distance": 45.89,
+      "seconds": 18.533333333333335
     },
     {
       "bot": "adaptive",
@@ -13272,8 +13272,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.54,
-      "seconds": 10.833333333333334
+      "distance": 30.35,
+      "seconds": 12.833333333333334
     },
     {
       "bot": "wide",
@@ -13305,8 +13305,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 30.37,
-      "seconds": 12.816666666666666
+      "distance": 37.91,
+      "seconds": 17.4
     },
     {
       "bot": "adaptive",
@@ -13349,8 +13349,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.99,
-      "seconds": 11
+      "distance": 31.32,
+      "seconds": 13
     },
     {
       "bot": "wide",
@@ -13382,8 +13382,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 26.74,
-      "seconds": 10.566666666666666
+      "distance": 31.32,
+      "seconds": 14
     },
     {
       "bot": "adaptive",
@@ -13426,8 +13426,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.99,
-      "seconds": 11
+      "distance": 33.2,
+      "seconds": 13
     },
     {
       "bot": "wide",
@@ -13459,8 +13459,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.85,
-      "seconds": 11.883333333333333
+      "distance": 35.01,
+      "seconds": 13.883333333333333
     },
     {
       "bot": "adaptive",
@@ -13503,8 +13503,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.57,
-      "seconds": 10.816666666666666
+      "distance": 32.77,
+      "seconds": 12.816666666666666
     },
     {
       "bot": "wide",
@@ -13536,8 +13536,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 41.85,
-      "seconds": 16.483333333333334
+      "distance": 44.39,
+      "seconds": 18.483333333333334
     },
     {
       "bot": "adaptive",
@@ -13581,7 +13581,7 @@
       "killer": "offscreen",
       "scene": "BACKLOT",
       "distance": 26.94,
-      "seconds": 10.816666666666666
+      "seconds": 12.816666666666666
     },
     {
       "bot": "wide",
@@ -13613,8 +13613,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.17,
-      "seconds": 11.183333333333334
+      "distance": 28.88,
+      "seconds": 13.183333333333334
     },
     {
       "bot": "adaptive",
@@ -13657,8 +13657,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.48,
-      "seconds": 10.783333333333333
+      "distance": 32.6,
+      "seconds": 12.783333333333333
     },
     {
       "bot": "wide",
@@ -13690,8 +13690,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 26.19,
-      "seconds": 10.45
+      "distance": 31.23,
+      "seconds": 12.45
     },
     {
       "bot": "adaptive",
@@ -13734,8 +13734,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.78,
-      "seconds": 10.916666666666666
+      "distance": 32.95,
+      "seconds": 12.916666666666666
     },
     {
       "bot": "wide",
@@ -13767,8 +13767,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 33.9,
-      "seconds": 13.433333333333334
+      "distance": 34.48,
+      "seconds": 15.433333333333334
     },
     {
       "bot": "adaptive",
@@ -13811,8 +13811,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.91,
-      "seconds": 10.966666666666667
+      "distance": 33.07,
+      "seconds": 12.966666666666667
     },
     {
       "bot": "wide",
@@ -13844,8 +13844,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.58,
-      "seconds": 10.966666666666667
+      "distance": 37.89,
+      "seconds": 15.016666666666667
     },
     {
       "bot": "adaptive",
@@ -13888,8 +13888,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.99,
-      "seconds": 11
+      "distance": 33.2,
+      "seconds": 13
     },
     {
       "bot": "wide",
@@ -13921,8 +13921,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 24.04,
-      "seconds": 9.583333333333334
+      "distance": 29.24,
+      "seconds": 11.583333333333334
     },
     {
       "bot": "adaptive",
@@ -13965,8 +13965,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.72,
-      "seconds": 11.283333333333333
+      "distance": 33.87,
+      "seconds": 13.283333333333333
     },
     {
       "bot": "wide",
@@ -13998,8 +13998,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 23.4,
-      "seconds": 9.35
+      "distance": 39.77,
+      "seconds": 15.766666666666667
     },
     {
       "bot": "adaptive",
@@ -14042,8 +14042,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.78,
-      "seconds": 10.916666666666666
+      "distance": 32.44,
+      "seconds": 12.916666666666666
     },
     {
       "bot": "wide",
@@ -14075,8 +14075,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.68,
-      "seconds": 11.383333333333333
+      "distance": 32.45,
+      "seconds": 15.183333333333334
     },
     {
       "bot": "adaptive",
@@ -14119,8 +14119,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.57,
-      "seconds": 10.816666666666666
+      "distance": 32.72,
+      "seconds": 12.816666666666666
     },
     {
       "bot": "wide",
@@ -14152,8 +14152,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 32.43,
-      "seconds": 12.883333333333333
+      "distance": 42.07,
+      "seconds": 16.666666666666668
     },
     {
       "bot": "adaptive",
@@ -14196,8 +14196,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.28,
-      "seconds": 10.7
+      "distance": 32.44,
+      "seconds": 12.7
     },
     {
       "bot": "wide",
@@ -14229,8 +14229,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 32.31,
-      "seconds": 12.9
+      "distance": 37.43,
+      "seconds": 14.9
     },
     {
       "bot": "adaptive",
@@ -14274,7 +14274,7 @@
       "killer": "offscreen",
       "scene": "BACKLOT",
       "distance": 26.82,
-      "seconds": 10.733333333333333
+      "seconds": 12.733333333333333
     },
     {
       "bot": "wide",
@@ -14306,8 +14306,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 26.82,
-      "seconds": 11.566666666666666
+      "distance": 37.97,
+      "seconds": 33.38333333333333
     },
     {
       "bot": "adaptive",
@@ -14351,7 +14351,7 @@
       "killer": "offscreen",
       "scene": "BACKLOT",
       "distance": 28.03,
-      "seconds": 11.033333333333333
+      "seconds": 13.033333333333333
     },
     {
       "bot": "wide",
@@ -14383,8 +14383,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.03,
-      "seconds": 11.216666666666667
+      "distance": 35.77,
+      "seconds": 16.066666666666666
     },
     {
       "bot": "adaptive",
@@ -14427,8 +14427,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.44,
-      "seconds": 11.15
+      "distance": 33.6,
+      "seconds": 13.15
     },
     {
       "bot": "wide",
@@ -14460,8 +14460,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 25.07,
-      "seconds": 9.9
+      "distance": 36.02,
+      "seconds": 14.183333333333334
     },
     {
       "bot": "adaptive",
@@ -14504,8 +14504,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.33,
-      "seconds": 11.116666666666667
+      "distance": 33.43,
+      "seconds": 13.116666666666667
     },
     {
       "bot": "wide",
@@ -14537,8 +14537,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 34.61,
-      "seconds": 13.716666666666667
+      "distance": 39.72,
+      "seconds": 15.716666666666667
     },
     {
       "bot": "adaptive",
@@ -14581,8 +14581,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.18,
-      "seconds": 11.466666666666667
+      "distance": 34.33,
+      "seconds": 13.466666666666667
     },
     {
       "bot": "wide",
@@ -14614,8 +14614,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 31.71,
-      "seconds": 12.6
+      "distance": 36.83,
+      "seconds": 14.6
     },
     {
       "bot": "adaptive",
@@ -14658,8 +14658,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.07,
-      "seconds": 11.033333333333333
+      "distance": 33.23,
+      "seconds": 13.033333333333333
     },
     {
       "bot": "wide",
@@ -14691,8 +14691,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 22.04,
-      "seconds": 8.85
+      "distance": 31.28,
+      "seconds": 12.466666666666667
     },
     {
       "bot": "adaptive",
@@ -14735,8 +14735,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.65,
-      "seconds": 10.85
+      "distance": 31.98,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -14768,8 +14768,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.07,
-      "seconds": 10.7
+      "distance": 31.98,
+      "seconds": 18.466666666666665
     },
     {
       "bot": "adaptive",
@@ -14812,8 +14812,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.83,
-      "seconds": 10.916666666666666
+      "distance": 32.95,
+      "seconds": 12.916666666666666
     },
     {
       "bot": "wide",
@@ -14845,8 +14845,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 22.84,
-      "seconds": 9.166666666666666
+      "distance": 28.04,
+      "seconds": 11.166666666666666
     },
     {
       "bot": "adaptive",
@@ -14889,8 +14889,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.83,
-      "seconds": 10.933333333333334
+      "distance": 33.08,
+      "seconds": 12.933333333333334
     },
     {
       "bot": "wide",
@@ -14922,8 +14922,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 25.89,
-      "seconds": 10.233333333333333
+      "distance": 34.67,
+      "seconds": 13.616666666666667
     },
     {
       "bot": "adaptive",
@@ -14966,8 +14966,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.19,
-      "seconds": 11.483333333333333
+      "distance": 34.38,
+      "seconds": 13.483333333333333
     },
     {
       "bot": "wide",
@@ -14999,8 +14999,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 36.41,
-      "seconds": 14.483333333333333
+      "distance": 41.52,
+      "seconds": 16.483333333333334
     },
     {
       "bot": "adaptive",
@@ -15043,8 +15043,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.48,
-      "seconds": 10.783333333333333
+      "distance": 30.61,
+      "seconds": 12.783333333333333
     },
     {
       "bot": "wide",
@@ -15076,8 +15076,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 22.57,
-      "seconds": 9.016666666666667
+      "distance": 30.61,
+      "seconds": 13.55
     },
     {
       "bot": "adaptive",
@@ -15120,8 +15120,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.99,
-      "seconds": 11
+      "distance": 33.15,
+      "seconds": 13
     },
     {
       "bot": "wide",
@@ -15153,8 +15153,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 24.2,
-      "seconds": 9.7
+      "distance": 34.11,
+      "seconds": 13.55
     },
     {
       "bot": "adaptive",
@@ -15197,8 +15197,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.69,
-      "seconds": 10.866666666666667
+      "distance": 32.81,
+      "seconds": 12.866666666666667
     },
     {
       "bot": "wide",
@@ -15230,8 +15230,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 34.48,
-      "seconds": 13.65
+      "distance": 39.6,
+      "seconds": 15.65
     },
     {
       "bot": "adaptive",
@@ -15274,8 +15274,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.4,
-      "seconds": 11.15
+      "distance": 33.59,
+      "seconds": 13.15
     },
     {
       "bot": "wide",
@@ -15307,8 +15307,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 25.98,
-      "seconds": 10.283333333333333
+      "distance": 31.01,
+      "seconds": 12.283333333333333
     },
     {
       "bot": "adaptive",
@@ -15351,8 +15351,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.53,
-      "seconds": 10.816666666666666
+      "distance": 32.68,
+      "seconds": 12.816666666666666
     },
     {
       "bot": "wide",
@@ -15384,8 +15384,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.89,
-      "seconds": 11.516666666666667
+      "distance": 33.93,
+      "seconds": 13.516666666666667
     },
     {
       "bot": "adaptive",
@@ -15428,8 +15428,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 28.07,
-      "seconds": 11.033333333333333
+      "distance": 32.24,
+      "seconds": 13.033333333333333
     },
     {
       "bot": "wide",
@@ -15461,8 +15461,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.71,
-      "seconds": 11.716666666666667
+      "distance": 49.56,
+      "seconds": 19.683333333333334
     },
     {
       "bot": "adaptive",
@@ -15505,8 +15505,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.69,
-      "seconds": 10.866666666666667
+      "distance": 32.84,
+      "seconds": 12.866666666666667
     },
     {
       "bot": "wide",
@@ -15538,8 +15538,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 31.39,
-      "seconds": 12.45
+      "distance": 50.66,
+      "seconds": 22.7
     },
     {
       "bot": "adaptive",
@@ -15582,8 +15582,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.58,
-      "seconds": 10.833333333333334
+      "distance": 32.74,
+      "seconds": 12.833333333333334
     },
     {
       "bot": "wide",
@@ -15615,8 +15615,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.24,
-      "seconds": 11.6
+      "distance": 34.28,
+      "seconds": 13.6
     },
     {
       "bot": "adaptive",
@@ -15659,8 +15659,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.36,
-      "seconds": 10.733333333333333
+      "distance": 32.51,
+      "seconds": 12.733333333333333
     },
     {
       "bot": "wide",
@@ -15692,8 +15692,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 30.1,
-      "seconds": 11.866666666666667
+      "distance": 33.26,
+      "seconds": 13.866666666666667
     },
     {
       "bot": "adaptive",
@@ -15736,8 +15736,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 27.62,
-      "seconds": 10.85
+      "distance": 32.78,
+      "seconds": 12.85
     },
     {
       "bot": "wide",
@@ -15769,8 +15769,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "BACKLOT",
-      "distance": 29.11,
-      "seconds": 11.533333333333333
+      "distance": 37.32,
+      "seconds": 14.85
     }
   ],
   "jitterWins": {

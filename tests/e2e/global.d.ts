@@ -18,6 +18,7 @@ declare global {
       finishForShare: () => void;
       lod: () => LodDiagnostics;
       setCamera: (x: number, z: number, zoom: number) => void;
+      lostDemo: (seconds?: number | null) => void;
       silhouettes: () => { ok: boolean; failures: string[]; heights: Record<string, number>; contrasts: Record<string, number>; sheet: string };
     };
   }
