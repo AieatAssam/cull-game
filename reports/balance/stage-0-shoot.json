@@ -6,7 +6,7 @@
     200
   ],
   "jitter": 8,
-  "command": "npm run balance -- --stage=0 --mode=both --seeds=200 --jitter=8",
+  "command": "npm run balance -- --stage=0 --mode=both --seeds=200 --jitter=8 --workers=8 --out=/tmp/bal",
   "note": "Report-only. Raw seeds. Bots read only player-visible state (src/bots/observe.ts). §5 targets are for the full Shoot; strip gates are informational.",
   "passive": {
     "bot": "gatekeeper",
@@ -17,12 +17,12 @@
       "runs": 200,
       "completed": 200,
       "completion": 1,
-      "meanDistance": 653.45,
+      "meanDistance": 653.05,
       "timeouts": 0,
       "clearSeconds": {
-        "min": 253.7,
-        "mean": 262.1,
-        "max": 270.8
+        "min": 252.9,
+        "mean": 261.9,
+        "max": 270.9
       },
       "failReasons": {},
       "killers": {},
@@ -213,27 +213,31 @@
     },
     "adaptive": {
       "runs": 1600,
-      "completed": 1598,
-      "completion": 0.9988,
-      "meanDistance": 653.13,
+      "completed": 1526,
+      "completion": 0.9538,
+      "meanDistance": 648.48,
       "timeouts": 0,
       "clearSeconds": {
         "min": 253.4,
-        "mean": 262.8,
-        "max": 272
+        "mean": 262.6,
+        "max": 271.8
       },
       "failReasons": {
-        "out-of-film": 2
+        "hit": 74
       },
       "killers": {
-        "film": 2
+        "urchin": 74
       },
       "scenes": {
-        "NIGHT SHOOT": 2
+        "LONG TAKE": 46,
+        "NIGHT SHOOT": 28
       },
       "sceneKillers": {
+        "LONG TAKE": {
+          "urchin": 46
+        },
         "NIGHT SHOOT": {
-          "film": 2
+          "urchin": 28
         }
       },
       "winsHistogram": [
@@ -241,11 +245,11 @@
         0,
         0,
         0,
-        0,
-        0,
-        1,
-        0,
-        199
+        2,
+        2,
+        12,
+        36,
+        148
       ]
     }
   },
@@ -276,7 +280,7 @@
     },
     {
       "name": "adaptive / passive mean distance",
-      "value": "32.689×",
+      "value": "32.669×",
       "target": "≥ 1.5×",
       "pass": true
     },
@@ -320,7 +324,7 @@
     },
     {
       "name": "skill is reliable: jitter(adaptive, 8) seeds with ≥6/8 wins",
-      "value": "100%",
+      "value": "98%",
       "target": "≥ 85%",
       "pass": true
     },
@@ -356,13 +360,13 @@
     },
     {
       "name": "never samey: roster kinds per scene (min over seeds)",
-      "value": "BACKLOT 2, MINIATURE CITY 4, NIGHT SHOOT 6, LONG TAKE 7",
+      "value": "BACKLOT 2, MINIATURE CITY 3, NIGHT SHOOT 6, LONG TAKE 7",
       "target": "≥ 3 each",
       "pass": false
     },
     {
       "name": "duration: Adaptive clear sim time",
-      "value": "253.7 / 262.1 / 270.8 s",
+      "value": "252.9 / 261.9 / 270.9 s",
       "target": "180–480 s",
       "pass": true
     }
@@ -376,8 +380,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 654.9,
-      "seconds": 263.01666666666665
+      "distance": 654.92,
+      "seconds": 263.1
     },
     {
       "bot": "tracker",
@@ -453,8 +457,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 648.71,
-      "seconds": 259.8333333333333
+      "distance": 648.18,
+      "seconds": 259.55
     },
     {
       "bot": "tracker",
@@ -530,8 +534,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 648.67,
-      "seconds": 259.81666666666666
+      "distance": 648.45,
+      "seconds": 259.7
     },
     {
       "bot": "tracker",
@@ -607,8 +611,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 641.36,
-      "seconds": 256.85
+      "distance": 641.34,
+      "seconds": 256.8666666666667
     },
     {
       "bot": "tracker",
@@ -684,8 +688,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 653.6,
-      "seconds": 261.7
+      "distance": 653.59,
+      "seconds": 261.81666666666666
     },
     {
       "bot": "tracker",
@@ -761,8 +765,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 648.6,
-      "seconds": 259.8833333333333
+      "distance": 648.35,
+      "seconds": 259.81666666666666
     },
     {
       "bot": "tracker",
@@ -838,8 +842,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 655.96,
-      "seconds": 263.23333333333335
+      "distance": 652.46,
+      "seconds": 261.81666666666666
     },
     {
       "bot": "tracker",
@@ -915,8 +919,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 659.52,
-      "seconds": 267.4
+      "distance": 661.22,
+      "seconds": 268.05
     },
     {
       "bot": "tracker",
@@ -992,8 +996,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 659.74,
-      "seconds": 264.9166666666667
+      "distance": 659.06,
+      "seconds": 264.71666666666664
     },
     {
       "bot": "tracker",
@@ -1069,8 +1073,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 654.04,
-      "seconds": 262.5
+      "distance": 653.83,
+      "seconds": 262.3666666666667
     },
     {
       "bot": "tracker",
@@ -1146,8 +1150,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 648.98,
-      "seconds": 259.75
+      "distance": 647.83,
+      "seconds": 259.3333333333333
     },
     {
       "bot": "tracker",
@@ -1223,8 +1227,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 659.61,
-      "seconds": 265.5833333333333
+      "distance": 660.09,
+      "seconds": 265.78333333333336
     },
     {
       "bot": "tracker",
@@ -1300,8 +1304,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 656.44,
-      "seconds": 263.31666666666666
+      "distance": 656.46,
+      "seconds": 263.48333333333335
     },
     {
       "bot": "tracker",
@@ -1377,8 +1381,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 642.11,
-      "seconds": 257.28333333333336
+      "distance": 642.18,
+      "seconds": 257.43333333333334
     },
     {
       "bot": "tracker",
@@ -1454,8 +1458,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 655.4,
-      "seconds": 262.8
+      "distance": 656.64,
+      "seconds": 263.25
     },
     {
       "bot": "tracker",
@@ -1531,8 +1535,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 656.53,
-      "seconds": 262.8833333333333
+      "distance": 656.61,
+      "seconds": 262.96666666666664
     },
     {
       "bot": "tracker",
@@ -1608,8 +1612,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 658.85,
-      "seconds": 264.65
+      "distance": 658.29,
+      "seconds": 263.71666666666664
     },
     {
       "bot": "tracker",
@@ -1686,7 +1690,7 @@
       "killer": null,
       "scene": "LONG TAKE",
       "distance": 658.15,
-      "seconds": 264.1166666666667
+      "seconds": 264.18333333333334
     },
     {
       "bot": "tracker",
@@ -1762,8 +1766,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 638.91,
-      "seconds": 255.93333333333334
+      "distance": 639.73,
+      "seconds": 256.3
     },
     {
       "bot": "tracker",
@@ -1839,8 +1843,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 653.35,
-      "seconds": 262.18333333333334
+      "distance": 653.25,
+      "seconds": 262.25
     },
     {
       "bot": "tracker",
@@ -1916,8 +1920,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 631.8,
-      "seconds": 253.71666666666667
+      "distance": 631.4,
+      "seconds": 253.53333333333333
     },
     {
       "bot": "tracker",
@@ -1993,8 +1997,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 663.06,
-      "seconds": 267.1333333333333
+      "distance": 663,
+      "seconds": 267.2
     },
     {
       "bot": "tracker",
@@ -2070,8 +2074,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 641.2,
-      "seconds": 256.75
+      "distance": 641.23,
+      "seconds": 256.68333333333334
     },
     {
       "bot": "tracker",
@@ -2147,8 +2151,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 632.36,
-      "seconds": 254.63333333333333
+      "distance": 631.93,
+      "seconds": 252.91666666666666
     },
     {
       "bot": "tracker",
@@ -2224,8 +2228,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 656.64,
-      "seconds": 263.26666666666665
+      "distance": 656.62,
+      "seconds": 263.25
     },
     {
       "bot": "tracker",
@@ -2302,7 +2306,7 @@
       "killer": null,
       "scene": "LONG TAKE",
       "distance": 651.88,
-      "seconds": 261.05
+      "seconds": 261.15
     },
     {
       "bot": "tracker",
@@ -2378,8 +2382,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 666.77,
-      "seconds": 267.2
+      "distance": 663.52,
+      "seconds": 265.98333333333335
     },
     {
       "bot": "tracker",
@@ -2455,8 +2459,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 659.56,
-      "seconds": 264.28333333333336
+      "distance": 659.43,
+      "seconds": 264.26666666666665
     },
     {
       "bot": "tracker",
@@ -2532,8 +2536,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 644.78,
-      "seconds": 258.51666666666665
+      "distance": 644.53,
+      "seconds": 258.4166666666667
     },
     {
       "bot": "tracker",
@@ -2609,8 +2613,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 661.53,
-      "seconds": 265.56666666666666
+      "distance": 658.37,
+      "seconds": 264.26666666666665
     },
     {
       "bot": "tracker",
@@ -2686,8 +2690,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 654.82,
-      "seconds": 262.55
+      "distance": 654.49,
+      "seconds": 262.43333333333334
     },
     {
       "bot": "tracker",
@@ -2763,8 +2767,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 652.31,
-      "seconds": 261.26666666666665
+      "distance": 651.89,
+      "seconds": 261.15
     },
     {
       "bot": "tracker",
@@ -2840,8 +2844,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 665.89,
-      "seconds": 267.51666666666665
+      "distance": 665.46,
+      "seconds": 267.31666666666666
     },
     {
       "bot": "tracker",
@@ -2917,8 +2921,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 649.7,
-      "seconds": 260.4166666666667
+      "distance": 649.67,
+      "seconds": 260.43333333333334
     },
     {
       "bot": "tracker",
@@ -2994,8 +2998,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 645.89,
-      "seconds": 258.65
+      "distance": 645.4,
+      "seconds": 258.5833333333333
     },
     {
       "bot": "tracker",
@@ -3071,8 +3075,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 667.02,
-      "seconds": 267.23333333333335
+      "distance": 667,
+      "seconds": 267.18333333333334
     },
     {
       "bot": "tracker",
@@ -3148,8 +3152,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 667.07,
-      "seconds": 268.2
+      "distance": 666.83,
+      "seconds": 268.15
     },
     {
       "bot": "tracker",
@@ -3225,8 +3229,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 652.79,
-      "seconds": 261.55
+      "distance": 652.74,
+      "seconds": 261.48333333333335
     },
     {
       "bot": "tracker",
@@ -3302,8 +3306,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 645.06,
-      "seconds": 258.3
+      "distance": 644.88,
+      "seconds": 258.25
     },
     {
       "bot": "tracker",
@@ -3379,8 +3383,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 665.45,
-      "seconds": 267.05
+      "distance": 663.44,
+      "seconds": 266.0833333333333
     },
     {
       "bot": "tracker",
@@ -3456,8 +3460,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 653.76,
-      "seconds": 262.21666666666664
+      "distance": 653.8,
+      "seconds": 262.7
     },
     {
       "bot": "tracker",
@@ -3533,8 +3537,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 659.08,
-      "seconds": 263.93333333333334
+      "distance": 658.84,
+      "seconds": 263.8333333333333
     },
     {
       "bot": "tracker",
@@ -3610,8 +3614,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 656.21,
-      "seconds": 262.78333333333336
+      "distance": 655.98,
+      "seconds": 262.6166666666667
     },
     {
       "bot": "tracker",
@@ -3687,8 +3691,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 646.46,
-      "seconds": 260.81666666666666
+      "distance": 646.19,
+      "seconds": 260.73333333333335
     },
     {
       "bot": "tracker",
@@ -3764,8 +3768,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 642.38,
-      "seconds": 257.8833333333333
+      "distance": 642.26,
+      "seconds": 257.85
     },
     {
       "bot": "tracker",
@@ -3841,8 +3845,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 643.93,
-      "seconds": 257.96666666666664
+      "distance": 643.89,
+      "seconds": 257.95
     },
     {
       "bot": "tracker",
@@ -3918,8 +3922,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 651.95,
-      "seconds": 263.53333333333336
+      "distance": 652.57,
+      "seconds": 261.9166666666667
     },
     {
       "bot": "tracker",
@@ -3995,8 +3999,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 638.71,
-      "seconds": 258.01666666666665
+      "distance": 636.92,
+      "seconds": 255.36666666666667
     },
     {
       "bot": "tracker",
@@ -4072,8 +4076,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 656.15,
-      "seconds": 262.8333333333333
+      "distance": 655.7,
+      "seconds": 263.56666666666666
     },
     {
       "bot": "tracker",
@@ -4149,8 +4153,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 647.77,
-      "seconds": 261.76666666666665
+      "distance": 647.19,
+      "seconds": 260.1666666666667
     },
     {
       "bot": "tracker",
@@ -4226,8 +4230,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 655.57,
-      "seconds": 266.55
+      "distance": 655.37,
+      "seconds": 266.48333333333335
     },
     {
       "bot": "tracker",
@@ -4303,8 +4307,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 653.38,
-      "seconds": 261.78333333333336
+      "distance": 653.19,
+      "seconds": 261.71666666666664
     },
     {
       "bot": "tracker",
@@ -4380,8 +4384,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 644.43,
-      "seconds": 258.8
+      "distance": 644.29,
+      "seconds": 258.73333333333335
     },
     {
       "bot": "tracker",
@@ -4457,8 +4461,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 653.12,
-      "seconds": 262
+      "distance": 649.77,
+      "seconds": 260.6166666666667
     },
     {
       "bot": "tracker",
@@ -4534,8 +4538,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 637.77,
-      "seconds": 255.7
+      "distance": 638.44,
+      "seconds": 255.86666666666667
     },
     {
       "bot": "tracker",
@@ -4611,8 +4615,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 653.73,
-      "seconds": 261.8333333333333
+      "distance": 653.81,
+      "seconds": 262
     },
     {
       "bot": "tracker",
@@ -4688,8 +4692,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 645.13,
-      "seconds": 258.78333333333336
+      "distance": 644.73,
+      "seconds": 258.56666666666666
     },
     {
       "bot": "tracker",
@@ -4765,8 +4769,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 666.95,
-      "seconds": 267.0833333333333
+      "distance": 666.32,
+      "seconds": 266.8666666666667
     },
     {
       "bot": "tracker",
@@ -4842,8 +4846,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 649.85,
-      "seconds": 260.3
+      "distance": 649.51,
+      "seconds": 260.1666666666667
     },
     {
       "bot": "tracker",
@@ -4919,8 +4923,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 655.45,
-      "seconds": 262.78333333333336
+      "distance": 653.98,
+      "seconds": 262.46666666666664
     },
     {
       "bot": "tracker",
@@ -4996,8 +5000,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 640.46,
-      "seconds": 256.73333333333335
+      "distance": 638.58,
+      "seconds": 256.01666666666665
     },
     {
       "bot": "tracker",
@@ -5073,8 +5077,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 652.31,
-      "seconds": 261.28333333333336
+      "distance": 652.11,
+      "seconds": 261.25
     },
     {
       "bot": "tracker",
@@ -5150,8 +5154,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 637.46,
-      "seconds": 257.06666666666666
+      "distance": 639.72,
+      "seconds": 257.95
     },
     {
       "bot": "tracker",
@@ -5227,7 +5231,7 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 635.18,
+      "distance": 634.98,
       "seconds": 254.56666666666666
     },
     {
@@ -5304,8 +5308,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 661.52,
-      "seconds": 265.18333333333334
+      "distance": 660.47,
+      "seconds": 264.6166666666667
     },
     {
       "bot": "tracker",
@@ -5381,8 +5385,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 651.07,
-      "seconds": 263.2
+      "distance": 650.76,
+      "seconds": 263.1
     },
     {
       "bot": "tracker",
@@ -5458,8 +5462,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 644.19,
-      "seconds": 259.1333333333333
+      "distance": 642.76,
+      "seconds": 258.51666666666665
     },
     {
       "bot": "tracker",
@@ -5535,8 +5539,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 646.82,
-      "seconds": 259.48333333333335
+      "distance": 646.24,
+      "seconds": 259.18333333333334
     },
     {
       "bot": "tracker",
@@ -5612,8 +5616,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 652.51,
-      "seconds": 261.78333333333336
+      "distance": 652.49,
+      "seconds": 261.85
     },
     {
       "bot": "tracker",
@@ -5689,8 +5693,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 656.68,
-      "seconds": 263.6166666666667
+      "distance": 658.22,
+      "seconds": 264.1166666666667
     },
     {
       "bot": "tracker",
@@ -5766,8 +5770,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 656.17,
-      "seconds": 263.1333333333333
+      "distance": 655.74,
+      "seconds": 263
     },
     {
       "bot": "tracker",
@@ -5843,8 +5847,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 654.36,
-      "seconds": 261.93333333333334
+      "distance": 654.04,
+      "seconds": 261.78333333333336
     },
     {
       "bot": "tracker",
@@ -5920,8 +5924,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 651.66,
-      "seconds": 261.15
+      "distance": 651.55,
+      "seconds": 261.1333333333333
     },
     {
       "bot": "tracker",
@@ -5997,8 +6001,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 645.5,
-      "seconds": 258.4166666666667
+      "distance": 645.27,
+      "seconds": 258.3
     },
     {
       "bot": "tracker",
@@ -6074,8 +6078,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 671.09,
-      "seconds": 268.65
+      "distance": 670.97,
+      "seconds": 268.6166666666667
     },
     {
       "bot": "tracker",
@@ -6151,8 +6155,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 655.13,
-      "seconds": 264.96666666666664
+      "distance": 655.15,
+      "seconds": 264.93333333333334
     },
     {
       "bot": "tracker",
@@ -6228,7 +6232,7 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 650.93,
+      "distance": 650.82,
       "seconds": 260.7
     },
     {
@@ -6305,8 +6309,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 652.35,
-      "seconds": 261.21666666666664
+      "distance": 651.94,
+      "seconds": 261.55
     },
     {
       "bot": "tracker",
@@ -6382,8 +6386,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 667.23,
-      "seconds": 267.18333333333334
+      "distance": 666.89,
+      "seconds": 267.05
     },
     {
       "bot": "tracker",
@@ -6459,8 +6463,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 656.28,
-      "seconds": 262.9166666666667
+      "distance": 656.39,
+      "seconds": 263.05
     },
     {
       "bot": "tracker",
@@ -6536,8 +6540,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 671.55,
-      "seconds": 270.76666666666665
+      "distance": 671.31,
+      "seconds": 270.65
     },
     {
       "bot": "tracker",
@@ -6613,8 +6617,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 645.35,
-      "seconds": 258.96666666666664
+      "distance": 645.28,
+      "seconds": 258.93333333333334
     },
     {
       "bot": "tracker",
@@ -6690,8 +6694,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 655.4,
-      "seconds": 262.6666666666667
+      "distance": 655.45,
+      "seconds": 262.8333333333333
     },
     {
       "bot": "tracker",
@@ -6767,8 +6771,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 658.58,
-      "seconds": 263.8666666666667
+      "distance": 658.54,
+      "seconds": 263.93333333333334
     },
     {
       "bot": "tracker",
@@ -6844,8 +6848,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 656.74,
-      "seconds": 263.53333333333336
+      "distance": 656.63,
+      "seconds": 263.8666666666667
     },
     {
       "bot": "tracker",
@@ -6921,8 +6925,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 655.83,
-      "seconds": 262.98333333333335
+      "distance": 656.06,
+      "seconds": 263.1166666666667
     },
     {
       "bot": "tracker",
@@ -6998,8 +7002,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 651.69,
-      "seconds": 261.68333333333334
+      "distance": 649.85,
+      "seconds": 260.8833333333333
     },
     {
       "bot": "tracker",
@@ -7075,8 +7079,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 659.66,
-      "seconds": 264.5
+      "distance": 659.41,
+      "seconds": 264.4166666666667
     },
     {
       "bot": "tracker",
@@ -7152,8 +7156,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 654.62,
-      "seconds": 262.28333333333336
+      "distance": 654.56,
+      "seconds": 262.3
     },
     {
       "bot": "tracker",
@@ -7229,8 +7233,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 653.46,
-      "seconds": 261.65
+      "distance": 651.31,
+      "seconds": 260.81666666666666
     },
     {
       "bot": "tracker",
@@ -7306,8 +7310,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 651.06,
-      "seconds": 261.03333333333336
+      "distance": 653.52,
+      "seconds": 262
     },
     {
       "bot": "tracker",
@@ -7383,8 +7387,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 647.51,
-      "seconds": 259.3
+      "distance": 648.9,
+      "seconds": 259.78333333333336
     },
     {
       "bot": "tracker",
@@ -7460,8 +7464,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 656.95,
-      "seconds": 263.2
+      "distance": 656.91,
+      "seconds": 263.28333333333336
     },
     {
       "bot": "tracker",
@@ -7537,8 +7541,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 653.89,
-      "seconds": 261.6666666666667
+      "distance": 653.72,
+      "seconds": 261.6333333333333
     },
     {
       "bot": "tracker",
@@ -7614,8 +7618,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 642.07,
-      "seconds": 257.43333333333334
+      "distance": 641.45,
+      "seconds": 257.2
     },
     {
       "bot": "tracker",
@@ -7691,7 +7695,7 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 649.69,
+      "distance": 649.59,
       "seconds": 260.1666666666667
     },
     {
@@ -7768,8 +7772,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 654.94,
-      "seconds": 263.1333333333333
+      "distance": 654.65,
+      "seconds": 263
     },
     {
       "bot": "tracker",
@@ -7845,8 +7849,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 660.03,
-      "seconds": 264.2
+      "distance": 659.74,
+      "seconds": 264.1
     },
     {
       "bot": "tracker",
@@ -7922,8 +7926,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 668.55,
-      "seconds": 268.05
+      "distance": 665.4,
+      "seconds": 266.75
     },
     {
       "bot": "tracker",
@@ -7999,8 +8003,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 657.21,
-      "seconds": 263.15
+      "distance": 654.13,
+      "seconds": 262
     },
     {
       "bot": "tracker",
@@ -8076,8 +8080,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 647.86,
-      "seconds": 259.7
+      "distance": 647.92,
+      "seconds": 259.71666666666664
     },
     {
       "bot": "tracker",
@@ -8153,8 +8157,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 646,
-      "seconds": 258.93333333333334
+      "distance": 645.84,
+      "seconds": 258.95
     },
     {
       "bot": "tracker",
@@ -8230,8 +8234,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 636.26,
-      "seconds": 257.4
+      "distance": 635.98,
+      "seconds": 255.21666666666667
     },
     {
       "bot": "tracker",
@@ -8307,7 +8311,7 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 662.72,
+      "distance": 662.65,
       "seconds": 265.51666666666665
     },
     {
@@ -8384,8 +8388,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 639.33,
-      "seconds": 256.1666666666667
+      "distance": 639.03,
+      "seconds": 256.06666666666666
     },
     {
       "bot": "tracker",
@@ -8461,8 +8465,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 647.55,
-      "seconds": 259.96666666666664
+      "distance": 647.69,
+      "seconds": 260.03333333333336
     },
     {
       "bot": "tracker",
@@ -8538,8 +8542,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 651.26,
-      "seconds": 260.85
+      "distance": 651.11,
+      "seconds": 263.3333333333333
     },
     {
       "bot": "tracker",
@@ -8615,8 +8619,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 662.02,
-      "seconds": 265.3
+      "distance": 661.81,
+      "seconds": 265.18333333333334
     },
     {
       "bot": "tracker",
@@ -8692,8 +8696,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 651.56,
-      "seconds": 260.8666666666667
+      "distance": 651.41,
+      "seconds": 260.85
     },
     {
       "bot": "tracker",
@@ -8769,8 +8773,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 654.77,
-      "seconds": 262.25
+      "distance": 654.01,
+      "seconds": 261.98333333333335
     },
     {
       "bot": "tracker",
@@ -8846,8 +8850,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 667.29,
-      "seconds": 267.48333333333335
+      "distance": 667.32,
+      "seconds": 267.4166666666667
     },
     {
       "bot": "tracker",
@@ -8923,8 +8927,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 644.02,
-      "seconds": 258.1
+      "distance": 643.46,
+      "seconds": 257.9166666666667
     },
     {
       "bot": "tracker",
@@ -9000,8 +9004,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 638.03,
-      "seconds": 256.35
+      "distance": 638.85,
+      "seconds": 256.7
     },
     {
       "bot": "tracker",
@@ -9077,7 +9081,7 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 647.27,
+      "distance": 647.21,
       "seconds": 259.3833333333333
     },
     {
@@ -9154,8 +9158,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 655.93,
-      "seconds": 262.6666666666667
+      "distance": 655.88,
+      "seconds": 262.65
     },
     {
       "bot": "tracker",
@@ -9231,8 +9235,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 654.9,
-      "seconds": 262.81666666666666
+      "distance": 654.89,
+      "seconds": 262.85
     },
     {
       "bot": "tracker",
@@ -9308,8 +9312,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 648.83,
-      "seconds": 259.8666666666667
+      "distance": 648.77,
+      "seconds": 259.98333333333335
     },
     {
       "bot": "tracker",
@@ -9385,8 +9389,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 657.36,
-      "seconds": 263.6166666666667
+      "distance": 657.01,
+      "seconds": 263.53333333333336
     },
     {
       "bot": "tracker",
@@ -9462,8 +9466,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 646.38,
-      "seconds": 258.8333333333333
+      "distance": 646.39,
+      "seconds": 258.8833333333333
     },
     {
       "bot": "tracker",
@@ -9539,8 +9543,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 660.59,
-      "seconds": 265.18333333333334
+      "distance": 662.18,
+      "seconds": 265.76666666666665
     },
     {
       "bot": "tracker",
@@ -9616,8 +9620,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 650.4,
-      "seconds": 260.23333333333335
+      "distance": 647.03,
+      "seconds": 258.9166666666667
     },
     {
       "bot": "tracker",
@@ -9693,8 +9697,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 657.15,
-      "seconds": 263.21666666666664
+      "distance": 656.36,
+      "seconds": 262.93333333333334
     },
     {
       "bot": "tracker",
@@ -9770,8 +9774,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 647.27,
-      "seconds": 259.68333333333334
+      "distance": 647.03,
+      "seconds": 259.55
     },
     {
       "bot": "tracker",
@@ -9847,8 +9851,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 643,
-      "seconds": 258.3333333333333
+      "distance": 643.31,
+      "seconds": 258.6
     },
     {
       "bot": "tracker",
@@ -9924,8 +9928,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 650.68,
-      "seconds": 260.9166666666667
+      "distance": 650.58,
+      "seconds": 260.9
     },
     {
       "bot": "tracker",
@@ -10001,8 +10005,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 656.86,
-      "seconds": 263.23333333333335
+      "distance": 656.43,
+      "seconds": 263.53333333333336
     },
     {
       "bot": "tracker",
@@ -10078,8 +10082,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 657.43,
-      "seconds": 263.3833333333333
+      "distance": 657.16,
+      "seconds": 263.3
     },
     {
       "bot": "tracker",
@@ -10155,8 +10159,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 672.77,
-      "seconds": 269.9
+      "distance": 672.54,
+      "seconds": 269.8833333333333
     },
     {
       "bot": "tracker",
@@ -10232,8 +10236,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 647.43,
-      "seconds": 259.9
+      "distance": 647.11,
+      "seconds": 259.75
     },
     {
       "bot": "tracker",
@@ -10309,8 +10313,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 649.72,
-      "seconds": 260.26666666666665
+      "distance": 649.44,
+      "seconds": 260.1166666666667
     },
     {
       "bot": "tracker",
@@ -10386,8 +10390,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 653.91,
-      "seconds": 261.96666666666664
+      "distance": 653.98,
+      "seconds": 262.06666666666666
     },
     {
       "bot": "tracker",
@@ -10463,8 +10467,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 655.56,
-      "seconds": 262.5833333333333
+      "distance": 655.75,
+      "seconds": 262.55
     },
     {
       "bot": "tracker",
@@ -10540,8 +10544,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 643.68,
-      "seconds": 257.8
+      "distance": 643.44,
+      "seconds": 257.68333333333334
     },
     {
       "bot": "tracker",
@@ -10617,7 +10621,7 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 665.48,
+      "distance": 665.29,
       "seconds": 266.73333333333335
     },
     {
@@ -10694,8 +10698,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 664.63,
-      "seconds": 266.4
+      "distance": 664.68,
+      "seconds": 266.53333333333336
     },
     {
       "bot": "tracker",
@@ -10771,8 +10775,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 657.8,
-      "seconds": 263.46666666666664
+      "distance": 656.59,
+      "seconds": 262.95
     },
     {
       "bot": "tracker",
@@ -10848,8 +10852,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 643.24,
-      "seconds": 257.78333333333336
+      "distance": 643.19,
+      "seconds": 257.8333333333333
     },
     {
       "bot": "tracker",
@@ -10925,8 +10929,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 661.17,
-      "seconds": 267.1166666666667
+      "distance": 660.56,
+      "seconds": 267
     },
     {
       "bot": "tracker",
@@ -11002,8 +11006,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 662.77,
-      "seconds": 265.6666666666667
+      "distance": 662.67,
+      "seconds": 265.6333333333333
     },
     {
       "bot": "tracker",
@@ -11079,8 +11083,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 645.18,
-      "seconds": 258.53333333333336
+      "distance": 645.11,
+      "seconds": 258.56666666666666
     },
     {
       "bot": "tracker",
@@ -11156,8 +11160,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 652.52,
-      "seconds": 261.31666666666666
+      "distance": 652.41,
+      "seconds": 261.3
     },
     {
       "bot": "tracker",
@@ -11233,8 +11237,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 656.49,
-      "seconds": 263
+      "distance": 655.24,
+      "seconds": 262.45
     },
     {
       "bot": "tracker",
@@ -11310,8 +11314,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 664.26,
-      "seconds": 265.75
+      "distance": 664.91,
+      "seconds": 266.0833333333333
     },
     {
       "bot": "tracker",
@@ -11387,8 +11391,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 652.72,
-      "seconds": 262.1333333333333
+      "distance": 650.43,
+      "seconds": 261.1333333333333
     },
     {
       "bot": "tracker",
@@ -11464,8 +11468,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 676.19,
-      "seconds": 270.8
+      "distance": 676,
+      "seconds": 270.93333333333334
     },
     {
       "bot": "tracker",
@@ -11541,8 +11545,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 657.12,
-      "seconds": 263.31666666666666
+      "distance": 656.68,
+      "seconds": 263.03333333333336
     },
     {
       "bot": "tracker",
@@ -11618,8 +11622,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 667.36,
-      "seconds": 267.25
+      "distance": 667.14,
+      "seconds": 267.21666666666664
     },
     {
       "bot": "tracker",
@@ -11695,8 +11699,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 663.6,
-      "seconds": 265.9
+      "distance": 663.26,
+      "seconds": 266.2
     },
     {
       "bot": "tracker",
@@ -11772,8 +11776,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 647.18,
-      "seconds": 259.3
+      "distance": 647.63,
+      "seconds": 259.5
     },
     {
       "bot": "tracker",
@@ -11849,8 +11853,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 641.3,
-      "seconds": 258.05
+      "distance": 641.03,
+      "seconds": 256.73333333333335
     },
     {
       "bot": "tracker",
@@ -11926,8 +11930,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 642.32,
-      "seconds": 257.06666666666666
+      "distance": 642.17,
+      "seconds": 257.0833333333333
     },
     {
       "bot": "tracker",
@@ -12003,8 +12007,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 655.43,
-      "seconds": 262.8666666666667
+      "distance": 655.1,
+      "seconds": 262.8
     },
     {
       "bot": "tracker",
@@ -12080,8 +12084,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 644.9,
-      "seconds": 259.3833333333333
+      "distance": 644.92,
+      "seconds": 259.53333333333336
     },
     {
       "bot": "tracker",
@@ -12157,8 +12161,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 643.29,
-      "seconds": 257.7
+      "distance": 643.2,
+      "seconds": 257.68333333333334
     },
     {
       "bot": "tracker",
@@ -12234,8 +12238,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 652.44,
-      "seconds": 261.31666666666666
+      "distance": 648.92,
+      "seconds": 259.93333333333334
     },
     {
       "bot": "tracker",
@@ -12311,8 +12315,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 665.45,
-      "seconds": 266.98333333333335
+      "distance": 665.19,
+      "seconds": 266.8333333333333
     },
     {
       "bot": "tracker",
@@ -12388,8 +12392,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 656.54,
-      "seconds": 263.25
+      "distance": 656.36,
+      "seconds": 263.05
     },
     {
       "bot": "tracker",
@@ -12465,8 +12469,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 658.6,
-      "seconds": 263.71666666666664
+      "distance": 658.21,
+      "seconds": 263.51666666666665
     },
     {
       "bot": "tracker",
@@ -12542,8 +12546,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 663.64,
-      "seconds": 266.01666666666665
+      "distance": 661.1,
+      "seconds": 264.96666666666664
     },
     {
       "bot": "tracker",
@@ -12619,7 +12623,7 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 659.75,
+      "distance": 659.62,
       "seconds": 264.0833333333333
     },
     {
@@ -12696,8 +12700,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 643.77,
-      "seconds": 257.76666666666665
+      "distance": 643.44,
+      "seconds": 257.7
     },
     {
       "bot": "tracker",
@@ -12773,8 +12777,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 657.86,
-      "seconds": 263.73333333333335
+      "distance": 654.56,
+      "seconds": 262.45
     },
     {
       "bot": "tracker",
@@ -12850,8 +12854,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 653.17,
-      "seconds": 261.6333333333333
+      "distance": 652.8,
+      "seconds": 262.26666666666665
     },
     {
       "bot": "tracker",
@@ -12927,8 +12931,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 661.48,
-      "seconds": 265.1
+      "distance": 661.07,
+      "seconds": 265.18333333333334
     },
     {
       "bot": "tracker",
@@ -13004,8 +13008,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 644.69,
-      "seconds": 258.5833333333333
+      "distance": 644.77,
+      "seconds": 260
     },
     {
       "bot": "tracker",
@@ -13081,8 +13085,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 661.08,
-      "seconds": 265.31666666666666
+      "distance": 660.99,
+      "seconds": 265.25
     },
     {
       "bot": "tracker",
@@ -13158,8 +13162,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 645.52,
-      "seconds": 258.75
+      "distance": 645.47,
+      "seconds": 258.6333333333333
     },
     {
       "bot": "tracker",
@@ -13235,8 +13239,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 661.34,
-      "seconds": 266
+      "distance": 661.31,
+      "seconds": 265.96666666666664
     },
     {
       "bot": "tracker",
@@ -13312,8 +13316,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 652.51,
-      "seconds": 263.01666666666665
+      "distance": 652.52,
+      "seconds": 263.03333333333336
     },
     {
       "bot": "tracker",
@@ -13389,8 +13393,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 660.7,
-      "seconds": 264.46666666666664
+      "distance": 660.75,
+      "seconds": 264.6666666666667
     },
     {
       "bot": "tracker",
@@ -13466,8 +13470,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 658.42,
-      "seconds": 263.8666666666667
+      "distance": 656.43,
+      "seconds": 263
     },
     {
       "bot": "tracker",
@@ -13543,8 +13547,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 656.28,
-      "seconds": 263.43333333333334
+      "distance": 655.83,
+      "seconds": 262.75
     },
     {
       "bot": "tracker",
@@ -13620,8 +13624,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 649.96,
-      "seconds": 260.1666666666667
+      "distance": 648.57,
+      "seconds": 259.3666666666667
     },
     {
       "bot": "tracker",
@@ -13697,8 +13701,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 660.03,
-      "seconds": 264.3666666666667
+      "distance": 658.08,
+      "seconds": 263.6166666666667
     },
     {
       "bot": "tracker",
@@ -13774,8 +13778,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 644.93,
-      "seconds": 258.46666666666664
+      "distance": 644.17,
+      "seconds": 258.76666666666665
     },
     {
       "bot": "tracker",
@@ -13851,8 +13855,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 647.75,
-      "seconds": 259.25
+      "distance": 647.52,
+      "seconds": 259.15
     },
     {
       "bot": "tracker",
@@ -13928,8 +13932,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 656.18,
-      "seconds": 264.93333333333334
+      "distance": 656.05,
+      "seconds": 263.6
     },
     {
       "bot": "tracker",
@@ -14005,8 +14009,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 651.2,
-      "seconds": 260.6166666666667
+      "distance": 650.36,
+      "seconds": 260.4
     },
     {
       "bot": "tracker",
@@ -14083,7 +14087,7 @@
       "killer": null,
       "scene": "LONG TAKE",
       "distance": 643.93,
-      "seconds": 259.05
+      "seconds": 259.46666666666664
     },
     {
       "bot": "tracker",
@@ -14159,7 +14163,7 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 647.1,
+      "distance": 646.89,
       "seconds": 259.26666666666665
     },
     {
@@ -14236,8 +14240,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 645.91,
-      "seconds": 258.65
+      "distance": 645.84,
+      "seconds": 258.6166666666667
     },
     {
       "bot": "tracker",
@@ -14313,8 +14317,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 665.1,
-      "seconds": 266.3333333333333
+      "distance": 661.69,
+      "seconds": 264.8333333333333
     },
     {
       "bot": "tracker",
@@ -14390,8 +14394,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 655.3,
-      "seconds": 264.6
+      "distance": 654.75,
+      "seconds": 262.4
     },
     {
       "bot": "tracker",
@@ -14467,8 +14471,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 664.75,
-      "seconds": 267.7
+      "distance": 662.8,
+      "seconds": 266.9
     },
     {
       "bot": "tracker",
@@ -14544,8 +14548,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 659.66,
-      "seconds": 264.4
+      "distance": 659.48,
+      "seconds": 264.26666666666665
     },
     {
       "bot": "tracker",
@@ -14621,8 +14625,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 633.92,
-      "seconds": 254.05
+      "distance": 633.73,
+      "seconds": 253.95
     },
     {
       "bot": "tracker",
@@ -14698,8 +14702,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 671.58,
-      "seconds": 268.8333333333333
+      "distance": 672.27,
+      "seconds": 269.25
     },
     {
       "bot": "tracker",
@@ -14775,8 +14779,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 660.28,
-      "seconds": 264.56666666666666
+      "distance": 659.94,
+      "seconds": 264.45
     },
     {
       "bot": "tracker",
@@ -14852,8 +14856,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 644.98,
-      "seconds": 258.35
+      "distance": 644.8,
+      "seconds": 258.3
     },
     {
       "bot": "tracker",
@@ -14929,8 +14933,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 655.73,
-      "seconds": 262.6
+      "distance": 656.24,
+      "seconds": 262.8333333333333
     },
     {
       "bot": "tracker",
@@ -15006,8 +15010,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 659.77,
-      "seconds": 264.01666666666665
+      "distance": 659.65,
+      "seconds": 264.05
     },
     {
       "bot": "tracker",
@@ -15083,8 +15087,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 654.93,
-      "seconds": 262.1333333333333
+      "distance": 654.88,
+      "seconds": 262.65
     },
     {
       "bot": "tracker",
@@ -15160,8 +15164,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 663.57,
-      "seconds": 265.5833333333333
+      "distance": 663.35,
+      "seconds": 265.56666666666666
     },
     {
       "bot": "tracker",
@@ -15237,8 +15241,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 663.94,
-      "seconds": 267.8
+      "distance": 663.57,
+      "seconds": 267.68333333333334
     },
     {
       "bot": "tracker",
@@ -15314,8 +15318,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 656.22,
-      "seconds": 262.76666666666665
+      "distance": 656.05,
+      "seconds": 262.9166666666667
     },
     {
       "bot": "tracker",
@@ -15391,8 +15395,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 643.55,
-      "seconds": 258.0833333333333
+      "distance": 643.32,
+      "seconds": 258
     },
     {
       "bot": "tracker",
@@ -15468,8 +15472,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 655.9,
-      "seconds": 262.85
+      "distance": 655.85,
+      "seconds": 262.93333333333334
     },
     {
       "bot": "tracker",
@@ -15545,8 +15549,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 653.8,
-      "seconds": 262.46666666666664
+      "distance": 650.2,
+      "seconds": 260.95
     },
     {
       "bot": "tracker",
@@ -15622,8 +15626,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 654.07,
-      "seconds": 262.2
+      "distance": 653.9,
+      "seconds": 262.0833333333333
     },
     {
       "bot": "tracker",
@@ -15699,8 +15703,8 @@
       "failed": null,
       "killer": null,
       "scene": "LONG TAKE",
-      "distance": 656.55,
-      "seconds": 262.9166666666667
+      "distance": 656.35,
+      "seconds": 263.35
     },
     {
       "bot": "tracker",
@@ -15974,16 +15978,16 @@
     },
     "adaptive": {
       "1": 8,
-      "2": 8,
+      "2": 7,
       "3": 8,
       "4": 8,
-      "5": 8,
+      "5": 5,
       "6": 8,
-      "7": 8,
+      "7": 7,
       "8": 8,
       "9": 8,
-      "10": 8,
-      "11": 8,
+      "10": 7,
+      "11": 7,
       "12": 8,
       "13": 8,
       "14": 8,
@@ -15994,45 +15998,45 @@
       "19": 8,
       "20": 8,
       "21": 8,
-      "22": 8,
+      "22": 6,
       "23": 8,
       "24": 8,
       "25": 8,
       "26": 8,
       "27": 8,
-      "28": 8,
+      "28": 7,
       "29": 8,
       "30": 8,
-      "31": 8,
-      "32": 8,
+      "31": 7,
+      "32": 7,
       "33": 8,
       "34": 8,
       "35": 8,
       "36": 8,
       "37": 8,
-      "38": 8,
+      "38": 6,
       "39": 8,
       "40": 8,
       "41": 8,
       "42": 8,
       "43": 8,
-      "44": 8,
-      "45": 8,
-      "46": 8,
+      "44": 6,
+      "45": 7,
+      "46": 7,
       "47": 8,
       "48": 8,
-      "49": 8,
+      "49": 7,
       "50": 8,
       "51": 8,
-      "52": 8,
+      "52": 7,
       "53": 8,
       "54": 8,
-      "55": 8,
+      "55": 7,
       "56": 8,
       "57": 8,
       "58": 8,
-      "59": 8,
-      "60": 8,
+      "59": 7,
+      "60": 6,
       "61": 8,
       "62": 8,
       "63": 8,
@@ -16040,48 +16044,48 @@
       "65": 8,
       "66": 8,
       "67": 8,
-      "68": 8,
+      "68": 7,
       "69": 8,
       "70": 8,
       "71": 8,
       "72": 8,
       "73": 8,
-      "74": 8,
-      "75": 8,
+      "74": 7,
+      "75": 7,
       "76": 8,
       "77": 8,
       "78": 8,
       "79": 8,
       "80": 8,
-      "81": 8,
+      "81": 7,
       "82": 8,
       "83": 8,
-      "84": 8,
+      "84": 6,
       "85": 8,
-      "86": 8,
+      "86": 7,
       "87": 8,
-      "88": 8,
-      "89": 8,
+      "88": 7,
+      "89": 7,
       "90": 8,
-      "91": 8,
+      "91": 7,
       "92": 8,
       "93": 8,
       "94": 8,
-      "95": 8,
+      "95": 7,
       "96": 8,
       "97": 8,
-      "98": 8,
+      "98": 7,
       "99": 8,
       "100": 8,
       "101": 8,
       "102": 8,
       "103": 8,
       "104": 8,
-      "105": 8,
+      "105": 5,
       "106": 8,
-      "107": 8,
+      "107": 6,
       "108": 8,
-      "109": 8,
+      "109": 6,
       "110": 8,
       "111": 8,
       "112": 8,
@@ -16090,16 +16094,16 @@
       "115": 8,
       "116": 8,
       "117": 8,
-      "118": 8,
-      "119": 8,
-      "120": 8,
+      "118": 7,
+      "119": 6,
+      "120": 7,
       "121": 8,
       "122": 8,
-      "123": 8,
+      "123": 7,
       "124": 8,
       "125": 8,
       "126": 8,
-      "127": 8,
+      "127": 6,
       "128": 8,
       "129": 8,
       "130": 8,
@@ -16113,7 +16117,7 @@
       "138": 8,
       "139": 8,
       "140": 8,
-      "141": 8,
+      "141": 7,
       "142": 8,
       "143": 8,
       "144": 8,
@@ -16124,35 +16128,35 @@
       "149": 8,
       "150": 8,
       "151": 8,
-      "152": 8,
+      "152": 4,
       "153": 8,
-      "154": 8,
-      "155": 8,
+      "154": 7,
+      "155": 6,
       "156": 8,
-      "157": 8,
+      "157": 4,
       "158": 8,
       "159": 8,
       "160": 8,
-      "161": 8,
+      "161": 7,
       "162": 8,
       "163": 8,
-      "164": 8,
+      "164": 7,
       "165": 8,
       "166": 8,
       "167": 8,
-      "168": 8,
+      "168": 7,
       "169": 8,
       "170": 8,
-      "171": 8,
+      "171": 7,
       "172": 8,
-      "173": 8,
+      "173": 7,
       "174": 8,
       "175": 8,
       "176": 8,
-      "177": 6,
+      "177": 8,
       "178": 8,
-      "179": 8,
-      "180": 8,
+      "179": 6,
+      "180": 7,
       "181": 8,
       "182": 8,
       "183": 8,
@@ -16160,14 +16164,14 @@
       "185": 8,
       "186": 8,
       "187": 8,
-      "188": 8,
+      "188": 7,
       "189": 8,
-      "190": 8,
+      "190": 6,
       "191": 8,
       "192": 8,
       "193": 8,
       "194": 8,
-      "195": 8,
+      "195": 7,
       "196": 8,
       "197": 8,
       "198": 8,

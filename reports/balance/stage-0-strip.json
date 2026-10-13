@@ -6,7 +6,7 @@
     200
   ],
   "jitter": 8,
-  "command": "npm run balance -- --stage=0 --mode=both --seeds=200 --jitter=8",
+  "command": "npm run balance -- --stage=0 --mode=both --seeds=200 --jitter=8 --workers=8 --out=/tmp/bal",
   "note": "Report-only. Raw seeds. Bots read only player-visible state (src/bots/observe.ts). §5 targets are for the full Shoot; strip gates are informational.",
   "passive": {
     "bot": "gatekeeper",
@@ -913,7 +913,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 65.3
+      "seconds": 65.96666666666667
     },
     {
       "bot": "tracker",
@@ -1375,7 +1375,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 82.35
+      "seconds": 81.58333333333333
     },
     {
       "bot": "tracker",
@@ -1452,7 +1452,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 73.53333333333333
+      "seconds": 72.53333333333333
     },
     {
       "bot": "tracker",
@@ -3762,7 +3762,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 65.41666666666667
+      "seconds": 64.71666666666667
     },
     {
       "bot": "tracker",
@@ -5379,7 +5379,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 67.61666666666666
+      "seconds": 67.95
     },
     {
       "bot": "tracker",
@@ -6380,7 +6380,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 66.7
+      "seconds": 67.03333333333333
     },
     {
       "bot": "tracker",
@@ -6919,7 +6919,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 68.23333333333333
+      "seconds": 68.28333333333333
     },
     {
       "bot": "tracker",
@@ -6996,7 +6996,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 66.4
+      "seconds": 66.73333333333333
     },
     {
       "bot": "tracker",
@@ -7920,7 +7920,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 74.13333333333334
+      "seconds": 74.06666666666666
     },
     {
       "bot": "tracker",
@@ -7997,7 +7997,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 72.61666666666666
+      "seconds": 73.21666666666667
     },
     {
       "bot": "tracker",
@@ -8767,7 +8767,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 67.18333333333334
+      "seconds": 67.85
     },
     {
       "bot": "tracker",
@@ -10461,7 +10461,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 82.25
+      "seconds": 82.85
     },
     {
       "bot": "tracker",
@@ -11231,7 +11231,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 94.21666666666667
+      "seconds": 93.45
     },
     {
       "bot": "tracker",
@@ -13618,7 +13618,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 66.03333333333333
+      "seconds": 66.36666666666666
     },
     {
       "bot": "tracker",
@@ -14465,7 +14465,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 66.13333333333334
+      "seconds": 65.43333333333334
     },
     {
       "bot": "tracker",

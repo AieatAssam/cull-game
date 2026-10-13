@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createDriver } from '../src/bots/balance-bots';
 import { cutFraming } from '../src/bots/players';
-import { generateScene, pathZAt } from '../src/gen/generate';
+import { generateScene, pathZAt, sharpTurns } from '../src/gen/generate';
 import { gateCast, gateStop, markShots, shotListForPath } from '../src/sim/framing';
 import { stateHash } from '../src/sim/hash';
 import { createShootState, stepShoot } from '../src/sim/shoot';
@@ -152,6 +152,57 @@ describe('bible M2: readable hazards', () => {
   });
 });
 
+describe('bible M2 round 2: Night/finale pressure and turning paths', () => {
+  const sceneSeed = (seed: number, index: number) => (seed + Math.imul(index, 0x9e3779b9)) >>> 0;
+
+  it('gives every scene at least two heading changes of 90° without breaking the threat budget', () => {
+    for (let seed = 1; seed <= 300; seed++) {
+      for (let index = 0; index < 4; index++) {
+        const scene = generateScene(sceneSeed(seed, index), index, 9);
+        expect(sharpTurns(scene.path)).toBeGreaterThanOrEqual(TUNING.minimumSharpTurns);
+        expect(scene.threatSpent).toBeLessThanOrEqual(scene.threatBudget);
+        expect(scene.forks.length).toBeGreaterThan(0);
+      }
+      expect(sharpTurns(generateScene(seed, 0).path)).toBeGreaterThanOrEqual(TUNING.minimumSharpTurns);
+    }
+  });
+
+  it('makes Night/finale Urchins denser, faster and already rolling once announced; Backlot and City are unchanged', () => {
+    const share = (difficulty: number) => {
+      let urchins = 0;
+      let ahead = 0;
+      for (let seed = 1; seed <= 200; seed++) {
+        for (const entity of generateScene(sceneSeed(seed, difficulty), difficulty, 9).entities.filter((item) => item.kind === 'urchin')) {
+          urchins++;
+          if (entity.pathBound) ahead++;
+          expect(entity.vx).toBe(-TUNING.urchinSpeedByDifficulty[difficulty]!);
+          expect(Boolean(entity.rollsIn)).toBe(Boolean(entity.pathBound) && difficulty >= TUNING.rollingEntryFromDifficulty);
+        }
+      }
+      return ahead / urchins;
+    };
+    expect(share(0)).toBeGreaterThanOrEqual(0.5);
+    expect(share(2)).toBeGreaterThan(share(0));
+    expect(TUNING.urchinSpeedByDifficulty[0]).toBe(TUNING.urchinSpeed);
+    expect(TUNING.urchinSpeedByDifficulty[2]).toBeGreaterThan(TUNING.urchinSpeed);
+  });
+
+  it('rolls an announced Night Urchin toward the frame, but not one off the call sheet or one that waits for its frame', () => {
+    const build = (x: number, rollsIn: boolean) => {
+      const state = createState(1, []);
+      state.path = [{ x: -40, z: 0 }, { x: 60, z: 0 }];
+      state.camera.zoom = 24;
+      state.entities = [cast('u', 'urchin', x, 0, { spawned: false, vx: -4.4, pathBound: true, rollsIn })];
+      return state;
+    };
+    // Just past the gate edge (12 u at zoom 24): listed as "Coming in", so it is already rolling.
+    expect(step(build(14, true), held).entities[0]!.x).toBeLessThan(14);
+    expect(step(build(14, false), held).entities[0]!.x).toBe(14);
+    // Far off the call sheet: nothing moves.
+    expect(step(build(40, true), held).entities[0]!.x).toBe(40);
+  });
+});
+
 describe('bible M2: Adaptive policy helpers', () => {
   it('finds a framing that cuts a target while the Talent stays in frame', () => {
     const state = createState(1, []);
@@ -164,15 +215,15 @@ describe('bible M2: Adaptive policy helpers', () => {
   });
 });
 
-// Fixed replay hashes after the bible M2 rule changes (DECISIONS 2026-10-13). Regenerate only with a decision entry.
+// Fixed replay hashes after the bible M2 rule changes (DECISIONS 2026-10-13, round 2). Regenerate only with a decision entry.
 describe('fixed replay hashes', () => {
   const frames = Array.from({ length: 10_000 }, (_, i) => ({ ...NEUTRAL_INPUT, panX: (i % 240 < 120 ? 30 : -30), zoom: i % 300 < 150 ? 0 : 1 }));
   const fixtures: Record<number, [string, string, string]> = {
-    1: ['50da4bab', '74cb8612', 'e05f92b3'],
-    19: ['32690067', '39314858', 'd310caac'],
-    2026: ['1da29d51', 'f9f5aa68', '2d17e80d'],
+    1: ['50da4bab', '74cb8612', '6ebb4e8c'],
+    19: ['32690067', '39314858', 'ce00d1c4'],
+    2026: ['1da29d51', 'f9f5aa68', '38027c06'],
   };
-  it.each(Object.entries(fixtures))('seed %s: strip world, generated strip and a fair Adaptive Shoot', (seedText, [world, generated, shoot]) => {
+  it.each(Object.entries(fixtures))('seed %s: strip world, generated strip and a full fair Adaptive Shoot', (seedText, [world, generated, shoot]) => {
     const seed = Number(seedText);
     let a = createState(seed);
     for (const frame of frames) a = step(a, frame);
@@ -182,7 +233,8 @@ describe('fixed replay hashes', () => {
     expect(stateHash(g)).toBe(generated);
     const drive = createDriver('adaptive', seed);
     let s = createShootState(seed);
-    for (let i = 0; i < 6000 && !s.failed; i++) s = stepShoot(s, drive(s));
+    for (let i = 0; i < 8 * 60 * TUNING.tickRate && !s.failed; i++) s = stepShoot(s, drive(s));
+    expect(s.shoot!.sceneIndex).toBe(3);
     expect(stateHash(s)).toBe(shoot);
   }, 60_000);
 });

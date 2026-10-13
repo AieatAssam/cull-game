@@ -21,9 +21,8 @@ jobs:
       - name: M5 generator and bot balance report (non-blocking while gates are red)
         run: npm run validate:m5
         continue-on-error: true
-      - name: M6 full Shoot bot duration report (non-blocking while the AdaptiveBot gate is red)
+      - name: M6 full Shoot bot duration gate (blocking from bible M2)
         run: npm run validate:m6
-        continue-on-error: true
       - name: Balance report (Stage 0, report-only)
         run: npm run balance -- --stage=0 --mode=both --seeds=200 --jitter=8
         continue-on-error: true

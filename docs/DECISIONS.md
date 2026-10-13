@@ -48,3 +48,12 @@
   - Not changed: hazard kinds, speeds, the film economy, and the portrait gate.
 - 2026-10-13: Because of these changes, the state hash now includes `lockTicks`, `gate` and `ShotGoal.opened`. Previously nothing in the repo pinned literal hashes; the determinism tests only compared two runs with each other. `tests/m2.test.ts` now pins fixed hashes for seeds 1, 19 and 2026 on the legacy strip world, the generated strip and a fair-Adaptive Shoot. Regenerate them only together with an entry here.
 - 2026-10-13: `validate:m6` drives Adaptive through the fair-information driver (`createDriver`), the same one `npm run balance` uses. Its numbers are now comparable with the harness and no longer read hidden state.
+- 2026-10-13 (M2 round 2): Bible M2 lever "Night/finale hazard density and speed", added because the review found Stage 0 too safe for skilled play.
+  - From scene difficulty `rollingEntryFromDifficulty` (2, Night) on, ahead-entry Urchins are generated with `rollsIn`. They roll down the path while they are on the call sheet ("Coming in"), not only once framed. The rule mirrors the HUD call-sheet test.
+  - Urchin speed is per scene difficulty (`urchinSpeedByDifficulty` 1.5 / 1.5 / 4.4 / 4.7).
+  - Ahead-entry share is per difficulty (`aheadEntryShare` 0.6 / 0.6 / 0.9 / 0.9).
+  - Backlot, City and the strip are unchanged.
+  - Generator: every scene has ≥ `minimumSharpTurns` (2) heading changes of ≥ 90°. Scenes short of that swap non-intro chunks, last first, for unused turning chunks with no greater threat cost and the same fork status.
+  - Rejected: a second or closer hostile camera, because its deaths are geometric (0/8 or 8/8). Late-call gates under the Wrap, because the Night strike outruns a medium Talent, so any hold there is fatal.
+  - Hashes: the replay-hash fixtures in `tests/m2.test.ts` now run a full fair-Adaptive Shoot, so they cover these rules. The Shoot hashes were regenerated: seed 1 `6ebb4e8c`, seed 19 `ce00d1c4`, seed 2026 `38027c06`. The strip and generated-strip hashes were unchanged.
+- 2026-10-13 (M2 round 2): The `validate:m6` CI step is blocking (no `continue-on-error`), as the bible's M2 acceptance requires. The validate:m5 and balance steps stay report-only.

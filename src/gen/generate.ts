@@ -29,10 +29,10 @@ function chooseSocketKind(socket: ChunkSocket, random: () => number): ChunkSocke
   return socket.allowedTypes[0]!;
 }
 
-function entityAt(socket: ChunkSocket, kind: ChunkSocket['allowedTypes'][number], offset: number, chunkId: string): CastEntity {
+function entityAt(socket: ChunkSocket, kind: ChunkSocket['allowedTypes'][number], offset: number, chunkId: string, tier: number): CastEntity {
   return {
     id: `${chunkId}-${socket.id}`, kind, x: offset + socket.x, z: socket.z - 8,
-    vx: kind === 'boulder' ? -TUNING.boulderSpeed : kind === 'urchin' ? -TUNING.urchinSpeed : 0,
+    vx: kind === 'boulder' ? -TUNING.boulderSpeed : kind === 'urchin' ? -TUNING.urchinSpeedByDifficulty[tier]! : 0,
     vz: 0, spawned: false, cut: false, age: 0,
   };
 }
@@ -52,6 +52,17 @@ function projectPathForks(selected: ChunkTemplate[], offsets: number[]): { path:
     }
   });
   return { path, forks };
+}
+
+/** Heading changes of at least 90° along a path. */
+export function sharpTurns(path: Array<{ x: number; z: number }>): number {
+  let turns = 0;
+  for (let i = 2; i < path.length; i++) {
+    const before = Math.atan2(path[i - 1]!.z - path[i - 2]!.z, path[i - 1]!.x - path[i - 2]!.x);
+    const after = Math.atan2(path[i]!.z - path[i - 1]!.z, path[i]!.x - path[i - 1]!.x);
+    if (Math.abs(after - before) >= Math.PI / 2 - 1e-9) turns++;
+  }
+  return turns;
 }
 
 /** z of the set path at world x (path x is strictly increasing). */
@@ -82,9 +93,21 @@ export function generateScene(seed: number, difficulty = 0, chunkCount?: number)
     hasFork ||= chunk.forks.length > 0;
   }
   const offsets = selected.map((_, index) => index * TUNING.chunkSize);
+  // Bible M2: the path turns. A scene short of `minimumSharpTurns` heading changes of ≥ 90° swaps non-intro chunks,
+  // last first, for unused turning chunks that cost no more threat and keep any fork.
+  for (let index = selected.length - 1; index > 0 && sharpTurns(projectPathForks(selected, offsets).path) < TUNING.minimumSharpTurns; index--) {
+    const current = selected[index]!;
+    const replacement = CHUNKS.find((chunk) => !used.has(chunk.id) && chunk.threatCost <= current.threatCost
+      && (current.forks.length === 0 || chunk.forks.length > 0) && sharpTurns(chunk.pathNodes) >= 1);
+    if (!replacement) continue;
+    used.delete(current.id);
+    used.add(replacement.id);
+    selected[index] = replacement;
+  }
   const { path, forks } = projectPathForks(selected, offsets);
   const baseThreatCost = selected.reduce((sum, chunk) => sum + chunk.threatCost, 0);
-  const threatBudget = count * (TUNING.threatBudgets[Math.max(0, Math.min(3, Math.floor(difficulty)))] ?? 1);
+  const tier = Math.max(0, Math.min(3, Math.floor(difficulty)));
+  const threatBudget = count * (TUNING.threatBudgets[tier] ?? 1);
   if (baseThreatCost > threatBudget) throw new Error(`Chunk set spends ${baseThreatCost} above threat budget ${threatBudget}`);
   const entities: CastEntity[] = [];
   const tiles: GeneratedScene['tiles'] = [];
@@ -100,7 +123,7 @@ export function generateScene(seed: number, difficulty = 0, chunkCount?: number)
       const canPlaceReel = socket.allowedTypes.length === 1 && socket.allowedTypes[0] === 'reel';
       if (!canPlaceReel && threatSpent + socket.threatCost > threatBudget) continue;
       const kind = chooseSocketKind(socket, random);
-      entities.push(entityAt(socket, kind, offset, chunk.id));
+      entities.push(entityAt(socket, kind, offset, chunk.id, tier));
       if (canPlaceReel) reelCount++;
       else threatSpent += socket.threatCost;
     }
@@ -116,9 +139,10 @@ export function generateScene(seed: number, difficulty = 0, chunkCount?: number)
   // Bible M2: threats come from ahead. At least half the Urchins (seeded) are set on the walked path and roll down it
   // toward the Talent, so panning behind them does not remove them; the rest keep their socket rows.
   entities.forEach((entity, index) => {
-    if (entity.kind !== 'urchin' || seededRange(seed, 0x0a11 + index, 0, 1) >= TUNING.aheadEntryShare) return;
+    if (entity.kind !== 'urchin' || seededRange(seed, 0x0a11 + index, 0, 1) >= TUNING.aheadEntryShare[tier]!) return;
     entity.z = pathZAt(path, entity.x);
     entity.pathBound = true;
+    if (tier >= TUNING.rollingEntryFromDifficulty) entity.rollsIn = true;
   });
   if (forks.length === 0) {
     const at = Math.min(8, path.length - 2);

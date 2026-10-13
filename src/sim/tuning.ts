@@ -32,9 +32,13 @@ export const TUNING = {
   // Glass framed out farther than this from the Talent is unloaded intact; nearer, it shatters (bible M2: no unseen holes).
   glassShatterRadius: 6,
   urchinSpeed: 1.5,
+  // Bible M2 "Night/finale hazard density and speed": Urchin roll speed by scene difficulty (Backlot, City, Night, finale).
+  urchinSpeedByDifficulty: [1.5, 1.5, 4.4, 4.7] as const,
   urchinRadius: 0.7,
-  // Share of generated Urchins that enter ahead on the walked path (bible M2: ≥ 50%).
-  aheadEntryShare: 0.6,
+  // Share of generated Urchins that enter ahead on the walked path (bible M2: ≥ 50%), denser at Night and in the finale.
+  aheadEntryShare: [0.6, 0.6, 0.9, 0.9] as const,
+  // From this scene difficulty on (Night, finale), ahead-entry Urchins are already rolling once they are on the call sheet.
+  rollingEntryFromDifficulty: 2,
   boulderSpeed: 4,
   boulderRadius: 0.8,
   extrasSpeed: 0.8,
@@ -59,6 +63,8 @@ export const TUNING = {
   wrapSpeeds: [1.8, 2.2, 2.6] as const,
   threatBudgets: [1, 1.6, 2.3, 2.8] as const,
   chunkSize: 16,
+  // Bible M2: every scene has at least this many heading changes of ≥ 90°.
+  minimumSharpTurns: 2,
   chunkTemplateCount: 40,
   minimumReelsPerScene: 6,
   sceneLength: [120, 220] as const,

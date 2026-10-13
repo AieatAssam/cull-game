@@ -45,6 +45,13 @@ function unloadsIntact(state: SimState, entity: CastEntity) {
   return entity.gate !== undefined && !gateOpen(state, entity.gate);
 }
 
+/** Mirrors the HUD call sheet ("Coming in"): unspawned cast just past the gate edge. */
+function onCallSheet(state: SimState, entity: CastEntity) {
+  const projected = projectPoint(entity.x, entity.z, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, lensAspect(state.lens));
+  const outside = Math.max(Math.abs(projected.x), Math.abs(projected.y)) - 0.5;
+  return outside >= 0 && outside <= TUNING.callSheetMargin;
+}
+
 /** A Wide crowd tramples the Talent when a visible member touches it. */
 function crowdContact(entity: CastEntity, talent: SimState['talent'], talentRadius: number) {
   return entity.members?.some((member) => !member.cut
@@ -201,6 +208,11 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
       entity.radius = advanceRumourRadius(entity.radius ?? 0.5, visible, dt);
       if (visible) entity.spawned = true;
       if (!entity.spawned) continue;
+    }
+    // Night/finale Urchins announced on the call sheet ("Coming in") are already rolling down the set toward the frame.
+    if (!entity.spawned && entity.rollsIn && onCallSheet(state, entity)) {
+      entity.x += entity.vx * dt;
+      entity.z = pathZAt(state.path, entity.x);
     }
     if (!entity.spawned) {
       const nearTalent = entity.gate !== undefined ? false : entity.kind === 'extras' && entity.members

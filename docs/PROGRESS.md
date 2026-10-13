@@ -100,61 +100,99 @@ On the strip, Gatekeeper beats Adaptive: 100% vs 94.5%, distance ratio 0.975×. 
 
 ## Bible M2: Stage 0 balance fix
 
-Command: `npm run balance -- --stage=0 --mode=both --seeds=200 --jitter=8`. Raw seeds 1..200, fair observe view (`src/bots/observe.ts`). Reports: [`reports/balance/stage-0-strip.json`](../reports/balance/stage-0-strip.json) and [`reports/balance/stage-0-shoot.json`](../reports/balance/stage-0-shoot.json). Wall time was ~5 min on 8 cores.
+Command: `npm run balance -- --stage=0 --mode=both --seeds=200 --jitter=8`. Raw seeds 1..200, fair observe view (`src/bots/observe.ts`). Reports: [`reports/balance/stage-0-strip.json`](../reports/balance/stage-0-strip.json) and [`reports/balance/stage-0-shoot.json`](../reports/balance/stage-0-shoot.json). Wall time was ~4.5 min on 8 cores. Numbers below are after the second review round.
 
-**Before (bible M1) → after (M2), Shoot:**
+**S0 column (bible §5), Shoot, before (M1) → after (M2):**
 
-| Gate / check | M1 | M2 | Target |
+| Gate | M1 | M2 | S0 target | Result |
+|---|---|---|---|---|
+| Passive (best of Tracker, Gatekeeper) | 69.5% (Gatekeeper) | **0%** (Gatekeeper 0%, Tracker 0%) | ≤ 25% | pass |
+| Metronome | 0% | 0% | ≤ 5% | pass |
+| Adaptive (exact: zero reaction, exact aim) | 43% | **100%** | ≥ 85% | pass |
+| Adaptive, jittered (150–300 ms, ±5% aim; 1,600 runs) | 43.5% of variants | **95.4%** of variants | — | — |
+| Adaptive − passive | −26.5 pp | 100 pp | ≥ 55 pp | pass |
+| Adaptive / passive mean distance | 0.932× | 32.7× (653.0 / 20.0) | ≥ 1.5× | pass |
+| Wide / Adaptive distance | 0.129× | 0.061× | ≤ 0.7× | pass |
+| Close / Adaptive distance | 0.068× | 0.031× | ≤ 0.7× | pass |
+| One scene's share of Adaptive deaths | NIGHT SHOOT 51.8% | exact: no deaths; jittered: LONG TAKE 62% (46), NIGHT SHOOT 38% (28) | ≤ 50% | pass (exact) |
+| NoKit, SpamKit | n/a | n/a | n/a at S0 | — |
+| Chaos completions | 0 | 0 | 0 | pass |
+
+**Luck lines, Shoot:**
+
+| Check | M1 | M2 | Target |
 |---|---|---|---|
-| Adaptive | 43% | **100%** | ≥ 85% |
-| Gatekeeper | 69.5% | **0%** (urchin 140, film 60) | ≤ 25% |
-| Tracker | 0% (film 200) | 0% (urchin 145, film 55) | ≤ 25% |
-| Metronome | 0% | 0% | ≤ 5% |
-| Adaptive − passive | −26.5 pp | 100 pp | ≥ 55 pp |
-| Adaptive / passive distance | 0.932× | 32.7× | ≥ 1.5× |
-| Wide / Adaptive, Close / Adaptive | 0.129×, 0.068× | 0.061×, 0.031× | ≤ 0.7× |
-| Top scene's share of Adaptive deaths | NIGHT SHOOT 51.8% | no Adaptive deaths | ≤ 50% |
-| Adaptive deaths by killer | red-monitor 49, extras 35, glass 23, bridge 7 | none | — |
-| jitter(gatekeeper, 8) seeds ≥ 4/8; seeds at 8/8 | 69.5%; 139 | 0%; none | ≤ 2%; none |
-| jitter(adaptive, 8) seeds ≥ 6/8 | 43.5% | 100% | ≥ 85% |
-| jitter(adaptive, 8) histogram [0/8 … 8/8] | almost all 0/8 or 8/8 | [0 0 0 0 0 0 1 0 199] | mixed (see open items) |
+| jitter(gatekeeper, 8): seeds ≥ 4/8; seeds at 8/8 | 69.5%; 139 | 0%; none | ≤ 2%; none |
+| jitter(gatekeeper, 8) histogram [0/8 … 8/8] | mostly 8/8 | [200 0 0 0 0 0 0 0 0] | — |
+| jitter(adaptive, 8): seeds ≥ 6/8 | 43.5% | **98%** | ≥ 85% |
+| jitter(adaptive, 8) histogram [0/8 … 8/8] | almost all 0/8 or 8/8 | **[0 0 0 0 2 2 12 36 148]** | mixed; no seed < 4/8 |
+| Seeds below 8/8; lowest | — | 52 (26%); 152 and 157 at 4/8, 105 and 5 at 5/8 | — |
+| Generator suspects (< 4/8) | 112 | 0 | listed |
 | Adaptive SD over 10 buckets; passive worst bucket | 13.3 pp; 90% | 0 pp; 0% | ≤ 8 pp; ≤ 40% |
-| Adaptive clear time (min / mean / max) | 248.8 / 255.7 / 262.5 s | 253.7 / 262.1 / 270.8 s | 180–480 s |
-| Passive FailReasons | 2, `hit` 82% | 2, `hit` 70% | ≥ 3, none > 60% (**still fails**) |
-| Roster kinds per scene (min) | BACKLOT 2 | BACKLOT 2 | ≥ 3 (**still fails**) |
-| Chaos | 0 | 0 | 0 |
+| Passive FailReasons | 2, `hit` 82% | 2, `hit` 70% (urchin 140, film 60) | ≥ 3, none > 60% (**fails**) |
+| Roster kinds per scene (min) | BACKLOT 2 | BACKLOT 2, CITY 3, NIGHT 6, LONG TAKE 7 | ≥ 3 (**fails**, BACKLOT) |
+| Adaptive clear time (min / mean / max) | 248.8 / 255.7 / 262.5 s | 252.9 / 261.9 / 270.9 s | 180–480 s |
 
-**Strip:** Adaptive 94.5% → **100%** (target ≥ 95%). Gatekeeper 100% → 0%, Tracker 0% → 0%, Metronome 0% → 0%. jitter(gatekeeper) has no seed at ≥ 4/8. jitter(adaptive) has 100% of seeds at ≥ 6/8.
+Every jittered Adaptive death is an Urchin in NIGHT SHOOT or LONG TAKE. The variants that die are the ones with a slow reaction or a tighter-than-intended zoom (aim < 1). The killing Urchin was announced on the call sheet about 2 s, or ~16 u, before contact.
+
+**Strip** (`--mode=strip`, Backlot difficulty, unchanged by round 2):
+- Adaptive is 100% (target ≥ 95%).
+- Gatekeeper, Tracker and Metronome are 0%.
+- Adaptive / passive distance is 9.8×, Wide / Adaptive 0.20×, Close / Adaptive 0.10×.
+- jitter(adaptive) histogram is [0 … 0 200]. jitter(gatekeeper) has no seed at ≥ 4/8.
 
 **Other checks:**
-- `validate:m6`, now on the fair driver: **20/20**, 255.9 / 261.9 / 267.4 s.
-- `validate:m5`, legacy full-state strip: all gates pass.
-- `npm run perf`: sim p95 0.61 ms.
+- `validate:m6` (fair driver): **20/20**, 256.3 / 261.8 / 268.1 s. It is now a **blocking** CI step. The validate:m5 and balance steps stay report-only.
+- `validate:m5`: all gates pass.
+- `npm run perf`: sim p95 0.53 ms.
 
-**What changed.** Rules are listed in `DECISIONS.md` (2026-10-13). In short:
-- Rules (`src/sim`):
+**What changed.** Rules are in `DECISIONS.md` (2026-10-13).
+
+Rules (`src/sim`):
+- **Round 1:**
   - Defang needs a close cut since the gate opened, against a stand-in Urchin waiting on its mark.
   - Gates are seeded per scene.
   - Far Glass unloads intact instead of leaving an unseen hole.
   - The hostile camera has a 1 s tally that you can avoid by framing it out. It never cuts unseen cast or the floor.
   - Crowds trample only on contact with a visible member.
-  - The Wrap strike line stays behind the Talent on winding paths. This was a bug that killed Adaptive on Glass in Night Shoot.
-- Generator data (`src/gen`): ≥ 50% of Urchins enter ahead on the path. This is a bible M2 lever, and it is why passive deaths now include `urchin`.
-- Tests: `tests/m2.test.ts` is new and pins fixed replay hashes. One pre-existing property test ("keeps every live CAST AABB overlapping the gate") already failed on the M1 branch: fast-check finds Glass held by the documented keep margin. It now asserts that documented margin.
+  - The Wrap strike line stays behind the Talent on winding paths. This was a bug.
+- **Round 2:**
+  - From Night on, an ahead-entry Urchin is already rolling once it is announced on the call sheet ("Coming in"), instead of waiting to be framed.
 
-**Adaptive policy changes** (`src/bots/players.ts`). Each one uses only what the fair view shows and mirrors what a reasonable player does:
-1. **Medium-wide (38) instead of Wide (48)** near Urchins and throughout the finale. 48 makes crowds trample and bridges drop, which the HUD shot size shows. 38 is past an Urchin's lethal tier and short of Wide. This removed the 35 crowd and 7 bridge deaths in LONG TAKE that the old "park at 48" policy caused.
-2. **React to an Urchin when it comes on screen** (14 u instead of 8 u). Urchins now roll in ahead on the path. A human sees one at the frame edge about 2.7 s before contact. With an 8 u trigger and a half-rate zoom the bot was slower than a person: jittered Adaptive fell to 61%.
-3. **Make the defang cut.** With the HUD gate text up, it frames the nearest visible hazard within the close-call radius out of shot, with the frame edge between it and the Talent. Without this, no bot can pass a gate. That is the point of the rule.
-4. **Keep a visible hostile camera out of the frame.** It remembers a monitor it has seen (position and facing are drawn) while the Talent is within reach. It prefers framings off the side or behind, not ahead of the Talent's walk. It keeps the framing in use unless another is clearly better, and only widens (never tightens) while holding the edge.
+Tuning (`src/sim/tuning.ts`, round 2):
+- Urchin speed by scene is 1.5 / 1.5 / **4.4 / 4.7** (Backlot / City / Night / finale).
+- Ahead-entry share is 0.6 / 0.6 / **0.9 / 0.9**.
+- Backlot, City and the strip are unchanged.
 
-`validate:m6` and the balance harness now use the same fair driver.
+Generator (`src/gen`):
+- **Round 1:** ≥ 50% of Urchins enter ahead on the path.
+- **Round 2:** every scene has ≥ 2 heading changes of ≥ 90° (`minimumSharpTurns`). 9% of scenes had fewer; they now swap non-intro chunks for turning chunks with no more threat and the same forks. 0 of 5,000 sampled scenes fall short.
 
-**Open items (not fixed here):**
-- **Jitter histograms are not mixed.** Adaptive no longer has layout-determined deaths: no seed sits at 0/8, against 112 suspect seeds in M1. But Stage 0 now rarely kills a competent player, so the histograms are 8/8 for Adaptive and 0/8 for passive. Jitter now separates skill from no skill, not seed from seed. I did not raise difficulty to manufacture deaths. If S0 should pressure skilled play, the bible's "Night/finale hazard density and speed" lever is the place to do it.
-- Passive "never samey" fails (2 reasons). Every passive death is an urchin hit or the film running out at the first defang gate. That is the bible's passive signature, not a variety of failures.
-- BACKLOT roster minimum is 2 on some seeds (unchanged from M1). It needs generator content.
-- **For other owners:**
-  - The HUD defang copy (`main.ts`, "zoom out until the spikes go dull, or cut one close") is now half wrong.
-  - The hostile camera's tally (`lockTicks`) should be drawn so the 1 s telegraph is visible.
-  - CI still runs `validate:m6` with `continue-on-error`. The bible makes it blocking from M2.
+Tests:
+- `tests/m2.test.ts` covers every rule above.
+- The fixed replay hashes now run a **full** fair-Adaptive Shoot through the finale.
+- Round 1 corrected one property test that already failed on M1: it now honours the documented Glass keep margin.
+
+**Why this pressure, and what was rejected (round 2).** Urchin speed alone did nothing, even at 6.5 u/s. Unspawned Urchins waited until framed, so the call sheet gave unlimited warning, and medium-wide (38) defangs every Urchin. "Already rolling once announced" turns speed into a real reaction contest. It stays readable: about 2 s of on-screen and call-sheet warning, and a human needs ~0.3 s to react plus ~0.8 s to zoom.
+
+Density shapes the spread. More, slightly slower Urchins give many small-risk encounters instead of one critical encounter per seed. That is what keeps every seed at ≥ 4/8.
+
+Rejected:
+- A second hostile camera, and a hostile camera nearer the path. Their deaths were purely geometric (0/8 or 8/8), not skill.
+- "Late call" gates under the Wrap. The Night strike (2.6 u/s) outruns a medium Talent (2.5 u/s), so any hold there is fatal for everyone.
+- Raising finale threat budgets. The budget is not the binding limit.
+
+**Adaptive policy** (`src/bots/players.ts`): no round-2 changes. The four round-1 changes, each using only what the fair view shows:
+1. Medium-wide (38) instead of Wide (48) near Urchins and in the finale, because Wide makes crowds trample and bridges drop.
+2. React to an Urchin when it comes on screen (14 u, not 8 u).
+3. Make the defang cut: put the frame edge between the nearest visible hazard in close-call range and the Talent.
+4. Keep a seen hostile camera out of frame, preferring side or behind framings. Hold the framing and only widen while doing so.
+
+**Still failing or open:**
+- **Exact Adaptive is 100%, not 88–95%.** The exact bot reacts in zero time with exact aim, so it is the ceiling of the jittered population. Any fair reaction contest it loses on a seed is one nearly every human-like variant loses too.
+  - Probe: at 7 u/s, exact Adaptive drops to 40%, but 47 of 60 seeds fall below 4/8 in jitter.
+  - At 4.5 / 4.6 u/s, exact Adaptive has one Night death. That makes the exact-bot scene-share gate a degenerate 100%.
+  - So pressure is tuned to the human-like (jittered) population: 95.4% of variants, 26% of seeds below 8/8, none below 4/8.
+- **Passive "never samey" fails** (2 reasons, `hit` 70%). Gatekeeper is bible-defined: it tracks centred, zooms 40 on a defang cue and never reads hazards. It can only die to an Urchin before the first defang gate, or run out of film stalled there. A third reason needs something a centred medium frame never triggers: `fell` needs Wide or a close Glass cut, `lost-talent` needs losing the Talent, and `wrapped` needs a stall inside the Wrap zone, which was rejected above as unfair. With existing kinds and fair placement, I found no honest way to add a third reason.
+- **BACKLOT roster minimum** is 2 on some seeds. It needs generator content.
+- **Other owners:** the hostile camera tally telegraph and the defang HUD hint are being pushed to this branch by the render/UI agent.
