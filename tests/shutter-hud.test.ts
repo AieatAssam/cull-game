@@ -16,15 +16,18 @@ describe('shutter HUD copy', () => {
     expect(cutBanner(result({ hits: [{ id: 'a', kind: 'urchin', distance: 'normal' }] }))).toBeNull();
     expect(takeReadout(3, 1250)).toBe('TAKE ×3  1,250');
   });
-  it('pins threat arrows to the gate edge, pulsing under 1 s', () => {
+  it('pins threat arrows inside the gate edge, merging similar bearings with a count, pulsing under 1 s', () => {
     const view = { camera: { x: 0, z: 0, zoom: 10, yaw: 0 } as never, lens: '35mm' as const, talent: { x: 0, z: 0 } as never };
-    const [right, slow] = threatMarkers(view, [
+    const size = { width: 500, height: 500 };
+    const [right, left] = threatMarkers(view, [
+      { id: 's', kind: 'urchin', direction: { x: 1, z: 0.05 }, distance: 20, timeToContact: 5 },
       { id: 'r', kind: 'urchin', direction: { x: 1, z: 0 }, distance: 20, timeToContact: 0.5 },
-      { id: 's', kind: 'urchin', direction: { x: 1, z: 0 }, distance: 20, timeToContact: 5 },
-    ]);
-    expect(right!.left).toBeCloseTo(0.94);
-    expect(right!).toMatchObject({ urgency: 'imminent', pulse: true });
-    expect(slow!).toMatchObject({ urgency: 'far', pulse: false });
-    expect(right!.scale).toBeGreaterThan(slow!.scale);
+      { id: 'l', kind: 'urchin', direction: { x: -1, z: 0 }, distance: 20, timeToContact: 3 },
+    ], size, { x: 48, y: 36 });
+    expect(right!).toMatchObject({ ids: ['r', 's'], count: 2, label: '×2  0.5s', urgency: 'imminent', pulse: true, side: 'right' });
+    expect(right!.left).toBeCloseTo(1 - 48 / 500);
+    expect(left!).toMatchObject({ count: 1, label: '3.0s', urgency: 'far', pulse: false, side: 'left' });
+    expect(left!.left).toBeCloseTo(48 / 500);
+    expect(right!.scale).toBeGreaterThan(left!.scale);
   });
 });

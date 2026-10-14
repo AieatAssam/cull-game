@@ -1021,8 +1021,16 @@ const CAST_NAMES: Record<string, string> = {
 function callSheetLines() {
   const aspect = lensAspect(state.lens);
   const lines: string[] = [];
+  const incoming = new Set<string>();
+  for (const marker of currentThreatMarkers()) {
+    for (const id of marker.ids) incoming.add(id);
+    const kinds = [...new Set(marker.ids.map((id) => state.entities.find((entity) => entity.id === id)?.kind).filter(Boolean))];
+    const name = kinds.map((kind) => CAST_NAMES[kind!] ?? kind).join(' + ') || 'something';
+    const time = Number.isFinite(marker.ttc) ? ` ${marker.ttc.toFixed(1)}s` : '';
+    lines.push(`Coming in · ${marker.count > 1 ? `${marker.count}× ` : ''}${name}${time} · ${marker.side}`);
+  }
   for (const entity of state.entities) {
-    if (entity.cut) continue;
+    if (entity.cut || incoming.has(entity.id)) continue;
     const projected = projectPoint(entity.x, entity.z, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, aspect);
     const outside = Math.max(Math.abs(projected.x), Math.abs(projected.y)) - 0.5;
     const name = CAST_NAMES[entity.kind] ?? entity.kind;
@@ -1182,15 +1190,16 @@ function showCut(result: CutResult, before: ReadonlyArray<{ id: string; x: numbe
     stamp.style.left = `${left * 100}%`; stamp.style.top = `${top * 100}%`;
     layer.append(stamp);
     if (reduced) continue;
-    for (let i = 0; i < 9; i++) {
+    for (let i = 0; i < 14; i++) {
       const scrap = document.createElement('i');
       scrap.className = 'scrap';
       const angle = Math.random() * Math.PI * 2;
-      const reach = 24 + Math.random() * 46;
+      const reach = 30 + Math.random() * 60;
       scrap.style.cssText = `left:${left * 100}%;top:${top * 100}%;--dx:${Math.cos(angle) * reach}px;--dy:${Math.sin(angle) * reach + 18}px;--spin:${Math.round(Math.random() * 540 - 270)}deg;background:${DEBRIS_COLOURS[i % DEBRIS_COLOURS.length]}`;
       layer.append(scrap);
     }
   }
+  placeStamps(layer);
   const banner = cutBanner(result);
   const bannerEl = $('#cut-banner');
   bannerEl.classList.toggle('hidden', !banner);
@@ -1212,6 +1221,27 @@ function showCut(result: CutResult, before: ReadonlyArray<{ id: string; x: numbe
   if (!result.missed && !result.penalised) gate.classList.add('kick');
   if (!reduced) hitStopUntil = performance.now() + (result.hits.some((hit) => hit.distance === 'close') ? 90 : 60);
 }
+/** Keeps every stamp box wholly inside the gate (with padding) and nudges later stamps clear of earlier ones. */
+function placeStamps(layer: HTMLElement) {
+  const padX = 34, padY = 12, gap = 4; // padX clears the sprocket strips
+  const width = layer.clientWidth, height = layer.clientHeight;
+  if (!width || !height) return;
+  const placed: { x: number; y: number; w: number; h: number }[] = [];
+  const clampX = (x: number, w: number) => Math.max(padX + w / 2, Math.min(width - padX - w / 2, x));
+  const clampY = (y: number, h: number) => Math.max(padY + h / 2, Math.min(height - padY - h / 2, y));
+  for (const stamp of layer.querySelectorAll<HTMLElement>('.cut-stamp')) {
+    const w = stamp.offsetWidth, h = stamp.offsetHeight;
+    const x = clampX(parseFloat(stamp.style.left) / 100 * width, w);
+    let y = clampY(parseFloat(stamp.style.top) / 100 * height, h);
+    const hits = (at: number) => placed.some((box) => Math.abs(box.x - x) < (box.w + w) / 2 + gap && Math.abs(box.y - at) < (box.h + h) / 2 + gap);
+    for (let step = 1; hits(y) && step < 12; step++) {
+      const down = clampY(y + (h + gap), h), up = clampY(y - (h + gap) * step, h);
+      y = !hits(down) ? down : !hits(up) ? up : down;
+    }
+    placed.push({ x, y, w, h });
+    stamp.style.left = `${x}px`; stamp.style.top = `${y}px`;
+  }
+}
 /** A press while the shutter recharges: a dull click and a shake on the meters. The sim ignores the press. */
 function shutterNotReady() {
   audio.playCue('dud');
@@ -1221,6 +1251,12 @@ function pressCut() {
   if (tutorial.showing || paused || state.failed) return;
   if (state.shutter.charge < 1) shutterNotReady();
   cutPress = true;
+}
+const CHEVRON = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 4 L28 16 L6 28 L12 16 Z" /></svg>';
+/** Off-frame threats merged into edge arrows, laid out against the gate's current pixel size. */
+function currentThreatMarkers() {
+  const gate = $('#gate');
+  return threatMarkers(state, offFrameThreats(state), { width: gate.clientWidth || 500, height: gate.clientHeight || 500 });
 }
 /** Charge bar by the viewfinder, ring around the CUT button, READY pop, take readout and the off-frame threat arrows. */
 function updateShutterHud() {
@@ -1237,9 +1273,9 @@ function updateShutterHud() {
   shutterWasReady = ready;
   $('#take-score').textContent = takeReadout(state.shutter.combo, state.score);
   const layer = $('#threats');
-  const markers = state.failed || tutorial.showing ? [] : threatMarkers(state, offFrameThreats(state));
+  const markers = state.failed || tutorial.showing ? [] : currentThreatMarkers();
   while (layer.children.length > markers.length) layer.lastElementChild!.remove();
-  while (layer.children.length < markers.length) { const arrow = document.createElement('i'); arrow.className = 'threat'; arrow.innerHTML = '<span>➤</span><small></small>'; layer.append(arrow); }
+  while (layer.children.length < markers.length) { const arrow = document.createElement('i'); arrow.className = 'threat'; arrow.innerHTML = `<span>${CHEVRON}</span><small></small>`; layer.append(arrow); }
   markers.forEach((marker, index) => {
     const arrow = layer.children[index] as HTMLElement;
     arrow.dataset.urgency = marker.urgency;

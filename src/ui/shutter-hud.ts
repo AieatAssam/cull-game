@@ -38,31 +38,63 @@ export function gatePoint(state: Pick<SimState, 'camera' | 'lens'>, x: number, z
 }
 
 export type ThreatUrgency = 'far' | 'near' | 'imminent';
-export interface ThreatMarker { id: string; left: number; top: number; angle: number; scale: number; urgency: ThreatUrgency; pulse: boolean; label: string; }
+export interface ThreatMarker {
+  ids: string[]; count: number; left: number; top: number; angle: number; scale: number; urgency: ThreatUrgency; pulse: boolean; label: string;
+  /** Soonest time to contact in the group, seconds (Infinity when not closing). */
+  ttc: number;
+  /** Which gate edge it sits on, for copy: "right", "left", "above", "below". */
+  side: 'right' | 'left' | 'above' | 'below';
+}
+
+/** Threats whose screen bearings differ by less than this share one arrow. */
+const MERGE_RADIANS = 0.42;
 
 /**
- * One edge arrow per off-frame threat, pinned to the gate edge on the ray from the centre toward it and pointing at it.
- * Size and colour grow as time to contact shrinks; under 1 s it pulses.
+ * One edge arrow per bearing: off-frame threats whose directions are within MERGE_RADIANS share an arrow with a count.
+ * The arrow sits on the ray from the gate centre toward the soonest threat, inset `pad` px from the edge (so its
+ * chevron and label never clip), and points at it. Size and colour grow as time to contact shrinks; under 1 s it pulses.
+ * `size` is the gate in px; without it the gate is treated as 500 px square.
  */
-export function threatMarkers(state: Pick<SimState, 'camera' | 'lens' | 'talent'>, threats: readonly Threat[]): ThreatMarker[] {
-  return threats.map((threat) => {
+export function threatMarkers(
+  state: Pick<SimState, 'camera' | 'lens' | 'talent'>,
+  threats: readonly Threat[],
+  size: { width: number; height: number } = { width: 500, height: 500 },
+  pad: { x: number; y: number } = { x: 48, y: 36 },
+): ThreatMarker[] {
+  const groups: { angle: number; threats: Threat[] }[] = [];
+  const sorted = [...threats].sort((a, b) => a.timeToContact - b.timeToContact);
+  for (const threat of sorted) {
     const wx = state.talent.x + threat.direction.x * threat.distance;
     const wz = state.talent.z + threat.direction.z * threat.distance;
     const at = projectPoint(wx, wz, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, lensAspect(state.lens));
-    const angle = Math.atan2(at.y, at.x);
-    const reach = 0.44 / Math.max(Math.abs(Math.cos(angle)), Math.abs(Math.sin(angle)));
-    const ttc = threat.timeToContact;
+    const angle = Math.atan2(at.y * size.height, at.x * size.width);
+    const near = groups.find((group) => Math.abs(Math.atan2(Math.sin(angle - group.angle), Math.cos(angle - group.angle))) < MERGE_RADIANS);
+    if (near) near.threats.push(threat);
+    else groups.push({ angle, threats: [threat] });
+  }
+  return groups.map(({ angle, threats: group }) => {
+    const halfW = Math.max(1, size.width / 2 - pad.x);
+    const halfH = Math.max(1, size.height / 2 - pad.y);
+    const cos = Math.cos(angle), sin = Math.sin(angle);
+    const reach = Math.min(Math.abs(cos) > 1e-6 ? halfW / Math.abs(cos) : Infinity, Math.abs(sin) > 1e-6 ? halfH / Math.abs(sin) : Infinity);
+    const ttc = group[0]!.timeToContact;
     const urgency: ThreatUrgency = ttc < 1 ? 'imminent' : ttc < 2.5 ? 'near' : 'far';
     const closeness = Number.isFinite(ttc) ? 1 - Math.min(1, ttc / TUNING.threatHorizonSeconds) : 0.2;
+    const time = Number.isFinite(ttc) ? `${ttc.toFixed(1)}s` : '';
+    const count = group.length;
+    const side = Math.abs(cos) * halfH >= Math.abs(sin) * halfW ? (cos > 0 ? 'right' : 'left') : (sin > 0 ? 'below' : 'above');
     return {
-      id: threat.id,
-      left: 0.5 + Math.cos(angle) * reach,
-      top: 0.5 + Math.sin(angle) * reach,
+      ids: group.map((threat) => threat.id),
+      count,
+      left: 0.5 + (cos * reach) / size.width,
+      top: 0.5 + (sin * reach) / size.height,
       angle,
-      scale: 0.7 + 0.8 * closeness,
+      scale: 1 + 0.35 * closeness,
       urgency,
       pulse: ttc < 1,
-      label: Number.isFinite(ttc) ? `${ttc.toFixed(1)}s` : '',
+      label: count > 1 ? `×${count}  ${time}`.trim() : time,
+      ttc,
+      side,
     };
   });
 }
