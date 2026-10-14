@@ -167,6 +167,11 @@ button, input, select, summary { font: inherit; }
 .focus-band { position: absolute; z-index: 3; left: 0; width: 100%; height: 40%; background: rgba(226, 176, 74, 0.12); box-shadow: inset 0 2px 0 var(--brass), inset 0 -2px 0 var(--brass); pointer-events: none; }
 .stage.fisheye .gate { border-radius: 28%; }
 .stage.fisheye .mount { clip-path: ellipse(75% 76% at 50% 50%); }
+/* 1 / TUNING.portraitGateTall. */
+.stage.gate-portrait { --gate-aspect: calc(2 / 3); }
+/* Portrait gate: the message line leaves the glass for a fixed two-line strip between gate and controls. */
+.stage.gate-portrait .gate-notes { flex-direction: column; align-items: center; gap: var(--space-1); min-height: 48px; }
+.gate-notes > .hud-message { position: static; flex: 0 0 auto; max-width: 100%; }
 .stage.anamorphic { --gate-aspect: 2.39; }
 
 /* HUD on the glass: score + REC top-left, film counter top-right, one message line bottom-centre, shutter meter bottom-left. */
@@ -389,6 +394,10 @@ kbd { display: inline-block; min-width: 24px; margin-right: 4px; padding: 0 4px;
   .stage.left-handed .cut-button { margin-right: 0; }
   .slate-card { padding: var(--space-2) var(--space-1); }
   .slate-row #roll { flex: 1 0 100%; }
+  /* Portrait gate: the slot hugs the full-width 2:3 gate, so the gate sits right under the pause row and the message strip
+     right under the gate; the spare height goes above the thumb controls, not around the frame. */
+  .stage.gate-portrait .gate-slot { flex: 0 1 calc((100vw - max(var(--space-1), env(safe-area-inset-left)) - max(var(--space-1), env(safe-area-inset-right))) * 1.5); }
+  .stage.gate-portrait .controlbar { margin-top: auto; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition: none !important; }

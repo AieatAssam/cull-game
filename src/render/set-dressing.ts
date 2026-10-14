@@ -388,7 +388,7 @@ export function createTableTextures() {
   }, 128, false);
   felt.repeat.set(1, 1);
   paper.repeat.set(1, 1);
-  cork.repeat.set(70, 6);
+  cork.repeat.set(70, 32);
   return { felt, cork, paper, cardboard, shadow, pool };
 }
 

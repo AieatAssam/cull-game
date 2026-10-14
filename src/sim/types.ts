@@ -19,6 +19,8 @@ export interface TerrainTile { x: number; z: number; kind: 'path' | 'set'; }
 export interface SimState {
   seed: number;
   lens: import('./lenses').LensId;
+  /** Viewfinder shape; absent means `square`. */
+  gate?: import('./lenses').GateId;
   tick: number;
   travelDistance: number;
   totalDistance: number;

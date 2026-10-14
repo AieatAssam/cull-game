@@ -1,6 +1,6 @@
 import { monitorConeContains } from '../sim/m6';
 import { inFrame } from '../sim/frame';
-import { lensAspect } from '../sim/lenses';
+import { frameView } from '../sim/lenses';
 import { lodTier } from '../sim/lod';
 import { TUNING } from '../sim/tuning';
 import type { CastEntity, SimState } from '../sim/types';
@@ -25,14 +25,14 @@ function visible(state: SimState, entity: CastEntity): boolean {
   if (!entity.spawned || entity.cut) return false;
   if (entity.kind === 'swarm' && lodTier(TUNING.swarmRadius * 1000 / state.camera.zoom, entity.lodTier) === 4) return false;
   return withinMonitor(state, entity.x, entity.z, entity.id)
-    || inFrame(entity.x, entity.z, radius(entity), state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, 0.8, lensAspect(state.lens), state.lens === 'tilt-shift' ? state.camera.focusOffset : null, state.lens === 'fisheye');
+    || inFrame(entity.x, entity.z, radius(entity), state.camera.x, state.camera.z, frameView(state.lens, state.gate, state.camera.zoom).zoom, state.camera.yaw, 0.8, frameView(state.lens, state.gate, state.camera.zoom).aspect, state.lens === 'tilt-shift' ? state.camera.focusOffset : null, state.lens === 'fisheye');
 }
 
 /** The exact set allowed to create sound this tick, including the Talent as a named source. */
 export function audibleSourceIds(state: SimState): string[] {
   const ids = state.entities.filter((entity) => visible(state, entity)).map((entity) => entity.id);
   const talentVisible = withinMonitor(state, state.talent.x, state.talent.z)
-    || inFrame(state.talent.x, state.talent.z, TUNING.talentRadii[Math.min(state.talent.lodTier ?? 1, 3)]!, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, 1.4, lensAspect(state.lens), state.lens === 'tilt-shift' ? state.camera.focusOffset : null, state.lens === 'fisheye');
+    || inFrame(state.talent.x, state.talent.z, TUNING.talentRadii[Math.min(state.talent.lodTier ?? 1, 3)]!, state.camera.x, state.camera.z, frameView(state.lens, state.gate, state.camera.zoom).zoom, state.camera.yaw, 1.4, frameView(state.lens, state.gate, state.camera.zoom).aspect, state.lens === 'tilt-shift' ? state.camera.focusOffset : null, state.lens === 'fisheye');
   if (talentVisible) ids.push('talent');
   return ids.sort();
 }

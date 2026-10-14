@@ -3,6 +3,8 @@ import type { SimState } from './types';
 export function stateHash(state: SimState): string {
   const normalized = JSON.stringify({
     lens: state.lens,
+    // Only non-square gates enter the hash, so square-gate hashes match runs recorded before gates existed.
+    ...(state.gate && state.gate !== 'square' ? { gate: state.gate } : {}),
     tick: state.tick,
     travelDistance: q(state.travelDistance),
     totalDistance: q(state.totalDistance),

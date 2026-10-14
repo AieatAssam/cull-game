@@ -1,6 +1,6 @@
 import { inFrame } from './frame';
 import { exitHeading } from './framing';
-import { lensAspect } from './lenses';
+import { frameView } from './lenses';
 import { monitorConeContains } from './m6';
 import { TUNING } from './tuning';
 import type { CastEntity, EntityKind, SimState } from './types';
@@ -27,8 +27,9 @@ function onScreen(state: SimState, entity: CastEntity): boolean {
   const inMonitor = state.entities.some((monitor) => monitor.kind === 'monitor' && monitor.spawned && !monitor.cut
     && monitorConeContains({ origin: { x: monitor.x, z: monitor.z }, heading: monitor.heading ?? 0, range: monitor.range ?? 0, halfAngle: monitor.halfAngle ?? 0 }, entity));
   if (inMonitor) return true;
-  const framed = (x: number, z: number, radius: number, height: number) => inFrame(x, z, radius, camera.x, camera.z, camera.zoom, camera.yaw, height,
-    lensAspect(state.lens), state.lens === 'tilt-shift' ? camera.focusOffset : null, state.lens === 'fisheye');
+  const view = frameView(state.lens, state.gate, camera.zoom);
+  const framed = (x: number, z: number, radius: number, height: number) => inFrame(x, z, radius, camera.x, camera.z, view.zoom, camera.yaw, height,
+    view.aspect, state.lens === 'tilt-shift' ? camera.focusOffset : null, state.lens === 'fisheye');
   if (entity.kind === 'extras' && entity.members) return entity.members.some((member) => !member.cut && framed(entity.x + member.dx, entity.z + member.dz, TUNING.extrasMemberRadius, 0.5));
   return framed(entity.x, entity.z, contactRadius(entity), entity.kind === 'boulder' ? 1 : 0.8);
 }

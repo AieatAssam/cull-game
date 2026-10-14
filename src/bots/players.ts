@@ -1,4 +1,5 @@
 import { mulberry32 } from '../sim/rng';
+import { frameView } from '../sim/lenses';
 import { step } from '../sim/step';
 import { TUNING } from '../sim/tuning';
 import { createGeneratedState } from '../sim/world';
@@ -29,13 +30,15 @@ export function cutFraming(state: SimState, target: { x: number; z: number }, ra
   const t = state.talent;
   const tr = TUNING.talentRadii[Math.min(t.lodTier ?? 1, 3)]!;
   const half = zoom / 2;
+  // The gate's vertical half-extent: taller than `half` on the portrait gate.
+  const halfZ = frameView(state.lens, state.gate, zoom).zoom / 2;
   const options = [
     // target right of the frame's right edge / left of its left edge
     { axis: 'x' as const, low: t.x - tr - half, high: target.x - radius - half },
     { axis: 'x' as const, low: target.x + radius + half, high: t.x + tr + half },
     // target below the bottom edge (larger z) / above the top edge
-    { axis: 'z' as const, low: t.z - tr - (talentHeight + half) / P, high: target.z - radius - (height + half) / P },
-    { axis: 'z' as const, low: target.z + radius + half / P, high: t.z + tr + half / P },
+    { axis: 'z' as const, low: t.z - tr - (talentHeight + halfZ) / P, high: target.z - radius - (height + halfZ) / P },
+    { axis: 'z' as const, low: target.z + radius + halfZ / P, high: t.z + tr + halfZ / P },
   ].map((option, index) => ({ axis: option.axis, value: (option.low + option.high) / 2, width: option.high - option.low,
     // While holding a framing, the Talent walks toward +x, so a margin on the leading edge closes: prefer the sides and behind.
     score: option.high - option.low - (hold && index === 0 ? 6 : 0) }));

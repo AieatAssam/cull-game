@@ -1,5 +1,5 @@
 import { projectPoint } from '../sim/frame';
-import { lensAspect } from '../sim/lenses';
+import { frameView } from '../sim/lenses';
 import type { Threat } from '../sim/threats';
 import { TUNING } from '../sim/tuning';
 import type { CutResult, SimState } from '../sim/types';
@@ -30,9 +30,15 @@ export function takeReadout(combo: number, score: number): string {
   return `TAKE ×${Math.max(1, combo)}  ${Math.round(score).toLocaleString('en-US')}`;
 }
 
+/** A world point in gate units (±0.5 at the edges) for this lens and gate. */
+function projectFrame(state: Pick<SimState, 'camera' | 'lens' | 'gate'>, x: number, z: number) {
+  const frame = frameView(state.lens, state.gate, state.camera.zoom);
+  return projectPoint(x, z, state.camera.x, state.camera.z, frame.zoom, state.camera.yaw, frame.aspect);
+}
+
 /** Where on the gate (0..1 from its top-left) a world point sits, clamped inside `inset` of the edge. */
-export function gatePoint(state: Pick<SimState, 'camera' | 'lens'>, x: number, z: number, inset = 0.08): { left: number; top: number } {
-  const at = projectPoint(x, z, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, lensAspect(state.lens));
+export function gatePoint(state: Pick<SimState, 'camera' | 'lens' | 'gate'>, x: number, z: number, inset = 0.08): { left: number; top: number } {
+  const at = projectFrame(state, x, z);
   const clamp = (value: number) => Math.max(inset, Math.min(1 - inset, value));
   return { left: clamp(0.5 + at.x), top: clamp(0.5 + at.y) };
 }
@@ -66,7 +72,7 @@ export function threatMarkers(
   for (const threat of sorted) {
     const wx = state.talent.x + threat.direction.x * threat.distance;
     const wz = state.talent.z + threat.direction.z * threat.distance;
-    const at = projectPoint(wx, wz, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, lensAspect(state.lens));
+    const at = projectFrame(state, wx, wz);
     const angle = Math.atan2(at.y * size.height, at.x * size.width);
     const near = groups.find((group) => Math.abs(Math.atan2(Math.sin(angle - group.angle), Math.cos(angle - group.angle))) < MERGE_RADIANS);
     if (near) near.threats.push(threat);

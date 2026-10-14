@@ -1,7 +1,7 @@
 /**
  * Balance harness (bible §5, M1). Report-only: it measures, it never fails the build.
  *
- *   npm run balance -- --stage=0 --mode=strip|shoot|both --seeds=200 --jitter=8 [--workers=N] [--out=reports/balance]
+ *   npm run balance -- --stage=0 --mode=strip|shoot|both [--gate=square|portrait|both] --seeds=200 --jitter=8 [--workers=N] [--out=reports/balance]
  *
  * Writes `reports/balance/stage-<n>-<mode>.json`. All bots see the world through `observe.ts` (player-visible only).
  * Raw seeds 1..N, never validated/filtered seeds.
@@ -15,6 +15,7 @@ import { createShootSceneState, createShootState, stepShoot } from '../sim/shoot
 import { step } from '../sim/step';
 import { TUNING } from '../sim/tuning';
 import { createGeneratedState } from '../sim/world';
+import type { GateId } from '../sim/lenses';
 import type { CastEntity, FailReason, InputFrame, SimState } from '../sim/types';
 import { createDriver, jitterTuning, type BalanceBot } from './balance-bots';
 
@@ -22,7 +23,7 @@ export type BalanceMode = 'strip' | 'shoot';
 /** Entity kind that ended the take, or the non-entity cause. */
 export type Killer = CastEntity['kind'] | 'offscreen' | 'film' | 'wrap-strike' | 'unknown';
 
-export interface RunTask { stage: number; mode: BalanceMode; bot: BalanceBot; seed: number; variant: number | null; }
+export interface RunTask { stage: number; mode: BalanceMode; bot: BalanceBot; seed: number; variant: number | null; gate?: GateId; }
 export interface RunResult {
   bot: BalanceBot; seed: number; variant: number | null;
   completed: boolean; timedOut: boolean; failed: FailReason | null; killer: Killer | null;
@@ -115,6 +116,7 @@ export function runTask(task: RunTask): RunResult {
   const advance = def.advance[task.mode];
   const maxTicks = def.maxTicks[task.mode];
   let state = def.create[task.mode](task.seed);
+  if (task.gate && task.gate !== 'square') state.gate = task.gate;
   const startTick = state.tick;
   while (!state.failed && state.tick - startTick < maxTicks) state = advance(state, drive(state));
   const completed = isCompleted(task.mode, state);
@@ -284,10 +286,10 @@ export function rosterKinds(stage: number, mode: BalanceMode, seeds: number[]): 
 
 // ---------------------------------------------------------------- running
 
-export interface BalanceOptions { stage: number; mode: BalanceMode; seeds: number; jitter: number; workers: number; bots?: BalanceBot[]; }
+export interface BalanceOptions { stage: number; mode: BalanceMode; seeds: number; jitter: number; workers: number; bots?: BalanceBot[]; gate?: GateId; }
 
 export interface BalanceReport {
-  stage: number; mode: BalanceMode; seeds: [number, number]; jitter: number; command: string;
+  stage: number; mode: BalanceMode; gate: GateId; seeds: [number, number]; jitter: number; command: string;
   note: string;
   passive: { bot: 'tracker' | 'gatekeeper'; completion: number };
   bots: Record<string, BotSummary>;
@@ -303,9 +305,9 @@ const HUMAN_BOTS = ['human-keys', 'human-touch'] as const;
 export function balanceTasks(options: BalanceOptions): RunTask[] {
   const tasks: RunTask[] = [];
   for (let seed = 1; seed <= options.seeds; seed++) {
-    for (const bot of options.bots ?? DEFAULT_BOTS) tasks.push({ stage: options.stage, mode: options.mode, bot, seed, variant: null });
+    for (const bot of options.bots ?? DEFAULT_BOTS) tasks.push({ stage: options.stage, mode: options.mode, bot, seed, variant: null, gate: options.gate });
     for (let variant = 0; variant < options.jitter; variant++) {
-      for (const bot of ['gatekeeper', 'adaptive'] as const) tasks.push({ stage: options.stage, mode: options.mode, bot, seed, variant });
+      for (const bot of ['gatekeeper', 'adaptive'] as const) tasks.push({ stage: options.stage, mode: options.mode, bot, seed, variant, gate: options.gate });
     }
   }
   return tasks;
@@ -361,7 +363,7 @@ export async function runBalance(options: BalanceOptions, command = ''): Promise
     rosterKinds: rosterKinds(options.stage, options.mode, seeds),
   });
   return {
-    stage: options.stage, mode: options.mode, seeds: [1, options.seeds], jitter: options.jitter, command,
+    stage: options.stage, mode: options.mode, gate: options.gate ?? 'square', seeds: [1, options.seeds], jitter: options.jitter, command,
     note: 'Report-only. Raw seeds. Bots read only player-visible state (src/bots/observe.ts). §5 targets are for the full Shoot; strip gates are informational.',
     passive: { bot: passiveBot, completion: bots[passiveBot]!.completion },
     bots, jitterBots, gates: stageGates(options.mode, def.targets, bots, passiveBot), luck,
@@ -372,7 +374,7 @@ export async function runBalance(options: BalanceOptions, command = ''): Promise
 }
 
 export function formatReport(report: BalanceReport): string {
-  const lines = [`Stage ${report.stage} · ${report.mode} · seeds ${report.seeds[0]}..${report.seeds[1]} · jitter ${report.jitter}`];
+  const lines = [`Stage ${report.stage} · ${report.mode} · gate ${report.gate} · seeds ${report.seeds[0]}..${report.seeds[1]} · jitter ${report.jitter}`];
   lines.push('bot         completion  mean dist  timeouts  deaths by killer');
   for (const [bot, summary] of Object.entries(report.bots)) {
     const killers = Object.entries(summary.killers).sort((a, b) => b[1] - a[1]).map(([kind, count]) => `${kind} ${count}`).join(', ');
@@ -393,7 +395,7 @@ export function formatReport(report: BalanceReport): string {
   return lines.join('\n');
 }
 
-export function parseArgs(argv: string[]): { stages: number[]; modes: BalanceMode[]; seeds: number; jitter: number; workers: number; out: string } {
+export function parseArgs(argv: string[]): { stages: number[]; modes: BalanceMode[]; gates: GateId[]; seeds: number; jitter: number; workers: number; out: string } {
   const args = new Map<string, string>();
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i]!;
@@ -402,7 +404,7 @@ export function parseArgs(argv: string[]): { stages: number[]; modes: BalanceMod
     const value = inline ?? (argv[i + 1] && !argv[i + 1]!.startsWith('--') ? argv[++i]! : 'true');
     args.set(key, value);
   }
-  const known = new Set(['stage', 'mode', 'seeds', 'jitter', 'workers', 'out']);
+  const known = new Set(['stage', 'mode', 'gate', 'seeds', 'jitter', 'workers', 'out']);
   for (const key of args.keys()) if (!known.has(key)) throw new Error(`Unknown option --${key}`);
   const stageArg = args.get('stage') ?? '0';
   const stages = stageArg === 'all' ? Object.keys(STAGES).map(Number) : [Number(stageArg)];
@@ -414,8 +416,11 @@ export function parseArgs(argv: string[]): { stages: number[]; modes: BalanceMod
     return value;
   };
   for (const stage of stages) stageDef(stage);
+  const gateArg = args.get('gate') ?? 'square';
+  if (!['square', 'portrait', 'both'].includes(gateArg)) throw new Error('--gate must be square, portrait or both');
   return {
     stages, modes: modeArg === 'both' ? ['strip', 'shoot'] : [modeArg as BalanceMode],
+    gates: gateArg === 'both' ? ['square', 'portrait'] : [gateArg as GateId],
     seeds: integer('seeds', 200, 1), jitter: integer('jitter', 8, 0),
     workers: integer('workers', Math.max(1, availableParallelism() - 1), 1), out: args.get('out') ?? 'reports/balance',
   };
@@ -427,10 +432,11 @@ async function main() {
   const command = `npm run balance -- ${argv.join(' ')}`.trim();
   mkdirSync(options.out, { recursive: true });
   for (const stage of options.stages) {
-    for (const mode of options.modes) {
+    for (const mode of options.modes) for (const gate of options.gates) {
       const started = performance.now();
-      const report = await runBalance({ stage, mode, seeds: options.seeds, jitter: options.jitter, workers: options.workers }, command);
-      const file = join(options.out, `stage-${stage}-${mode}.json`);
+      const report = await runBalance({ stage, mode, gate, seeds: options.seeds, jitter: options.jitter, workers: options.workers }, command);
+      // Square keeps the historic file name; other gates get a suffix.
+      const file = join(options.out, `stage-${stage}-${mode}${gate === 'square' ? '' : `-${gate}`}.json`);
       writeFileSync(file, `${JSON.stringify(report, null, 2)}\n`);
       console.log(formatReport(report));
       console.log(`→ ${file} (${((performance.now() - started) / 1000).toFixed(1)} s)\n`);

@@ -32,7 +32,7 @@ import { makeContactSheet, type ContactFrame } from './ui/contact-sheet';
 import { filmStocks, loadFilmStock, saveFilmStock, unlockedFilmStocks, type FilmStock } from './meta/film-stock';
 import { lensFeats, unlockedLenses } from './meta/lenses';
 import { monitorConeContains } from './sim/m6';
-import { lensAspect, lensLodFactor, lensRenderTicks, type LensId } from './sim/lenses';
+import { frameView, lensLodFactor, type GateId, lensRenderTicks, type LensId } from './sim/lenses';
 import { COACH_LINES, closeCallsForGrade, describeShot } from './ui/describe-shot';
 import { cutBanner, cutStampText, gatePoint, takeReadout, threatMarkers } from './ui/shutter-hud';
 import { offFrameThreats } from './sim/threats';
@@ -72,9 +72,19 @@ function initialLens(): LensId {
   } catch { return '35mm'; }
 }
 let pendingLens = initialLens();
+/** Portrait phones get the taller 2:3 gate; the choice is fixed per take and recorded in its replay. `?gate=` forces one. */
+const portraitPhone = window.matchMedia('(orientation: portrait) and (pointer: coarse) and (max-width: 800px)');
+function takeGate(): GateId {
+  if (replayData) return replayData.gate ?? 'square';
+  const requested = query.get('gate');
+  if (requested === 'square' || requested === 'portrait') return requested;
+  return portraitPhone.matches ? 'portrait' : 'square';
+}
+const applyGate = (take: SimState) => { const gate = takeGate(); if (gate !== 'square') take.gate = gate; };
 let botRandom = mulberry32((seed ^ 0xb07b07) >>> 0);
 let state: SimState = createTake(seed);
 state.lens = pendingLens;
+applyGate(state);
 if (state.lens === 'long-lens') state.camera.zoom = TUNING.minZoom;
 let replayIndex = 0;
 let inputLog: InputFrame[] = [];
@@ -291,7 +301,8 @@ function displayPoint(x: number, z: number) {
   if (state.lens !== 'fisheye') return { x, z };
   const basis = cameraBasis(state.camera.yaw);
   const dx = x - state.camera.x; const dz = z - state.camera.z;
-  const width = state.camera.zoom * lensAspect(state.lens);
+  const frame = frameView(state.lens, state.gate, state.camera.zoom);
+  const width = frame.zoom * frame.aspect;
   const localX = dx * basis.cos - dz * basis.sin;
   const wrappedX = ((localX + width / 2) % width + width) % width - width / 2;
   const shift = wrappedX - localX;
@@ -303,7 +314,8 @@ function detailFactor(x: number, z: number) {
 }
 const tableTextures = createTableTextures();
 const floorMaterial = new THREE.MeshPhongMaterial({ map: tableTextures.cork, color: '#c9a46b', emissive: '#000000', shininess: 2, specular: '#000000' });
-const floor = new THREE.Mesh(new THREE.PlaneGeometry(400, 30), floorMaterial);
+// The table runs well past any gate (portrait 2:3 at max zoom sees ~90 u of depth), so no gate ever frames the backdrop.
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(400, 160), floorMaterial);
 floor.rotation.x = -Math.PI / 2;
 floor.position.y = -0.12;
 scene.add(floor);
@@ -817,11 +829,12 @@ function syncEntities(showTransientRings = true) {
 }
 
 function syncCamera() {
-  updateRenderCamera(camera, { ...state.camera, lens: state.lens });
+  updateRenderCamera(camera, { ...state.camera, lens: state.lens, gate: state.gate });
 }
 function captureContactFrame() {
   if (state.tick === 0) return;
-  const thirds = thirdsDistance(state.talent.x, state.talent.z, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, lensAspect(state.lens));
+  const view = frameView(state.lens, state.gate, state.camera.zoom);
+  const thirds = thirdsDistance(state.talent.x, state.talent.z, state.camera.x, state.camera.z, view.zoom, state.camera.yaw, view.aspect);
   const isBestThirds = thirds < bestThirdsDistance;
   if (isBestThirds) bestThirdsDistance = thirds;
   const sampled = state.tick === 1 || state.tick % 300 === 0 || state.failed !== null || pendingCloseCall || isBestThirds;
@@ -922,7 +935,7 @@ async function saveRunSummary() {
   replay.searchParams.delete('frozen');
   if (!dailyRun) replay.searchParams.delete('daily');
   if (overcrankUsed) replay.searchParams.set('assist', '75');
-  replay.hash = encodeReplay(state.seed, inputLog, state.lens);
+  replay.hash = encodeReplay(state.seed, inputLog, state.lens, state.gate);
   const replayLink = $('#replay-link') as HTMLAnchorElement;
   replayLink.href = replay.toString();
 }
@@ -963,6 +976,7 @@ async function renderReplayContactFrames(): Promise<ScoredFrame[]> {
   try {
     const initial = createTake(terminalState.seed);
     initial.lens = terminalState.lens;
+    if (terminalState.gate) initial.gate = terminalState.gate;
     if (initial.lens === 'long-lens') initial.camera.zoom = TUNING.minZoom;
     selected = (await selectReplayContactFrames(initial, inputLog, terminalState)).frames;
     const rendered: ScoredFrame[] = [];
@@ -1041,7 +1055,7 @@ const CAST_NAMES: Record<string, string> = {
   'red-monitor': 'hostile camera', continuity: 'swappable prop',
 };
 function callSheetLines() {
-  const aspect = lensAspect(state.lens);
+  const frame = frameView(state.lens, state.gate, state.camera.zoom);
   const lines: string[] = [];
   const incoming = new Set<string>();
   for (const marker of currentThreatMarkers()) {
@@ -1053,7 +1067,7 @@ function callSheetLines() {
   }
   for (const entity of state.entities) {
     if (entity.cut || incoming.has(entity.id)) continue;
-    const projected = projectPoint(entity.x, entity.z, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, aspect);
+    const projected = projectPoint(entity.x, entity.z, state.camera.x, state.camera.z, frame.zoom, state.camera.yaw, frame.aspect);
     const outside = Math.max(Math.abs(projected.x), Math.abs(projected.y)) - 0.5;
     const name = CAST_NAMES[entity.kind] ?? entity.kind;
     if (!entity.spawned && outside >= 0 && outside <= TUNING.callSheetMargin) lines.push(`Coming in · ${name}`);
@@ -1081,8 +1095,8 @@ function updateLostHer() {
   $('#lost-bar').style.width = `${(1 - progress) * 100}%`;
   $('#lost-count').textContent = `${left.toFixed(1)} s left · film burning`;
   lostLine = `Find her — ${left.toFixed(1)} s`;
-  const aspect = lensAspect(state.lens);
-  const at = projectPoint(state.talent.x, state.talent.z, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, aspect);
+  const frame = frameView(state.lens, state.gate, state.camera.zoom);
+  const at = projectPoint(state.talent.x, state.talent.z, state.camera.x, state.camera.z, frame.zoom, state.camera.yaw, frame.aspect);
   const angle = Math.atan2(at.y, at.x);
   // Pin the arrow to the gate edge along the ray from the centre toward her.
   const reach = 0.4 / Math.max(Math.abs(Math.cos(angle)), Math.abs(Math.sin(angle)));
@@ -1129,6 +1143,11 @@ function updateHud() {
   shell.querySelector('.film')!.classList.toggle('low', state.film < 20);
   $('#lens').textContent = state.lens === 'long-lens' ? '85 mm' : `${Math.round(Math.max(24, Math.min(85, 85 - (state.camera.zoom - 10) * 61 / 38)))} mm`;
   shell.classList.toggle('anamorphic', state.lens === 'anamorphic');
+  shell.classList.toggle('gate-portrait', state.gate === 'portrait');
+  // On the portrait gate the message line reads just under the glass, so it never covers the table.
+  const messageHome = state.gate === 'portrait' ? $('.gate-notes') : $('.hud');
+  const messageLine = $('#hud-message');
+  if (messageLine.parentElement !== messageHome) messageHome.prepend(messageLine);
   shell.classList.toggle('fisheye', state.lens === 'fisheye');
   // The gate names its ratio only when a lens changes it.
   $('#gate-ratio').textContent = state.lens === 'anamorphic' ? 'Gate 2.39:1'
@@ -1541,7 +1560,7 @@ $('#make-reel').addEventListener('click', () => {
 function newTake(nextSeed: number) {
   if (nextSeed !== state.seed) dailyRun = false;
   takeNumber++;
-  replayData = undefined; invalidReplay = false; state = createTake(nextSeed); state.lens = pendingLens;
+  replayData = undefined; invalidReplay = false; state = createTake(nextSeed); state.lens = pendingLens; applyGate(state);
   if (state.lens === 'long-lens') state.camera.zoom = TUNING.minZoom;
   botRandom = mulberry32((nextSeed ^ 0xb07b07) >>> 0); inputLog = []; replayIndex = 0;
   contactFrames.length = 0; closeCallFrames.length = 0; lastContactTick = 0; bestThirdsDistance = Number.POSITIVE_INFINITY;

@@ -1,6 +1,6 @@
 import { inFrame, projectPoint } from '../sim/frame';
 import { exitHeading, releasing } from '../sim/framing';
-import { lensAspect } from '../sim/lenses';
+import { frameView } from '../sim/lenses';
 import { monitorConeContains } from '../sim/m6';
 import { offFrameThreats, type Threat } from '../sim/threats';
 import { TUNING } from '../sim/tuning';
@@ -32,7 +32,8 @@ const entityRadius = (entity: CastEntity) => entity.kind === 'boulder' ? TUNING.
 
 function framed(state: SimState, x: number, z: number, radius: number, height: number) {
   const { camera } = state;
-  return inFrame(x, z, radius, camera.x, camera.z, camera.zoom, camera.yaw, height, lensAspect(state.lens),
+  const view = frameView(state.lens, state.gate, camera.zoom);
+  return inFrame(x, z, radius, camera.x, camera.z, view.zoom, camera.yaw, height, view.aspect,
     state.lens === 'tilt-shift' ? camera.focusOffset : null, state.lens === 'fisheye');
 }
 
@@ -56,7 +57,8 @@ export function entityOnScreen(state: SimState, entity: CastEntity): boolean {
 export function onCallSheet(state: SimState, entity: CastEntity): boolean {
   if (entity.cut || entity.spawned) return false;
   const { camera } = state;
-  const projected = projectPoint(entity.x, entity.z, camera.x, camera.z, camera.zoom, camera.yaw, lensAspect(state.lens));
+  const view = frameView(state.lens, state.gate, camera.zoom);
+  const projected = projectPoint(entity.x, entity.z, camera.x, camera.z, view.zoom, camera.yaw, view.aspect);
   const outside = Math.max(Math.abs(projected.x), Math.abs(projected.y)) - 0.5;
   return outside >= 0 && outside <= TUNING.callSheetMargin;
 }

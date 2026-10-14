@@ -1,7 +1,7 @@
 import { activeShot, releasing } from '../sim/framing';
 import { inFrame } from '../sim/frame';
 import { lodTier } from '../sim/lod';
-import { lensAspect } from '../sim/lenses';
+import { frameView } from '../sim/lenses';
 import { talentLost } from '../sim/step';
 import { TUNING } from '../sim/tuning';
 import type { CastEntity, EntityKind, SimState } from '../sim/types';
@@ -62,8 +62,8 @@ function hazardState(kind: EntityKind, tier: number) {
 function urchinInShot(state: SimState, urchin: CastEntity) {
   return inFrame(
     urchin.x, urchin.z, TUNING.urchinRadius,
-    state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw,
-    0.8, lensAspect(state.lens),
+    state.camera.x, state.camera.z, frameView(state.lens, state.gate, state.camera.zoom).zoom, state.camera.yaw,
+    0.8, frameView(state.lens, state.gate, state.camera.zoom).aspect,
     state.lens === 'tilt-shift' ? state.camera.focusOffset : null,
     state.lens === 'fisheye',
   );
