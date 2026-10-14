@@ -241,7 +241,28 @@ describe('bible M2 round 2: Night/finale pressure and turning paths', () => {
     }
   });
 
-  it('makes Night/finale Urchins denser, faster and already rolling once announced; Backlot and City are unchanged', () => {
+  it('leads Backlot and City ahead-entry Urchins with staggered waves up the path; Night and the finale have none', () => {
+    for (let difficulty = 0; difficulty < 4; difficulty++) {
+      for (let seed = 1; seed <= 50; seed++) {
+        const scene = generateScene(sceneSeed(seed, difficulty), difficulty, 9);
+        const followers = scene.entities.filter((entity) => /-w\d+$/.test(entity.id));
+        if (TUNING.urchinWaveFollowers[difficulty] === 0) expect(followers).toHaveLength(0);
+        for (const follower of followers) {
+          const k = Number(follower.id.split('-w').at(-1));
+          const leader = scene.entities.find((entity) => entity.id === follower.id.replace(/-w\d+$/, ''))!;
+          expect(k).toBeLessThanOrEqual(TUNING.urchinWaveFollowers[difficulty]!);
+          expect(follower.kind).toBe('urchin');
+          expect(follower.pathBound && leader.pathBound).toBe(true);
+          expect(follower.x - leader.x).toBeCloseTo(k * TUNING.urchinWaveGap);
+          expect(follower.z).toBeCloseTo(pathZAt(scene.path, follower.x));
+        }
+      }
+    }
+    expect(TUNING.urchinWaveFollowers[0]).toBeGreaterThan(0);
+    expect(TUNING.urchinWaveFollowers[1]).toBeGreaterThan(0);
+  });
+
+  it('makes Night/finale Urchins denser, faster and already rolling once announced', () => {
     const share = (difficulty: number) => {
       let urchins = 0;
       let ahead = 0;
@@ -289,13 +310,13 @@ describe('bible M2: Adaptive policy helpers', () => {
   });
 });
 
-// Fixed replay hashes after the bible M2 rule changes (DECISIONS 2026-10-13, round 2) and the graded out-of-frame rule (DECISIONS 2026-10-13, LOST HER) and fast zoom (DECISIONS 2026-10-13, fast zoom) and the defang ACTION beat / gate film burn / per-scene beat (DECISIONS 2026-10-13, loop review round 2) and the B1 Shutter (DECISIONS 2026-10-14). Regenerate only with a decision entry.
+// Fixed replay hashes after the bible M2 rule changes (DECISIONS 2026-10-13, round 2) and the graded out-of-frame rule (DECISIONS 2026-10-13, LOST HER) and fast zoom (DECISIONS 2026-10-13, fast zoom) and the defang ACTION beat / gate film burn / per-scene beat (DECISIONS 2026-10-13, loop review round 2) and the B1 Shutter and its Urchin waves (DECISIONS 2026-10-14). Regenerate only with a decision entry.
 describe('fixed replay hashes', () => {
   const frames = Array.from({ length: 10_000 }, (_, i) => ({ ...NEUTRAL_INPUT, panX: (i % 240 < 120 ? 30 : -30), zoom: i % 300 < 150 ? 0 : 1 }));
   const fixtures: Record<number, [string, string, string]> = {
-    1: ['c1fc28e4', 'f39cd2b9', '7c6d6853'],
-    19: ['581c7b32', '0420eaef', '137d0fe9'],
-    2026: ['11a5d388', '55a21dfb', '2bde18a6'],
+    1: ['c1fc28e4', 'eaad4cbb', 'a4e1ae96'],
+    19: ['581c7b32', '61bd177b', 'abb7dbfa'],
+    2026: ['11a5d388', 'c5ba5fd7', '809fab34'],
   };
   it.each(Object.entries(fixtures))('seed %s: strip world, generated strip and a full fair Adaptive Shoot', (seedText, [world, generated, shoot]) => {
     const seed = Number(seedText);

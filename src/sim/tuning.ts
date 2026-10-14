@@ -59,6 +59,10 @@ export const TUNING = {
   urchinRadius: 0.7,
   // Share of generated Urchins that enter ahead on the walked path (bible M2: ≥ 50%), denser at Night and in the finale.
   aheadEntryShare: [0.6, 0.6, 0.9, 0.9] as const,
+  // Urchin waves (DECISIONS 2026-10-14, shutter density): followers per ahead-entry Urchin by scene difficulty, spaced this far
+  // up the path behind it, so a wave arrives staggered across one shutter recharge. Night and the finale already run 0.9 ahead.
+  urchinWaveFollowers: [4, 2, 0, 0] as const,
+  urchinWaveGap: 7,
   // From this scene difficulty on (Night, finale), ahead-entry Urchins are already rolling once they are on the call sheet.
   rollingEntryFromDifficulty: 2,
   boulderSpeed: 4,
