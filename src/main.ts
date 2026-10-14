@@ -1164,7 +1164,8 @@ function updateHud() {
     const endings: Record<string, string> = { 'lost-talent': 'You lost her', hit: 'She was hit', fell: 'She fell', 'out-of-film': 'Out of film', wrapped: "That's a wrap" };
     $('#end-title').textContent = endings[state.failed] ?? 'Cut';
     $('#end-stamp').textContent = `Dailies · take ${takeNumber}`;
-    $('#end-detail').textContent = `${locationFor(state)} · seed ${String(state.seed).padStart(5, '0')}`;
+    const place = locationFor(state);
+    $('#end-detail').textContent = `${place.charAt(0)}${place.slice(1).toLowerCase()} · seed ${String(state.seed).padStart(5, '0')}`;
     $('#end-cuts').closest('div')!.setAttribute('aria-label', plural(state.cuts.length, 'cut'));
     $('#end-score').textContent = state.score.toLocaleString('en-GB');
     $('#end-metres').textContent = `${Math.floor(state.totalDistance)} m`;

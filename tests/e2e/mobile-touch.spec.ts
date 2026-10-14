@@ -55,7 +55,7 @@ for (const viewport of [{ width: 412, height: 915 }, { width: 390, height: 844 }
       expect((await camera(page)).failed).toBeNull();
     });
 
-    test('touch controls are at least 44 px, sit right below the viewfinder, and swap key chips for touch hints', async ({ page }) => {
+    test('touch controls are at least 44 px, sit in the bottom thumb zone, and swap key chips for touch hints', async ({ page }) => {
       await page.goto('/?debug&seed=1');
       await page.locator('#play').tap();
       while ((await page.evaluate(() => window.__cull.tutorial().showing))) await page.locator('#roll').tap();
@@ -64,19 +64,23 @@ for (const viewport of [{ width: 412, height: 915 }, { width: 390, height: 844 }
         .filter(({ box }) => box.width && (box.width < 44 || box.height < 44)).map(({ label }) => label));
       expect(small).toEqual([]);
       const gate = (await page.locator('#gate').boundingBox())!;
-      let nearest = Number.POSITIVE_INFINITY;
+      let top = Number.POSITIVE_INFINITY;
+      let bottom = 0;
       for (const id of ['#hold', '#cut', '#rotate-left', '#rotate-right', '#zoom-out', '#zoom-in']) {
         const box = (await page.locator(id).boundingBox())!;
         expect(box.y).toBeGreaterThanOrEqual(gate.y + gate.height);
         expect(box.y + box.height).toBeLessThanOrEqual(viewport.height);
-        nearest = Math.min(nearest, box.y - (gate.y + gate.height));
+        top = Math.min(top, box.y);
+        bottom = Math.max(bottom, box.y + box.height);
       }
-      // No dead band between the frame and the thumb controls.
-      expect(nearest).toBeLessThan(32);
+      // The cluster is anchored to the bottom thumb zone, the square gate centred in the space above it.
+      expect(viewport.height - bottom).toBeLessThan(32);
+      expect(Math.abs(gate.width - gate.height)).toBeLessThan(2);
       // Hold is the left thumb, CUT the right; the pause button sits above the frame, outside it.
       expect((await page.locator('#hold').boundingBox())!.x).toBeLessThan(viewport.width / 2);
       const pause = (await page.locator('#pause').boundingBox())!;
       expect(pause.y + pause.height).toBeLessThanOrEqual(gate.y);
+      expect(Math.abs((gate.y - (pause.y + pause.height)) - (top - (gate.y + gate.height)))).toBeLessThan(24);
       expect(pause.x + pause.width / 2).toBeGreaterThan(viewport.width / 2);
       const film = (await page.locator('.film').boundingBox())!;
       expect(film.y + film.height).toBeLessThanOrEqual(viewport.height);
