@@ -121,10 +121,12 @@ export class AudioDirector {
     }
   }
 
-  playCue(name: 'cut' | 'pop' | 'reel' | 'lod' | 'wrap') {
+  playCue(name: 'cut' | 'clack' | 'dud' | 'pop' | 'reel' | 'lod' | 'wrap') {
     if (!this.context || !this.master || !this.sfxBus) return;
+    if (name === 'dud') { this.playDud(); return; }
     this.ambience?.duckFor();
     if (name === 'cut') { this.playSplice(); return; }
+    if (name === 'clack') { this.playClack(); return; }
     const frequenciesByCue = { pop: [220, 880], reel: [520, 1040], lod: [900, 240], wrap: [90, 440] };
     const [from, to] = frequenciesByCue[name];
     const now = this.context.currentTime;
@@ -196,5 +198,49 @@ export class AudioDirector {
     thump.start(now); thump.stop(now + 0.14);
     noise.onended = () => { noise.disconnect(); filter.disconnect(); gain.disconnect(); };
     thump.onended = () => { thump.disconnect(); thumpGain.disconnect(); };
+  }
+
+  /** A short band-passed noise click at `at`, the building block of the shutter clack. */
+  private click(at: number, frequency: number, level: number, duration = 0.012) {
+    if (!this.context || !this.sfxBus) return;
+    const length = Math.max(1, Math.floor(this.context.sampleRate * duration));
+    const buffer = this.context.createBuffer(1, length, this.context.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / length) ** 3;
+    const noise = this.context.createBufferSource();
+    const filter = this.context.createBiquadFilter();
+    const gain = this.context.createGain();
+    noise.buffer = buffer;
+    filter.type = 'bandpass';
+    filter.frequency.value = frequency;
+    filter.Q.value = 1.4;
+    gain.gain.value = level * (this.currentSettings.calm ? 0.45 : 1);
+    noise.connect(filter); filter.connect(gain); gain.connect(this.sfxBus);
+    noise.start(at);
+    noise.onended = () => { noise.disconnect(); filter.disconnect(); gain.disconnect(); };
+  }
+
+  /** Shutter clack: blade open, a body thump, blade close 45 ms later. Presentation only. */
+  private playClack() {
+    if (!this.context || !this.sfxBus) return;
+    const now = this.context.currentTime;
+    this.click(now, 3200, 0.7);
+    this.click(now + 0.045, 2200, 0.55, 0.018);
+    const body = this.context.createOscillator();
+    const bodyGain = this.context.createGain();
+    body.type = 'triangle';
+    body.frequency.setValueAtTime(140, now);
+    body.frequency.exponentialRampToValueAtTime(60, now + 0.07);
+    bodyGain.gain.setValueAtTime(0.22 * (this.currentSettings.calm ? 0.45 : 1), now);
+    bodyGain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+    body.connect(bodyGain); bodyGain.connect(this.sfxBus);
+    body.start(now); body.stop(now + 0.12);
+    body.onended = () => { body.disconnect(); bodyGain.disconnect(); };
+  }
+
+  /** A press while the shutter recharges: one dull, muffled click. */
+  private playDud() {
+    if (!this.context) return;
+    this.click(this.context.currentTime, 420, 0.5, 0.02);
   }
 }

@@ -2,6 +2,7 @@ import { inFrame, projectPoint } from '../sim/frame';
 import { exitHeading, releasing } from '../sim/framing';
 import { lensAspect } from '../sim/lenses';
 import { monitorConeContains } from '../sim/m6';
+import { offFrameThreats, type Threat } from '../sim/threats';
 import { TUNING } from '../sim/tuning';
 import type { CastEntity, SimState } from '../sim/types';
 
@@ -11,7 +12,8 @@ import type { CastEntity, SimState } from '../sim/types';
  * - call-sheet entries: unspawned cast just past the frame edge (`callSheetMargin`), as `main.ts` lists them;
  * - the Talent where it was last seen, its shot size, the camera, film, slate (scene/biome), the set path;
  * - the shot-list gate only while its HUD text is up (the Talent is held at it);
- * - the ACTION exit arrow, only while it is drawn at her feet and she is on screen.
+ * - the ACTION exit arrow, only while it is drawn at her feet and she is on screen;
+ * - the shutter meter (charge, combo, last CUT result) and the off-frame threat edge indicators (`offFrameThreats`).
  * Everything else (pending spawns elsewhere, cast cut off-screen, gate positions) is stripped.
  */
 export interface PlayerView {
@@ -21,6 +23,8 @@ export interface PlayerView {
   gate: 'defang' | 'portrait' | null;
   /** The ACTION beat's exit arrow (unit, world x/z) while it is on screen, or null. */
   action?: { x: number; z: number } | null;
+  /** Edge indicators: off-frame hazards closing on her (direction from her + time to contact), soonest first. */
+  threats: Threat[];
 }
 
 const entityRadius = (entity: CastEntity) => entity.kind === 'boulder' ? TUNING.boulderRadius : entity.kind === 'urchin' ? TUNING.urchinRadius
@@ -82,11 +86,13 @@ export function createObserver(): Observer {
     return {
       gate,
       action,
+      threats: offFrameThreats(state),
       state: {
         ...state,
         camera: { ...state.camera },
         talent: { ...state.talent, x: lastSeen.x, z: lastSeen.z },
         shoot: state.shoot ? { ...state.shoot } : undefined,
+        shutter: { ...state.shutter },
         entities,
         shots: undefined,
       },

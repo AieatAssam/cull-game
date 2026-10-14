@@ -9,13 +9,13 @@ Draft for Aieat Assam, 12 Oct 2026. Campaign milestones live in `docs/design/gam
 
 ## 1. Pitch
 
-You're the camera operator on a film shoot that's falling apart. The **Talent**, a tiny figure in a red coat, walks forward on their own and will not stop. You don't control them. You control the **frame**. The world follows one law: **whatever isn't in the shot doesn't exist.** Pan away from a boulder and it's gone. Pan away from the bridge the Talent is about to cross and that's gone too. Zoom out and more of the world exists, threats included, but everything gets **simpler**, because in CULL the level-of-detail trick games use to save GPU time is literally physics: a spiked urchin seen from far away *is* a harmless cube.
+You're the camera operator on a film shoot that's falling apart. The **Talent**, a tiny figure in a red coat, walks forward on their own and will not stop. You don't control them. You control the **frame**. The world follows one law: **whatever isn't in the shot keeps coming, until you CUT it out of existence.** Pan a boulder out of shot and CUT, and it's gone. Pan the bridge the Talent is about to cross out of shot and CUT, and that's gone too. Zoom out and more of the world exists, threats included, but everything gets **simpler**, because in CULL the level-of-detail trick games use to save GPU time is literally physics: a spiked urchin seen from far away *is* a harmless cube.
 
 Three-to-seven-minute runs. Mouse, keyboard or one thumb. Every run leaves you a 9-frame contact sheet of your best shots.
 
 ### The rule-bending premise
 Game engines quietly cheat: they skip anything off-screen (frustum culling), swap distant objects for cheaper models (LOD), and load the world as you approach (streaming). CULL makes all three **visible and lawful**:
-- **Culling is death.** Leaving the frame deletes things.
+- **Culling is a CUT.** Leaving the frame deletes nothing. Off-frame things keep moving and stay lethal, and the shutter deletes them only when you press CUT.
 - **LOD is physics.** How big something is on screen decides how detailed, and how dangerous or useful, it is.
 - **Streaming is spawning.** Entering the frame creates things, sometimes already moving (pop-in).
 
@@ -35,18 +35,19 @@ The research says one tangible rule twist that changes every second of play is w
 - An entity is **in frame** if its **projected screen-space AABB overlaps the gate rectangle by any amount** (partial counts). The projection is the same orthographic matrix the renderer uses, implemented as a pure function in the sim. A test asserts the sim and renderer matrices are equal.
   - *Why projected AABB rather than the ground footprint:* what you see is what exists. A tall tower whose top pokes into the shot exists.
 - **Occlusion does not count.** Something hidden behind a wall but inside the gate still exists. *Why:* readability, determinism and cost. The rule must be judged from the frame edges alone. (Open question Q3 considers one late-game "occluder" set piece.)
+- **Fully outside** means no overlap at all. Only a CUT reaches entities that are fully outside (§2.7).
 - **Edge-clipped** (partially inside) is a visible state, drawn with a hatch on the cut side. Most entities treat it as fully present; a few use it (see the Slab and Bridge in §5).
 
 ### 2.3 Entity classes: what persists off-screen
 | Class | When it leaves the frame | When it re-enters | Examples |
 |---|---|---|---|
 | **SET** (static terrain) | unloaded | **reloaded identically from the seed** (it's the location) | ground tiles, walls, ramps |
-| **CAST** (dynamic) | **CUT, deleted permanently** for this run, marked with a "CUT" stamp on the call sheet | never returns | enemies, hazards, pickups, fragile floors |
+| **CAST** (dynamic) | **stays live**: it keeps moving and is lethal on contact, until a CUT made while it is fully outside the gate deletes it for this run (a "CUT" stamp on the call sheet) | never returns once cut | enemies, hazards, fragile floors |
 | **LEDGER** (rare, marked red) | keeps a tiny abstract record (e.g. "time unseen") with **no simulation of position** | re-spawns with its state advanced by its ledger rule | the Rumour |
 | **RECURRING** | unloaded | re-rolled to the next entry in its seeded sequence | the Continuity Prop |
 | **TALENT** (the hero) | 0.5 s ⚙ free grace, then "LOST HER": film burns +4 s/s ⚙ and a countdown runs; at 3.0 s ⚙ out of frame the run fails ("Lost the Talent") | n/a | the hero |
 
-- **Spawning:** every CAST, LEDGER and RECURRING entity has a seeded *spawn point* from the generator (§7). It loads the first tick its projected AABB overlaps the gate, in its seed state (position, velocity, facing). A spawn point is consumed once loaded, unless it's RECURRING.
+- **Spawning:** every CAST, LEDGER and RECURRING entity has a seeded *spawn point* from the generator (§7). It loads the first tick its projected AABB overlaps the gate, in its seed state (position, velocity, facing). A spawn point is consumed once loaded, unless it's RECURRING. Cast that has never been framed never spawns, so a CUT can only reach cast the shot has shown.
 - **Pop-in safety:** no hazard spawns with its AABB within 2.0 u ⚙ of the Talent. A spawn that would breach this waits until the frame moves.
 - **Call sheet (preview margin):** anything with an unconsumed spawn point within 0.25 W ⚙ outside the gate is drawn in the margin as a **bounding box only**. Hazards are red, with an arrow if they spawn moving; pickups are cyan. They **do not exist** and aren't simulated. This is the fairness valve: pop-in is a choice you make, not an ambush.
 
@@ -54,20 +55,31 @@ The research says one tangible rule twist that changes every second of play is w
 - The Talent walks along the location's **path graph** (generated walkable tiles) at a speed set by their own LOD tier (§4).
 - **At forks** the Talent takes the branch whose heading best matches the direction from the Talent to the **gate centre**: *"the Talent walks toward what you're looking at."* Your only steering is framing.
 - **Void ahead:** if the next tile isn't loaded (off-frame) or doesn't exist, the Talent stops and waits ("Holding for set…"), which burns film (§2.6).
-- **HOLD** (Space, or the thumb button) stops the Talent while held. It burns film at 2× ⚙. It's the only direct hero control.
+- **HOLD** (H, or the HOLD button) stops the Talent while held. It burns film at 2× ⚙. It's the only direct hero control. The shutter (CUT, §2.7) acts on the world, not on her.
 - The Talent never turns back on their own and doesn't fight. Collisions with SET push them along the path; collisions with CAST resolve by that entity's tier stats.
 
 ### 2.5 Failure states (the run ends)
 1. **Lost the Talent:** the Talent has been fully outside the gate (and outside every friendly monitor cone) for 3.0 s ⚙. The rule is graded: the first 0.5 s ⚙ out of frame are free; after that she is **lost**, film drains an extra 4 s per second ⚙ on top of the normal burn, the gate edge flashes, a "LOST HER" banner counts down to the cut and an edge arrow points to her. Reframing her resets the count.
 2. **Hit:** a lethal-tier CAST entity touches the Talent.
-3. **Fell:** no floor under the Talent's centre (a fragile floor was cut, or a bridge dropped its planks at low LOD).
+3. **Fell:** no floor under the Talent's centre (a fragile floor was cut by a CUT, or a bridge dropped its planks at low LOD).
 4. **Out of film:** the film counter reaches 0.
 5. **Wrapped:** the strike line (§5, Wrap) reaches the Talent.
 
 No lives and no mid-run continues. Runs are short, so failing ends the run with a summary (a natural stopping point, M12 guardrail). Completed scenes bank their score.
 
 ### 2.6 Film (the run clock)
-Start with 90 s ⚙. Film burns 1 s per second (2× while holding or waiting). Reel pickups +15 s ⚙; finishing a scene +30 s ⚙. That gives runs of roughly **3–8 minutes** depending on skill.
+Start with 90 s ⚙. Film burns 1 s per second (2× while holding or waiting). Reel pickups +15 s ⚙; finishing a scene +30 s ⚙. That gives runs of roughly **3–8 minutes** depending on skill. CUT adds to or takes from film: a close cut refunds 2 s ⚙, a missed CUT costs 2 s ⚙, and a penalised CUT costs 4 s ⚙.
+
+### 2.7 The shutter (CUT)
+- **Input:** Space or Enter, or the CUT button (touch, ≥ 72 px, bottom-right, with a charge ring). Nothing else cuts.
+- **Effect:** one CUT slices **every live cuttable hazard that is fully outside the gate**, in one hit. Cuttable: Urchin, Boulder, Glass, Bridge, Extras (each member outside), Swarm, Stagehand and Red Monitor. Reels and Friendly Monitors are not cuttable. A framed or partly framed hazard is never cut.
+- **Recharge:** the shutter starts empty after each CUT and refills over `shutterRechargeSeconds` 1.8 s ⚙. A press while it recharges does nothing (the not-ready click and shake are the only feedback).
+- **Scoring:** distance is measured from her. **Close** (≤ 1.5 u ⚙) scores 250 and refunds 2 s ⚙ of film. **Normal** (≤ 8 u ⚙) scores 50. **Too far** scores 0. Each score is multiplied by the combo multiplier 1 + 0.5 × (combo − 1) ⚙. The combo counts consecutive productive cuts and carries across scenes.
+- **Costs:** a **missed** CUT (nothing cut) costs 2 s ⚙ and breaks the combo. A **penalised** CUT (she is not framed at the cut) costs 4 s ⚙ and breaks the combo. A too-far-only cut neither scores nor breaks the combo.
+- **Off-frame pressure:** a spawned Urchin that is fully outside the gate turns back on her and rolls at 3× its speed ⚙. Framing it out no longer stops it. Backlot and City send Urchin waves (4 and 2 followers per path-bound Urchin, 7 u apart), so one charge can't cover a wave.
+- **Defang marks:** a mark is cleared only by a close CUT made while its stand-in Urchin is fully outside the gate. A farther CUT leaves the stand-in on its mark. Defang marks stand at least 6 u ⚙ from Glass on the walked side, so a close cut at the mark can't shatter that Glass.
+- **Threat indicators:** live hazards that are fully outside the gate and would reach her within 6 s ⚙ (or are within 1.5 u of her) are drawn as edge arrows on the viewfinder. Arrows are coloured and sized by time to contact, and pulse under 1 s. The same list is all the bots see of off-frame cast.
+- **Result:** every CUT shows a per-cut result stamp, and a missed CUT or a penalised CUT shows a MISSED or SHE'S OUT OF SHOT banner. The combo shows as a TAKE ×N score readout.
 
 ---
 
@@ -79,13 +91,14 @@ Start with 90 s ⚙. Film burns 1 s per second (2× while holding or waiting). R
 | **Zoom** | mouse wheel / Z and X / `-` and `=` | pinch on the pad or gate; or the slider on the pad edge | the risk/reward lever: more world vs more detail |
 | **Rotate (45° snaps)** | Q / E | two-finger twist past 25° ⚙ snaps one step | lets the square gate cut diagonally, excluding a corner threat. Snaps keep it readable, testable and low-nausea. Unlocks in Scene 2 of the first run, so new players learn pan and zoom first. |
 | **Steady** | hold Shift | drag with two fingers on the pad | precise slow pan (0.35× ⚙) for threading the frame edge |
-| **Hold Talent** | Space | large HOLD button bottom-right of the pad (left-hand option in settings) | emergency brake, at a film cost |
+| **CUT (shutter)** | Space or Enter | CUT button bottom-right, ≥ 72 px, with a charge ring | slices every live hazard fully outside the frame; recharges over 1.8 s (§2.7) |
+| **Hold Talent** | H | large HOLD button bottom-right of the pad (left-hand option in settings) | emergency brake, at a film cost |
 | **Pause** | Esc / P | tap the timecode; auto-pause on `visibilitychange` | |
 
 **Camera physics (sim-side, deterministic).** The input is a *desired* pan velocity. The camera has max speed 1.2 gate-widths/s ⚙ and acceleration 6 gate-widths/s² ⚙, with critically damped smoothing. Zoom is rate-limited by a response curve: ×1.6 per second ⚙ for light inputs, rising to about ×90 per second ⚙ at full input. A tap snaps to the next framing step (10 / 16 / 24 / 38 / 48 ⚙), and a hold zooms at full speed. Both are input-side easing over the same channel the bots use, and rotation tweens 0.18 s ⚙ per 45°.
 - *Why limits:* without them a flick could cull everything instantly. Limits make framing a skill (M4, Swink's game feel).
 - *Motion state:* when camera speed exceeds 0.6 gate/s ⚙ the frame is **"in motion"**. It gets a light directional blur, and the Stagehand moves (§5).
-- **No free-look and no camera shake from gameplay** (shake is only a 1-frame cue on a cut, and is disabled under reduced motion).
+- **No free-look and no camera shake from gameplay.** The only jolt is a short camera kick and hit-stop on a CUT, both disabled under reduced motion.
 
 ---
 
@@ -126,15 +139,15 @@ Each entry gives its class, its per-tier stats, and **how framing exploits it or
 
 2. **Set tiles** (SET). Floor, walls, ramps. They reload from the seed every time, so they're always trustworthy. *Lesson:* "The location is permanent; the people and props are not."
 
-3. **Glass floor** (CAST, fragile). A walkable tile that's **cut permanently** if it leaves the frame. A run of glass across a chasm forces you to keep the whole crossing in frame until the Talent is over it. Edge-clipped glass cracks visibly (a warning). *All tiers:* walkable.
+3. **Glass floor** (CAST, fragile). A walkable tile that stays solid until a CUT made while it is fully outside the frame **cuts** it. A CUT that shatters a pane she is about to walk onto drops her, so the crossing has to be framed, not just cut. Edge-clipped glass cracks visibly (a warning). *All tiers:* walkable.
 
 4. **Rope bridge** (CAST, fragile, LOD-sensitive). Close-up/Medium: planks, walkable. **Wide/Proxy: the planks are detail, so they're gone**, leaving two ropes and a fall. It's 14 u long ⚙, longer than the closest gate, so you need *exactly* a medium zoom with the whole bridge in frame. That's a framing puzzle under time pressure.
 
-5. **Urchin** (CAST). Close-up: spiked and lethal, rolls toward the Talent at 1.5 u/s ⚙. Medium: lethal, slower. **Wide: an octahedron that only pushes. Proxy: an inert cube you can push or use as a step.** *Exploit:* zoom out to defang it. *Catch:* zooming out also drops the Talent below Reel-collecting tier.
+5. **Urchin** (CAST). Close-up: spiked and lethal, rolls toward the Talent at 1.5 u/s ⚙. Medium: lethal, slower. **Wide: an octahedron that only pushes. Proxy: an inert cube you can push or use as a step.** *Exploit:* zoom out to defang it. *Catch:* zooming out also drops the Talent below Reel-collecting tier. Framing an Urchin out no longer stops it: fully off-frame it turns back on her at 3× speed, and Backlot and City send waves of them, so the CUT is the answer (§2.7).
 
-6. **Boulder** (CAST, **pop-in hazard**). It spawns *already rolling* at 4 u/s ⚙ along its seeded vector, from the edge it enters. The call sheet shows a red box with an arrow. *Exploit:* see the box and pan away to cull its spawn chance, or pan so it enters behind the Talent. *Close call:* cull it within 1.5 u ⚙ of the Talent for a "Cut it close" bonus (a near-miss that comes purely from skill, M7).
+6. **Boulder** (CAST, **pop-in hazard**). It spawns *already rolling* at 4 u/s ⚙ along its seeded vector, from the edge it enters. The call sheet shows a red box with an arrow. *Exploit:* see the box and pan away to cull its spawn chance, or pan so it enters behind the Talent. *Close call:* a CUT with it fully outside the frame within 1.5 u ⚙ of the Talent is a close cut, scoring the top bonus (a near-miss that comes purely from skill, M7).
 
-7. **Extras** (CAST, crowd of 4–12). Close-up/Medium: individuals milling at 0.8 u/s ⚙, with walkable gaps between them. **Wide/Proxy: the crowd merges into one impostor billboard, a solid wall.** The opposite of the Urchin: they force you to zoom *in*. Frame them half-out and the clipped individuals are cut, thinning the crowd.
+7. **Extras** (CAST, crowd of 4–12). Close-up/Medium: individuals milling at 0.8 u/s ⚙, with walkable gaps between them. **Wide/Proxy: the crowd merges into one impostor billboard, a solid wall.** The opposite of the Urchin: they force you to zoom *in*. A CUT removes each member that is fully outside the frame, so you thin a crowd by cutting it, not by framing it.
 
 8. **Swarm** (CAST, tiny). Midge-sized (radius 0.08 u ⚙) and lethal on contact at any visible tier. **Below 4 lpx they're sub-pixel and don't exist**, which at radius 0.08 happens around W ≥ 20 ⚙. *Exploit:* zoom out and they're gone, but only while you stay out. Zoom back in and the ones still within their seeded cloud re-spawn. (The Swarm is the one CAST exception: it's a *size-culled* group, not a frame-culled one. That's documented and tested.)
 
@@ -146,7 +159,7 @@ Each entry gives its class, its per-tier stats, and **how framing exploits it or
 
 12. **Continuity Prop** (RECURRING). Each time it re-enters the frame it's the **next prop in its seeded sequence**, for example ramp → spikes → crate → plank → ramp. You re-roll it deliberately by panning off and back on. It's a puzzle tool and costs film. It never involves money and its sequence is shown on hover (a transparent, free variable, per the research guardrails).
 
-13. **Reel canister** (CAST, pickup). +15 s film ⚙. Collectable only at Talent tier Close-up or Medium. Cut if framed out, so collecting is a commitment.
+13. **Reel canister** (CAST, pickup). +15 s film ⚙. Collectable only at Talent tier Close-up or Medium. Reels are not cuttable, so a framed-out reel stays where it is and collecting it is still a commitment.
 
 14. **The Wrap** (scene-end chaser). In each scene's final 25% ⚙ a **strike line** advances along the path behind the Talent, *deleting the world* (SET included) at 1.8 u/s ⚙, rising to 2.6 by Scene 3. You must keep the Talent moving and keep the floor ahead in frame. It's the climax of every scene.
 
@@ -192,7 +205,7 @@ Each entry gives its class, its per-tier stats, and **how framing exploits it or
 - **Cinematography grades** (shown after each scene with the maths, Balatro-style transparency M6):
   - *Thirds:* % of time the Talent sits within 0.1 gate of a thirds intersection.
   - *Smooth:* inverse mean camera jerk.
-  - *Close calls:* hazards culled within 1.5 u.
+  - *Close calls:* hazards cut by a CUT within 1.5 u.
   - *Coverage:* % of Reels collected.
   
   These give grades of S/A/B/C. Grades unlock **cosmetic** film stocks (colour LUTs: Kodachrome, bleach bypass, Ilford B&W).
@@ -225,8 +238,8 @@ At "That's a wrap!" the game re-simulates the run deterministically and auto-pic
 | 0:35 | A cyan Reel box appears in the margin. It loads into the frame; the Talent collects it (+15 s). | Previews in the margin tell the truth. |
 | 0:50 | **Intro chunk: Urchin.** A spiked ball rolls toward the Talent, and the hint "pinch to zoom out" appears. The player zooms out, the urchin *visibly simplifies* (spikes retract with a mesh-swap shimmer and an "LOD2" ring flash), and it bumps the Talent harmlessly. | **LOD is physics.** The "wait, what?" moment. |
 | 1:10 | Zoomed out, the Talent passes a Reel, and a grey "WIDE: can't collect" tag appears. The player zooms back in. | Zoom is a trade-off. |
-| 1:30 | **Intro chunk: the cut.** A slow Urchin rolls in from behind, with the hint "pan away". The player pans ahead, the urchin hits the gate edge, a *snip* sounds, it shatters into a wireframe that dissolves, and a "CUT" stamp lands in the margin. | **Off-screen = gone. The frame is a weapon.** |
-| 1:50 | **Intro chunk: glass floor.** A glass crossing; the player pans ahead too early, the trailing glass is cut, and it cracks under the Talent: **FELL**. The run ends at 1:58. The contact sheet shows the fatal frame circled. | Culling cuts both ways. A cheap, fair, understood failure (M7). |
+| 1:30 | **Intro chunk: the cut.** A slow Urchin rolls in from behind, with the hint "pan ahead, then CUT". The player pans ahead so it is fully outside the frame and presses CUT. A *clack* sounds, it shatters into a wireframe that dissolves, and a result stamp lands on the viewfinder. | **Off-frame is not gone. CUT deletes it.** |
+| 1:50 | **Intro chunk: glass floor.** A glass crossing; the player presses CUT before she is over it, the pane she is about to cross shatters, and she falls: **FELL**. The run ends at 1:58. The contact sheet shows the fatal frame circled. | Cutting cuts both ways. A cheap, fair, understood failure (M7). |
 | 2:05 | Tap "Again". Same daily seed, same location. The player now anticipates. | Mastery feels within reach (M1, M2). |
 | 3:10 | The player clears Scene 1 (+30 s film). Scene 2 title card: Miniature City. Hint: "Q/E or twist to rotate". | Rotation unlocks. |
 | 3:40 | **Boulder** red box with an arrow in the margin. The player pans away so it never spawns, then deliberately lets the second one in behind the Talent. | Pop-in is a choice. |
@@ -240,7 +253,7 @@ At "That's a wrap!" the game re-simulates the run deterministically and auto-pic
 - **Audio obeys the rules too.** Every CAST entity carries its own sound source, and **only in-frame entities make sound** (mixed in stereo by x position in the gate). LOD applies to sound: Close-up is full bandwidth, Wide is low-passed and bit-reduced, Proxy is a single sine "placeholder" tone. Zooming out literally makes the world sound cheaper.
 - **Generative score:** a minimal pulse at 96 BPM ⚙. Each *entity type* owns a stem (Urchin = plucked bass, Extras = murmured chord pad, Rumour = detuned drone, Swarm = hi-hat ticks). The music is literally what's in shot, so culling a threat cuts its instrument mid-bar.
 - **Signature sounds:**
-  - *Cut:* tape-splice snip plus a 60 ms reverse whoosh.
+  - *CUT:* a synthesised shutter clack.
   - *Pop-in:* clapperboard clack, preceded by a quiet preload tick when a red box appears.
   - *Off-screen countdown:* projector clatter speeding up.
   - *LOD change:* a short bitcrush glissando.
@@ -304,7 +317,7 @@ src/
   replay/         InputFrame codec (quantise, RLE, CompressionStream deflate, base64url)
   render/         three.js view: reads sim snapshots, interpolates between ticks, never writes sim state
   audio/          WebAudio graph driven by snapshot (in-frame entity list)
-  input/          mouse/keyboard/touch/gamepad → InputFrame {pan:int8x2, zoom:int8, rot:-1|0|1, hold:bool, steady:bool}
+  input/          mouse/keyboard/touch/gamepad → InputFrame {pan:int8x2, zoom:int8, rot:-1|0|1, hold:bool, steady:bool, cut:bool}
   ui/             DOM HUD, menus, contact-sheet compositor
   bots/           TrackerBot, WideBot, CloseBot, AdaptiveBot, ChaosBot, scenario scripts
 data/archetypes.json, data/chunks/*.json
@@ -328,7 +341,7 @@ data/archetypes.json, data/chunks/*.json
      - (d) a consumed spawn point never respawns (except RECURRING);
      - (e) SET reload is byte-identical.
 2. **State hashes.** Golden hashes for 5 seeds × 3 bots at ticks 600/3,600/18,000. Any change needs `UPDATE_HASHES=1` plus a reason in the PR.
-   - Current pinned fair-Adaptive Shoot hashes (`tests/m2.test.ts`): seed 1 `9525b1c6`, seed 19 `6ece64b1`, seed 2026 `fe881e70`. These were last bumped 2026-10-13 (loop review round 2) for the defang ACTION beat (per scene), and the 1× film burn while a defang gate holds her. See `DECISIONS.md`.
+   - Current pinned fair-Adaptive Shoot hashes (`tests/m2.test.ts`): seed 1 `a4e1ae96`, seed 19 `abb7dbfa`, seed 2026 `809fab34`. These were last bumped 2026-10-14 (Shutter step 1 follow-up 2, Urchin waves), when the shutter state entered the hash. See `DECISIONS.md`.
 3. **Scenario tests.** Tiny hand-authored chunks with scripted inputs, e.g. "Urchin at W=30 touches the Talent → no fail", "Bridge at W=40 → FELL", "Stagehand doesn't move while camera speed < 0.6", "Rumour grows by exactly 0.3·t off-screen".
 4. **Bot players** (`src/bots`, also runnable in the browser via `?bot=`):
    - **TrackerBot** keeps the Talent centred at mid zoom (the passive baseline).
@@ -359,7 +372,7 @@ A cold playtest still watches five signals. The old M2 kill criterion and its pi
 
 | Signal | What to watch |
 |---|---|
-| Understanding | They can explain "off-screen = deleted" within 60 s of play |
+| Understanding | They can explain "off-frame stays live until CUT deletes it" within 60 s of play |
 | Agency | They deliberately cull a threat by their second run |
 | LOD discovery | They change zoom for a LOD reason by 5 min |
 | Pull | They start a third run on their own |
@@ -370,7 +383,7 @@ A cold playtest still watches five signals. The old M2 kill criterion and its pi
 ## 17. Risks and open questions
 
 **Risks**
-- **Motion sickness:** mitigated with critically damped camera, no gameplay shake, snap rotation, reduced-motion mode, an optional static-grid overlay and the speed assist. Tested at M2 and M10.
+- **Motion sickness:** mitigated with critically damped camera, no gameplay shake beyond the short CUT kick, snap rotation, reduced-motion mode, an optional static-grid overlay and the speed assist. Tested at M2 and M10.
 - **Readability:** with debug lines plus clay it can get busy. Mitigations: lines only on CAST, hazard colour plus hatch, and a "clean frame" toggle. Checked by golden screenshots and human eyes.
 - **Passive play dominance:** guarded by the design-health bot ratios in `docs/design/game-design.md`.
 - **"Hard to get from a thumbnail":** the contact sheet with a half-sliced hazard is the hook. The first 15 s must show a cut.
@@ -408,6 +421,17 @@ A cold playtest still watches five signals. The old M2 kill criterion and its pi
 | Talent speeds | 2.0/2.5/3.2/3.6 u/s |
 | Talent radii | 0.30/0.40/0.60/0.75 |
 | film | start 90 s, Reel +15 s, scene +30 s, hold ×2 (×1 while a defang gate or its ACTION beat holds her) |
+| shutter recharge (CUT) | 1.8 s from empty to full (`shutterRechargeSeconds`); a press while recharging does nothing |
+| close cut (≤ 1.5 u) | scores 250, refunds 2 s film (`closeCutRadius`, `closeCutScore`, `closeCutFilm`) |
+| normal cut (≤ 8 u) | scores 50 (`farCutRadius`, `normalCutScore`); too-far cut scores 0 |
+| combo multiplier | 1 + 0.5 × (combo − 1) (`comboStep`); a missed or penalised CUT breaks it |
+| missed CUT | −2 s film, breaks the combo (`missedCutFilm`) |
+| penalised CUT (she isn't framed) | −4 s film, breaks the combo (`penalisedCutFilm`) |
+| off-frame Urchin speed | 3× its roll speed, homing on her (`offFrameUrchinSpeedFactor`) |
+| Urchin waves (Backlot / City / Night / finale) | followers 4 / 2 / 0 / 0 per path-bound Urchin, 7 u apart (`urchinWaveFollowers`, `urchinWaveGap`) |
+| threat indicator horizon | 6 s to contact, or within 1.5 u (`threatHorizonSeconds`) |
+| defang mark to Glass | 6 u on the walked side (`glassShatterRadius`) |
+| defang mark clear | a close CUT with the stand-in fully outside the frame; a farther CUT leaves it on its mark |
 | defang ACTION beat | after the close cut she holds her mark under an "ACTION" cue and an exit arrow at her feet, then walks on: Backlot 0.35 s, City/Night/Long Take 0.9 s (`gateReleaseSecondsByScene`) |
 | urchin speed | 1.5 u/s |
 | boulder speed | 4 u/s |
@@ -416,7 +440,7 @@ A cold playtest still watches five signals. The old M2 kill criterion and its pi
 | stagehand speed | 3 u/s |
 | rumour | +0.3 / −0.5 u/s |
 | bridge length | 14 u |
-| close-call radius | 1.5 u |
+| close-cut radius | 1.5 u (also the close-call radius, §5) |
 | wrap speed | 1.8 / 2.2 / 2.6 u/s, last 25% of scene |
 | threat budget | 1.0 / 1.6 / 2.3 / 2.8 |
 | sim rate | 60 Hz, max 5 catch-up ticks |

@@ -56,6 +56,8 @@ function makeScene(seed: number, sceneIndex: number, carry: SimState): SimState 
   next.cuts = [...carry.cuts];
   next.shoot = { sceneIndex, biome: biomes[sceneIndex]!, wrapDistance: null, wrapCaught: false, finaleTicks: 0 };
   next.closeCalls = 0;
+  // A fresh, charged shutter each scene; the take's combo carries on.
+  next.shutter = { charge: 1, combo: carry.shutter.combo, last: null };
   next.shots = sceneIndex < 3 ? shotListForPath(generated.path, sceneSeed(seed, sceneIndex), generated.forks, generatedEntities) : undefined;
   if (next.shots) next.entities.push(...gateCast(generated.path, next.shots));
   return next;

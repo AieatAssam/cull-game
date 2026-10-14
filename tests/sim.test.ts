@@ -13,6 +13,8 @@ import { TUNING } from '../src/sim/tuning';
 import { lensLodFactor, lensRenderTicks } from '../src/sim/lenses';
 import type { CastEntity, SimState } from '../src/sim/types';
 
+const CUT_HELD = { ...NEUTRAL_INPUT, hold: true, cut: true };
+
 function entity(state: SimState, kind: CastEntity['kind'], x: number, y = 0): CastEntity {
   const item: CastEntity = { id: `${kind}-test`, kind, x, z: y, vx: 0, vz: 0, spawned: true, cut: false, age: 0 };
   state.entities = [item];
@@ -72,11 +74,13 @@ describe('frame projection and lifecycle', () => {
     expect(lensRenderTicks('super8')).toBe(5);
     expect(lensRenderTicks('35mm')).toBe(1);
   });
-  it('cuts a spawned CAST entity after leaving frame permanently', () => {
+  it('cuts a spawned CAST entity out of frame only on CUT, and permanently', () => {
     const state = createState(1, []);
     const hazard = entity(state, 'urchin', 0);
     state.camera.x = 100;
-    const next = step(state);
+    const framedOut = step(state);
+    expect(framedOut.entities[0]?.cut).toBe(false);
+    const next = step(state, { ...NEUTRAL_INPUT, cut: true });
     expect(next.entities[0]?.cut).toBe(true);
     expect(next.cuts).toContain(hazard.id);
     next.camera.x = 0;
@@ -201,20 +205,6 @@ describe('frame projection and lifecycle', () => {
       expect(new Set(first.consumed).size).toBe(first.consumed.length);
     }));
   });
-  it('keeps every live CAST AABB overlapping the gate after a tick', () => {
-    fc.assert(fc.property(fc.double({ min: -40, max: 40, noNaN: true }), fc.double({ min: -40, max: 40, noNaN: true }), fc.double({ min: 10, max: 48, noNaN: true }), (x, z, zoom) => {
-      const state = createState(1, []);
-      state.camera.zoom = zoom;
-      state.entities = [{ id: 'prop', kind: 'glass', x, z, vx: 0, vz: 0, spawned: true, cut: false, age: 0 }];
-      const next = step(state);
-      for (const item of next.entities.filter((cast) => cast.spawned && !cast.cut)) {
-        // Fragile floor within `fragileKeepMargin` past the gate is kept live on purpose (DECISIONS 2026-10-12).
-        const bounds = projectedAabb(item.x, item.z, 0.55, 0.8, next.camera.x, next.camera.z, next.camera.zoom, next.camera.yaw);
-        const margin = TUNING.fragileKeepMargin;
-        expect(overlapsFrame(bounds, { left: -0.5 - margin, right: 0.5 + margin, bottom: -0.5 - margin, top: 0.5 + margin })).toBe(true);
-      }
-    }));
-  });
 });
 
 describe('fixed step simulation and failure rules', () => {
@@ -309,7 +299,8 @@ describe('fixed step simulation and failure rules', () => {
     state.camera.zoom = 10;
     const extras = entity(state, 'extras', 5.5);
     extras.members = [-1.2, 0, 1.8].map((dx) => ({ dx, dz: 0, vx: 0, vz: 0, cut: false }));
-    const next = step(state, { ...NEUTRAL_INPUT, hold: true });
+    expect(step(state, { ...NEUTRAL_INPUT, hold: true }).entities[0]?.members?.every((member) => !member.cut)).toBe(true);
+    const next = step(state, CUT_HELD);
     expect(next.entities[0]?.members?.map((member) => member.cut)).toEqual([false, true, true]);
   });
   it('turns Extras into a wall at wide zoom while close framing leaves walkable gaps', () => {
@@ -387,14 +378,17 @@ describe('fixed step simulation and failure rules', () => {
     expect(step(state, { ...NEUTRAL_INPUT, hold: true }).entities[0]?.cut).toBe(false);
     expect(reel.kind).toBe('reel');
   });
-  it('scores a hazard cut inside the close-call radius', () => {
+  it('scores and refunds film for a hazard cut inside the close-cut radius', () => {
     const state = createState(1, []);
-    entity(state, 'urchin', 1.2);
-    state.camera.x = 30;
-    const next = step(state, { ...NEUTRAL_INPUT, hold: true });
+    state.camera.zoom = 10;
+    entity(state, 'urchin', 1.6);
+    state.talent.x = 0.4;
+    state.camera.x = -4.6;
+    const next = step(state, CUT_HELD);
+    expect(next.film).toBeCloseTo(state.film + TUNING.closeCutFilm - 2 / TUNING.tickRate);
     expect(next.cuts).toContain('urchin-test');
     expect(next.closeCalls).toBe(1);
-    expect(next.score).toBe(TUNING.closeCallScore);
+    expect(next.score).toBe(TUNING.closeCutScore);
   });
   it('holds the Talent until a close cut defangs, then for a medium portrait', () => {
     const state = createGeneratedState(3, 0, 4);
@@ -413,9 +407,11 @@ describe('fixed step simulation and failure rules', () => {
     const standIn = still.entities.find((cast) => cast.gate === 0)!;
     expect(standIn.spawned).toBe(true);
     still.camera.x = still.talent.x - still.camera.zoom / 2 + 0.2;
-    const cut = step(still);
+    const framedOut = step(still);
+    expect(framedOut.closeCalls).toBe(still.closeCalls);
+    const cut = step(framedOut, { ...NEUTRAL_INPUT, cut: true });
     expect(cut.closeCalls).toBe(still.closeCalls + 1);
-    let wide = step(cut);
+    let wide = cut;
     expect(wide.shots?.find((shot) => shot.kind === 'defang')?.done).toBe(true);
     // The ACTION beat: she holds her mark for the scene's gateReleaseSecondsByScene, burning film at 1× (the gate holds her, not HOLD), then walks on.
     const beatFilm = wide.film;
@@ -446,25 +442,14 @@ describe('fixed step simulation and failure rules', () => {
     expect(released.shots?.every((shot) => shot.done)).toBe(true);
     expect(released.waiting).toBe(false);
   });
-  it('keeps a fragile floor that is only just outside the gate', () => {
-    const state = createState(1, []);
-    state.camera.zoom = 30;
-    entity(state, 'glass', 16.2);
-    const next = step(state, { ...NEUTRAL_INPUT, hold: true });
-    expect(next.entities[0]?.cut).toBe(false);
-    // Bible M2: Glass framed out far from the Talent is unloaded intact, never left as an unseen hole.
-    next.camera.x = -20;
-    const unloaded = step(next, { ...NEUTRAL_INPUT, hold: true });
-    expect(unloaded.entities[0]).toMatchObject({ cut: false, spawned: false });
-  });
-  it('shatters Glass framed out within reach of the Talent, and the Talent falls through it', () => {
+  it('shatters Glass on a CUT that leaves it out of frame (never by framing alone), and the Talent falls through it', () => {
     const state = createState(1, []);
     state.camera.zoom = 10;
-    const glass = entity(state, 'glass', 3);
+    entity(state, 'glass', 3);
     state.camera.x = -5.2;
-    const shattered = step(state, { ...NEUTRAL_INPUT, hold: true });
+    expect(step(state, { ...NEUTRAL_INPUT, hold: true }).entities[0]).toMatchObject({ cut: false, spawned: true });
+    const shattered = step(state, CUT_HELD);
     expect(shattered.entities[0]).toMatchObject({ cut: true });
-    expect(Math.hypot(glass.x - state.talent.x, glass.z - state.talent.z)).toBeLessThanOrEqual(TUNING.glassShatterRadius);
     shattered.talent.x = 3;
     expect(step(shattered, { ...NEUTRAL_INPUT, hold: true }).failed).toBe('fell');
   });

@@ -144,6 +144,17 @@ export function generateScene(seed: number, difficulty = 0, chunkCount?: number)
     entity.pathBound = true;
     if (tier >= TUNING.rollingEntryFromDifficulty) entity.rollsIn = true;
   });
+  // Shutter pressure (DECISIONS 2026-10-14): in Backlot and City an ahead-entry Urchin leads a wave. Its followers roll down
+  // the same path a fixed gap behind, so they arrive staggered across the shutter recharge and one charge cannot cover them all.
+  const followers = TUNING.urchinWaveFollowers[tier] ?? 0;
+  const end = path.at(-1)?.x ?? 0;
+  for (const leader of entities.filter((entity) => entity.kind === 'urchin' && entity.pathBound)) {
+    for (let k = 1; k <= followers; k++) {
+      const x = leader.x + k * TUNING.urchinWaveGap;
+      if (x > end - 2) break;
+      entities.push({ ...leader, id: `${leader.id}-w${k}`, x, z: pathZAt(path, x) });
+    }
+  }
   if (forks.length === 0) {
     const at = Math.min(8, path.length - 2);
     const point = path[at]!;

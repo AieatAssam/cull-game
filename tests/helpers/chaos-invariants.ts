@@ -12,6 +12,7 @@ function chaosInput(random: () => number): InputFrame {
     rotate: random() < 0.02 ? (random() < 0.5 ? -1 : 1) : 0,
     hold: random() < 0.01,
     steady: random() < 0.1,
+    cut: random() < 0.02,
   };
 }
 

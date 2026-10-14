@@ -297,7 +297,7 @@ export interface BalanceReport {
   jitterWins: Record<string, Record<number, number>>;
 }
 
-export const DEFAULT_BOTS: BalanceBot[] = ['adaptive', 'tracker', 'gatekeeper', 'metronome', 'wide', 'close', 'chaos', 'human-keys', 'human-touch'];
+export const DEFAULT_BOTS: BalanceBot[] = ['adaptive', 'tracker', 'gatekeeper', 'metronome', 'wide', 'close', 'chaos', 'spam', 'human-keys', 'human-touch'];
 const HUMAN_BOTS = ['human-keys', 'human-touch'] as const;
 
 export function balanceTasks(options: BalanceOptions): RunTask[] {

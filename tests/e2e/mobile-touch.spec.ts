@@ -28,6 +28,9 @@ for (const viewport of [{ width: 412, height: 915 }, { width: 390, height: 844 }
         await page.locator('#tutorial-next').tap();
       }
       await expect.poll(async () => (await camera(page)).tick).toBeGreaterThan(0);
+      // The gestures run on the wall clock, so swap the live take for the static LOD stage: its lone Urchin has no speed and
+      // cannot home on her off-frame, so a slow runner can't lose her mid-gesture. The camera and touch path are unchanged.
+      await page.evaluate(() => window.__cull.loadLodDemo());
       const gate = (await page.locator('#gate').boundingBox())!;
 
       const cx = gate.x + gate.width / 2; const cy = gate.y + gate.height / 2;
@@ -54,7 +57,7 @@ for (const viewport of [{ width: 412, height: 915 }, { width: 390, height: 844 }
         .filter(({ box }) => box.width && (box.width < 44 || box.height < 44)).map(({ label }) => label));
       expect(small).toEqual([]);
       const gate = (await page.locator('#gate').boundingBox())!;
-      for (const id of ['#hold', '#rotate-left', '#rotate-right', '#zoom-out', '#zoom-in']) {
+      for (const id of ['#hold', '#cut', '#rotate-left', '#rotate-right', '#zoom-out', '#zoom-in']) {
         const box = (await page.locator(id).boundingBox())!;
         expect(box.y).toBeGreaterThanOrEqual(gate.y + gate.height);
         expect(box.y + box.height).toBeLessThanOrEqual(viewport.height);
@@ -72,3 +75,25 @@ for (const viewport of [{ width: 412, height: 915 }, { width: 390, height: 844 }
     });
   });
 }
+
+test.describe('touch CUT button', () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+  test('is a ≥72 px thumb button bottom-right, off the viewfinder, and a tap stamps the cut', async ({ page }) => {
+    await page.goto('/?debug&seed=1');
+    while (await page.evaluate(() => window.__cull.tutorial().showing)) await page.locator('#tutorial-next').tap();
+    const [cut, gate] = [(await page.locator('#cut').boundingBox())!, (await page.locator('#gate').boundingBox())!];
+    expect(Math.min(cut.width, cut.height)).toBeGreaterThanOrEqual(72);
+    expect(cut.y).toBeGreaterThanOrEqual(gate.y + gate.height);
+    expect(cut.x + cut.width / 2).toBeGreaterThan(390 / 2);
+    expect(cut.y + cut.height).toBeLessThanOrEqual(844);
+    await page.evaluate(() => {
+      window.__cull.loadLodDemo();
+      const { talent } = window.__cull.state();
+      window.__cull.setCamera(talent.x - 1, talent.z, 4);
+    });
+    await page.locator('#cut').tap();
+    await expect.poll(() => page.evaluate(() => window.__cull.state().shutter.last?.hits.length ?? -1)).toBeGreaterThan(0);
+    await expect(page.locator('#cut-layer .cut-stamp').first()).toBeAttached();
+    await expect(page.locator('#cut')).not.toHaveClass(/\bready\b/);
+  });
+});

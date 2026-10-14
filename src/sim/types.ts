@@ -7,6 +7,8 @@ export interface InputFrame {
   rotate: -1 | 0 | 1;
   hold: boolean;
   steady: boolean;
+  /** CUT (Space / the CUT button): true on the press tick only. */
+  cut: boolean;
 }
 export interface CrowdMember { dx: number; dz: number; vx: number; vz: number; cut: boolean; }
 export interface SpawnPoint { id: string; kind: EntityKind; x: number; z: number; vx: number; vz: number; members?: CrowdMember[]; }
@@ -34,8 +36,26 @@ export interface SimState {
   score: number;
   cuts: string[];
   closeCalls: number;
-  shots?: Array<{ at: number; kind: 'defang' | 'portrait'; done: boolean; opened?: number; releaseTick?: number }>;
+  shutter: Shutter;
+  shots?: Array<{ at: number; kind: 'defang' | 'portrait'; done: boolean; releaseTick?: number }>;
   shoot?: { sceneIndex: number; biome: 'BACKLOT' | 'MINIATURE CITY' | 'NIGHT SHOOT' | 'LONG TAKE'; wrapDistance: number | null; wrapCaught: boolean; finaleTicks: number; };
 }
+/** close ≤ closeCutRadius < normal ≤ farCutRadius < too-far (distance from her). */
+export type CutDistance = 'close' | 'normal' | 'too-far';
+/**
+ * One CUT, for the HUD. `hits` lists every hazard the shutter caught; a defang stand-in that was not close is listed
+ * with `held: true` and stays on its mark. `missed`: nothing was cut. `penalised`: she was not framed at the cut.
+ */
+export interface CutResult {
+  tick: number;
+  hits: Array<{ id: string; kind: EntityKind; distance: CutDistance; held?: true }>;
+  missed: boolean;
+  penalised: boolean;
+  defanged: boolean;
+  combo: number;
+  score: number;
+  film: number;
+}
+export interface Shutter { charge: number; combo: number; last: CutResult | null; }
 export interface FrameRect { left: number; right: number; bottom: number; top: number; }
 export interface ProjectedBounds { left: number; right: number; bottom: number; top: number; }

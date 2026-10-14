@@ -2,7 +2,8 @@ import type { InputFrame } from '../sim/types';
 import type { LensId } from '../sim/lenses';
 
 export interface ReplayData { seed: number; frames: InputFrame[]; lens: LensId; }
-type InputTuple = [number, number, number, -1 | 0 | 1, 0 | 1, 0 | 1];
+// The CUT flag is the 7th; runs recorded before the shutter (six flags) decode with cut = 0.
+type InputTuple = [number, number, number, -1 | 0 | 1, 0 | 1, 0 | 1, 0 | 1];
 const maxFrames = 8 * 60 * 60;
 // Base64url of the worst-case eight-minute stream fits under this bound.
 // Highly varying input logs do not benefit from RLE and exceed 100 KB.
@@ -11,8 +12,8 @@ const maxEncodedLength = 1_500_000;
 function tuple(frame: InputFrame): InputTuple {
   const fields = [frame.panX, frame.panZ, frame.zoom];
   if (fields.some((value) => !Number.isInteger(value) || value < -127 || value > 127)) throw new RangeError('Replay input axes must be int8 values');
-  if (![0, -1, 1].includes(frame.rotate) || typeof frame.hold !== 'boolean' || typeof frame.steady !== 'boolean') throw new RangeError('Invalid replay input flags');
-  return [frame.panX, frame.panZ, frame.zoom, frame.rotate, Number(frame.hold) as 0 | 1, Number(frame.steady) as 0 | 1];
+  if (![0, -1, 1].includes(frame.rotate) || typeof frame.hold !== 'boolean' || typeof frame.steady !== 'boolean' || typeof frame.cut !== 'boolean') throw new RangeError('Invalid replay input flags');
+  return [frame.panX, frame.panZ, frame.zoom, frame.rotate, Number(frame.hold) as 0 | 1, Number(frame.steady) as 0 | 1, Number(frame.cut) as 0 | 1];
 }
 
 function encodeBase64Url(text: string): string {
@@ -54,12 +55,12 @@ export function decodeReplay(encoded: string): ReplayData {
     || (value.v === 2 && !validLens) || !Number.isInteger(value.seed) || (value.seed as number) < 0 || (value.seed as number) > 0xffffffff || !Array.isArray(value.runs)) throw new TypeError('Unsupported replay payload');
   const frames: InputFrame[] = [];
   for (const run of value.runs) {
-    if (!Array.isArray(run) || run.length !== 7 || !Number.isInteger(run[0]) || run[0] < 1 || run[0] > maxFrames) throw new TypeError('Malformed replay run');
-    const [, panX, panZ, zoom, rotate, hold, steady] = run;
-    const decoded = tuple({ panX, panZ, zoom, rotate, hold: hold === 1, steady: steady === 1 });
-    if (![0, 1].includes(hold) || ![0, 1].includes(steady)) throw new TypeError('Malformed replay flags');
+    if (!Array.isArray(run) || (run.length !== 7 && run.length !== 8) || !Number.isInteger(run[0]) || run[0] < 1 || run[0] > maxFrames) throw new TypeError('Malformed replay run');
+    const [, panX, panZ, zoom, rotate, hold, steady, cut = 0] = run;
+    const decoded = tuple({ panX, panZ, zoom, rotate, hold: hold === 1, steady: steady === 1, cut: cut === 1 });
+    if (![0, 1].includes(hold) || ![0, 1].includes(steady) || ![0, 1].includes(cut)) throw new TypeError('Malformed replay flags');
     if (frames.length + run[0] > maxFrames) throw new RangeError('Replay exceeds the eight-minute input limit');
-    for (let i = 0; i < run[0]; i++) frames.push({ panX: decoded[0], panZ: decoded[1], zoom: decoded[2], rotate: decoded[3], hold: decoded[4] === 1, steady: decoded[5] === 1 });
+    for (let i = 0; i < run[0]; i++) frames.push({ panX: decoded[0], panZ: decoded[1], zoom: decoded[2], rotate: decoded[3], hold: decoded[4] === 1, steady: decoded[5] === 1, cut: decoded[6] === 1 });
   }
   return { seed: value.seed as number, frames, lens: value.v === 1 ? '35mm' : value.lens as LensId };
 }

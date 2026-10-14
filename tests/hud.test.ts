@@ -12,6 +12,7 @@ function take(patch: Partial<Omit<SimState, 'talent' | 'camera'>> & { talent?: P
     seed: 1, lens: '35mm', tick: 0, travelDistance: 0, totalDistance: 0,
     path: [], tiles: [], forks: [], routeChoices: {}, entities: [],
     consumed: [], film: 90, waiting: false, failed: null, score: 0, cuts: [], closeCalls: 0,
+    shutter: { charge: 1, combo: 0, last: null },
     ...patch, camera, talent,
   };
 }
@@ -56,10 +57,10 @@ describe('describeShot', () => {
   });
 
   it('grades close calls from the sim on 200 bot runs', () => {
-    const cut = createState(1, [{ id: 'u', kind: 'urchin', x: -1, z: 0, vx: 0, vz: 0, spawned: true, cut: false, age: 1 }]);
-    cut.camera.x = 8;
+    const cut = createState(1, [{ id: 'u', kind: 'urchin', x: -1.4, z: 0, vx: 0, vz: 0, spawned: true, cut: false, age: 1 }]);
+    cut.camera.x = 5.5;
     cut.camera.zoom = 12;
-    const after = step(cut, { panX: 0, panZ: 0, zoom: 0, rotate: 0, hold: true, steady: true });
+    const after = step(cut, { panX: 0, panZ: 0, zoom: 0, rotate: 0, hold: true, steady: true, cut: true });
     expect(after.closeCalls).toBeGreaterThan(0);
     expect(closeCallsForGrade(after)).toBe(after.closeCalls);
     for (let seed = 1; seed <= 200; seed++) {

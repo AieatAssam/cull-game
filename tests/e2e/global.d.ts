@@ -1,4 +1,4 @@
-interface DebugState { seed: number; tick: number; failed?: string; lens: string; path: Array<{ x: number; z: number }>; tiles: Array<unknown>; camera: { x: number; zoom: number }; entities: Array<{ kind: string; spawned: boolean; cut: boolean }>; shoot?: { sceneIndex: number; biome: string }; }
+interface DebugState { seed: number; tick: number; failed?: string; lens: string; path: Array<{ x: number; z: number }>; tiles: Array<unknown>; camera: { x: number; zoom: number }; entities: Array<{ kind: string; spawned: boolean; cut: boolean }>; shoot?: { sceneIndex: number; biome: string }; talent: { x: number; z: number }; shutter: { charge: number; combo: number; last: { tick: number; missed: boolean; penalised: boolean; hits: Array<{ id: string; distance: string }> } | null }; }
 interface RenderMetrics { drawCalls: number; triangles: number; }
 interface LodDiagnostics { bucketCounts: number[]; tiers: Record<string, number>; visibleRings: number; }
 interface DebugDiagnostics { paused: boolean; keys: string[]; hidden: boolean; focused: boolean; dprTier: number; dragTarget: { x: number; z: number } | null; }
@@ -10,7 +10,7 @@ declare global {
       hash: () => string;
       diagnostics: () => DebugDiagnostics;
       step: (ticks?: number) => void;
-      input: (frame: { panX: number; panZ: number; zoom: number; rotate: -1 | 0 | 1; hold: boolean; steady: boolean }) => void;
+      input: (frame: { panX: number; panZ: number; zoom: number; rotate: -1 | 0 | 1; hold: boolean; steady: boolean; cut?: boolean }) => void;
       performance: () => RenderMetrics;
       setTier: (tier: number) => void;
       loadLodDemo: () => void;

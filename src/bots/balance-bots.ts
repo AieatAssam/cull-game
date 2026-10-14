@@ -3,12 +3,12 @@ import { NEUTRAL_INPUT } from '../sim/step';
 import { TUNING } from '../sim/tuning';
 import type { InputFrame, SimState } from '../sim/types';
 import { createObserver, type PlayerView } from './observe';
-import { createHumanDriver, type HumanPersona } from './human';
+import { createHumanDriver, wantsCut, type HumanPersona } from './human';
 import { inputForBot, type AdaptiveMemory } from './players';
 
 /** Bots the balance harness runs. Every one of them sees the world only through `PlayerView`. */
-export type BalanceBot = 'adaptive' | 'tracker' | 'gatekeeper' | 'metronome' | 'wide' | 'close' | 'chaos' | HumanPersona;
-export const BALANCE_BOTS: readonly BalanceBot[] = ['adaptive', 'tracker', 'gatekeeper', 'metronome', 'wide', 'close', 'chaos', 'human-keys', 'human-touch'];
+export type BalanceBot = 'adaptive' | 'tracker' | 'gatekeeper' | 'metronome' | 'wide' | 'close' | 'chaos' | 'spam' | HumanPersona;
+export const BALANCE_BOTS: readonly BalanceBot[] = ['adaptive', 'tracker', 'gatekeeper', 'metronome', 'wide', 'close', 'chaos', 'spam', 'human-keys', 'human-touch'];
 export const isHuman = (bot: BalanceBot): bot is HumanPersona => bot === 'human-keys' || bot === 'human-touch';
 
 export interface Policy { act(view: PlayerView): InputFrame; }
@@ -69,10 +69,31 @@ function gatekeeper(tuning: BotTuning): Policy {
   };
 }
 
+/** Tracks her at zoom 24 like Tracker and presses CUT every time the shutter is charged, whatever is off-frame. */
+function spam(): Policy {
+  return {
+    act({ state }) {
+      return {
+        ...NEUTRAL_INPUT,
+        panX: pan(state.talent.x - state.camera.x),
+        panZ: pan(state.talent.z - state.camera.z),
+        zoom: zoomToward(state.camera.zoom, 24, 32),
+        cut: state.shutter.charge >= 1,
+      };
+    },
+  };
+}
+
 function legacy(bot: 'adaptive' | 'tracker' | 'wide' | 'close' | 'chaos', seed: number, tuning: BotTuning): Policy {
   const random = mulberry32((seed ^ 0xb07b07) >>> 0);
   const memory: AdaptiveMemory = {};
-  return { act: ({ state, gate }) => inputForBot(state, bot, random, tuning.aim, gate, memory) };
+  return {
+    act: (view) => {
+      const input = inputForBot(view.state, bot, random, tuning.aim, view.gate, memory);
+      // Adaptive is the only legacy bot that uses the shutter, with the humans' CUT judgement and no human limits.
+      return bot === 'adaptive' ? { ...input, cut: wantsCut(view) } : input;
+    },
+  };
 }
 
 /**
@@ -87,13 +108,13 @@ function delayed(policy: Policy, reactionTicks: number): Policy {
       history.push(view);
       if (history.length > reactionTicks + 1) history.shift();
       const seen = history[0]!;
-      return policy.act({ gate: seen.gate, action: seen.action, state: { ...seen.state, camera: view.state.camera, tick: view.state.tick } });
+      return policy.act({ gate: seen.gate, action: seen.action, threats: seen.threats, state: { ...seen.state, camera: view.state.camera, tick: view.state.tick } });
     },
   };
 }
 
 export function createPolicy(bot: Exclude<BalanceBot, HumanPersona>, seed: number, tuning: BotTuning = exact): Policy {
-  const base = bot === 'metronome' ? metronome(seed) : bot === 'gatekeeper' ? gatekeeper(tuning) : legacy(bot, seed, tuning);
+  const base = bot === 'metronome' ? metronome(seed) : bot === 'gatekeeper' ? gatekeeper(tuning) : bot === 'spam' ? spam() : legacy(bot, seed, tuning);
   return delayed(base, tuning.reactionTicks);
 }
 

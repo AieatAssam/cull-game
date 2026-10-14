@@ -51,6 +51,7 @@ export function createState(seed: number, entities = loadScene(seed)): SimState 
     }),
     routeChoices: {},
     entities, consumed: [], film: 90, waiting: false, failed: null, score: 0, cuts: [], closeCalls: 0,
+    shutter: { charge: 1, combo: 0, last: null },
   };
 }
 

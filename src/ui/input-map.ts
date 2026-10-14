@@ -11,14 +11,14 @@ import { easeZoomInput, heldZoomInput } from './zoom-control';
 /** Digital pan per held direction key. */
 export const KEY_PAN = 90;
 
-/** WASD / arrows → pan, Space or the HOLD button → hold, Shift → steady. `keys` holds lower-cased `KeyboardEvent.key` values. */
+/** WASD / arrows → pan, H or the HOLD button → hold, Shift → steady (Space is CUT, see `InputDevices.cutPress`). `keys` holds lower-cased `KeyboardEvent.key` values. */
 export function panFromKeys(keys: ReadonlySet<string>, holdButton: boolean): InputFrame {
   let x = 0; let z = 0;
   if (keys.has('a') || keys.has('arrowleft')) x -= KEY_PAN;
   if (keys.has('d') || keys.has('arrowright')) x += KEY_PAN;
   if (keys.has('w') || keys.has('arrowup')) z -= KEY_PAN;
   if (keys.has('s') || keys.has('arrowdown')) z += KEY_PAN;
-  return { ...NEUTRAL_INPUT, panX: x, panZ: z, zoom: 0, rotate: 0, hold: keys.has(' ') || holdButton, steady: keys.has('shift') };
+  return { ...NEUTRAL_INPUT, panX: x, panZ: z, zoom: 0, rotate: 0, hold: keys.has('h') || holdButton, steady: keys.has('shift'), cut: false };
 }
 
 /** A world point the camera is being dragged to; one-finger drags move it, and the camera chases it then stops. */
@@ -72,6 +72,8 @@ export interface InputDevices {
   /** Snap, pinch or slider zoom target, or null. */
   zoomTarget: number | null;
   rotationPulse: -1 | 0 | 1;
+  /** Space or the CUT button went down since the last tick (an edge: the caller clears it after composing). */
+  cutPress: boolean;
   /** Scripted input (the `__cull.input` test hook); neutral otherwise. */
   frameInput: InputFrame;
 }
@@ -97,6 +99,7 @@ export function composeInput(devices: InputDevices, view: Pick<SimState, 'camera
       rotate: devices.rotationPulse || frameInput.rotate,
       hold: keyInput.hold || frameInput.hold,
       steady: keyInput.steady || frameInput.steady,
+      cut: devices.cutPress || frameInput.cut,
     }),
   };
 }
@@ -110,7 +113,7 @@ export const ASSIST_HAZARD_MARGIN = 1;
 export function assistSuspended(state: Pick<SimState, 'talent' | 'entities' | 'shots'>): boolean {
   if (state.shots?.some((shot) => shot.kind === 'defang' && !shot.done && state.talent.x >= shot.at - 0.35)) return true;
   return state.entities.some((entity) => entity.spawned && !entity.cut && HAZARDS.has(entity.kind)
-    && Math.hypot(entity.x - state.talent.x, entity.z - state.talent.z) <= TUNING.closeCallRadius + ASSIST_HAZARD_MARGIN);
+    && Math.hypot(entity.x - state.talent.x, entity.z - state.talent.z) <= TUNING.closeCutRadius + ASSIST_HAZARD_MARGIN);
 }
 const HAZARDS = new Set(['urchin', 'boulder', 'swarm', 'stagehand']);
 
@@ -137,5 +140,5 @@ export function assistInput(input: InputFrame, state: Pick<SimState, 'talent' | 
 
 export function quantizeInput(input: InputFrame): InputFrame {
   const axis = (value: number) => Math.max(-127, Math.min(127, Math.round(value)));
-  return { panX: axis(input.panX), panZ: axis(input.panZ), zoom: axis(input.zoom), rotate: input.rotate, hold: Boolean(input.hold), steady: Boolean(input.steady) };
+  return { panX: axis(input.panX), panZ: axis(input.panZ), zoom: axis(input.zoom), rotate: input.rotate, hold: Boolean(input.hold), steady: Boolean(input.steady), cut: Boolean(input.cut) };
 }
