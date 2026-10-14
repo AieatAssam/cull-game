@@ -6,6 +6,7 @@ import { gateCast, gateStop, shotListForPath } from '../src/sim/framing';
 import { stateHash } from '../src/sim/hash';
 import { createShootState, stepShoot } from '../src/sim/shoot';
 import { NEUTRAL_INPUT, step } from '../src/sim/step';
+import { offFrameThreats } from '../src/sim/threats';
 import { TUNING } from '../src/sim/tuning';
 import { createGeneratedState, createState } from '../src/sim/world';
 import type { CastEntity, SimState } from '../src/sim/types';
@@ -133,6 +134,21 @@ describe('Shutter rules (DECISIONS 2026-10-14)', () => {
     expect(state.shutter.last).toMatchObject({ penalised: true, score: 0, combo: 0 });
     expect(state.score).toBe(0);
     expect(state.film).toBeCloseTo(film - TUNING.penalisedCutFilm - 2 / TUNING.tickRate);
+  });
+
+  it('an off-frame Urchin turns back on her and rolls offFrameUrchinSpeedFactor× faster; framed, it rolls as usual', () => {
+    // Behind her and rolling away (vx −1.5): off-frame it comes back for her, and the edge indicator says so.
+    let state = createState(1, [cast('u', 'urchin', -8, 0, { vx: -1.5 })]);
+    state.camera.zoom = 10;
+    expect(offFrameThreats(state)[0]).toMatchObject({ id: 'u', timeToContact: expect.any(Number) });
+    expect(offFrameThreats(state)[0]!.timeToContact).toBeLessThan(TUNING.threatHorizonSeconds);
+    state = step(state, held);
+    expect(state.entities[0]!.x).toBeCloseTo(-8 + 1.5 * TUNING.offFrameUrchinSpeedFactor / TUNING.tickRate);
+    // Framed (wide), the same Urchin keeps its own roll.
+    state = createState(1, [cast('u', 'urchin', -8, 0, { vx: -1.5 })]);
+    state.camera.zoom = 48;
+    state = step(state, held);
+    expect(state.entities[0]!.x).toBeCloseTo(-8 - 1.5 / TUNING.tickRate);
   });
 });
 
@@ -277,9 +293,9 @@ describe('bible M2: Adaptive policy helpers', () => {
 describe('fixed replay hashes', () => {
   const frames = Array.from({ length: 10_000 }, (_, i) => ({ ...NEUTRAL_INPUT, panX: (i % 240 < 120 ? 30 : -30), zoom: i % 300 < 150 ? 0 : 1 }));
   const fixtures: Record<number, [string, string, string]> = {
-    1: ['c1fc28e4', 'f39cd2b9', 'e1358833'],
-    19: ['581c7b32', '0420eaef', 'a5251fd7'],
-    2026: ['11a5d388', '55a21dfb', 'aa5b21f6'],
+    1: ['c1fc28e4', 'f39cd2b9', '7c6d6853'],
+    19: ['581c7b32', '0420eaef', '137d0fe9'],
+    2026: ['11a5d388', '55a21dfb', '2bde18a6'],
   };
   it.each(Object.entries(fixtures))('seed %s: strip world, generated strip and a full fair Adaptive Shoot', (seedText, [world, generated, shoot]) => {
     const seed = Number(seedText);

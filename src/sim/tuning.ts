@@ -34,7 +34,7 @@ export const TUNING = {
   sceneFilm: 30,
   reelFilm: 15,
   // Shutter (concept review B1, DECISIONS 2026-10-14). CUT slices every live hazard fully outside the frame, then recharges.
-  shutterRechargeSeconds: 1.5,
+  shutterRechargeSeconds: 1.8,
   // Distance classes from her: close ≤ closeCutRadius < normal ≤ farCutRadius < too-far.
   closeCutRadius: 1.5,
   farCutRadius: 8,
@@ -48,6 +48,9 @@ export const TUNING = {
   penalisedCutFilm: 4,
   // Off-frame threats (edge indicators) are listed when they would reach her within this many seconds.
   threatHorizonSeconds: 6,
+  // Framing an Urchin out no longer stops it (DECISIONS 2026-10-14, shutter pressure): fully off-frame it turns back on her
+  // and rolls this many times faster, so a framed-out Urchin is a clock the player must CUT against, not a solved problem.
+  offFrameUrchinSpeedFactor: 3,
   // Defang marks stand this far from Glass on the walked side: the close cut at the mark would shatter it.
   glassShatterRadius: 6,
   urchinSpeed: 1.5,

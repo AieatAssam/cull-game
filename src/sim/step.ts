@@ -314,7 +314,9 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
       }
     }
     entity.age++;
-    entity.x += entity.vx * dt;
+    // Off-frame, an Urchin turns back on her and rolls faster: framing it out buys time, only a CUT removes it.
+    const homing = entity.kind === 'urchin' && entity.gate === undefined && !entityInFrame(state, entity);
+    entity.x += (homing ? Math.sign(talent.x - entity.x) * Math.abs(entity.vx) * TUNING.offFrameUrchinSpeedFactor : entity.vx) * dt;
     entity.z = entity.pathBound ? pathZAt(state.path, entity.x) : entity.z + entity.vz * dt;
     // Once spawned, cast stays live off-frame (moving, and lethal on contact) until the shutter cuts it.
     if (entity.kind === 'extras' && entity.members) {

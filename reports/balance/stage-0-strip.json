@@ -20,9 +20,9 @@
       "meanDistance": 161.58,
       "timeouts": 0,
       "clearSeconds": {
-        "min": 63.7,
-        "mean": 86,
-        "max": 109.9
+        "min": 63.6,
+        "mean": 86.1,
+        "max": 111.6
       },
       "failReasons": {
         "fell": 7
@@ -143,7 +143,7 @@
       "runs": 200,
       "completed": 0,
       "completion": 0,
-      "meanDistance": 16.89,
+      "meanDistance": 15.97,
       "timeouts": 0,
       "clearSeconds": null,
       "failReasons": {
@@ -172,27 +172,27 @@
       "runs": 200,
       "completed": 0,
       "completion": 0,
-      "meanDistance": 22.22,
+      "meanDistance": 21.81,
       "timeouts": 0,
       "clearSeconds": null,
       "failReasons": {
-        "lost-talent": 139,
-        "hit": 58,
-        "fell": 3
+        "lost-talent": 136,
+        "hit": 62,
+        "fell": 2
       },
       "killers": {
-        "offscreen": 139,
-        "urchin": 58,
-        "glass": 3
+        "offscreen": 136,
+        "urchin": 62,
+        "glass": 2
       },
       "scenes": {
         "STRIP": 200
       },
       "sceneKillers": {
         "STRIP": {
-          "offscreen": 139,
-          "urchin": 58,
-          "glass": 3
+          "offscreen": 136,
+          "urchin": 62,
+          "glass": 2
         }
       }
     },
@@ -223,70 +223,70 @@
     },
     "human-keys": {
       "runs": 200,
-      "completed": 191,
-      "completion": 0.955,
-      "meanDistance": 160.22,
+      "completed": 186,
+      "completion": 0.93,
+      "meanDistance": 157.31,
       "timeouts": 0,
       "clearSeconds": {
         "min": 70.7,
-        "mean": 98.8,
-        "max": 135.8
+        "mean": 99.3,
+        "max": 137
       },
       "failReasons": {
-        "hit": 1,
-        "fell": 6,
-        "lost-talent": 1,
+        "fell": 5,
+        "hit": 6,
+        "lost-talent": 2,
         "out-of-film": 1
       },
       "killers": {
-        "urchin": 1,
-        "glass": 6,
-        "offscreen": 1,
+        "glass": 5,
+        "urchin": 6,
+        "offscreen": 2,
         "film": 1
       },
       "scenes": {
-        "STRIP": 9
+        "STRIP": 14
       },
       "sceneKillers": {
         "STRIP": {
-          "urchin": 1,
-          "glass": 6,
-          "offscreen": 1,
+          "glass": 5,
+          "urchin": 6,
+          "offscreen": 2,
           "film": 1
         }
       }
     },
     "human-touch": {
       "runs": 200,
-      "completed": 188,
-      "completion": 0.94,
-      "meanDistance": 159.28,
+      "completed": 182,
+      "completion": 0.91,
+      "meanDistance": 155.17,
       "timeouts": 0,
       "clearSeconds": {
         "min": 68,
-        "mean": 98.2,
-        "max": 136.9
+        "mean": 98.5,
+        "max": 137.2
       },
       "failReasons": {
+        "hit": 9,
         "fell": 7,
         "out-of-film": 1,
-        "hit": 3,
         "lost-talent": 1
       },
       "killers": {
+        "urchin": 9,
         "glass": 7,
         "film": 1,
-        "urchin": 3,
         "offscreen": 1
       },
       "scenes": {
-        "STRIP": 12
+        "STRIP": 18
       },
       "sceneKillers": {
         "STRIP": {
+          "urchin": 9,
           "glass": 7,
           "film": 1,
-          "urchin": 3,
           "offscreen": 1
         }
       }
@@ -337,7 +337,7 @@
       "timeouts": 0,
       "clearSeconds": {
         "min": 64,
-        "mean": 86.4,
+        "mean": 86.5,
         "max": 110.9
       },
       "failReasons": {
@@ -406,7 +406,7 @@
     },
     {
       "name": "close / adaptive distance",
-      "value": "0.105×",
+      "value": "0.099×",
       "target": "≤ 0.7×",
       "pass": true
     },
@@ -430,13 +430,13 @@
     },
     {
       "name": "human-keys strip clear",
-      "value": "95.5%",
+      "value": "93%",
       "target": "60–80% (target, report-only)",
       "pass": null
     },
     {
       "name": "human-touch strip clear",
-      "value": "94%",
+      "value": "91%",
       "target": "60–80% (target, report-only)",
       "pass": null
     }
@@ -498,7 +498,7 @@
     },
     {
       "name": "duration: Adaptive clear sim time",
-      "value": "63.7 / 86 / 109.9 s",
+      "value": "63.6 / 86.1 / 111.6 s",
       "target": "180–480 s",
       "pass": null
     }
@@ -513,7 +513,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 91.25
+      "seconds": 91.23333333333333
     },
     {
       "bot": "tracker",
@@ -590,7 +590,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 36.69,
-      "seconds": 53.68333333333333
+      "seconds": 58.15
     },
     {
       "bot": "human-keys",
@@ -601,7 +601,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 101.28333333333333
+      "seconds": 101.48333333333333
     },
     {
       "bot": "human-touch",
@@ -623,7 +623,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 99.76666666666667
+      "seconds": 99.78333333333333
     },
     {
       "bot": "tracker",
@@ -677,8 +677,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -711,7 +711,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 109.83333333333333
+      "seconds": 111.53333333333333
     },
     {
       "bot": "human-touch",
@@ -733,7 +733,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 97
+      "seconds": 96.96666666666667
     },
     {
       "bot": "tracker",
@@ -787,8 +787,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -821,7 +821,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 107.03333333333333
+      "seconds": 107.13333333333334
     },
     {
       "bot": "human-touch",
@@ -931,18 +931,18 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 123.01666666666667
+      "seconds": 118.91666666666667
     },
     {
       "bot": "human-touch",
       "seed": 4,
-      "completed": true,
+      "completed": false,
       "timedOut": false,
-      "failed": null,
-      "killer": null,
+      "failed": "hit",
+      "killer": "urchin",
       "scene": "STRIP",
-      "distance": 207,
-      "seconds": 120.2
+      "distance": 51.12,
+      "seconds": 36.93333333333333
     },
     {
       "bot": "adaptive",
@@ -953,7 +953,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 99.85
+      "seconds": 99.86666666666666
     },
     {
       "bot": "tracker",
@@ -1035,13 +1035,13 @@
     {
       "bot": "human-keys",
       "seed": 5,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "hit",
-      "killer": "urchin",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 39.7,
-      "seconds": 31.6
+      "distance": 191,
+      "seconds": 110.63333333333334
     },
     {
       "bot": "human-touch",
@@ -1052,7 +1052,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 107.28333333333333
+      "seconds": 106.86666666666666
     },
     {
       "bot": "adaptive",
@@ -1063,7 +1063,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 92.61666666666666
+      "seconds": 92.6
     },
     {
       "bot": "tracker",
@@ -1117,8 +1117,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -1151,7 +1151,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 110.95
+      "seconds": 110.21666666666667
     },
     {
       "bot": "human-touch",
@@ -1162,7 +1162,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 112.81666666666666
+      "seconds": 112.48333333333333
     },
     {
       "bot": "adaptive",
@@ -1173,7 +1173,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 67.28333333333333
+      "seconds": 67.25
     },
     {
       "bot": "tracker",
@@ -1250,7 +1250,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 28.92,
-      "seconds": 54.016666666666666
+      "seconds": 59.96666666666667
     },
     {
       "bot": "human-keys",
@@ -1393,7 +1393,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 74.73333333333333
+      "seconds": 74.71666666666667
     },
     {
       "bot": "tracker",
@@ -1447,19 +1447,19 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
       "seed": 9,
       "completed": false,
       "timedOut": false,
-      "failed": "lost-talent",
-      "killer": "offscreen",
+      "failed": "hit",
+      "killer": "urchin",
       "scene": "STRIP",
-      "distance": 11.05,
-      "seconds": 8.183333333333334
+      "distance": 5.54,
+      "seconds": 2.6333333333333333
     },
     {
       "bot": "spam",
@@ -1481,7 +1481,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 85.93333333333334
+      "seconds": 86.33333333333333
     },
     {
       "bot": "human-touch",
@@ -1503,7 +1503,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 91.18333333333334
+      "seconds": 91.13333333333334
     },
     {
       "bot": "tracker",
@@ -1557,8 +1557,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -1602,7 +1602,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 113.9
+      "seconds": 99.98333333333333
     },
     {
       "bot": "adaptive",
@@ -1613,7 +1613,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 90.61666666666666
+      "seconds": 90.65
     },
     {
       "bot": "tracker",
@@ -1667,8 +1667,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -1701,7 +1701,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 105.91666666666667
+      "seconds": 105.86666666666666
     },
     {
       "bot": "human-touch",
@@ -1712,7 +1712,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 104.33333333333333
+      "seconds": 105.5
     },
     {
       "bot": "adaptive",
@@ -1800,7 +1800,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 24.04,
-      "seconds": 47.016666666666666
+      "seconds": 51.016666666666666
     },
     {
       "bot": "human-keys",
@@ -1811,7 +1811,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 77.53333333333333
+      "seconds": 77.7
     },
     {
       "bot": "human-touch",
@@ -1887,8 +1887,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -2031,7 +2031,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 119.51666666666667
+      "seconds": 119.5
     },
     {
       "bot": "human-touch",
@@ -2042,7 +2042,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 97.1
+      "seconds": 100.33333333333333
     },
     {
       "bot": "adaptive",
@@ -2053,7 +2053,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 72.96666666666667
+      "seconds": 72.85
     },
     {
       "bot": "tracker",
@@ -2130,7 +2130,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 45.35,
-      "seconds": 59.81666666666667
+      "seconds": 67.01666666666667
     },
     {
       "bot": "human-keys",
@@ -2163,7 +2163,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 88.53333333333333
+      "seconds": 88.6
     },
     {
       "bot": "tracker",
@@ -2240,7 +2240,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 44.04,
-      "seconds": 59.81666666666667
+      "seconds": 65.41666666666667
     },
     {
       "bot": "human-keys",
@@ -2273,7 +2273,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 99.56666666666666
+      "seconds": 99.55
     },
     {
       "bot": "tracker",
@@ -2327,8 +2327,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -2361,7 +2361,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 111.55
+      "seconds": 112.21666666666667
     },
     {
       "bot": "human-touch",
@@ -2372,7 +2372,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 117.41666666666667
+      "seconds": 117.45
     },
     {
       "bot": "adaptive",
@@ -2383,7 +2383,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 86.78333333333333
+      "seconds": 86.73333333333333
     },
     {
       "bot": "tracker",
@@ -2437,8 +2437,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -2471,18 +2471,18 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 101.88333333333334
+      "seconds": 97.65
     },
     {
       "bot": "human-touch",
       "seed": 18,
-      "completed": true,
+      "completed": false,
       "timedOut": false,
-      "failed": null,
-      "killer": null,
+      "failed": "hit",
+      "killer": "urchin",
       "scene": "STRIP",
-      "distance": 159,
-      "seconds": 94.63333333333334
+      "distance": 43.41,
+      "seconds": 32.5
     },
     {
       "bot": "adaptive",
@@ -2547,8 +2547,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -2680,7 +2680,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 39.71,
-      "seconds": 55.21666666666667
+      "seconds": 59.96666666666667
     },
     {
       "bot": "human-keys",
@@ -2691,7 +2691,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 112.63333333333334
+      "seconds": 113.26666666666667
     },
     {
       "bot": "human-touch",
@@ -2713,7 +2713,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 77.98333333333333
+      "seconds": 78.15
     },
     {
       "bot": "tracker",
@@ -2801,7 +2801,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 87.05
+      "seconds": 87.38333333333334
     },
     {
       "bot": "human-touch",
@@ -2812,7 +2812,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 86.53333333333333
+      "seconds": 90.76666666666667
     },
     {
       "bot": "adaptive",
@@ -2823,7 +2823,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 93.66666666666667
+      "seconds": 93.61666666666666
     },
     {
       "bot": "tracker",
@@ -2877,8 +2877,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -2911,7 +2911,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 107.01666666666667
+      "seconds": 104.68333333333334
     },
     {
       "bot": "human-touch",
@@ -2922,7 +2922,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 101.75
+      "seconds": 104.33333333333333
     },
     {
       "bot": "adaptive",
@@ -3010,7 +3010,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 25.92,
-      "seconds": 46.016666666666666
+      "seconds": 50.88333333333333
     },
     {
       "bot": "human-keys",
@@ -3043,7 +3043,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 70.83333333333333
+      "seconds": 70.88333333333334
     },
     {
       "bot": "tracker",
@@ -3120,7 +3120,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 34.5,
-      "seconds": 61.016666666666666
+      "seconds": 67.01666666666667
     },
     {
       "bot": "human-keys",
@@ -3131,7 +3131,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 80
+      "seconds": 80.23333333333333
     },
     {
       "bot": "human-touch",
@@ -3142,7 +3142,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 80.01666666666667
+      "seconds": 81.95
     },
     {
       "bot": "adaptive",
@@ -3230,7 +3230,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 30.25,
-      "seconds": 54.016666666666666
+      "seconds": 59.96666666666667
     },
     {
       "bot": "human-keys",
@@ -3241,7 +3241,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 107.83333333333333
+      "seconds": 107.96666666666667
     },
     {
       "bot": "human-touch",
@@ -3252,7 +3252,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 136.83333333333334
+      "seconds": 137.23333333333332
     },
     {
       "bot": "adaptive",
@@ -3263,7 +3263,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 92.01666666666667
+      "seconds": 92.03333333333333
     },
     {
       "bot": "tracker",
@@ -3340,7 +3340,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 27.83,
-      "seconds": 54.016666666666666
+      "seconds": 58.15
     },
     {
       "bot": "human-keys",
@@ -3427,8 +3427,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -3461,7 +3461,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 89.73333333333333
+      "seconds": 92.4
     },
     {
       "bot": "human-touch",
@@ -3483,7 +3483,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 79.76666666666667
+      "seconds": 79.75
     },
     {
       "bot": "tracker",
@@ -3548,8 +3548,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 20.47,
-      "seconds": 12.433333333333334
+      "distance": 20.3,
+      "seconds": 12.216666666666667
     },
     {
       "bot": "spam",
@@ -3582,7 +3582,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 85.4
+      "seconds": 83.8
     },
     {
       "bot": "adaptive",
@@ -3647,8 +3647,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -3681,7 +3681,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 80.61666666666666
+      "seconds": 78.6
     },
     {
       "bot": "human-touch",
@@ -3703,7 +3703,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 106.71666666666667
+      "seconds": 106.7
     },
     {
       "bot": "tracker",
@@ -3757,8 +3757,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -3791,7 +3791,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 116.68333333333334
+      "seconds": 119.53333333333333
     },
     {
       "bot": "human-touch",
@@ -3802,7 +3802,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 112.15
+      "seconds": 116.21666666666667
     },
     {
       "bot": "adaptive",
@@ -3813,7 +3813,7 @@
       "killer": "glass",
       "scene": "STRIP",
       "distance": 59.64,
-      "seconds": 33.45
+      "seconds": 33.483333333333334
     },
     {
       "bot": "tracker",
@@ -3890,7 +3890,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 46.17,
-      "seconds": 61.016666666666666
+      "seconds": 67.01666666666667
     },
     {
       "bot": "human-keys",
@@ -3923,7 +3923,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 83.5
+      "seconds": 83.53333333333333
     },
     {
       "bot": "tracker",
@@ -3977,8 +3977,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -4022,7 +4022,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 93.11666666666666
+      "seconds": 94.11666666666666
     },
     {
       "bot": "adaptive",
@@ -4121,7 +4121,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 106.66666666666667
+      "seconds": 99.58333333333333
     },
     {
       "bot": "human-touch",
@@ -4143,7 +4143,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 93.03333333333333
+      "seconds": 93.01666666666667
     },
     {
       "bot": "tracker",
@@ -4197,8 +4197,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -4238,11 +4238,11 @@
       "seed": 34,
       "completed": false,
       "timedOut": false,
-      "failed": "out-of-film",
-      "killer": "film",
+      "failed": "hit",
+      "killer": "urchin",
       "scene": "STRIP",
-      "distance": 166.24,
-      "seconds": 94.98333333333333
+      "distance": 35.96,
+      "seconds": 25.166666666666668
     },
     {
       "bot": "adaptive",
@@ -4307,8 +4307,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -4318,8 +4318,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 36.67,
-      "seconds": 24.1
+      "distance": 37.94,
+      "seconds": 23.683333333333334
     },
     {
       "bot": "spam",
@@ -4451,7 +4451,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 124.63333333333334
+      "seconds": 124.43333333333334
     },
     {
       "bot": "human-touch",
@@ -4462,7 +4462,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 129.3
+      "seconds": 132.08333333333334
     },
     {
       "bot": "adaptive",
@@ -4473,7 +4473,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 93.4
+      "seconds": 93.38333333333334
     },
     {
       "bot": "tracker",
@@ -4527,8 +4527,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -4561,18 +4561,18 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 122.83333333333333
+      "seconds": 125.93333333333334
     },
     {
       "bot": "human-touch",
       "seed": 37,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "hit",
-      "killer": "urchin",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 98.69,
-      "seconds": 67.95
+      "distance": 175,
+      "seconds": 113.13333333333334
     },
     {
       "bot": "adaptive",
@@ -4583,7 +4583,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 97.05
+      "seconds": 97.15
     },
     {
       "bot": "tracker",
@@ -4637,8 +4637,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -4682,7 +4682,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 106.35
+      "seconds": 109.13333333333334
     },
     {
       "bot": "adaptive",
@@ -4725,7 +4725,7 @@
       "failed": "out-of-film",
       "killer": "film",
       "scene": "STRIP",
-      "distance": 17.81,
+      "distance": 18.26,
       "seconds": 104.75
     },
     {
@@ -4781,7 +4781,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 87.75
+      "seconds": 89.8
     },
     {
       "bot": "human-touch",
@@ -4792,7 +4792,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 76.03333333333333
+      "seconds": 79.4
     },
     {
       "bot": "adaptive",
@@ -4803,7 +4803,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 91.73333333333333
+      "seconds": 91.75
     },
     {
       "bot": "tracker",
@@ -4857,8 +4857,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -4891,7 +4891,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 111.33333333333333
+      "seconds": 111.36666666666666
     },
     {
       "bot": "human-touch",
@@ -4902,7 +4902,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 105.36666666666666
+      "seconds": 100.93333333333334
     },
     {
       "bot": "adaptive",
@@ -4913,7 +4913,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 105.78333333333333
+      "seconds": 105.66666666666667
     },
     {
       "bot": "tracker",
@@ -4967,8 +4967,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -5001,7 +5001,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 116.36666666666666
+      "seconds": 115.16666666666667
     },
     {
       "bot": "human-touch",
@@ -5023,7 +5023,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 90.98333333333333
+      "seconds": 90.93333333333334
     },
     {
       "bot": "tracker",
@@ -5077,8 +5077,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -5111,7 +5111,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 105.31666666666666
+      "seconds": 105.85
     },
     {
       "bot": "human-touch",
@@ -5122,7 +5122,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 109.26666666666667
+      "seconds": 101.91666666666667
     },
     {
       "bot": "adaptive",
@@ -5133,7 +5133,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 102.06666666666666
+      "seconds": 102.08333333333333
     },
     {
       "bot": "tracker",
@@ -5187,8 +5187,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -5221,7 +5221,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 115.91666666666667
+      "seconds": 115.81666666666666
     },
     {
       "bot": "human-touch",
@@ -5232,7 +5232,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 109.96666666666667
+      "seconds": 110.23333333333333
     },
     {
       "bot": "adaptive",
@@ -5243,7 +5243,7 @@
       "killer": "glass",
       "scene": "STRIP",
       "distance": 58.5,
-      "seconds": 34.21666666666667
+      "seconds": 34.2
     },
     {
       "bot": "tracker",
@@ -5342,7 +5342,7 @@
       "killer": "glass",
       "scene": "STRIP",
       "distance": 58.5,
-      "seconds": 45.15
+      "seconds": 40.05
     },
     {
       "bot": "adaptive",
@@ -5407,19 +5407,19 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
       "seed": 45,
       "completed": false,
       "timedOut": false,
-      "failed": "lost-talent",
-      "killer": "offscreen",
+      "failed": "hit",
+      "killer": "urchin",
       "scene": "STRIP",
-      "distance": 32.04,
-      "seconds": 19.1
+      "distance": 11.29,
+      "seconds": 7
     },
     {
       "bot": "spam",
@@ -5452,7 +5452,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 81.25
+      "seconds": 74.63333333333334
     },
     {
       "bot": "adaptive",
@@ -5540,18 +5540,18 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 18.25,
-      "seconds": 46.016666666666666
+      "seconds": 50.88333333333333
     },
     {
       "bot": "human-keys",
       "seed": 46,
-      "completed": true,
+      "completed": false,
       "timedOut": false,
-      "failed": null,
-      "killer": null,
+      "failed": "hit",
+      "killer": "urchin",
       "scene": "STRIP",
-      "distance": 127,
-      "seconds": 83.48333333333333
+      "distance": 18.25,
+      "seconds": 23.233333333333334
     },
     {
       "bot": "human-touch",
@@ -5562,7 +5562,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 77.16666666666667
+      "seconds": 77.7
     },
     {
       "bot": "adaptive",
@@ -5650,7 +5650,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 31.04,
-      "seconds": 54.016666666666666
+      "seconds": 59.96666666666667
     },
     {
       "bot": "human-keys",
@@ -5661,7 +5661,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 102.05
+      "seconds": 101.88333333333334
     },
     {
       "bot": "human-touch",
@@ -5745,11 +5745,11 @@
       "seed": 48,
       "completed": false,
       "timedOut": false,
-      "failed": "lost-talent",
-      "killer": "offscreen",
+      "failed": "hit",
+      "killer": "urchin",
       "scene": "STRIP",
-      "distance": 35.27,
-      "seconds": 18.5
+      "distance": 9.9,
+      "seconds": 6.366666666666666
     },
     {
       "bot": "spam",
@@ -5771,7 +5771,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 109.8
+      "seconds": 110.85
     },
     {
       "bot": "human-touch",
@@ -5793,7 +5793,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 83.68333333333334
+      "seconds": 83.66666666666667
     },
     {
       "bot": "tracker",
@@ -5870,7 +5870,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 29.71,
-      "seconds": 52.15
+      "seconds": 58.016666666666666
     },
     {
       "bot": "human-keys",
@@ -5881,7 +5881,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 103.1
+      "seconds": 102.08333333333333
     },
     {
       "bot": "human-touch",
@@ -5892,7 +5892,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 94.9
+      "seconds": 95.9
     },
     {
       "bot": "adaptive",
@@ -5903,7 +5903,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 88.96666666666667
+      "seconds": 88.95
     },
     {
       "bot": "tracker",
@@ -5957,8 +5957,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -5991,7 +5991,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 98.9
+      "seconds": 99.08333333333333
     },
     {
       "bot": "human-touch",
@@ -6002,7 +6002,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 104.05
+      "seconds": 100.03333333333333
     },
     {
       "bot": "adaptive",
@@ -6067,19 +6067,19 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
       "seed": 51,
       "completed": false,
       "timedOut": false,
-      "failed": "fell",
-      "killer": "glass",
+      "failed": "hit",
+      "killer": "urchin",
       "scene": "STRIP",
-      "distance": 27.76,
-      "seconds": 15.7
+      "distance": 9.8,
+      "seconds": 6.166666666666667
     },
     {
       "bot": "spam",
@@ -6101,7 +6101,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 77.01666666666667
+      "seconds": 77.7
     },
     {
       "bot": "human-touch",
@@ -6112,7 +6112,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 78.68333333333334
+      "seconds": 79.55
     },
     {
       "bot": "adaptive",
@@ -6177,8 +6177,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -6233,7 +6233,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 63.65
+      "seconds": 63.63333333333333
     },
     {
       "bot": "tracker",
@@ -6310,7 +6310,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 28,
-      "seconds": 52.15
+      "seconds": 58.016666666666666
     },
     {
       "bot": "human-keys",
@@ -6321,7 +6321,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 73.36666666666666
+      "seconds": 72.63333333333334
     },
     {
       "bot": "human-touch",
@@ -6332,7 +6332,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 76.26666666666667
+      "seconds": 74.83333333333333
     },
     {
       "bot": "adaptive",
@@ -6343,7 +6343,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 72.96666666666667
+      "seconds": 72.95
     },
     {
       "bot": "tracker",
@@ -6442,7 +6442,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 81.48333333333333
+      "seconds": 81.76666666666667
     },
     {
       "bot": "adaptive",
@@ -6507,8 +6507,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -6563,7 +6563,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 67.6
+      "seconds": 67.58333333333333
     },
     {
       "bot": "tracker",
@@ -6628,7 +6628,7 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 25.29,
+      "distance": 26.07,
       "seconds": 16.983333333333334
     },
     {
@@ -6651,7 +6651,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 75.11666666666666
+      "seconds": 74.5
     },
     {
       "bot": "human-touch",
@@ -6673,7 +6673,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 96.25
+      "seconds": 96.28333333333333
     },
     {
       "bot": "tracker",
@@ -6727,8 +6727,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -6761,7 +6761,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 103.28333333333333
+      "seconds": 102.83333333333333
     },
     {
       "bot": "human-touch",
@@ -6772,7 +6772,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 110.76666666666667
+      "seconds": 112.21666666666667
     },
     {
       "bot": "adaptive",
@@ -6837,8 +6837,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -6871,7 +6871,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 91.26666666666667
+      "seconds": 90.16666666666667
     },
     {
       "bot": "human-touch",
@@ -6882,7 +6882,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 97.11666666666666
+      "seconds": 96
     },
     {
       "bot": "adaptive",
@@ -6958,8 +6958,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 13.25,
-      "seconds": 7.833333333333333
+      "distance": 12.67,
+      "seconds": 7.6
     },
     {
       "bot": "spam",
@@ -7003,7 +7003,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 76.35
+      "seconds": 76.36666666666666
     },
     {
       "bot": "tracker",
@@ -7080,7 +7080,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 26.82,
-      "seconds": 52.15
+      "seconds": 58.016666666666666
     },
     {
       "bot": "human-keys",
@@ -7091,7 +7091,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 85.16666666666667
+      "seconds": 89.05
     },
     {
       "bot": "human-touch",
@@ -7113,7 +7113,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 93.1
+      "seconds": 94.9
     },
     {
       "bot": "tracker",
@@ -7167,8 +7167,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -7201,18 +7201,18 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 109.46666666666667
+      "seconds": 112.7
     },
     {
       "bot": "human-touch",
       "seed": 61,
-      "completed": false,
+      "completed": true,
       "timedOut": false,
-      "failed": "hit",
-      "killer": "urchin",
+      "failed": null,
+      "killer": null,
       "scene": "STRIP",
-      "distance": 41.92,
-      "seconds": 32.56666666666667
+      "distance": 175,
+      "seconds": 103.35
     },
     {
       "bot": "adaptive",
@@ -7223,7 +7223,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 101.4
+      "seconds": 101.38333333333334
     },
     {
       "bot": "tracker",
@@ -7277,8 +7277,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -7311,7 +7311,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 116.61666666666666
+      "seconds": 116.75
     },
     {
       "bot": "human-touch",
@@ -7333,7 +7333,7 @@
       "killer": "glass",
       "scene": "STRIP",
       "distance": 43.54,
-      "seconds": 24.566666666666666
+      "seconds": 24.633333333333333
     },
     {
       "bot": "tracker",
@@ -7417,11 +7417,11 @@
       "seed": 63,
       "completed": false,
       "timedOut": false,
-      "failed": "fell",
-      "killer": "glass",
+      "failed": "hit",
+      "killer": "urchin",
       "scene": "STRIP",
-      "distance": 43.54,
-      "seconds": 44.81666666666667
+      "distance": 37.65,
+      "seconds": 41.46666666666667
     },
     {
       "bot": "human-touch",
@@ -7432,7 +7432,7 @@
       "killer": "glass",
       "scene": "STRIP",
       "distance": 43.54,
-      "seconds": 29.633333333333333
+      "seconds": 31.733333333333334
     },
     {
       "bot": "adaptive",
@@ -7443,7 +7443,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 107.01666666666667
+      "seconds": 107.15
     },
     {
       "bot": "tracker",
@@ -7520,7 +7520,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 42.8,
-      "seconds": 54.016666666666666
+      "seconds": 59.96666666666667
     },
     {
       "bot": "human-keys",
@@ -7531,7 +7531,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 122.21666666666667
+      "seconds": 121.43333333333334
     },
     {
       "bot": "human-touch",
@@ -7542,7 +7542,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 130.58333333333334
+      "seconds": 133.16666666666666
     },
     {
       "bot": "adaptive",
@@ -7607,8 +7607,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -7663,7 +7663,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 68.38333333333334
+      "seconds": 70.2
     },
     {
       "bot": "tracker",
@@ -7717,8 +7717,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -7745,13 +7745,13 @@
     {
       "bot": "human-keys",
       "seed": 66,
-      "completed": true,
+      "completed": false,
       "timedOut": false,
-      "failed": null,
-      "killer": null,
+      "failed": "hit",
+      "killer": "urchin",
       "scene": "STRIP",
-      "distance": 127,
-      "seconds": 73.35
+      "distance": 25.1,
+      "seconds": 21.583333333333332
     },
     {
       "bot": "human-touch",
@@ -7761,8 +7761,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 25.29,
-      "seconds": 19.783333333333335
+      "distance": 25.28,
+      "seconds": 19.5
     },
     {
       "bot": "adaptive",
@@ -7773,7 +7773,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 103.96666666666667
+      "seconds": 103.9
     },
     {
       "bot": "tracker",
@@ -7827,8 +7827,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -7861,7 +7861,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 117.56666666666666
+      "seconds": 116.31666666666666
     },
     {
       "bot": "human-touch",
@@ -7937,8 +7937,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -7971,7 +7971,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 94.23333333333333
+      "seconds": 92.3
     },
     {
       "bot": "human-touch",
@@ -7982,7 +7982,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 95.91666666666667
+      "seconds": 94.38333333333334
     },
     {
       "bot": "adaptive",
@@ -7993,7 +7993,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 106.21666666666667
+      "seconds": 111.63333333333334
     },
     {
       "bot": "tracker",
@@ -8058,8 +8058,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 17,
-      "seconds": 10.183333333333334
+      "distance": 15.83,
+      "seconds": 9.733333333333333
     },
     {
       "bot": "spam",
@@ -8081,18 +8081,18 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 117.16666666666667
+      "seconds": 117.55
     },
     {
       "bot": "human-touch",
       "seed": 69,
-      "completed": true,
+      "completed": false,
       "timedOut": false,
-      "failed": null,
-      "killer": null,
+      "failed": "out-of-film",
+      "killer": "film",
       "scene": "STRIP",
-      "distance": 191,
-      "seconds": 129
+      "distance": 121.31,
+      "seconds": 104.31666666666666
     },
     {
       "bot": "adaptive",
@@ -8103,7 +8103,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 98.66666666666667
+      "seconds": 98.7
     },
     {
       "bot": "tracker",
@@ -8157,8 +8157,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -8191,7 +8191,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 108.03333333333333
+      "seconds": 109.26666666666667
     },
     {
       "bot": "human-touch",
@@ -8202,7 +8202,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 109.43333333333334
+      "seconds": 109.73333333333333
     },
     {
       "bot": "adaptive",
@@ -8213,7 +8213,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 97.18333333333334
+      "seconds": 97.13333333333334
     },
     {
       "bot": "tracker",
@@ -8267,8 +8267,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -8301,7 +8301,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 115.85
+      "seconds": 116.15
     },
     {
       "bot": "human-touch",
@@ -8377,8 +8377,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -8411,7 +8411,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 89.48333333333333
+      "seconds": 93.01666666666667
     },
     {
       "bot": "human-touch",
@@ -8433,7 +8433,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 96.95
+      "seconds": 96.91666666666667
     },
     {
       "bot": "tracker",
@@ -8521,7 +8521,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 107.78333333333333
+      "seconds": 103.86666666666666
     },
     {
       "bot": "human-touch",
@@ -8532,7 +8532,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 105.01666666666667
+      "seconds": 114.95
     },
     {
       "bot": "adaptive",
@@ -8597,8 +8597,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -8631,7 +8631,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 92.83333333333333
+      "seconds": 89.85
     },
     {
       "bot": "human-touch",
@@ -8653,7 +8653,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 77.2
+      "seconds": 77.15
     },
     {
       "bot": "tracker",
@@ -8730,7 +8730,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 35.09,
-      "seconds": 46.016666666666666
+      "seconds": 50.88333333333333
     },
     {
       "bot": "human-keys",
@@ -8746,13 +8746,13 @@
     {
       "bot": "human-touch",
       "seed": 75,
-      "completed": true,
+      "completed": false,
       "timedOut": false,
-      "failed": null,
-      "killer": null,
+      "failed": "hit",
+      "killer": "urchin",
       "scene": "STRIP",
-      "distance": 143,
-      "seconds": 83.2
+      "distance": 35.09,
+      "seconds": 25.533333333333335
     },
     {
       "bot": "adaptive",
@@ -8763,7 +8763,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 83.65
+      "seconds": 83.63333333333334
     },
     {
       "bot": "tracker",
@@ -8817,8 +8817,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -8851,7 +8851,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 100.43333333333334
+      "seconds": 99.25
     },
     {
       "bot": "human-touch",
@@ -8862,7 +8862,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 97.36666666666666
+      "seconds": 98.01666666666667
     },
     {
       "bot": "adaptive",
@@ -8873,7 +8873,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 82.51666666666667
+      "seconds": 82.5
     },
     {
       "bot": "tracker",
@@ -8961,7 +8961,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 92.43333333333334
+      "seconds": 92.26666666666667
     },
     {
       "bot": "human-touch",
@@ -8972,7 +8972,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 91.35
+      "seconds": 91.55
     },
     {
       "bot": "adaptive",
@@ -8983,7 +8983,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 91.03333333333333
+      "seconds": 90.96666666666667
     },
     {
       "bot": "tracker",
@@ -9060,7 +9060,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 34.33,
-      "seconds": 53.68333333333333
+      "seconds": 58.15
     },
     {
       "bot": "human-keys",
@@ -9071,7 +9071,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 111.5
+      "seconds": 111.46666666666667
     },
     {
       "bot": "human-touch",
@@ -9082,7 +9082,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 96.55
+      "seconds": 96.91666666666667
     },
     {
       "bot": "adaptive",
@@ -9147,8 +9147,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -9203,7 +9203,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 102.38333333333334
+      "seconds": 102.4
     },
     {
       "bot": "tracker",
@@ -9268,8 +9268,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 11.47,
-      "seconds": 7.183333333333334
+      "distance": 11.02,
+      "seconds": 6.85
     },
     {
       "bot": "spam",
@@ -9291,7 +9291,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 113.73333333333333
+      "seconds": 112.93333333333334
     },
     {
       "bot": "human-touch",
@@ -9302,7 +9302,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 114.96666666666667
+      "seconds": 114.2
     },
     {
       "bot": "adaptive",
@@ -9313,7 +9313,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 109.06666666666666
+      "seconds": 109.01666666666667
     },
     {
       "bot": "tracker",
@@ -9378,7 +9378,7 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 39.33,
+      "distance": 39.25,
       "seconds": 21.966666666666665
     },
     {
@@ -9401,7 +9401,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 124.58333333333333
+      "seconds": 124.21666666666667
     },
     {
       "bot": "human-touch",
@@ -9412,7 +9412,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 120.7
+      "seconds": 121.08333333333333
     },
     {
       "bot": "adaptive",
@@ -9423,7 +9423,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 95.26666666666667
+      "seconds": 95.21666666666667
     },
     {
       "bot": "tracker",
@@ -9477,8 +9477,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -9488,8 +9488,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6.58,
-      "seconds": 2.9166666666666665
+      "distance": 6.46,
+      "seconds": 2.8666666666666667
     },
     {
       "bot": "spam",
@@ -9505,13 +9505,13 @@
     {
       "bot": "human-keys",
       "seed": 82,
-      "completed": true,
+      "completed": false,
       "timedOut": false,
-      "failed": null,
-      "killer": null,
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 191,
-      "seconds": 100.2
+      "distance": 39.15,
+      "seconds": 25.4
     },
     {
       "bot": "human-touch",
@@ -9522,7 +9522,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 105.81666666666666
+      "seconds": 105.28333333333333
     },
     {
       "bot": "adaptive",
@@ -9587,19 +9587,19 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
       "seed": 83,
       "completed": false,
       "timedOut": false,
-      "failed": "hit",
-      "killer": "urchin",
+      "failed": "lost-talent",
+      "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 11.8,
-      "seconds": 8.05
+      "distance": 29.37,
+      "seconds": 17.233333333333334
     },
     {
       "bot": "spam",
@@ -9621,7 +9621,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 114.16666666666667
+      "seconds": 114.81666666666666
     },
     {
       "bot": "human-touch",
@@ -9632,7 +9632,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 111.86666666666666
+      "seconds": 110.68333333333334
     },
     {
       "bot": "adaptive",
@@ -9697,8 +9697,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -9731,7 +9731,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 107.71666666666667
+      "seconds": 109.88333333333334
     },
     {
       "bot": "human-touch",
@@ -9742,7 +9742,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 93.58333333333333
+      "seconds": 94.1
     },
     {
       "bot": "adaptive",
@@ -9807,8 +9807,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -9863,7 +9863,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 68.65
+      "seconds": 68.63333333333334
     },
     {
       "bot": "tracker",
@@ -9940,7 +9940,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 26.83,
-      "seconds": 47.55
+      "seconds": 51.016666666666666
     },
     {
       "bot": "human-keys",
@@ -9951,7 +9951,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 80.8
+      "seconds": 83.15
     },
     {
       "bot": "human-touch",
@@ -9962,7 +9962,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 79.73333333333333
+      "seconds": 79.43333333333334
     },
     {
       "bot": "adaptive",
@@ -10050,7 +10050,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 34.5,
-      "seconds": 53.68333333333333
+      "seconds": 58.15
     },
     {
       "bot": "human-keys",
@@ -10083,7 +10083,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 107.2
+      "seconds": 107.11666666666666
     },
     {
       "bot": "tracker",
@@ -10160,7 +10160,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 44.17,
-      "seconds": 61.35
+      "seconds": 67.23333333333333
     },
     {
       "bot": "human-keys",
@@ -10171,7 +10171,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 120.33333333333333
+      "seconds": 120.75
     },
     {
       "bot": "human-touch",
@@ -10182,7 +10182,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 121.68333333333334
+      "seconds": 120.55
     },
     {
       "bot": "adaptive",
@@ -10247,8 +10247,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -10281,7 +10281,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 121.16666666666667
+      "seconds": 119.75
     },
     {
       "bot": "human-touch",
@@ -10292,7 +10292,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 119.51666666666667
+      "seconds": 121.66666666666667
     },
     {
       "bot": "adaptive",
@@ -10303,7 +10303,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 66.55
+      "seconds": 66.56666666666666
     },
     {
       "bot": "tracker",
@@ -10357,8 +10357,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -10391,7 +10391,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 79.38333333333334
+      "seconds": 78.48333333333333
     },
     {
       "bot": "human-touch",
@@ -10402,7 +10402,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 91.03333333333333
+      "seconds": 84.46666666666667
     },
     {
       "bot": "adaptive",
@@ -10413,7 +10413,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 92.05
+      "seconds": 92.03333333333333
     },
     {
       "bot": "tracker",
@@ -10501,7 +10501,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 103.83333333333333
+      "seconds": 103.11666666666666
     },
     {
       "bot": "human-touch",
@@ -10512,7 +10512,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 102.26666666666667
+      "seconds": 97.4
     },
     {
       "bot": "adaptive",
@@ -10600,7 +10600,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 22.24,
-      "seconds": 52.15
+      "seconds": 58.016666666666666
     },
     {
       "bot": "human-keys",
@@ -10611,7 +10611,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 94.18333333333334
+      "seconds": 96.88333333333334
     },
     {
       "bot": "human-touch",
@@ -10622,7 +10622,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 92.26666666666667
+      "seconds": 93.36666666666666
     },
     {
       "bot": "adaptive",
@@ -10687,8 +10687,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -10732,7 +10732,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 87.73333333333333
+      "seconds": 88.33333333333333
     },
     {
       "bot": "adaptive",
@@ -10743,7 +10743,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 72.25
+      "seconds": 72.2
     },
     {
       "bot": "tracker",
@@ -10820,7 +10820,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 34.04,
-      "seconds": 47.55
+      "seconds": 52.7
     },
     {
       "bot": "human-keys",
@@ -10853,7 +10853,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 87.26666666666667
+      "seconds": 89.08333333333333
     },
     {
       "bot": "tracker",
@@ -10907,8 +10907,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -10941,7 +10941,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 105.93333333333334
+      "seconds": 100.33333333333333
     },
     {
       "bot": "human-touch",
@@ -11028,7 +11028,7 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 31,
+      "distance": 27.46,
       "seconds": 18.3
     },
     {
@@ -11040,7 +11040,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 26.38,
-      "seconds": 47.016666666666666
+      "seconds": 51.016666666666666
     },
     {
       "bot": "human-keys",
@@ -11073,7 +11073,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 91.2
+      "seconds": 91.25
     },
     {
       "bot": "tracker",
@@ -11127,8 +11127,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -11161,7 +11161,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 115.41666666666667
+      "seconds": 114.43333333333334
     },
     {
       "bot": "human-touch",
@@ -11172,7 +11172,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 106.58333333333333
+      "seconds": 106.15
     },
     {
       "bot": "adaptive",
@@ -11183,7 +11183,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 91.03333333333333
+      "seconds": 92.95
     },
     {
       "bot": "tracker",
@@ -11237,8 +11237,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -11248,8 +11248,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6.58,
-      "seconds": 2.9
+      "distance": 6.29,
+      "seconds": 2.783333333333333
     },
     {
       "bot": "spam",
@@ -11271,7 +11271,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 104.28333333333333
+      "seconds": 104.43333333333334
     },
     {
       "bot": "human-touch",
@@ -11282,7 +11282,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 109.18333333333334
+      "seconds": 107.11666666666666
     },
     {
       "bot": "adaptive",
@@ -11293,7 +11293,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 74.3
+      "seconds": 76.1
     },
     {
       "bot": "tracker",
@@ -11381,7 +11381,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 85.55
+      "seconds": 84.28333333333333
     },
     {
       "bot": "human-touch",
@@ -11392,7 +11392,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 82.2
+      "seconds": 82.18333333333334
     },
     {
       "bot": "adaptive",
@@ -11403,7 +11403,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 73.51666666666667
+      "seconds": 73.43333333333334
     },
     {
       "bot": "tracker",
@@ -11457,8 +11457,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -11485,24 +11485,24 @@
     {
       "bot": "human-keys",
       "seed": 100,
-      "completed": true,
+      "completed": false,
       "timedOut": false,
-      "failed": null,
-      "killer": null,
+      "failed": "hit",
+      "killer": "urchin",
       "scene": "STRIP",
-      "distance": 143,
-      "seconds": 88.56666666666666
+      "distance": 34.79,
+      "seconds": 31.8
     },
     {
       "bot": "human-touch",
       "seed": 100,
-      "completed": true,
+      "completed": false,
       "timedOut": false,
-      "failed": null,
-      "killer": null,
+      "failed": "hit",
+      "killer": "urchin",
       "scene": "STRIP",
-      "distance": 143,
-      "seconds": 80.41666666666667
+      "distance": 34.79,
+      "seconds": 24.466666666666665
     },
     {
       "bot": "adaptive",
@@ -11578,8 +11578,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 41.32,
-      "seconds": 26.016666666666666
+      "distance": 40.42,
+      "seconds": 24.45
     },
     {
       "bot": "spam",
@@ -11590,7 +11590,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 24.79,
-      "seconds": 52.15
+      "seconds": 58.016666666666666
     },
     {
       "bot": "human-keys",
@@ -11623,7 +11623,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 99.23333333333333
+      "seconds": 99.16666666666667
     },
     {
       "bot": "tracker",
@@ -11700,7 +11700,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 45.91,
-      "seconds": 59.81666666666667
+      "seconds": 65.41666666666667
     },
     {
       "bot": "human-keys",
@@ -11711,7 +11711,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 134.93333333333334
+      "seconds": 137
     },
     {
       "bot": "human-touch",
@@ -11722,7 +11722,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 106.5
+      "seconds": 110.23333333333333
     },
     {
       "bot": "adaptive",
@@ -11733,7 +11733,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 73.88333333333334
+      "seconds": 73.9
     },
     {
       "bot": "tracker",
@@ -11810,7 +11810,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 27.29,
-      "seconds": 47.55
+      "seconds": 53.016666666666666
     },
     {
       "bot": "human-keys",
@@ -11821,7 +11821,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 93.78333333333333
+      "seconds": 88.88333333333334
     },
     {
       "bot": "human-touch",
@@ -11832,7 +11832,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 86.48333333333333
+      "seconds": 81.4
     },
     {
       "bot": "adaptive",
@@ -11843,7 +11843,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 106.85
+      "seconds": 106.86666666666666
     },
     {
       "bot": "tracker",
@@ -11897,8 +11897,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -11931,7 +11931,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 112.96666666666667
+      "seconds": 115.55
     },
     {
       "bot": "human-touch",
@@ -11942,7 +11942,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 114.31666666666666
+      "seconds": 112.9
     },
     {
       "bot": "adaptive",
@@ -11953,7 +11953,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 67.3
+      "seconds": 67.08333333333333
     },
     {
       "bot": "tracker",
@@ -12128,7 +12128,7 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 32.37,
+      "distance": 29.83,
       "seconds": 19.116666666666667
     },
     {
@@ -12173,7 +12173,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 104.18333333333334
+      "seconds": 104.21666666666667
     },
     {
       "bot": "tracker",
@@ -12261,7 +12261,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 117.65
+      "seconds": 117.7
     },
     {
       "bot": "human-touch",
@@ -12272,7 +12272,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 118.05
+      "seconds": 117.95
     },
     {
       "bot": "adaptive",
@@ -12337,8 +12337,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -12382,7 +12382,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 98.11666666666666
+      "seconds": 98.21666666666667
     },
     {
       "bot": "adaptive",
@@ -12393,7 +12393,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 105.38333333333334
+      "seconds": 105.31666666666666
     },
     {
       "bot": "tracker",
@@ -12447,8 +12447,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -12481,7 +12481,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 119.41666666666667
+      "seconds": 119.03333333333333
     },
     {
       "bot": "human-touch",
@@ -12492,7 +12492,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 120.41666666666667
+      "seconds": 121.1
     },
     {
       "bot": "adaptive",
@@ -12557,8 +12557,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -12667,8 +12667,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -12701,7 +12701,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 117.06666666666666
+      "seconds": 117.5
     },
     {
       "bot": "human-touch",
@@ -12712,7 +12712,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 124.23333333333333
+      "seconds": 122.5
     },
     {
       "bot": "adaptive",
@@ -12777,8 +12777,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -12822,7 +12822,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 97.26666666666667
+      "seconds": 94.6
     },
     {
       "bot": "adaptive",
@@ -12910,7 +12910,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 45.29,
-      "seconds": 53.68333333333333
+      "seconds": 58.15
     },
     {
       "bot": "human-keys",
@@ -12921,7 +12921,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 98.88333333333334
+      "seconds": 99.88333333333334
     },
     {
       "bot": "human-touch",
@@ -12997,8 +12997,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -13053,7 +13053,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 73.21666666666667
+      "seconds": 73.2
     },
     {
       "bot": "tracker",
@@ -13130,7 +13130,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 29.71,
-      "seconds": 47.55
+      "seconds": 52.7
     },
     {
       "bot": "human-keys",
@@ -13141,7 +13141,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 80.63333333333334
+      "seconds": 80.43333333333334
     },
     {
       "bot": "human-touch",
@@ -13163,7 +13163,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 107.5
+      "seconds": 107.48333333333333
     },
     {
       "bot": "tracker",
@@ -13262,7 +13262,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 114.95
+      "seconds": 116.35
     },
     {
       "bot": "adaptive",
@@ -13273,7 +13273,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 77.31666666666666
+      "seconds": 77.33333333333333
     },
     {
       "bot": "tracker",
@@ -13327,8 +13327,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -13361,7 +13361,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 92.23333333333333
+      "seconds": 97.08333333333333
     },
     {
       "bot": "human-touch",
@@ -13372,7 +13372,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 87.61666666666666
+      "seconds": 91.73333333333333
     },
     {
       "bot": "adaptive",
@@ -13437,8 +13437,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -13448,7 +13448,7 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 35.91,
+      "distance": 36.17,
       "seconds": 25.033333333333335
     },
     {
@@ -13471,7 +13471,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 84.03333333333333
+      "seconds": 84.56666666666666
     },
     {
       "bot": "human-touch",
@@ -13482,7 +13482,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 80.11666666666666
+      "seconds": 80.5
     },
     {
       "bot": "adaptive",
@@ -13493,7 +13493,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 105.83333333333333
+      "seconds": 105.75
     },
     {
       "bot": "tracker",
@@ -13570,7 +13570,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 35.62,
-      "seconds": 54.016666666666666
+      "seconds": 59.96666666666667
     },
     {
       "bot": "human-keys",
@@ -13581,7 +13581,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 120.85
+      "seconds": 123.2
     },
     {
       "bot": "human-touch",
@@ -13592,7 +13592,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 123.13333333333334
+      "seconds": 123.53333333333333
     },
     {
       "bot": "adaptive",
@@ -13603,7 +13603,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 105.16666666666667
+      "seconds": 105.26666666666667
     },
     {
       "bot": "tracker",
@@ -13657,8 +13657,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -13691,7 +13691,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 115.13333333333334
+      "seconds": 115.25
     },
     {
       "bot": "human-touch",
@@ -13702,7 +13702,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 113.96666666666667
+      "seconds": 114.2
     },
     {
       "bot": "adaptive",
@@ -13767,8 +13767,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -13806,13 +13806,13 @@
     {
       "bot": "human-touch",
       "seed": 121,
-      "completed": true,
+      "completed": false,
       "timedOut": false,
-      "failed": null,
-      "killer": null,
+      "failed": "hit",
+      "killer": "urchin",
       "scene": "STRIP",
-      "distance": 127,
-      "seconds": 77.55
+      "distance": 32.96,
+      "seconds": 29.2
     },
     {
       "bot": "adaptive",
@@ -13823,7 +13823,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 96.56666666666666
+      "seconds": 98.35
     },
     {
       "bot": "tracker",
@@ -13877,8 +13877,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -13911,7 +13911,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 113.43333333333334
+      "seconds": 113.33333333333333
     },
     {
       "bot": "human-touch",
@@ -13922,7 +13922,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 109.11666666666666
+      "seconds": 107.95
     },
     {
       "bot": "adaptive",
@@ -14032,7 +14032,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 109.3
+      "seconds": 110.43333333333334
     },
     {
       "bot": "adaptive",
@@ -14043,7 +14043,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 99.16666666666667
+      "seconds": 99.13333333333334
     },
     {
       "bot": "tracker",
@@ -14120,7 +14120,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 45.25,
-      "seconds": 59.81666666666667
+      "seconds": 65.41666666666667
     },
     {
       "bot": "human-keys",
@@ -14131,7 +14131,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 111.36666666666666
+      "seconds": 114.15
     },
     {
       "bot": "human-touch",
@@ -14142,7 +14142,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 107.73333333333333
+      "seconds": 111.93333333333334
     },
     {
       "bot": "adaptive",
@@ -14153,7 +14153,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 105.93333333333334
+      "seconds": 105.9
     },
     {
       "bot": "tracker",
@@ -14207,8 +14207,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -14241,7 +14241,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 113.18333333333334
+      "seconds": 114.45
     },
     {
       "bot": "human-touch",
@@ -14252,7 +14252,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 126.03333333333333
+      "seconds": 129
     },
     {
       "bot": "adaptive",
@@ -14317,8 +14317,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -14351,7 +14351,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 99.46666666666667
+      "seconds": 99.66666666666667
     },
     {
       "bot": "human-touch",
@@ -14362,7 +14362,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 102.58333333333333
+      "seconds": 101.98333333333333
     },
     {
       "bot": "adaptive",
@@ -14427,8 +14427,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -14461,7 +14461,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 78.86666666666666
+      "seconds": 80.55
     },
     {
       "bot": "human-touch",
@@ -14472,7 +14472,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 77.81666666666666
+      "seconds": 79.66666666666667
     },
     {
       "bot": "adaptive",
@@ -14537,8 +14537,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -14571,7 +14571,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 98.75
+      "seconds": 99.03333333333333
     },
     {
       "bot": "human-touch",
@@ -14582,7 +14582,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 94.75
+      "seconds": 94.48333333333333
     },
     {
       "bot": "adaptive",
@@ -14647,8 +14647,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -14757,8 +14757,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -14867,8 +14867,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -14923,7 +14923,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 83.15
+      "seconds": 83.2
     },
     {
       "bot": "tracker",
@@ -14977,8 +14977,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -15011,7 +15011,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 94.88333333333334
+      "seconds": 94.61666666666666
     },
     {
       "bot": "human-touch",
@@ -15022,7 +15022,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 101.56666666666666
+      "seconds": 101.46666666666667
     },
     {
       "bot": "adaptive",
@@ -15087,8 +15087,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -15098,8 +15098,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6.47,
-      "seconds": 3.05
+      "distance": 6.1,
+      "seconds": 2.8666666666666667
     },
     {
       "bot": "spam",
@@ -15197,8 +15197,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -15231,7 +15231,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 106.8
+      "seconds": 107.68333333333334
     },
     {
       "bot": "human-touch",
@@ -15307,8 +15307,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -15341,7 +15341,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 78.15
+      "seconds": 80.96666666666667
     },
     {
       "bot": "human-touch",
@@ -15363,7 +15363,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 85
+      "seconds": 84.98333333333333
     },
     {
       "bot": "tracker",
@@ -15440,7 +15440,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 37.29,
-      "seconds": 61.016666666666666
+      "seconds": 67.01666666666667
     },
     {
       "bot": "human-keys",
@@ -15451,7 +15451,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 93.48333333333333
+      "seconds": 92.83333333333333
     },
     {
       "bot": "human-touch",
@@ -15462,7 +15462,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 94.41666666666667
+      "seconds": 93.4
     },
     {
       "bot": "adaptive",
@@ -15473,7 +15473,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 96.76666666666667
+      "seconds": 96.78333333333333
     },
     {
       "bot": "tracker",
@@ -15550,7 +15550,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 47.12,
-      "seconds": 61.016666666666666
+      "seconds": 67.01666666666667
     },
     {
       "bot": "human-keys",
@@ -15693,7 +15693,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 85.41666666666667
+      "seconds": 85.38333333333334
     },
     {
       "bot": "tracker",
@@ -15747,8 +15747,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -15781,7 +15781,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 93.23333333333333
+      "seconds": 93.78333333333333
     },
     {
       "bot": "human-touch",
@@ -15792,7 +15792,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 97.28333333333333
+      "seconds": 97.1
     },
     {
       "bot": "adaptive",
@@ -15880,7 +15880,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 25.21,
-      "seconds": 53.68333333333333
+      "seconds": 58.15
     },
     {
       "bot": "human-keys",
@@ -15891,7 +15891,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 78.06666666666666
+      "seconds": 78.9
     },
     {
       "bot": "human-touch",
@@ -15902,7 +15902,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 83.83333333333333
+      "seconds": 83.93333333333334
     },
     {
       "bot": "adaptive",
@@ -15967,8 +15967,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -16012,7 +16012,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 112.61666666666666
+      "seconds": 110.78333333333333
     },
     {
       "bot": "adaptive",
@@ -16100,7 +16100,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 28.25,
-      "seconds": 53.68333333333333
+      "seconds": 58.15
     },
     {
       "bot": "human-keys",
@@ -16122,7 +16122,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 114.45
+      "seconds": 113.43333333333334
     },
     {
       "bot": "adaptive",
@@ -16133,7 +16133,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 107.2
+      "seconds": 107.31666666666666
     },
     {
       "bot": "tracker",
@@ -16221,7 +16221,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 117.11666666666666
+      "seconds": 123.68333333333334
     },
     {
       "bot": "human-touch",
@@ -16232,7 +16232,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 127.46666666666667
+      "seconds": 127.75
     },
     {
       "bot": "adaptive",
@@ -16297,8 +16297,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -16325,24 +16325,24 @@
     {
       "bot": "human-keys",
       "seed": 144,
-      "completed": true,
+      "completed": false,
       "timedOut": false,
-      "failed": null,
-      "killer": null,
+      "failed": "hit",
+      "killer": "urchin",
       "scene": "STRIP",
-      "distance": 127,
-      "seconds": 73.76666666666667
+      "distance": 21.32,
+      "seconds": 19.083333333333332
     },
     {
       "bot": "human-touch",
       "seed": 144,
-      "completed": true,
+      "completed": false,
       "timedOut": false,
-      "failed": null,
-      "killer": null,
+      "failed": "hit",
+      "killer": "urchin",
       "scene": "STRIP",
-      "distance": 127,
-      "seconds": 71.36666666666666
+      "distance": 21.29,
+      "seconds": 16.883333333333333
     },
     {
       "bot": "adaptive",
@@ -16353,7 +16353,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 90.01666666666667
+      "seconds": 90.03333333333333
     },
     {
       "bot": "tracker",
@@ -16407,8 +16407,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -16441,7 +16441,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 100.55
+      "seconds": 100.5
     },
     {
       "bot": "human-touch",
@@ -16517,8 +16517,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -16627,8 +16627,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -16737,8 +16737,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -16793,7 +16793,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 82.38333333333334
+      "seconds": 82.36666666666666
     },
     {
       "bot": "tracker",
@@ -16870,7 +16870,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 35.38,
-      "seconds": 52.15
+      "seconds": 58.016666666666666
     },
     {
       "bot": "human-keys",
@@ -16881,7 +16881,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 92.23333333333333
+      "seconds": 90.88333333333334
     },
     {
       "bot": "human-touch",
@@ -16892,7 +16892,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 87.75
+      "seconds": 90.85
     },
     {
       "bot": "adaptive",
@@ -16903,7 +16903,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 98.86666666666666
+      "seconds": 98.96666666666667
     },
     {
       "bot": "tracker",
@@ -16957,8 +16957,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -16991,7 +16991,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 124.5
+      "seconds": 122.58333333333333
     },
     {
       "bot": "human-touch",
@@ -17002,7 +17002,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 125.11666666666666
+      "seconds": 125.5
     },
     {
       "bot": "adaptive",
@@ -17078,8 +17078,8 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 29.38,
-      "seconds": 15.516666666666667
+      "distance": 29.35,
+      "seconds": 15.55
     },
     {
       "bot": "spam",
@@ -17123,7 +17123,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 84.65
+      "seconds": 84.56666666666666
     },
     {
       "bot": "tracker",
@@ -17211,7 +17211,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 94.26666666666667
+      "seconds": 93.25
     },
     {
       "bot": "human-touch",
@@ -17222,7 +17222,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 96.51666666666667
+      "seconds": 93.1
     },
     {
       "bot": "adaptive",
@@ -17233,7 +17233,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 65.2
+      "seconds": 65.18333333333334
     },
     {
       "bot": "tracker",
@@ -17298,7 +17298,7 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 33.29,
+      "distance": 30.54,
       "seconds": 19.166666666666668
     },
     {
@@ -17310,7 +17310,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 30.54,
-      "seconds": 47.55
+      "seconds": 52.7
     },
     {
       "bot": "human-keys",
@@ -17332,7 +17332,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 74.98333333333333
+      "seconds": 74.58333333333333
     },
     {
       "bot": "adaptive",
@@ -17431,7 +17431,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 108.18333333333334
+      "seconds": 106.31666666666666
     },
     {
       "bot": "human-touch",
@@ -17442,7 +17442,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 96.03333333333333
+      "seconds": 95.66666666666667
     },
     {
       "bot": "adaptive",
@@ -17453,7 +17453,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 86.25
+      "seconds": 88.06666666666666
     },
     {
       "bot": "tracker",
@@ -17507,8 +17507,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -17552,7 +17552,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 96.25
+      "seconds": 96.45
     },
     {
       "bot": "adaptive",
@@ -17617,8 +17617,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -17651,7 +17651,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 104.1
+      "seconds": 104.35
     },
     {
       "bot": "human-touch",
@@ -17662,7 +17662,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 101.75
+      "seconds": 102.83333333333333
     },
     {
       "bot": "adaptive",
@@ -17727,8 +17727,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -17738,7 +17738,7 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 26.71,
+      "distance": 26.7,
       "seconds": 14.4
     },
     {
@@ -17761,7 +17761,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 91.11666666666666
+      "seconds": 91.21666666666667
     },
     {
       "bot": "human-touch",
@@ -17837,8 +17837,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -17871,7 +17871,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 84.46666666666667
+      "seconds": 84.05
     },
     {
       "bot": "human-touch",
@@ -17882,7 +17882,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 81.65
+      "seconds": 84.56666666666666
     },
     {
       "bot": "adaptive",
@@ -17947,8 +17947,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -17958,7 +17958,7 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 33.37,
+      "distance": 28.21,
       "seconds": 17.433333333333334
     },
     {
@@ -18003,7 +18003,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 106.38333333333334
+      "seconds": 106.4
     },
     {
       "bot": "tracker",
@@ -18057,8 +18057,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -18091,7 +18091,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 114.26666666666667
+      "seconds": 123.6
     },
     {
       "bot": "human-touch",
@@ -18102,7 +18102,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 126.1
+      "seconds": 125.45
     },
     {
       "bot": "adaptive",
@@ -18190,7 +18190,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 28.21,
-      "seconds": 52.15
+      "seconds": 58.016666666666666
     },
     {
       "bot": "human-keys",
@@ -18212,7 +18212,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 76.71666666666667
+      "seconds": 78.21666666666667
     },
     {
       "bot": "adaptive",
@@ -18223,7 +18223,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 96.55
+      "seconds": 98.46666666666667
     },
     {
       "bot": "tracker",
@@ -18311,7 +18311,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 119.06666666666666
+      "seconds": 119.48333333333333
     },
     {
       "bot": "human-touch",
@@ -18322,7 +18322,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 115.63333333333334
+      "seconds": 115.08333333333333
     },
     {
       "bot": "adaptive",
@@ -18333,7 +18333,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 84.95
+      "seconds": 84.93333333333334
     },
     {
       "bot": "tracker",
@@ -18398,7 +18398,7 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 29.25,
+      "distance": 29.29,
       "seconds": 15.383333333333333
     },
     {
@@ -18497,8 +18497,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -18553,7 +18553,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 87.46666666666667
+      "seconds": 87.53333333333333
     },
     {
       "bot": "tracker",
@@ -18607,8 +18607,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -18641,7 +18641,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 110.38333333333334
+      "seconds": 107.31666666666666
     },
     {
       "bot": "human-touch",
@@ -18717,8 +18717,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -18762,7 +18762,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 113.23333333333333
+      "seconds": 112.83333333333333
     },
     {
       "bot": "adaptive",
@@ -18773,7 +18773,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 105.26666666666667
+      "seconds": 105.46666666666667
     },
     {
       "bot": "tracker",
@@ -18827,8 +18827,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -18861,7 +18861,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 123.18333333333334
+      "seconds": 117.86666666666666
     },
     {
       "bot": "human-touch",
@@ -18937,8 +18937,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -18948,8 +18948,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 14.71,
-      "seconds": 8.466666666666667
+      "distance": 14.12,
+      "seconds": 8.216666666666667
     },
     {
       "bot": "spam",
@@ -18971,7 +18971,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 87.3
+      "seconds": 110.6
     },
     {
       "bot": "human-touch",
@@ -18982,7 +18982,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 91.1
+      "seconds": 89.95
     },
     {
       "bot": "adaptive",
@@ -19047,8 +19047,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -19092,7 +19092,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 84.98333333333333
+      "seconds": 85.38333333333334
     },
     {
       "bot": "adaptive",
@@ -19103,7 +19103,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 109.08333333333333
+      "seconds": 109.05
     },
     {
       "bot": "tracker",
@@ -19157,8 +19157,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -19191,7 +19191,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 135.81666666666666
+      "seconds": 134.96666666666667
     },
     {
       "bot": "human-touch",
@@ -19202,7 +19202,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 124.16666666666667
+      "seconds": 125.26666666666667
     },
     {
       "bot": "adaptive",
@@ -19278,7 +19278,7 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 22.71,
+      "distance": 22.54,
       "seconds": 12.216666666666667
     },
     {
@@ -19301,7 +19301,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 95.15
+      "seconds": 97.13333333333334
     },
     {
       "bot": "human-touch",
@@ -19312,7 +19312,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 103.95
+      "seconds": 103.6
     },
     {
       "bot": "adaptive",
@@ -19400,7 +19400,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 17.68,
-      "seconds": 47.016666666666666
+      "seconds": 51.016666666666666
     },
     {
       "bot": "human-keys",
@@ -19411,7 +19411,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 73.66666666666667
+      "seconds": 73.9
     },
     {
       "bot": "human-touch",
@@ -19422,7 +19422,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 75.06666666666666
+      "seconds": 75.83333333333333
     },
     {
       "bot": "adaptive",
@@ -19510,7 +19510,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 24.25,
-      "seconds": 46.016666666666666
+      "seconds": 50.88333333333333
     },
     {
       "bot": "human-keys",
@@ -19521,7 +19521,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 72.48333333333333
+      "seconds": 74.13333333333334
     },
     {
       "bot": "human-touch",
@@ -19532,7 +19532,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 80.21666666666667
+      "seconds": 82.71666666666667
     },
     {
       "bot": "adaptive",
@@ -19597,8 +19597,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -19608,8 +19608,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6.38,
-      "seconds": 3.05
+      "distance": 5.77,
+      "seconds": 2.783333333333333
     },
     {
       "bot": "spam",
@@ -19636,13 +19636,13 @@
     {
       "bot": "human-touch",
       "seed": 174,
-      "completed": true,
+      "completed": false,
       "timedOut": false,
-      "failed": null,
-      "killer": null,
+      "failed": "hit",
+      "killer": "urchin",
       "scene": "STRIP",
-      "distance": 175,
-      "seconds": 99.75
+      "distance": 32.04,
+      "seconds": 25.1
     },
     {
       "bot": "adaptive",
@@ -19653,7 +19653,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 90.7
+      "seconds": 90.6
     },
     {
       "bot": "tracker",
@@ -19707,8 +19707,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -19741,7 +19741,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 101.48333333333333
+      "seconds": 103.48333333333333
     },
     {
       "bot": "human-touch",
@@ -19752,7 +19752,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 102.18333333333334
+      "seconds": 103.18333333333334
     },
     {
       "bot": "adaptive",
@@ -19763,7 +19763,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 64.18333333333334
+      "seconds": 64.2
     },
     {
       "bot": "tracker",
@@ -19817,8 +19817,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -19851,7 +19851,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 74.06666666666666
+      "seconds": 74.48333333333333
     },
     {
       "bot": "human-touch",
@@ -19862,7 +19862,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 71.43333333333334
+      "seconds": 74.96666666666667
     },
     {
       "bot": "adaptive",
@@ -19938,7 +19938,7 @@
       "failed": "lost-talent",
       "killer": "offscreen",
       "scene": "STRIP",
-      "distance": 30.44,
+      "distance": 30.03,
       "seconds": 17.583333333333332
     },
     {
@@ -20037,8 +20037,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -20048,8 +20048,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6.4,
-      "seconds": 3.066666666666667
+      "distance": 6.37,
+      "seconds": 3.05
     },
     {
       "bot": "spam",
@@ -20071,7 +20071,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 125.58333333333333
+      "seconds": 126.75
     },
     {
       "bot": "human-touch",
@@ -20082,7 +20082,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 131.23333333333332
+      "seconds": 120.71666666666667
     },
     {
       "bot": "adaptive",
@@ -20093,7 +20093,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 89.31666666666666
+      "seconds": 89.36666666666666
     },
     {
       "bot": "tracker",
@@ -20170,7 +20170,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 45.17,
-      "seconds": 54.016666666666666
+      "seconds": 59.96666666666667
     },
     {
       "bot": "human-keys",
@@ -20203,7 +20203,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 106.5
+      "seconds": 106.51666666666667
     },
     {
       "bot": "tracker",
@@ -20280,7 +20280,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 48.96,
-      "seconds": 61.35
+      "seconds": 67.23333333333333
     },
     {
       "bot": "human-keys",
@@ -20291,7 +20291,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 120.25
+      "seconds": 121.01666666666667
     },
     {
       "bot": "human-touch",
@@ -20302,7 +20302,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 120.13333333333334
+      "seconds": 122.35
     },
     {
       "bot": "adaptive",
@@ -20313,7 +20313,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 79.63333333333334
+      "seconds": 79.61666666666666
     },
     {
       "bot": "tracker",
@@ -20378,7 +20378,7 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 15.82,
+      "distance": 15.57,
       "seconds": 8.883333333333333
     },
     {
@@ -20401,7 +20401,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 94.46666666666667
+      "seconds": 94.51666666666667
     },
     {
       "bot": "human-touch",
@@ -20412,7 +20412,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 159,
-      "seconds": 90.91666666666667
+      "seconds": 90.26666666666667
     },
     {
       "bot": "adaptive",
@@ -20477,8 +20477,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -20533,7 +20533,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 69.28333333333333
+      "seconds": 69.3
     },
     {
       "bot": "tracker",
@@ -20610,7 +20610,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 33.53,
-      "seconds": 54.016666666666666
+      "seconds": 59.96666666666667
     },
     {
       "bot": "human-keys",
@@ -20632,7 +20632,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 88.41666666666667
+      "seconds": 85.56666666666666
     },
     {
       "bot": "adaptive",
@@ -20697,8 +20697,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -20753,7 +20753,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 97.45
+      "seconds": 97.46666666666667
     },
     {
       "bot": "tracker",
@@ -20830,7 +20830,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 43.21,
-      "seconds": 61.016666666666666
+      "seconds": 67.01666666666667
     },
     {
       "bot": "human-keys",
@@ -20852,7 +20852,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 106.55
+      "seconds": 107.48333333333333
     },
     {
       "bot": "adaptive",
@@ -20917,8 +20917,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -20951,7 +20951,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 101.21666666666667
+      "seconds": 101.11666666666666
     },
     {
       "bot": "human-touch",
@@ -20973,7 +20973,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 109.91666666666667
+      "seconds": 110.15
     },
     {
       "bot": "tracker",
@@ -21061,7 +21061,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 135.18333333333334
+      "seconds": 132.6
     },
     {
       "bot": "human-touch",
@@ -21072,7 +21072,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 130.41666666666666
+      "seconds": 133.08333333333334
     },
     {
       "bot": "adaptive",
@@ -21083,7 +21083,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 89.33333333333333
+      "seconds": 89.4
     },
     {
       "bot": "tracker",
@@ -21137,8 +21137,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -21171,7 +21171,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 99.06666666666666
+      "seconds": 96.73333333333333
     },
     {
       "bot": "human-touch",
@@ -21182,7 +21182,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 97.9
+      "seconds": 98.4
     },
     {
       "bot": "adaptive",
@@ -21247,8 +21247,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -21357,8 +21357,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -21391,7 +21391,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 101.48333333333333
+      "seconds": 102.88333333333334
     },
     {
       "bot": "human-touch",
@@ -21402,7 +21402,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 175,
-      "seconds": 97.28333333333333
+      "seconds": 99.78333333333333
     },
     {
       "bot": "adaptive",
@@ -21413,7 +21413,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 64.93333333333334
+      "seconds": 64.95
     },
     {
       "bot": "tracker",
@@ -21501,7 +21501,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 74.26666666666667
+      "seconds": 73.45
     },
     {
       "bot": "human-touch",
@@ -21512,7 +21512,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 127,
-      "seconds": 80.8
+      "seconds": 80.13333333333334
     },
     {
       "bot": "adaptive",
@@ -21577,8 +21577,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -21633,7 +21633,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 102.11666666666666
+      "seconds": 102.1
     },
     {
       "bot": "tracker",
@@ -21695,11 +21695,11 @@
       "seed": 193,
       "completed": false,
       "timedOut": false,
-      "failed": "lost-talent",
-      "killer": "offscreen",
+      "failed": "hit",
+      "killer": "urchin",
       "scene": "STRIP",
-      "distance": 19.04,
-      "seconds": 11.1
+      "distance": 8.25,
+      "seconds": 4
     },
     {
       "bot": "spam",
@@ -21710,7 +21710,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 44.71,
-      "seconds": 53.68333333333333
+      "seconds": 58.15
     },
     {
       "bot": "human-keys",
@@ -21721,7 +21721,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 116.9
+      "seconds": 107.31666666666666
     },
     {
       "bot": "human-touch",
@@ -21743,7 +21743,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 100.3
+      "seconds": 100.26666666666667
     },
     {
       "bot": "tracker",
@@ -21825,13 +21825,13 @@
     {
       "bot": "human-keys",
       "seed": 194,
-      "completed": true,
+      "completed": false,
       "timedOut": false,
-      "failed": null,
-      "killer": null,
+      "failed": "hit",
+      "killer": "urchin",
       "scene": "STRIP",
-      "distance": 191,
-      "seconds": 111.88333333333334
+      "distance": 39.04,
+      "seconds": 30.6
     },
     {
       "bot": "human-touch",
@@ -21842,7 +21842,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 191,
-      "seconds": 108.88333333333334
+      "seconds": 111.58333333333333
     },
     {
       "bot": "adaptive",
@@ -21853,7 +21853,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 105.36666666666666
+      "seconds": 105.31666666666666
     },
     {
       "bot": "tracker",
@@ -21930,7 +21930,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 54.46,
-      "seconds": 61.016666666666666
+      "seconds": 67.01666666666667
     },
     {
       "bot": "human-keys",
@@ -21941,7 +21941,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 134.01666666666668
+      "seconds": 135.26666666666668
     },
     {
       "bot": "human-touch",
@@ -21952,7 +21952,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 117.86666666666666
+      "seconds": 120.81666666666666
     },
     {
       "bot": "adaptive",
@@ -22017,8 +22017,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -22073,7 +22073,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 76.81666666666666
+      "seconds": 76.78333333333333
     },
     {
       "bot": "tracker",
@@ -22150,7 +22150,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 30,
-      "seconds": 47.016666666666666
+      "seconds": 51.016666666666666
     },
     {
       "bot": "human-keys",
@@ -22161,7 +22161,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 89.11666666666666
+      "seconds": 89.01666666666667
     },
     {
       "bot": "human-touch",
@@ -22172,7 +22172,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 84.93333333333334
+      "seconds": 83.38333333333334
     },
     {
       "bot": "adaptive",
@@ -22183,7 +22183,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 104.31666666666666
+      "seconds": 104.35
     },
     {
       "bot": "tracker",
@@ -22237,8 +22237,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -22293,7 +22293,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 105.5
+      "seconds": 105.51666666666667
     },
     {
       "bot": "tracker",
@@ -22370,7 +22370,7 @@
       "killer": "film",
       "scene": "STRIP",
       "distance": 37.07,
-      "seconds": 53.68333333333333
+      "seconds": 58.15
     },
     {
       "bot": "human-keys",
@@ -22392,7 +22392,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 207,
-      "seconds": 111.68333333333334
+      "seconds": 112.75
     },
     {
       "bot": "adaptive",
@@ -22457,8 +22457,8 @@
       "failed": "hit",
       "killer": "urchin",
       "scene": "STRIP",
-      "distance": 6,
-      "seconds": 3.35
+      "distance": 4.33,
+      "seconds": 2.316666666666667
     },
     {
       "bot": "chaos",
@@ -22491,7 +22491,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 83.8
+      "seconds": 83.11666666666666
     },
     {
       "bot": "human-touch",
@@ -22502,7 +22502,7 @@
       "killer": null,
       "scene": "STRIP",
       "distance": 143,
-      "seconds": 78.81666666666666
+      "seconds": 76.91666666666667
     }
   ],
   "jitterWins": {

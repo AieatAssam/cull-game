@@ -52,7 +52,10 @@ export function offFrameThreats(state: SimState): Threat[] {
     const dz = entity.z - talent.z;
     const distance = Math.hypot(dx, dz) || 1e-6;
     // Closing speed along the line between them.
-    const closing = ((tvx - entity.vx) * dx + (tvz - entity.vz) * dz) / distance;
+    // Off-frame Urchins turn back on her and roll faster (step.ts); every entity listed here is off-frame.
+    const homing = entity.kind === 'urchin' && entity.gate === undefined;
+    const evx = homing ? -Math.sign(dx) * Math.abs(entity.vx) * TUNING.offFrameUrchinSpeedFactor : entity.vx;
+    const closing = ((tvx - evx) * dx + (tvz - entity.vz) * dz) / distance;
     const gap = Math.max(0, distance - contactRadius(entity) - talentRadius);
     const timeToContact = gap === 0 ? 0 : closing > 1e-3 ? gap / closing : Infinity;
     if (timeToContact > TUNING.threatHorizonSeconds && distance > TUNING.closeCutRadius) continue;
