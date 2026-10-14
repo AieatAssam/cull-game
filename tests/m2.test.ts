@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createDriver } from '../src/bots/balance-bots';
 import { cutFraming } from '../src/bots/players';
 import { generateScene, pathZAt, sharpTurns } from '../src/gen/generate';
-import { gateCast, gateStop, markShots, shotListForPath } from '../src/sim/framing';
+import { gateCast, gateStop, shotListForPath } from '../src/sim/framing';
 import { stateHash } from '../src/sim/hash';
 import { createShootState, stepShoot } from '../src/sim/shoot';
 import { NEUTRAL_INPUT, step } from '../src/sim/step';
@@ -24,54 +24,48 @@ function gateFixture(): SimState {
   return state;
 }
 
-describe('bible M2: defang needs a close cut made since the gate opened', () => {
-  it('ignores zoom alone and close cuts made before the gate opened', () => {
-    const state = gateFixture();
-    state.closeCalls = 3;
+const cutInput = { ...held, cut: true };
+
+describe('Shutter defang (DECISIONS 2026-10-14): a CUT with the stand-in out of frame and close to her', () => {
+  it('is not made by zoom or by framing the stand-in out without a CUT', () => {
+    let state = gateFixture();
     state.camera.zoom = 48;
     state.talent.x = 19.7;
     state.camera.x = 19.7;
-    markShots(state);
-    expect(state.shots![0]).toMatchObject({ done: false, opened: 3 });
-    markShots(state);
+    state = step(state, held);
+    state.camera.x = state.talent.x - state.camera.zoom / 2 + 0.2;
+    state.camera.vx = 0;
+    for (let i = 0; i < 30; i++) state = step(state, held);
     expect(state.shots![0]!.done).toBe(false);
-    state.closeCalls = 4;
-    markShots(state);
-    expect(state.shots![0]!.done).toBe(true);
-    // The stand-in leaves its mark once the shot is made.
-    expect(state.entities.find((entity) => entity.gate === 0)?.cut).toBe(true);
+    expect(state.entities[0]).toMatchObject({ cut: false, spawned: true });
   });
 
-  it('puts the stand-in inside the close-call radius but out of reach of the held Talent', () => {
+  it('puts the stand-in inside the close-cut radius but out of reach of the held Talent', () => {
     const path = [{ x: 0, z: 0 }, { x: 10, z: 5 }, { x: 40, z: -3 }];
     const shots = shotListForPath(path, 7);
     const [standIn] = gateCast(path, shots);
     const stop = gateStop(path, shots[0]!.at);
     const reach = Math.hypot(standIn!.x - stop.x, standIn!.z - stop.z);
     expect(reach).toBeCloseTo(TUNING.gateMarkDistance);
-    expect(reach + 3.6 / TUNING.tickRate).toBeLessThanOrEqual(TUNING.closeCallRadius);
+    expect(reach + 3.6 / TUNING.tickRate).toBeLessThanOrEqual(TUNING.closeCutRadius);
     expect(reach - 3.6 / TUNING.tickRate).toBeGreaterThan(TUNING.urchinRadius + TUNING.talentRadii[2]);
   });
 
-  it('cuts a stand-in framed out far before its shot is called, without credit, and re-dresses it when the shot is called', () => {
+  it('holds a stand-in on its mark against a far CUT: listed as held, not cut, no credit', () => {
     let state = gateFixture();
     state.camera.x = 21;
     state = step(state, held);
     expect(state.entities[0]!.spawned).toBe(true);
-    state.camera.x = -40;
-    state = step(state, held);
-    expect(state.entities[0]).toMatchObject({ cut: true });
-    expect(state.cuts).toContain('gate-urchin-0');
-    expect(state.closeCalls).toBe(0);
-    // Her reaching the mark calls the shot: the stand-in is back on its mark, and the shot still needs a close cut.
-    state.talent.x = 19.7;
-    state.camera.x = 19.7;
-    state = step(state, held);
-    expect(state.entities[0]).toMatchObject({ cut: false, x: gateCast(state.path, [{ at: 20, kind: 'defang', done: false }])[0]!.x });
+    state.camera.x = -10;
+    state.talent.x = -10;
+    state = step(state, cutInput);
+    expect(state.entities[0]).toMatchObject({ cut: false, spawned: true });
+    expect(state.shutter.last).toMatchObject({ missed: true, hits: [{ id: 'gate-urchin-0', held: true, distance: 'too-far' }] });
     expect(state.shots![0]!.done).toBe(false);
+    expect(state.closeCalls).toBe(0);
   });
 
-  it('can be cleared by a player who frames the stand-in out close', () => {
+  it('is cleared by a close CUT, which starts the ACTION beat when the mark was holding her', () => {
     let state = gateFixture();
     state.camera.zoom = 24;
     for (let i = 0; i < 1200 && !state.waiting; i++) state = step(state, { ...NEUTRAL_INPUT, panX: Math.sign(state.talent.x - state.camera.x) * 127 });
@@ -79,9 +73,66 @@ describe('bible M2: defang needs a close cut made since the gate opened', () => 
     state.camera.x = state.talent.x - state.camera.zoom / 2 + 0.2;
     state.camera.vx = 0;
     state = step(state, held);
-    state = step(state, held);
+    expect(state.shots![0]!.done).toBe(false);
+    state = step(state, cutInput);
     expect(state.shots![0]!.done).toBe(true);
+    expect(state.shots![0]!.releaseTick).toBeGreaterThan(state.tick);
+    expect(state.entities[0]!.cut).toBe(true);
+    expect(state.shutter.last).toMatchObject({ defanged: true, missed: false, penalised: false, hits: [{ id: 'gate-urchin-0', distance: 'close' }] });
+    expect(state.closeCalls).toBe(1);
     expect(state.failed).toBeNull();
+  });
+});
+
+describe('Shutter rules (DECISIONS 2026-10-14)', () => {
+  /** A spawned Urchin `d` u right of her, with the camera centred on her at zoom 10 (so it is outside for d ≥ ~6). */
+  function urchinAt(d: number): SimState {
+    const state = createState(1, [cast('u', 'urchin', d, 0)]);
+    state.camera.zoom = 10;
+    return state;
+  }
+
+  it('never cuts by framing alone: an out-of-frame hazard stays live', () => {
+    let state = urchinAt(7);
+    for (let i = 0; i < 60; i++) state = step(state, held);
+    expect(state.entities[0]).toMatchObject({ cut: false, spawned: true });
+    expect(state.cuts).toEqual([]);
+  });
+
+  it('cuts everything fully outside on a charged CUT, then recharges over shutterRechargeSeconds', () => {
+    let state = urchinAt(7);
+    state = step(state, cutInput);
+    expect(state.entities[0]!.cut).toBe(true);
+    expect(state.shutter.last).toMatchObject({ missed: false, combo: 1, score: TUNING.normalCutScore, hits: [{ id: 'u', distance: 'normal' }] });
+    expect(state.shutter.charge).toBe(0);
+    const before = state.film;
+    state = step(state, cutInput);
+    expect(state.shutter.last!.tick).toBe(0);
+    expect(state.film).toBeCloseTo(before - 2 / TUNING.tickRate);
+    for (let i = 0; i < TUNING.shutterRechargeSeconds * TUNING.tickRate; i++) state = step(state, held);
+    expect(state.shutter.charge).toBe(1);
+  });
+
+  it('a missed CUT wastes the charge and film and breaks the combo', () => {
+    let state = urchinAt(2);
+    state.shutter.combo = 3;
+    const film = state.film;
+    state = step(state, cutInput);
+    expect(state.shutter).toMatchObject({ charge: 0, combo: 0 });
+    expect(state.shutter.last).toMatchObject({ missed: true, hits: [] });
+    expect(state.film).toBeCloseTo(film - TUNING.missedCutFilm - 2 / TUNING.tickRate);
+  });
+
+  it('penalises a CUT while she is not framed: film cost, combo break, no score', () => {
+    let state = urchinAt(7);
+    state.shutter.combo = 2;
+    state.camera.x = 30;
+    const film = state.film;
+    state = step(state, cutInput);
+    expect(state.entities[0]!.cut).toBe(true);
+    expect(state.shutter.last).toMatchObject({ penalised: true, score: 0, combo: 0 });
+    expect(state.score).toBe(0);
+    expect(state.film).toBeCloseTo(film - TUNING.penalisedCutFilm - 2 / TUNING.tickRate);
   });
 });
 
@@ -222,13 +273,13 @@ describe('bible M2: Adaptive policy helpers', () => {
   });
 });
 
-// Fixed replay hashes after the bible M2 rule changes (DECISIONS 2026-10-13, round 2) and the graded out-of-frame rule (DECISIONS 2026-10-13, LOST HER) and fast zoom (DECISIONS 2026-10-13, fast zoom) and the defang ACTION beat / gate film burn / per-scene beat (DECISIONS 2026-10-13, loop review round 2). Regenerate only with a decision entry.
+// Fixed replay hashes after the bible M2 rule changes (DECISIONS 2026-10-13, round 2) and the graded out-of-frame rule (DECISIONS 2026-10-13, LOST HER) and fast zoom (DECISIONS 2026-10-13, fast zoom) and the defang ACTION beat / gate film burn / per-scene beat (DECISIONS 2026-10-13, loop review round 2) and the B1 Shutter (DECISIONS 2026-10-14). Regenerate only with a decision entry.
 describe('fixed replay hashes', () => {
   const frames = Array.from({ length: 10_000 }, (_, i) => ({ ...NEUTRAL_INPUT, panX: (i % 240 < 120 ? 30 : -30), zoom: i % 300 < 150 ? 0 : 1 }));
   const fixtures: Record<number, [string, string, string]> = {
-    1: ['4500bdc4', '4339a9ff', '9525b1c6'],
-    19: ['5f4a7114', 'af0d6135', '6ece64b1'],
-    2026: ['ec251869', '85774155', 'fe881e70'],
+    1: ['c1fc28e4', 'f39cd2b9', 'e1358833'],
+    19: ['581c7b32', '0420eaef', 'a5251fd7'],
+    2026: ['11a5d388', '55a21dfb', 'aa5b21f6'],
   };
   it.each(Object.entries(fixtures))('seed %s: strip world, generated strip and a full fair Adaptive Shoot', (seedText, [world, generated, shoot]) => {
     const seed = Number(seedText);

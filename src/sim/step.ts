@@ -1,13 +1,13 @@
-import { inFrame, projectPoint, projectedAabb } from './frame';
-import { activeShot, markShots, releasing, shotBlocksTalent } from './framing';
+import { inFrame, projectPoint } from './frame';
+import { activeShot, gateOpen, gateReleaseSeconds, markShots, releasing, shotBlocksTalent } from './framing';
 import { lodTier, type LodTier } from './lod';
 import { lensAspect, lensLodFactor } from './lenses';
 import { TUNING } from './tuning';
 import { pathZAt } from '../gen/generate';
 import { advanceRumourRadius, advanceWrap, isDeletedByWrap, isWrapActive, monitorConeContains, redMonitorOverlapsTarget, type MonitorCone } from './m6';
-import type { CastEntity, FailReason, InputFrame, SimState } from './types';
+import type { CastEntity, CutDistance, CutResult, EntityKind, FailReason, InputFrame, SimState } from './types';
 
-export const NEUTRAL_INPUT: InputFrame = { panX: 0, panZ: 0, zoom: 0, rotate: 0, hold: false, steady: false };
+export const NEUTRAL_INPUT: InputFrame = { panX: 0, panZ: 0, zoom: 0, rotate: 0, hold: false, steady: false, cut: false };
 const dt = 1 / TUNING.tickRate;
 const distance = (ax: number, az: number, bx: number, bz: number) => Math.hypot(ax - bx, az - bz);
 
@@ -20,11 +20,14 @@ function detailFactor(state: SimState, x: number, z: number) {
   return lensLodFactor(state.lens, projected.x, projected.y);
 }
 
+function inMonitor(state: SimState, x: number, z: number) {
+  return state.entities.some((monitor) => monitor.kind === 'monitor' && monitor.spawned && !monitor.cut
+    && monitorConeContains(monitorCone(monitor), { x, z }));
+}
+
 function entityInFrame(state: SimState, entity: CastEntity) {
   if (entity.kind === 'monitor') return true;
-  const inMonitor = state.entities.some((monitor) => monitor.kind === 'monitor' && monitor.spawned && !monitor.cut
-    && monitorConeContains(monitorCone(monitor), { x: entity.x, z: entity.z }));
-  if (inMonitor) return true;
+  if (inMonitor(state, entity.x, entity.z)) return true;
   if (entity.kind === 'extras' && entity.members) {
     return entity.members.some((member) => !member.cut && framed(state, entity.x + member.dx, entity.z + member.dz, TUNING.extrasMemberRadius, 0.5));
   }
@@ -34,15 +37,6 @@ function entityInFrame(state: SimState, entity: CastEntity) {
 
 function monitorCone(entity: CastEntity): MonitorCone {
   return { origin: { x: entity.x, z: entity.z }, heading: entity.heading ?? 0, range: entity.range ?? 0, halfAngle: entity.halfAngle ?? 0 };
-}
-
-/**
- * Framed out but not cut: far Glass is unloaded intact (it only shatters within reach of the Talent, where it was
- * just on screen). Everything else framed out is cut, at any distance — including a gate's stand-in (loop review
- * 2026-10-13: a deliberate far cut removes it; it is re-dressed on its mark when the shot is called, see markShots).
- */
-function unloadsIntact(state: SimState, entity: CastEntity) {
-  return entity.kind === 'glass' && distance(entity.x, entity.z, state.talent.x, state.talent.z) > TUNING.glassShatterRadius;
 }
 
 /** Mirrors the HUD call sheet ("Coming in"): unspawned cast just past the gate edge. */
@@ -92,22 +86,71 @@ function fail(state: SimState, reason: FailReason) {
   if (!state.failed) state.failed = reason;
 }
 
-function outsideFrame(state: SimState, x: number, z: number, radius: number, height: number) {
-  const aspect = lensAspect(state.lens);
-  const bounds = projectedAabb(x, z, radius, height, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw);
-  const halfBand = state.lens === 'tilt-shift' ? 0.2 : 0.5;
-  const center = state.lens === 'tilt-shift' ? state.camera.focusOffset : 0;
-  const dx = Math.max(-aspect / 2 - bounds.right, bounds.left - aspect / 2);
-  const dy = Math.max(center - halfBand - bounds.top, bounds.bottom - (center + halfBand));
-  return Math.max(dx, dy);
+/** What the shutter can slice: hazards and the set pieces that fail her. Reels, monitors and continuity props are not cut. */
+export const CUTTABLE: ReadonlySet<EntityKind> = new Set<EntityKind>(['urchin', 'boulder', 'glass', 'bridge', 'extras', 'swarm', 'stagehand', 'red-monitor']);
+
+export function cutDistance(d: number): CutDistance {
+  return d <= TUNING.closeCutRadius ? 'close' : d <= TUNING.farCutRadius ? 'normal' : 'too-far';
 }
 
-function noteFrameCut(state: SimState, entity: CastEntity) {
-  state.cuts.push(entity.id);
-  if (entity.kind === 'reel' || entity.kind === 'monitor' || entity.kind === 'red-monitor' || entity.kind === 'continuity') return;
-  if (distance(entity.x, entity.z, state.talent.x, state.talent.z) > TUNING.closeCallRadius) return;
-  state.closeCalls += 1;
-  state.score += TUNING.closeCallScore;
+/**
+ * CUT (concept review B1, DECISIONS 2026-10-14). Every live cuttable hazard FULLY outside the frame is cut in one hit
+ * (a crowd loses every member outside it). Framing alone never cuts. A defang stand-in falls only to a close cut, which
+ * clears its mark; farther, it is listed as held. Scoring: productive cuts (anything within farCutRadius) build the combo
+ * and score by class × combo; close cuts refund film. A CUT that cuts nothing is missed (film cost, combo break); a CUT
+ * while she is not framed is penalised (film cost, combo break, no score). Too-far-only cuts neither score nor break.
+ */
+function fireShutter(state: SimState, talentFramed: boolean): CutResult {
+  const { talent } = state;
+  const hits: CutResult['hits'] = [];
+  let defanged = false;
+  for (const entity of state.entities) {
+    if (entity.cut || !entity.spawned || !CUTTABLE.has(entity.kind)) continue;
+    if (entity.kind === 'extras' && entity.members) {
+      const outside = entity.members.filter((member) => !member.cut && !framed(state, entity.x + member.dx, entity.z + member.dz, TUNING.extrasMemberRadius, 0.5)
+        && !inMonitor(state, entity.x + member.dx, entity.z + member.dz));
+      if (!outside.length) continue;
+      for (const member of outside) member.cut = true;
+      const nearest = Math.min(...outside.map((member) => distance(entity.x + member.dx, entity.z + member.dz, talent.x, talent.z)));
+      hits.push({ id: entity.id, kind: entity.kind, distance: cutDistance(nearest) });
+      if (entity.members.every((member) => member.cut)) { entity.cut = true; state.cuts.push(entity.id); }
+      continue;
+    }
+    if (entityInFrame(state, entity)) continue;
+    const reach = cutDistance(distance(entity.x, entity.z, talent.x, talent.z));
+    if (entity.gate !== undefined && reach !== 'close') { hits.push({ id: entity.id, kind: entity.kind, distance: reach, held: true }); continue; }
+    entity.cut = true;
+    state.cuts.push(entity.id);
+    hits.push({ id: entity.id, kind: entity.kind, distance: reach });
+    const shot = entity.gate !== undefined ? state.shots?.[entity.gate] : undefined;
+    if (shot && !shot.done) {
+      // She walks on after the ACTION beat if the mark was holding her; a mark cleared before she reached it never holds her.
+      if (gateOpen(state, entity.gate!)) shot.releaseTick = state.tick + Math.round(gateReleaseSeconds(state) * TUNING.tickRate);
+      shot.done = true;
+      defanged = true;
+    }
+  }
+  const cut = hits.filter((hit) => !hit.held);
+  const close = cut.filter((hit) => hit.distance === 'close').length;
+  const productive = cut.some((hit) => hit.distance !== 'too-far');
+  const missed = cut.length === 0;
+  const penalised = !missed && !talentFramed;
+  const shutter = state.shutter;
+  let score = 0;
+  let film = 0;
+  if (missed || penalised) {
+    shutter.combo = 0;
+    film = -(missed ? TUNING.missedCutFilm : TUNING.penalisedCutFilm);
+  } else if (productive) {
+    shutter.combo += 1;
+    const base = cut.reduce((sum, hit) => sum + (hit.distance === 'close' ? TUNING.closeCutScore : hit.distance === 'normal' ? TUNING.normalCutScore : 0), 0);
+    score = Math.round(base * (1 + TUNING.comboStep * (shutter.combo - 1)));
+    film = close * TUNING.closeCutFilm;
+    state.closeCalls += close;
+  }
+  state.score += score;
+  state.film += film;
+  return { tick: state.tick, hits, missed, penalised, defanged, combo: shutter.combo, score, film };
 }
 
 /** Log zoom speed per second for an input in −127…127 (positive tightens): gentle near zero, fast at full input. */
@@ -206,11 +249,18 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
   const talentTravel = distance(talentBeforeMove.x, talentBeforeMove.z, talent.x, talent.z);
   state.travelDistance += talentTravel;
   state.totalDistance += talentTravel;
-  const talentInMonitor = state.entities.some((monitor) => monitor.kind === 'monitor' && monitor.spawned && !monitor.cut
-    && monitorConeContains(monitorCone(monitor), { x: talent.x, z: talent.z }));
-  if (talentInMonitor || framed(state, talent.x, talent.z, TUNING.talentRadii[Math.min(talentTier, 3)], 1.4)) talent.offscreenTicks = 0;
+  if (inMonitor(state, talent.x, talent.z) || framed(state, talent.x, talent.z, TUNING.talentRadii[Math.min(talentTier, 3)], 1.4)) talent.offscreenTicks = 0;
   else talent.offscreenTicks++;
   if (talent.offscreenTicks >= TUNING.offscreenFailSeconds * TUNING.tickRate) fail(state, 'lost-talent');
+
+  // The shutter: CUT fires only when fully charged (a press while recharging does nothing), then recharges from empty.
+  const shutter = state.shutter = { ...previous.shutter };
+  if (input.cut && shutter.charge >= 1) {
+    shutter.charge = 0;
+    shutter.last = fireShutter(state, talent.offscreenTicks === 0);
+  } else {
+    shutter.charge = Math.min(1, shutter.charge + dt / TUNING.shutterRechargeSeconds);
+  }
 
   for (const entity of state.entities) {
     if (entity.cut) continue;
@@ -266,16 +316,7 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
     entity.age++;
     entity.x += entity.vx * dt;
     entity.z = entity.pathBound ? pathZAt(state.path, entity.x) : entity.z + entity.vz * dt;
-    const visible = entityInFrame(state, entity);
-    const fragileHold = (entity.kind === 'glass' || entity.kind === 'bridge')
-      && outsideFrame(state, entity.x, entity.z, radius, 0.8) < TUNING.fragileKeepMargin;
-    if (!visible && !fragileHold && entity.kind !== 'swarm' && entity.kind !== 'rumour') {
-      if (unloadsIntact(state, entity)) { entity.spawned = false; continue; }
-      entity.cut = true;
-      noteFrameCut(state, entity);
-      continue;
-    }
-    if (!visible) continue;
+    // Once spawned, cast stays live off-frame (moving, and lethal on contact) until the shutter cuts it.
     if (entity.kind === 'extras' && entity.members) {
       for (const member of entity.members) {
         if (member.cut) continue;
@@ -285,12 +326,6 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
         if (member.dz < -0.8 || member.dz > 0.8) member.vz *= -1;
         member.dx = Math.max(-1.8, Math.min(1.8, member.dx));
         member.dz = Math.max(-0.8, Math.min(0.8, member.dz));
-        if (!framed(state, entity.x + member.dx, entity.z + member.dz, TUNING.extrasMemberRadius, 0.5)) member.cut = true;
-      }
-      if (entity.members.every((member) => member.cut)) {
-        entity.cut = true;
-        state.cuts.push(entity.id);
-        continue;
       }
     }
     const close = distance(entity.x, entity.z, talent.x, talent.z) <= radius + TUNING.talentRadii[Math.min(talentTier, 3)];

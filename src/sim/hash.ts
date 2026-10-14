@@ -15,7 +15,8 @@ export function stateHash(state: SimState): string {
     consumed: state.consumed,
     film: q(state.film), failed: state.failed, score: state.score, cuts: state.cuts,
     closeCalls: state.closeCalls ?? 0,
-    shots: state.shots?.map((shot) => [q(shot.at), shot.kind, shot.done, shot.opened ?? null]) ?? null,
+    shutter: state.shutter ? [q(state.shutter.charge), state.shutter.combo] : null,
+    shots: state.shots?.map((shot) => [q(shot.at), shot.kind, shot.done, shot.releaseTick ?? null]) ?? null,
     shoot: state.shoot ? [state.shoot.sceneIndex, state.shoot.biome, state.shoot.wrapDistance === null ? null : q(state.shoot.wrapDistance), state.shoot.wrapCaught, state.shoot.finaleTicks] : null,
   });
   let hash = 0x811c9dc5;

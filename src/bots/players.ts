@@ -5,7 +5,7 @@ import { createGeneratedState } from '../sim/world';
 import type { InputFrame, SimState } from '../sim/types';
 
 export type BotKind = 'tracker' | 'wide' | 'close' | 'adaptive' | 'chaos' | 'smart';
-const neutral: InputFrame = { panX: 0, panZ: 0, zoom: 0, rotate: 0, hold: false, steady: false };
+const neutral: InputFrame = { panX: 0, panZ: 0, zoom: 0, rotate: 0, hold: false, steady: false, cut: false };
 const sceneTickLimit = (TUNING.startFilm + 14 * TUNING.reelFilm + TUNING.sceneFilm) * TUNING.tickRate;
 
 function direction(value: number): number {
@@ -60,7 +60,7 @@ export function inputForBot(state: SimState, bot: BotKind, random: () => number 
   if (bot === 'chaos') return {
     panX: Math.round(random() * 254 - 127), panZ: Math.round(random() * 254 - 127),
     zoom: Math.round(random() * 254 - 127), rotate: random() < 0.02 ? (random() < 0.5 ? -1 : 1) : 0,
-    hold: random() < 0.01, steady: random() < 0.1,
+    hold: random() < 0.01, steady: random() < 0.1, cut: random() < 0.02,
   };
   const glassAhead = bot === 'adaptive' ? state.entities
     .filter((entity) => !entity.cut && entity.kind === 'glass' && entity.x - state.talent.x > -2 && entity.x - state.talent.x < 22)
@@ -90,7 +90,7 @@ export function inputForBot(state: SimState, bot: BotKind, random: () => number 
     // At an open defang gate, cut the nearest visible hazard close: put the frame edge between it and the Talent.
     const closeTarget = shotGate === 'defang' ? state.entities
       .filter((entity) => !entity.cut && entity.spawned && (entity.kind === 'urchin' || entity.kind === 'boulder' || entity.kind === 'stagehand')
-        && Math.hypot(entity.x - talent.x, entity.z - talent.z) <= TUNING.closeCallRadius)
+        && Math.hypot(entity.x - talent.x, entity.z - talent.z) <= TUNING.closeCutRadius)
       .sort((a, b) => Math.hypot(a.x - talent.x, a.z - talent.z) - Math.hypot(b.x - talent.x, b.z - talent.z))[0] : undefined;
     const hide = memory.hostile && Math.hypot(memory.hostile.x - talent.x, memory.hostile.z - talent.z) <= memory.hostile.range + 6
       ? cutFraming(state, memory.hostile, 0.55, 0.8, { keepAxis: memory.hideAxis, minWidth: 1.5 }) : null;

@@ -57,9 +57,19 @@ describe('balance bots', () => {
   it('gatekeeper zooms out for an open defang gate and tracks at 24 otherwise', () => {
     const state = createState(1, []);
     const policy = createPolicy('gatekeeper', 1);
-    expect(policy.act({ state, gate: 'defang' }).zoom).toBeLessThan(0);
-    expect(policy.act({ state, gate: null }).zoom).toBeGreaterThan(0);
-    expect(policy.act({ state: { ...state, camera: { ...state.camera, zoom: 40 } }, gate: 'defang' }).zoom).toBe(0);
+    expect(policy.act({ state, gate: 'defang', threats: [] }).zoom).toBeLessThan(0);
+    expect(policy.act({ state, gate: null, threats: [] }).zoom).toBeGreaterThan(0);
+    expect(policy.act({ state: { ...state, camera: { ...state.camera, zoom: 40 } }, gate: 'defang', threats: [] }).zoom).toBe(0);
+  });
+
+  it('passive bots never press CUT; spam presses it whenever the shutter is charged', () => {
+    const state = createState(1, []);
+    for (const bot of ['tracker', 'gatekeeper', 'metronome', 'wide', 'close'] as const) {
+      expect(createPolicy(bot, 1).act({ state, gate: 'defang', threats: [] }).cut).toBe(false);
+    }
+    const spam = createPolicy('spam', 1);
+    expect(spam.act({ state, gate: null, threats: [] }).cut).toBe(true);
+    expect(spam.act({ state: { ...state, shutter: { ...state.shutter, charge: 0.5 } }, gate: null, threats: [] }).cut).toBe(false);
   });
 
   it('jitter variants are seeded within 150–300 ms and ±5% aim', () => {
@@ -113,7 +123,7 @@ describe('balance report', () => {
     expect(parseArgs([]).modes).toEqual(['strip', 'shoot']);
     expect(() => parseArgs(['--stage=3'])).toThrow(/not shipped/);
     expect(() => parseArgs(['--speed=2'])).toThrow(/Unknown option/);
-    expect(balanceTasks({ stage: 0, mode: 'strip', seeds: 2, jitter: 3, workers: 1 })).toHaveLength(2 * (9 + 2 * 3));
+    expect(balanceTasks({ stage: 0, mode: 'strip', seeds: 2, jitter: 3, workers: 1 })).toHaveLength(2 * (10 + 2 * 3));
   });
 
   it('is deterministic per task', () => {

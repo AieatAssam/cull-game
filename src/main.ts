@@ -108,6 +108,8 @@ let dragTarget: DragTarget | null = null;
 /** A short HUD line after a far cut or a re-dressed stand-in; it overrides the toast until `until`. */
 let cutNote: { text: string; until: number } | null = null;
 let rotationPulse: -1 | 0 | 1 = 0;
+/** Space (or the CUT button, step 2) went down since the last tick. */
+let cutPress = false;
 let simAccumulator = 0;
 let previousTime = 0;
 let frameSamples: number[] = [];
@@ -124,7 +126,7 @@ shell.innerHTML = `
     <div class="gate-wrap"><div class="gate-label"><span id="gate-ratio">VIEWFINDER · GATE 1:1</span><span id="lod">SHE IS IN A MEDIUM SHOT</span></div><div class="gate" id="gate"><div class="thirds"></div><div class="focus-band" id="focus-band" hidden></div><div class="gate-corners"></div><div class="sprockets left"></div><div class="sprockets right"></div><div id="mount" class="mount"></div><div class="depth-blur top"></div><div class="depth-blur bottom"></div><div class="lost-edge" id="lost-edge"></div><div class="lost-arrow hidden" id="lost-arrow"><span>➤</span><b>HER</b></div><div class="lost-banner hidden" id="lost-banner"><strong>LOST HER</strong><small id="lost-count">2.5 s TO CUT</small><div class="lost-track"><i id="lost-bar"></i></div></div><div class="title-card hidden" id="title-card"><p class="title-kicker">SCENE 01 · TAKE 01</p><h1>CULL</h1></div><div class="cut-flash" id="cut-flash"></div><div class="slice" id="slice"></div><div class="peel" id="peel"></div><div class="cut-stamp" id="cut-stamp">CUT</div><i class="spark" style="--dx:-18px;--dy:-24px;left:70%;top:40%"></i><i class="spark" style="--dx:16px;--dy:-20px;left:72%;top:46%"></i><i class="spark" style="--dx:8px;--dy:18px;left:68%;top:50%"></i><i class="spark" style="--dx:-22px;--dy:8px;left:74%;top:42%"></i></div><div class="gate-notes"><p class="frame-message" id="message">Keep her in the shot.</p><div class="tutorial hidden" id="tutorial" role="dialog" aria-labelledby="tutorial-text"><p class="tutorial-kicker" id="tutorial-kicker"></p><p class="tutorial-text" id="tutorial-text"></p><button id="tutorial-next" type="button">CONTINUE</button></div></div><div class="gate-foot"><span>55° TABLETOP</span><span id="status">ROLLING</span></div></div>
     <aside class="margin margin-right"><div class="camera-mark">Slate<small>CAM 01</small></div><div class="call-sheet"><span>CALL SHEET</span><div id="call-sheet">Looking outside the frame…</div></div></aside>
   </div>
-  <footer class="controlbar"><div class="controls"><span><kbd>WASD</kbd> PAN</span><span><kbd>−</kbd> / <kbd>+</kbd> ZOOM</span><span><kbd>SPACE</kbd> HOLD</span><span><kbd>Q</kbd> / <kbd>E</kbd> ROTATE</span></div><p class="touch-hint">Drag to frame · pinch to zoom</p><div class="mobile-controls"><button id="hold" type="button" aria-label="Hold Talent">HOLD</button><div class="touch-buttons"><button id="rotate-left" type="button" aria-label="Rotate left">↺</button><button id="rotate-right" type="button" aria-label="Rotate right">↻</button><button id="zoom-out" type="button" aria-label="Zoom out">−</button><button id="zoom-in" type="button" aria-label="Zoom in">+</button></div><label class="zoom-slider">ZOOM <input id="zoom-slider" aria-label="Zoom" type="range" min="10" max="48" value="30" /></label></div><div class="assist-controls"><button id="left-hand" type="button" aria-pressed="false">LEFT HAND</button><button id="overcrank" type="button" aria-pressed="false">75% SPEED</button></div><div class="film"><span>FILM</span><div class="film-track"><i id="filmbar"></i></div><b id="film">90s</b><em id="film-drain" hidden>−${TUNING.offscreenFilmDrainPerSecond}s/s</em></div></footer>
+  <footer class="controlbar"><div class="controls"><span><kbd>WASD</kbd> PAN</span><span><kbd>−</kbd> / <kbd>+</kbd> ZOOM</span><span><kbd>SPACE</kbd> CUT</span><span><kbd>H</kbd> HOLD</span><span><kbd>Q</kbd> / <kbd>E</kbd> ROTATE</span></div><p class="touch-hint">Drag to frame · pinch to zoom</p><div class="mobile-controls"><button id="hold" type="button" aria-label="Hold Talent">HOLD</button><div class="touch-buttons"><button id="rotate-left" type="button" aria-label="Rotate left">↺</button><button id="rotate-right" type="button" aria-label="Rotate right">↻</button><button id="zoom-out" type="button" aria-label="Zoom out">−</button><button id="zoom-in" type="button" aria-label="Zoom in">+</button></div><label class="zoom-slider">ZOOM <input id="zoom-slider" aria-label="Zoom" type="range" min="10" max="48" value="30" /></label></div><div class="assist-controls"><button id="left-hand" type="button" aria-pressed="false">LEFT HAND</button><button id="overcrank" type="button" aria-pressed="false">75% SPEED</button></div><div class="film"><span>FILM</span><div class="film-track"><i id="filmbar"></i></div><b id="film">90s</b><em id="film-drain" hidden>−${TUNING.offscreenFilmDrainPerSecond}s/s</em></div></footer>
   <div class="end-card hidden" id="end-card"><div class="end-stamp">TAKE ENDED</div><h1 id="end-title">CUT</h1><p id="end-detail"></p><p id="share-card"></p><div id="grade-detail" class="grade-detail"></div><details class="grade-method"><summary>How the grade works</summary><p>The grade averages four things: how often she sits on a thirds mark, how smooth the camera was, close cuts (10 points each, up to 100), and how many film reels you kept. S is 90 or above, A is 75, B is 60, and the rest is C.</p></details><details class="lens-feats"><summary>LENS FEATS</summary><ul id="lens-feat-list"></ul></details><label class="next-lens">NEXT TAKE LENS <select id="lens-select" aria-label="Lens for next take"></select></label><div class="end-actions"><a id="download-sheet" download>CONTACT SHEET ↓</a><button id="make-reel">DIRECTOR'S REEL</button><a id="download-reel" class="hidden" download>WEBM ↓</a><button id="share">SHARE</button><a id="replay-link" target="_blank" rel="noreferrer">REPLAY ↗</a></div><details class="filmography"><summary>FILMOGRAPHY · LAST 5 TAKES</summary><ol id="filmography-list"></ol></details><button id="restart">NEW TAKE ↗</button></div>
 `;
 app.append(shell);
@@ -471,7 +473,7 @@ function talentPose(): 'walk' | 'idle' | 'flinch' | 'fall' {
   if (state.failed === 'hit' || state.failed === 'fell') return 'fall';
   const danger = state.entities.some((entity) => entity.spawned && !entity.cut
     && entity.kind !== 'reel' && entity.kind !== 'monitor' && entity.kind !== 'continuity'
-    && Math.hypot(entity.x - state.talent.x, entity.z - state.talent.z) <= TUNING.closeCallRadius);
+    && Math.hypot(entity.x - state.talent.x, entity.z - state.talent.z) <= TUNING.closeCutRadius);
   if (danger && !state.failed) return 'flinch';
   if (state.waiting || state.failed) return 'idle';
   return 'walk';
@@ -1096,7 +1098,7 @@ function updateHud() {
 
 function buildInput(): InputFrame {
   const composed = composeInput({
-    keys, holdButton, dragTarget, rotationPulse, frameInput, zoomTarget: sliderZoomTarget,
+    keys, holdButton, dragTarget, rotationPulse, cutPress, frameInput, zoomTarget: sliderZoomTarget,
     zoomPress: zoomPress && { direction: zoomPress.direction, heldSeconds: (performance.now() - zoomPress.since) / 1000 },
   }, state);
   sliderZoomTarget = composed.zoomTarget;
@@ -1160,6 +1162,7 @@ function advanceTick(forcedInput?: InputFrame) {
   audio.update(state);
   frameInput = { ...NEUTRAL_INPUT };
   rotationPulse = 0;
+  cutPress = false;
 }
 function showCut(entity: { x: number; z: number }, label: 'CUT' | 'TOO FAR') {
   $('#cut-stamp').textContent = label;
@@ -1222,6 +1225,7 @@ window.addEventListener('keydown', (event) => {
   keys.add(event.key.toLowerCase());
   const zoomDirection = zoomKeyDirection(event.key);
   if (zoomDirection && !event.repeat) startZoomPress(zoomDirection);
+  if (!event.repeat && event.key === ' ') cutPress = true;
   if (!event.repeat && event.key.toLowerCase() === 'q') rotationPulse = -1;
   if (!event.repeat && event.key.toLowerCase() === 'e') rotationPulse = 1;
   if (event.key === 'Escape' || event.key.toLowerCase() === 'p') paused = !paused;

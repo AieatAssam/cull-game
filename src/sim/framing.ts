@@ -2,8 +2,12 @@ import { seededRange } from './rng';
 import { TUNING } from './tuning';
 import type { CastEntity, PathFork, SimState } from './types';
 
-/** `opened` is the close-call count when the Talent reached the gate; defang needs a close cut after that. */
-export interface ShotGoal { at: number; kind: 'defang' | 'portrait'; done: boolean; opened?: number; }
+/**
+ * A shot-list gate. Defang (DECISIONS 2026-10-14): its mark is cleared only by a CUT made while the stand-in Urchin is
+ * fully outside the frame AND within `closeCutRadius` of her (`step`'s shutter). A farther CUT leaves the stand-in held
+ * on its mark. Portrait: a framing between 16 and 34 once defang is done.
+ */
+export interface ShotGoal { at: number; kind: 'defang' | 'portrait'; done: boolean; releaseTick?: number; }
 
 type PathPoint = { x: number; z: number };
 
@@ -72,25 +76,11 @@ export function gateOpen(state: SimState, index: number): boolean {
   return Boolean(shot && !shot.done && state.talent.x >= shot.at - 0.35 && state.shots!.slice(0, index).every((before) => before.done));
 }
 
+/** Portrait is made by framing alone; defang is made by the shutter (`step`). */
 export function markShots(state: SimState) {
   const shots = state.shots;
   if (!shots?.length) return;
-  const defangIndex = shots.findIndex((shot) => shot.kind === 'defang');
-  const defang = shots[defangIndex];
-  if (defang && !defang.done) {
-    if (defang.opened === undefined && gateOpen(state, defangIndex)) defang.opened = state.closeCalls;
-    // Bible M2: a zoom alone no longer defangs; it needs a close cut made since the gate opened.
-    if (defang.opened !== undefined && state.closeCalls > defang.opened) {
-      defang.done = true;
-      defang.releaseTick = state.tick + Math.round(gateReleaseSeconds(state) * TUNING.tickRate);
-      // The stand-in leaves its mark once the shot is made, whoever was cut.
-      for (const entity of state.entities) if (entity.gate === defangIndex && !entity.cut) { entity.cut = true; entity.spawned = false; }
-    }
-    // A stand-in cut early (far from her) is re-dressed on its mark once the shot is called: the shot still needs a close cut.
-    if (!defang.done && defang.opened !== undefined) {
-      for (const entity of state.entities) if (entity.gate === defangIndex && entity.cut) { entity.cut = false; entity.spawned = false; entity.age = 0; }
-    }
-  }
+  const defang = shots.find((shot) => shot.kind === 'defang');
   const portrait = shots.find((shot) => shot.kind === 'portrait');
   if (portrait && !portrait.done && defang?.done && state.camera.zoom >= 16 && state.camera.zoom <= 34) portrait.done = true;
 }

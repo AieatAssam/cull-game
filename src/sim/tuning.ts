@@ -33,11 +33,22 @@ export const TUNING = {
   startZoom: 30,
   sceneFilm: 30,
   reelFilm: 15,
-  closeCallRadius: 1.5,
-  closeCallScore: 250,
-  // Glass and bridges this far past the gate (projected) stay, so a zoom twitch cannot delete the floor.
-  fragileKeepMargin: 0.12,
-  // Glass framed out farther than this from the Talent is unloaded intact; nearer, it shatters (bible M2: no unseen holes).
+  // Shutter (concept review B1, DECISIONS 2026-10-14). CUT slices every live hazard fully outside the frame, then recharges.
+  shutterRechargeSeconds: 1.5,
+  // Distance classes from her: close ≤ closeCutRadius < normal ≤ farCutRadius < too-far.
+  closeCutRadius: 1.5,
+  farCutRadius: 8,
+  // Score per hazard by class, times the combo multiplier 1 + comboStep × (combo − 1). Too-far cuts score nothing.
+  closeCutScore: 250,
+  normalCutScore: 50,
+  comboStep: 0.5,
+  // Film refunded per close cut; film a missed CUT (nothing cut) wastes; film a CUT costs when she is not framed.
+  closeCutFilm: 2,
+  missedCutFilm: 2,
+  penalisedCutFilm: 4,
+  // Off-frame threats (edge indicators) are listed when they would reach her within this many seconds.
+  threatHorizonSeconds: 6,
+  // Defang marks stand this far from Glass on the walked side: the close cut at the mark would shatter it.
   glassShatterRadius: 6,
   urchinSpeed: 1.5,
   // Bible M2 "Night/finale hazard density and speed": Urchin roll speed by scene difficulty (Backlot, City, Night, finale).

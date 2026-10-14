@@ -16,7 +16,7 @@ class MemoryStorage implements StorageLike {
   setItem(key: string, value: string) { this.values.set(key, value); }
 }
 
-const neutral: InputFrame = { panX: 0, panZ: 0, zoom: 0, rotate: 0, hold: false, steady: false };
+const neutral: InputFrame = { panX: 0, panZ: 0, zoom: 0, rotate: 0, hold: false, steady: false, cut: false };
 
 describe('M9 daily seed, filmography, and replay data', () => {
   it('scores transparent cinematography metrics and detects thirds intersections', () => {
@@ -45,7 +45,7 @@ describe('M9 daily seed, filmography, and replay data', () => {
     const frames = Array.from({ length: 8 * 60 * 60 }, (_, i) => ({
       panX: i % 255 - 127, panZ: Math.floor(i / 255) % 255 - 127,
       zoom: Math.floor(i / (255 * 255)) % 255 - 127,
-      rotate: ([0, 1, -1] as const)[i % 3]!, hold: i % 2 === 1, steady: i % 5 === 1,
+      rotate: ([0, 1, -1] as const)[i % 3]!, hold: i % 2 === 1, steady: i % 5 === 1, cut: false,
     }));
     expect(decodeReplay(encodeReplay(7, frames))).toEqual({ seed: 7, frames, lens: '35mm' });
   });
