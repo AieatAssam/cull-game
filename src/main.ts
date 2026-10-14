@@ -32,7 +32,7 @@ import { makeContactSheet, type ContactFrame } from './ui/contact-sheet';
 import { filmStocks, loadFilmStock, saveFilmStock, unlockedFilmStocks, type FilmStock } from './meta/film-stock';
 import { lensFeats, unlockedLenses } from './meta/lenses';
 import { monitorConeContains } from './sim/m6';
-import { frameView, lensLodFactor, type GateId, lensRenderTicks, type LensId } from './sim/lenses';
+import { applyGate, frameView, lensLodFactor, type GateId, lensRenderTicks, type LensId } from './sim/lenses';
 import { COACH_LINES, closeCallsForGrade, describeShot } from './ui/describe-shot';
 import { cutBanner, cutStampText, gatePoint, takeReadout, threatMarkers } from './ui/shutter-hud';
 import { offFrameThreats } from './sim/threats';
@@ -80,11 +80,11 @@ function takeGate(): GateId {
   if (requested === 'square' || requested === 'portrait') return requested;
   return portraitPhone.matches ? 'portrait' : 'square';
 }
-const applyGate = (take: SimState) => { const gate = takeGate(); if (gate !== 'square') take.gate = gate; };
+const applyTakeGate = (take: SimState) => applyGate(take, takeGate());
 let botRandom = mulberry32((seed ^ 0xb07b07) >>> 0);
 let state: SimState = createTake(seed);
 state.lens = pendingLens;
-applyGate(state);
+applyTakeGate(state);
 if (state.lens === 'long-lens') state.camera.zoom = TUNING.minZoom;
 let replayIndex = 0;
 let inputLog: InputFrame[] = [];
@@ -976,7 +976,7 @@ async function renderReplayContactFrames(): Promise<ScoredFrame[]> {
   try {
     const initial = createTake(terminalState.seed);
     initial.lens = terminalState.lens;
-    if (terminalState.gate) initial.gate = terminalState.gate;
+    applyGate(initial, terminalState.gate);
     if (initial.lens === 'long-lens') initial.camera.zoom = TUNING.minZoom;
     selected = (await selectReplayContactFrames(initial, inputLog, terminalState)).frames;
     const rendered: ScoredFrame[] = [];
@@ -1560,7 +1560,7 @@ $('#make-reel').addEventListener('click', () => {
 function newTake(nextSeed: number) {
   if (nextSeed !== state.seed) dailyRun = false;
   takeNumber++;
-  replayData = undefined; invalidReplay = false; state = createTake(nextSeed); state.lens = pendingLens; applyGate(state);
+  replayData = undefined; invalidReplay = false; state = createTake(nextSeed); state.lens = pendingLens; applyTakeGate(state);
   if (state.lens === 'long-lens') state.camera.zoom = TUNING.minZoom;
   botRandom = mulberry32((nextSeed ^ 0xb07b07) >>> 0); inputLog = []; replayIndex = 0;
   contactFrames.length = 0; closeCallFrames.length = 0; lastContactTick = 0; bestThirdsDistance = Number.POSITIVE_INFINITY;

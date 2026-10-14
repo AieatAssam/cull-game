@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createDriver } from '../src/bots/balance-bots';
 import { decodeReplay, encodeReplay } from '../src/replay/codec';
 import { stateHash } from '../src/sim/hash';
-import { frameView, type GateId } from '../src/sim/lenses';
+import { applyGate, frameView, type GateId } from '../src/sim/lenses';
 import { createShootState, stepShoot } from '../src/sim/shoot';
 import { NEUTRAL_INPUT, step } from '../src/sim/step';
 import { TUNING } from '../src/sim/tuning';
@@ -13,13 +13,10 @@ import type { SimState } from '../src/sim/types';
 // change portrait values only deliberately, with a DECISIONS entry.
 const GOLDEN: Record<GateId, Record<number, [string, string]>> = {
   square: { 1: ['c1fc28e4', 'c75d948d'], 19: ['581c7b32', '0fb14bd5'], 2026: ['11a5d388', '6ca7bec8'] },
-  portrait: { 1: ['82510f60', '309938d9'], 19: ['b6d8bd9e', '7b742fbd'], 2026: ['5eaf0fac', 'fd19b5f9'] },
+  portrait: { 1: ['64211af4', 'c10f45b0'], 19: ['4e672afa', '88679131'], 2026: ['3b349867', '116163f7'] },
 };
 
-function withGate(state: SimState, gate: GateId) {
-  if (gate !== 'square') state.gate = gate;
-  return state;
-}
+const withGate = (state: SimState, gate: GateId) => applyGate(state, gate);
 
 describe('viewfinder gate', () => {
   it('keeps the square frame identical to the lens frame and makes portrait 2:3', () => {

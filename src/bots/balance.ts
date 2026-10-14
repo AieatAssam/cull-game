@@ -15,7 +15,7 @@ import { createShootSceneState, createShootState, stepShoot } from '../sim/shoot
 import { step } from '../sim/step';
 import { TUNING } from '../sim/tuning';
 import { createGeneratedState } from '../sim/world';
-import type { GateId } from '../sim/lenses';
+import { applyGate, type GateId } from '../sim/lenses';
 import type { CastEntity, FailReason, InputFrame, SimState } from '../sim/types';
 import { createDriver, jitterTuning, type BalanceBot } from './balance-bots';
 
@@ -116,7 +116,7 @@ export function runTask(task: RunTask): RunResult {
   const advance = def.advance[task.mode];
   const maxTicks = def.maxTicks[task.mode];
   let state = def.create[task.mode](task.seed);
-  if (task.gate && task.gate !== 'square') state.gate = task.gate;
+  applyGate(state, task.gate);
   const startTick = state.tick;
   while (!state.failed && state.tick - startTick < maxTicks) state = advance(state, drive(state));
   const completed = isCompleted(task.mode, state);

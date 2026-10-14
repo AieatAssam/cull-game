@@ -1,4 +1,5 @@
 import { TUNING } from './tuning';
+import type { SimState } from './types';
 
 export type LensId = '35mm' | 'anamorphic' | 'tilt-shift' | 'fisheye' | 'long-lens' | 'super8';
 
@@ -28,4 +29,15 @@ export function lensLodFactor(lens: LensId, normalizedX: number, normalizedY: nu
 
 export function lensRenderTicks(lens: LensId): number {
   return lens === 'super8' ? 5 : 1;
+}
+
+/**
+ * Put a fresh take or scene on `gate`. Square leaves the state untouched (desktop hashes); portrait also starts the camera
+ * at `portraitStartZoom`, except Anamorphic, which keeps its own frame on any gate. Call after the lens is set.
+ */
+export function applyGate(state: SimState, gate: GateId | undefined): SimState {
+  if (!gate || gate === 'square') return state;
+  state.gate = gate;
+  if (state.lens !== 'anamorphic') state.camera.zoom = TUNING.portraitStartZoom;
+  return state;
 }

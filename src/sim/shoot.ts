@@ -2,6 +2,7 @@ import { gateCast, shotListForPath } from './framing';
 import { generateScene } from '../gen/generate';
 import { createContinuitySequence } from './m6';
 import { TUNING } from './tuning';
+import { applyGate } from './lenses';
 import { createState } from './world';
 import type { CastEntity, InputFrame, SimState } from './types';
 import { step } from './step';
@@ -38,7 +39,7 @@ function makeScene(seed: number, sceneIndex: number, carry: SimState): SimState 
   const generatedEntities = sceneKinds ? generated.entities.filter((entity) => sceneKinds.has(entity.kind)) : generated.entities;
   const next = createState(seed, [...generatedEntities, ...addM6Cast({ ...carry, path: generated.path }, seed, sceneIndex)]);
   next.lens = carry.lens;
-  if (carry.gate) next.gate = carry.gate;
+  applyGate(next, carry.gate);
   next.path = generated.path;
   next.forks = generated.forks;
   next.tiles = generated.tiles;

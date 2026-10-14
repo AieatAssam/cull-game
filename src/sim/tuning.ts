@@ -2,6 +2,8 @@ export const TUNING = {
   gateAspect: 1,
   // Portrait phone gate (2:3): visible height over width; fills a portrait phone between pause row and thumb controls. Run config, see DECISIONS 2026-10-14 (phone frame).
   portraitGateTall: 1.5,
+  // Portrait takes and scenes start one framing step tighter (medium, zoomSteps[2]) than startZoom so the Talent reads bigger on a phone. DECISIONS 2026-10-14 (phone zoom).
+  portraitStartZoom: 24,
   cameraPitch: 55,
   projectionPitchScale: 0.8191520442889918,
   projectionPitchCosine: 0.5735764363510462,
