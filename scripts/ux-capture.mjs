@@ -22,10 +22,15 @@ const views = [
 ];
 const play = '/?debug&frozen=1&seed=17&shoot=1';
 
-/** Each state gets a fresh page so localStorage (tutorial seen, mute) starts clean. */
+/**
+ * Each state gets a fresh page so localStorage (tutorial seen, mute) starts clean.
+ * Covers the title screen, slate, tutorial, in-take HUD, cut stamp, lost-her, pause menu,
+ * results (plus its expanded "more" section) and the settings screen.
+ */
 const states = [
   ['title', '/?seed=17', async () => {}],
-  ['tutorial', '/?seed=17', async (page) => { await page.locator('#tutorial-next').click(); await page.waitForTimeout(150); }],
+  ['slate', '/?seed=17', async (page) => { await page.locator('#play').click(); await page.waitForTimeout(150); }],
+  ['tutorial', '/?seed=17', async (page) => { await page.locator('#play').click(); await page.locator('#roll').click(); await page.waitForTimeout(150); }],
   ['in-take-hud', play, async (page) => { await page.evaluate(() => window.__cull.step(90)); }],
   ['cut-stamp', play, async (page) => {
     await page.evaluate(() => {
@@ -39,7 +44,8 @@ const states = [
   ['lost-her', play, async (page) => { await page.evaluate(() => { window.__cull.step(30); window.__cull.lostDemo(1.2); }); }],
   ['pause', play, async (page) => { await page.evaluate(() => window.__cull.step(30)); await page.keyboard.press('p'); await page.evaluate(() => window.__cull.step(0)); }],
   ['results', play, async (page) => { await page.evaluate(() => { window.__cull.step(200); window.__cull.finishForShare(); }); await page.waitForTimeout(300); }],
-  ['settings-sound', play, async (page) => { await page.evaluate(() => window.__cull.step(30)); await page.locator('#sound-summary').click({ force: true }); }],
+  ['results-more', play, async (page) => { await page.evaluate(() => { window.__cull.step(200); window.__cull.finishForShare(); }); await page.waitForTimeout(300); await page.locator('#end-more > summary').click(); await page.waitForTimeout(150); }],
+  ['settings', '/?seed=17', async (page) => { await page.locator('#title-settings').click(); await page.waitForTimeout(150); }],
 ];
 
 for (const view of views) {

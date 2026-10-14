@@ -124,18 +124,31 @@ let hitStopUntil = 0;
 /** The intro and the coach lines are cards read before the take rolls; while one shows the loop advances no ticks. */
 const TUTORIAL_STEPS = ['Nothing exists unless it is in the shot. You hold the camera. She walks. CUT slices whatever you leave outside.', ...COACH_LINES] as const;
 const tutorial = { step: 0, steps: 0, showing: false };
+/** The title screen sits in front of the slate; while it is up `tutorial.showing` is also true, so no ticks run. */
+let titleOpen = false;
+/** Takes rolled this visit: the slate's take number, and the key legend shows on the first only. */
+let takeNumber = 1;
+/** Player setting on top of the OS preference; render-only. */
+let reduceMotionSetting = false;
+const plural = (count: number, word: string) => `${count} ${word}${count === 1 ? '' : 's'}`;
 
 const shell = document.createElement('section');
 shell.className = 'stage';
 shell.innerHTML = `
   <div class="legacy-hud" aria-live="polite"><div class="brand"><strong>CULL</strong></div><div class="margin"><div class="slate">SCENE 01<br><strong>BACKLOT</strong><small>SEED <span id="seed">00001</span></small><small id="best">BEST —</small></div><span class="touch-hint">Drag to frame, pinch to zoom</span></div><span id="status">ROLLING</span><span id="timecode">01:30</span><span id="lod">SHE IS IN A MEDIUM SHOT</span><p id="message">Keep her in the shot.</p><div id="call-sheet">Looking outside the frame…</div><b class="take-score" id="take-score">TAKE ×1  0</b><div class="lost-banner hidden" id="lost-banner"><strong>Lost her</strong><small id="lost-count"></small><div class="lost-track"><i id="lost-bar"></i></div></div></div>
-  <header class="topbar"><label class="stock-control">Stock <select id="film-stock" aria-label="Film stock"><option value="clean">35 mm · clean</option><option value="kodachrome">Kodachrome · B</option><option value="bleach">Bleach bypass · A</option><option value="ilford">Ilford B&amp;W · S</option></select></label><details class="sound-settings" id="sound-settings"><summary id="sound-summary">${ICONS.sound}<span>Sound</span></summary><div class="sound-panel"><button id="mute-audio" type="button" aria-pressed="false">Mute all</button><label>Master <input id="volume-master" aria-label="Master volume" type="range" min="0" max="100" value="100" /></label><label>Music <input id="volume-music" aria-label="Music volume" type="range" min="0" max="100" value="80" /></label><label>Effects <input id="volume-sfx" aria-label="Effects volume" type="range" min="0" max="100" value="80" /></label><label><input id="mono-audio" type="checkbox" /> Mono</label><label><input id="calm-audio" type="checkbox" /> Calm mix</label></div></details><div class="assist-controls"><button id="left-hand" type="button" aria-pressed="false">Left hand</button><button id="overcrank" type="button" aria-pressed="false">75% speed</button></div><a class="daily-link" href="?daily=1">Daily</a><button class="pause-button" id="pause" type="button" aria-label="Pause game">${ICONS.pause}</button></header>
-  <div class="gate-slot"><div class="gate" id="gate"><div class="thirds"></div><div class="focus-band" id="focus-band" hidden></div><div id="mount" class="mount"></div><div class="depth-blur top"></div><div class="depth-blur bottom"></div><div class="gate-corners"></div><div class="lost-edge" id="lost-edge"></div><div class="lost-arrow hidden" id="lost-arrow"><span>${ICONS.arrow}</span><b>Her</b></div><div class="title-card hidden" id="title-card"><h1>CULL</h1></div><div class="cut-flash" id="cut-flash"></div><div class="edge-flash" id="edge-flash"></div><div class="threats" id="threats" aria-hidden="true"></div><div class="cut-layer" id="cut-layer" aria-live="polite"></div>
+  <header class="topbar"><button class="pause-button" id="pause" type="button" aria-label="Pause game">${ICONS.pause}</button></header>
+  <div class="gate-slot"><div class="gate" id="gate"><div class="thirds"></div><div class="focus-band" id="focus-band" hidden></div><div id="mount" class="mount"></div><div class="depth-blur top"></div><div class="depth-blur bottom"></div><div class="gate-corners"></div><div class="lost-edge" id="lost-edge"></div><div class="lost-arrow hidden" id="lost-arrow"><span>${ICONS.arrow}</span><b>Her</b></div><div class="cut-flash" id="cut-flash"></div><div class="edge-flash" id="edge-flash"></div><div class="threats" id="threats" aria-hidden="true"></div><div class="cut-layer" id="cut-layer" aria-live="polite"></div>
     <div class="hud" aria-hidden="true"><div class="hud-tl"><span class="rec-dot"></span><b class="hud-score" id="hud-score"><small>×1</small> 0</b></div><div class="hud-tc"><span id="gate-ratio"></span></div><div class="hud-tr"><span class="cut-banner hidden" id="cut-banner"></span><em id="film-drain" hidden>−${TUNING.offscreenFilmDrainPerSecond}s/s</em><b class="hud-counter" id="film">90s</b><span class="hud-lens" id="lens">35 mm</span></div><p class="hud-message" id="hud-message"></p><div class="shutter-meter" id="shutter-meter" role="meter" aria-label="Shutter charge" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span class="shutter-label" id="shutter-label">READY</span><div class="shutter-track"><i id="shutter-bar"></i></div></div></div>
-    <div class="film" aria-hidden="true"><div class="film-track"><i id="filmbar"></i></div></div><div class="pause-dim" aria-hidden="true">${ICONS.play}</div></div></div>
-  <div class="gate-notes"><div class="tutorial hidden" id="tutorial" role="dialog" aria-labelledby="tutorial-text"><p class="tutorial-kicker" id="tutorial-kicker"></p><p class="tutorial-text" id="tutorial-text"></p><button id="tutorial-next" type="button">Continue</button></div></div>
+    <div class="film" aria-hidden="true"><div class="film-track"><i id="filmbar"></i></div></div></div></div>
+  <div class="gate-notes"><div class="slate-card hidden" id="slate-card" role="dialog" aria-labelledby="slate-scene"><div class="slate-board"><div><small>Scene</small><b id="slate-scene">01 · BACKLOT</b></div><div><small>Take</small><b id="slate-take">1</b></div><div><small>Best</small><b id="slate-best">—</b></div></div><div class="slate-row"><label class="stock-control">Stock <select id="film-stock" aria-label="Film stock"><option value="clean">35 mm · clean</option><option value="kodachrome">Kodachrome · B</option><option value="bleach">Bleach bypass · A</option><option value="ilford">Ilford B&amp;W · S</option></select></label><small class="slate-seed">Seed <span id="slate-seed">00001</span></small><span class="slate-step" id="slate-step"></span><button id="roll" class="primary" type="button"><span>Roll camera</span>${ICONS.play}</button></div></div></div>
   <footer class="controlbar"><div class="controls"><span><kbd>WASD</kbd> pan</span><span><kbd>−</kbd><kbd>+</kbd> zoom</span><span><kbd>Space</kbd> cut</span><span><kbd>H</kbd> hold</span><span><kbd>Q</kbd><kbd>E</kbd> rotate</span><span><kbd>P</kbd> pause</span></div><div class="mobile-controls"><button id="hold" type="button" aria-label="Hold Talent">Hold</button><div class="touch-buttons"><button id="rotate-left" type="button" aria-label="Rotate left">${ICONS.rotateLeft}</button><button id="rotate-right" type="button" aria-label="Rotate right">${ICONS.rotateRight}</button><button id="zoom-out" type="button" aria-label="Zoom out">${ICONS.zoomOut}</button><button id="zoom-in" type="button" aria-label="Zoom in">${ICONS.zoomIn}</button></div><label class="zoom-slider">Zoom <input id="zoom-slider" aria-label="Zoom" type="range" min="10" max="48" value="30" /></label><button id="cut" class="cut-button" type="button" aria-label="Cut: slice everything outside the frame" style="--charge:1"><span>CUT</span></button></div></footer>
-  <div class="end-card hidden" id="end-card"><div class="end-stamp">Take ended</div><h1 id="end-title">CUT</h1><p id="end-detail"></p><p id="share-card"></p><div id="grade-detail" class="grade-detail"></div><details class="grade-method"><summary>How the grade works</summary><p>The grade averages four things: how often she sits on a thirds mark, how smooth the camera was, close cuts (10 points each, up to 100), and how many film reels you kept. S is 90 or above, A is 75, B is 60, and the rest is C.</p></details><details class="lens-feats"><summary>Lens feats</summary><ul id="lens-feat-list"></ul></details><label class="next-lens">Next take lens <select id="lens-select" aria-label="Lens for next take"></select></label><div class="end-actions"><a id="download-sheet" download>Contact sheet</a><button id="make-reel">Director's reel</button><a id="download-reel" class="hidden" download>Download reel</a><button id="share">${ICONS.share}<span>Share</span></button><a id="replay-link" target="_blank" rel="noreferrer">Replay</a></div><details class="filmography"><summary>Filmography · last 5 takes</summary><ol id="filmography-list"></ol></details><button id="restart">Another take</button></div>
+  <div class="screen title-screen hidden" id="title-screen" role="dialog" aria-label="CULL"><h1 class="wordmark">CULL</h1><p class="tagline">Nothing exists unless it is framed.</p><div class="screen-actions"><button id="play" class="primary" type="button">${ICONS.play}<span>Play</span></button><a id="title-daily" class="secondary" href="?daily=1">Daily</a><button id="title-settings" class="secondary" type="button">Settings</button></div></div>
+  <div class="screen menu hidden" id="menu" role="dialog" aria-modal="true" aria-labelledby="menu-title"><div class="menu-panel"><h2 id="menu-title">Paused</h2><div class="menu-actions"><button id="resume" class="primary" type="button">Resume</button><button id="restart-take" class="secondary" type="button">Restart take</button></div>
+    <section class="menu-section" aria-labelledby="settings-title"><h3 id="settings-title">Settings</h3><div class="sound-panel"><button id="mute-audio" type="button" aria-pressed="false">Mute all</button><label>Master <input id="volume-master" aria-label="Master volume" type="range" min="0" max="100" value="100" /></label><label>Music <input id="volume-music" aria-label="Music volume" type="range" min="0" max="100" value="80" /></label><label>Effects <input id="volume-sfx" aria-label="Effects volume" type="range" min="0" max="100" value="80" /></label><label><input id="mono-audio" type="checkbox" /> Mono</label><label><input id="calm-audio" type="checkbox" /> Calm mix</label></div><div class="menu-toggles"><button id="left-hand" type="button" aria-pressed="false">Left hand</button><button id="overcrank" type="button" aria-pressed="false">75% speed</button><button id="reduce-motion" type="button" aria-pressed="false">Reduced motion</button></div></section>
+    <section class="menu-section" aria-labelledby="legend-title"><h3 id="legend-title">Controls</h3><p class="legend-keys"><span><kbd>WASD</kbd> pan</span> <span><kbd>−</kbd><kbd>+</kbd> zoom</span> <span><kbd>Space</kbd> cut</span> <span><kbd>H</kbd> hold</span> <span><kbd>Q</kbd><kbd>E</kbd> rotate</span> <span><kbd>P</kbd> pause</span></p><p class="legend-touch">Drag to frame, pinch to zoom. CUT slices everything outside the frame. Hold keeps her on her mark.</p></section>
+    <button id="quit-title" class="text-button" type="button">Quit to title</button></div></div>
+  <div class="end-card hidden" id="end-card"><div class="end-stamp" id="end-stamp">Take 1</div><h1 id="end-title">CUT</h1><p id="end-detail"></p><div class="end-score"><b id="end-score">0</b><span class="end-grade" id="end-grade" aria-label="Grade">—</span></div><dl class="end-stats"><div><dt>Distance</dt><dd id="end-metres">0 m</dd></div><div><dt>Cuts</dt><dd id="end-cuts">0</dd></div><div><dt>Close calls</dt><dd id="end-close">0</dd></div></dl><button id="restart" class="primary" type="button">Another take</button><button id="share" class="secondary" type="button">${ICONS.share}<span>Share</span></button>
+    <details class="end-more" id="end-more"><summary>More</summary><div class="end-actions"><a id="download-sheet" download>Contact sheet</a><button id="make-reel" type="button">Director's reel</button><a id="download-reel" class="hidden" download>Download reel</a><a id="replay-link" target="_blank" rel="noreferrer">Replay</a></div><p id="share-card"></p><div id="grade-detail" class="grade-detail"></div><details class="grade-method"><summary>How the grade works</summary><p>The grade averages four things: how often she sits on a thirds mark, how smooth the camera was, close cuts (10 points each, up to 100), and how many film reels you kept. S is 90 or above, A is 75, B is 60, and the rest is C.</p></details><label class="next-lens">Next take lens <select id="lens-select" aria-label="Lens for next take"></select></label><details class="lens-feats"><summary>Lens feats</summary><ul id="lens-feat-list"></ul></details><details class="filmography"><summary>Filmography · last 5 takes</summary><ol id="filmography-list"></ol></details></details></div>
 `;
 app.append(shell);
 const $ = <T extends HTMLElement>(selector: string) => shell.querySelector<T>(selector)!;
@@ -191,6 +204,7 @@ try {
   if (replayData) overcrank = query.get('assist') === '75';
   else overcrank ||= window.localStorage.getItem('cull.overcrank') === 'true';
   leftHanded = window.localStorage.getItem('cull.leftHanded') === 'true';
+  reduceMotionSetting = window.localStorage.getItem('cull.reducedMotion') === 'true';
 } catch { /* Storage can be disabled in private browsing modes. */ }
 let audioSettings: AudioSettings = audio.settings;
 try {
@@ -209,7 +223,6 @@ const muteButton = $('#mute-audio');
 const showMute = () => {
   muteButton.setAttribute('aria-pressed', String(audio.settings.muted));
   muteButton.textContent = audio.settings.muted ? 'Unmute' : 'Mute all';
-  $('#sound-summary span').textContent = audio.settings.muted ? 'Sound off' : 'Sound';
 };
 showMute();
 muteButton.addEventListener('click', () => {
@@ -229,8 +242,11 @@ overcrankUsed = overcrank;
 shell.classList.toggle('left-handed', leftHanded);
 $('#left-hand').setAttribute('aria-pressed', String(leftHanded));
 $('#overcrank').setAttribute('aria-pressed', String(overcrank));
+document.documentElement.classList.toggle('reduce-motion', reduceMotionSetting);
+$('#reduce-motion').setAttribute('aria-pressed', String(reduceMotionSetting));
 const mount = $('#mount');
 $('#seed').textContent = String(state.seed).padStart(5, '0');
+$('#slate-seed').textContent = String(state.seed).padStart(5, '0');
 
 function locationFor(current: SimState) {
   return current.shoot?.biome ?? 'BACKLOT';
@@ -240,7 +256,8 @@ function refreshPersonalBest() {
   try {
     const best = personalBest(window.localStorage, locationFor(state), state.lens);
     $('#best').textContent = best ? `BEST ${Math.floor(best.meters)} M` : 'BEST —';
-  } catch { $('#best').textContent = 'BEST —'; }
+    $('#slate-best').textContent = best ? `${Math.floor(best.meters)} m` : '—';
+  } catch { $('#best').textContent = 'BEST —'; $('#slate-best').textContent = '—'; }
 }
 refreshPersonalBest();
 
@@ -859,6 +876,8 @@ async function saveRunSummary() {
     reelsAvailable: reelIds.size,
   };
   const grade = gradeMetrics(metrics);
+  $('#end-grade').textContent = grade;
+  $('#end-close').textContent = String(metrics.closeCalls);
   const entry = {
     date: utcDate, seed: state.seed, location: locationFor(state), meters: Math.floor(state.totalDistance),
     cuts: state.cuts.length, score: state.score, cause: state.failed, grade, ...metrics,
@@ -887,7 +906,7 @@ async function saveRunSummary() {
   download.textContent = 'Contact sheet';
   download.dataset.ready = 'true'; download.setAttribute('aria-busy', 'false');
   shareButton.disabled = false; reelButton.disabled = false; reelButton.textContent = "Director's reel";
-  const shareCard = `CULL #${state.seed} · ${entry.location} · ${state.lens} · ${entry.meters} m · ✂ ${entry.cuts} cuts · ${entry.score} pts · ${grade} grade${overcrankUsed ? ' · 75% SPEED ASSIST' : ''}`;
+  const shareCard = `CULL #${state.seed} · ${entry.location} · ${state.lens} · ${entry.meters} m · ✂ ${plural(entry.cuts, 'cut')} · ${entry.score} pts · ${grade} grade${overcrankUsed ? ' · 75% SPEED ASSIST' : ''}`;
   $('#share-card').textContent = shareCard;
   $('#grade-detail').textContent = `GRADE ${grade} · THIRDS ${metrics.thirdsPercent}% · SMOOTH ${Math.round(metrics.smoothness)} · CLOSE CALLS ${metrics.closeCalls} · REELS ${metrics.reelsCollected}/${metrics.reelsAvailable}`;
   const historyList = $('#filmography-list');
@@ -1086,9 +1105,9 @@ function updateMessageLine(shotAdvice: string, coachNote: string | null, sheet: 
   if (!state.failed && invalidReplay) offers.push({ text: 'This replay link is invalid.', priority: 'danger' });
   if (lostLine) offers.push({ text: lostLine, priority: 'danger', key: 'lost-her' });
   if ($('#gate').classList.contains('hostile-lock')) offers.push({ text: 'A hostile camera has her: frame it out.', priority: 'danger' });
-  if (tutorial.showing) offers.push({ text: TUTORIAL_STEPS[tutorial.step]!, priority: 'tutorial' });
+  if (tutorial.showing && !titleOpen) offers.push({ text: TUTORIAL_STEPS[tutorial.step]!, priority: 'tutorial' });
   if (coachNote) offers.push({ text: coachNote, priority: 'tutorial' });
-  if (!tutorial.showing && !state.failed && state.tick < LEGEND_TICKS) {
+  if (!tutorial.showing && !state.failed && takeNumber === 1 && state.tick < LEGEND_TICKS) {
     offers.push({ text: coarsePointer.matches ? 'Drag to frame, pinch to zoom. CUT slices what is outside.' : 'WASD or drag to frame. Space cuts.', priority: 'tutorial', key: 'first-hint' });
   }
   const incoming = sheet.split('\n').find((line) => line.startsWith('Coming in'));
@@ -1119,10 +1138,9 @@ function updateHud() {
   const panHint = $('.controls span');
   const panHtml = state.lens === 'tilt-shift' ? '<kbd>A</kbd><kbd>D</kbd> pan · <kbd>W</kbd><kbd>S</kbd> focus' : '<kbd>WASD</kbd> pan';
   if (panHint.innerHTML !== panHtml) panHint.innerHTML = panHtml;
-  // The key legend shows through the first seconds of a take and whenever the take is paused.
-  shell.classList.toggle('legend-open', tutorial.showing || paused || (!state.failed && state.tick < LEGEND_TICKS));
-  shell.classList.toggle('paused', paused && !state.failed);
-  if (paused !== shownPaused) { shownPaused = paused; $('#pause').innerHTML = paused ? ICONS.play : ICONS.pause; $('#pause').setAttribute('aria-label', paused ? 'Resume game' : 'Pause game'); }
+  // The key legend shows on the slate and through the first seconds of the first take only; the pause menu carries it after that.
+  shell.classList.toggle('legend-open', takeNumber === 1 && !titleOpen && (tutorial.showing || (!state.failed && state.tick < LEGEND_TICKS)));
+  if (paused !== shownPaused) syncMenu();
   const focusBand = $('#focus-band');
   focusBand.hidden = state.lens !== 'tilt-shift';
   focusBand.style.top = `${(0.5 - state.camera.focusOffset - 0.2) * 100}%`;
@@ -1143,9 +1161,14 @@ function updateHud() {
   const filmBar = shell.querySelector<HTMLElement>('.film-track')!;
   filmBar.style.setProperty('--remaining', `${Math.max(0, state.film / 90 * 100)}%`);
   if (state.failed) {
-    const endings: Record<string, string> = { 'lost-talent': 'LOST HER', hit: 'HIT', fell: 'SHE FELL', 'out-of-film': 'OUT OF FILM', wrapped: "THAT'S A WRAP" };
-    $('#end-title').textContent = endings[state.failed] ?? 'CUT';
-    $('#end-detail').textContent = `Take ${String(state.seed).padStart(5, '0')} · ${Math.floor(state.totalDistance)} metres · ${state.cuts.length} cuts`;
+    const endings: Record<string, string> = { 'lost-talent': 'You lost her', hit: 'She was hit', fell: 'She fell', 'out-of-film': 'Out of film', wrapped: "That's a wrap" };
+    $('#end-title').textContent = endings[state.failed] ?? 'Cut';
+    $('#end-stamp').textContent = `Dailies · take ${takeNumber}`;
+    $('#end-detail').textContent = `${locationFor(state)} · seed ${String(state.seed).padStart(5, '0')}`;
+    $('#end-cuts').closest('div')!.setAttribute('aria-label', plural(state.cuts.length, 'cut'));
+    $('#end-score').textContent = state.score.toLocaleString('en-GB');
+    $('#end-metres').textContent = `${Math.floor(state.totalDistance)} m`;
+    $('#end-cuts').textContent = String(state.cuts.length);
     $('#end-card').classList.remove('hidden');
     void saveRunSummary();
   }
@@ -1333,7 +1356,7 @@ const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 let filmOffset = 0;
 /** The bottom film strip's perforations travel while the camera rolls (render time, never sim): faster while film burns, frozen on pause, static in reduced motion. */
 function advanceFilmStrip(frameTime: number) {
-  if (paused || tutorial.showing || state.failed || reducedMotion.matches || frameTime <= 0) return;
+  if (paused || tutorial.showing || state.failed || reducedMotion.matches || reduceMotionSetting || frameTime <= 0) return;
   filmOffset = (filmOffset + Math.min(frameTime, 100) / 1000 * (lostLine ? 72 : 24)) % 16;
   shell.querySelector<HTMLElement>('.film-track')!.style.setProperty('--film-offset', `${(-filmOffset).toFixed(2)}px`);
 }
@@ -1381,8 +1404,16 @@ function loop(now: number) {
 let holdButton = false;
 window.addEventListener('keydown', (event) => {
   unlockAudio();
+  if (menuMode) {
+    if (event.key === 'Escape' || (menuMode === 'pause' && event.key.toLowerCase() === 'p')) { event.preventDefault(); closeMenu(); }
+    return;
+  }
+  if (titleOpen) {
+    if ((event.key === ' ' || event.key === 'Enter') && event.target === document.body) { event.preventDefault(); if (!event.repeat) leaveTitle(); }
+    return;
+  }
   if (tutorial.showing) {
-    if (event.key === ' ' || event.key === 'Enter') { event.preventDefault(); if (!event.repeat) advanceTutorial(); }
+    if ((event.key === ' ' || event.key === 'Enter') && !(event.target instanceof HTMLSelectElement)) { event.preventDefault(); if (!event.repeat) advanceTutorial(); }
     return;
   }
   if ([' ', 'Enter', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) event.preventDefault();
@@ -1392,7 +1423,7 @@ window.addEventListener('keydown', (event) => {
   if (!event.repeat && (event.key === ' ' || event.key === 'Enter')) pressCut();
   if (!event.repeat && event.key.toLowerCase() === 'q') rotationPulse = -1;
   if (!event.repeat && event.key.toLowerCase() === 'e') rotationPulse = 1;
-  if (event.key === 'Escape' || event.key.toLowerCase() === 'p') paused = !paused;
+  if (event.key === 'Escape' || event.key.toLowerCase() === 'p') setPaused(!paused);
 });
 window.addEventListener('keyup', (event) => {
   keys.delete(event.key.toLowerCase());
@@ -1454,7 +1485,7 @@ renderer.domElement.addEventListener('wheel', (event) => {
   lastWheelStep = performance.now();
   stepZoom(event.deltaY < 0 ? 1 : -1);
 }, { passive: false });
-document.addEventListener('visibilitychange', () => { if (document.hidden) paused = true; });
+document.addEventListener('visibilitychange', () => { if (document.hidden && !tutorial.showing) setPaused(true); });
 $('#hold').addEventListener('pointerdown', () => { holdButton = true; frameInput.hold = true; });
 $('#cut').addEventListener('pointerdown', (event) => { event.preventDefault(); unlockAudio(); pressCut(); });
 for (const type of ['pointerup', 'pointercancel', 'pointerleave']) $('#hold').addEventListener(type, () => { holdButton = false; frameInput.hold = false; });
@@ -1472,7 +1503,7 @@ for (const surface of [$('#gate'), $('.controlbar')]) surface.addEventListener('
 document.addEventListener('touchmove', (event) => { if (event.touches.length > 1) event.preventDefault(); }, { passive: false });
 for (const type of ['gesturestart', 'gesturechange']) document.addEventListener(type, (event) => { event.preventDefault(); });
 $('#zoom-slider').addEventListener('input', (event) => { sliderZoomTarget = Number((event.currentTarget as HTMLInputElement).value); });
-$('#pause').addEventListener('click', () => { paused = !paused; });
+$('#pause').addEventListener('click', () => { if (menuMode) closeMenu(); else setPaused(!paused); });
 $('#make-reel').addEventListener('click', () => {
   if (typeof MediaRecorder === 'undefined' || !directorReelMimeType || typeof HTMLCanvasElement.prototype.captureStream !== 'function' || directorReelFrames.length === 0) return;
   const mimeType = directorReelMimeType;
@@ -1505,9 +1536,10 @@ $('#make-reel').addEventListener('click', () => {
   const interval = window.setInterval(() => { frameIndex++; draw(); }, 1000 / 12);
   window.setTimeout(() => { window.clearInterval(interval); if (recorder.state !== 'inactive') recorder.stop(); }, 6000);
 });
-$('#restart').addEventListener('click', () => {
-  const nextSeed = state.seed + 1;
-  dailyRun = false;
+/** A fresh take on `nextSeed`. UI bookkeeping only: the sim state comes from the same createTake as page load. */
+function newTake(nextSeed: number) {
+  if (nextSeed !== state.seed) dailyRun = false;
+  takeNumber++;
   replayData = undefined; invalidReplay = false; state = createTake(nextSeed); state.lens = pendingLens;
   if (state.lens === 'long-lens') state.camera.zoom = TUNING.minZoom;
   botRandom = mulberry32((nextSeed ^ 0xb07b07) >>> 0); inputLog = []; replayIndex = 0;
@@ -1519,7 +1551,20 @@ $('#restart').addEventListener('click', () => {
   frameInput = { ...NEUTRAL_INPUT }; resultSaved = false; displayedLocation = locationFor(state); refreshPersonalBest();
   entityMeshes.clear(); urchinBuckets.reset();
   for (const child of [...scene.children]) if (child instanceof THREE.Group && child !== talent && child !== terrainGroup) scene.remove(child);
-  terrainTiles = null; $('#end-card').classList.add('hidden'); messages.reset(); refreshLensSelector();
+  terrainTiles = null; $('#end-card').classList.add('hidden'); ($('#end-more') as HTMLDetailsElement).open = false; $('#end-grade').textContent = '—'; messages.reset(); refreshLensSelector();
+  $('#seed').textContent = String(state.seed).padStart(5, '0');
+  $('#slate-seed').textContent = String(state.seed).padStart(5, '0');
+}
+$('#restart').addEventListener('click', () => {
+  newTake(state.seed + 1);
+  if (slateBeforeTakes) openSlate(1);
+  render();
+});
+$('#reduce-motion').addEventListener('click', () => {
+  reduceMotionSetting = !reduceMotionSetting;
+  document.documentElement.classList.toggle('reduce-motion', reduceMotionSetting);
+  $('#reduce-motion').setAttribute('aria-pressed', String(reduceMotionSetting));
+  try { window.localStorage.setItem('cull.reducedMotion', String(reduceMotionSetting)); } catch { /* Setting remains active for this visit. */ }
 });
 $('#left-hand').addEventListener('click', () => {
   leftHanded = !leftHanded;
@@ -1553,7 +1598,7 @@ if (query.has('debug')) {
     lockDemo = progress === null ? null : Math.max(0, Math.min(1, progress));
     demoMonitor = lockDemo === null ? null : { id: 'demo-red-monitor', kind: 'red-monitor', x: state.talent.x + 5, z: state.talent.z - 3.5, vx: 0, vz: 0, spawned: true, cut: false, age: 0, heading: Math.atan2(3.5, -5), range: 8, halfAngle: 0.45 };
     render();
-  }, tutorial: () => ({ step: tutorial.step, steps: tutorial.steps, showing: tutorial.showing, paused: paused || tutorial.showing }), silhouettes: () => measureSilhouettes({ urchin: spriteAssets.urchinTiers[2]!, boulder: spriteAssets.boulder, glass: spriteAssets.glass, extras: spriteAssets.extras[0]!, swarm: spriteAssets.swarmMoth, rumour: spriteAssets.rumour, stagehand: spriteAssets.stagehand, monitor: spriteAssets.monitorTeal, redMonitor: spriteAssets.monitorRed, continuity: spriteAssets.continuity[2]!, talent: spriteAssets.walk[0]! }) } });
+  }, tutorial: () => ({ step: tutorial.step, steps: tutorial.steps, showing: tutorial.showing, title: titleOpen, paused: paused || tutorial.showing }), silhouettes: () => measureSilhouettes({ urchin: spriteAssets.urchinTiers[2]!, boulder: spriteAssets.boulder, glass: spriteAssets.glass, extras: spriteAssets.extras[0]!, swarm: spriteAssets.swarmMoth, rumour: spriteAssets.rumour, stagehand: spriteAssets.stagehand, monitor: spriteAssets.monitorTeal, redMonitor: spriteAssets.monitorRed, continuity: spriteAssets.continuity[2]!, talent: spriteAssets.walk[0]! }) } });
 }
 
 new ResizeObserver(() => {
@@ -1562,38 +1607,93 @@ new ResizeObserver(() => {
   render();
 }).observe(mount);
 render();
+let menuMode: 'pause' | 'settings' | null = null;
+/** The pause menu doubles as the title's settings sheet; only the heading and the actions differ. */
+function syncMenu() {
+  shownPaused = paused;
+  const menu = $('#menu');
+  menu.classList.toggle('hidden', !menuMode);
+  menu.classList.toggle('settings-only', menuMode === 'settings');
+  $('#menu-title').textContent = menuMode === 'settings' ? 'Settings' : 'Paused';
+  $('#resume').textContent = menuMode === 'settings' ? 'Done' : 'Resume';
+  shell.classList.toggle('paused', paused && !state.failed);
+  $('#pause').innerHTML = paused ? ICONS.play : ICONS.pause;
+  $('#pause').setAttribute('aria-label', paused ? 'Resume game' : 'Pause game');
+}
+function setPaused(value: boolean) {
+  if (value && (tutorial.showing || state.failed)) return;
+  paused = value;
+  menuMode = paused ? 'pause' : null;
+  if (!paused) { previousTime = 0; simAccumulator = 0; }
+  syncMenu();
+  if (paused) $('#resume').focus();
+}
+function closeMenu() {
+  if (menuMode === 'settings') { menuMode = null; syncMenu(); $('#title-settings').focus(); return; }
+  setPaused(false);
+}
+$('#resume').addEventListener('click', closeMenu);
+$('#restart-take').addEventListener('click', () => { setPaused(false); newTake(state.seed); openSlate(1); render(); });
+$('#quit-title').addEventListener('click', () => { setPaused(false); newTake(state.seed); takeNumber = 1; openTitle(); render(); });
+$('#title-settings').addEventListener('click', () => { menuMode = 'settings'; syncMenu(); $('#resume').focus(); });
+$('#play').addEventListener('click', () => leaveTitle());
+$('#roll').addEventListener('click', () => advanceTutorial());
+
+/** The slate before a take: scene, take number, best, stock and seed. A first visit steps the coach lines on the message line. */
 function showTutorialStep() {
   const last = tutorial.step >= tutorial.steps - 1;
-  $('#tutorial-kicker').textContent = tutorial.step === 0 ? `Scene 1 · take 1${tutorial.steps > 1 ? ` · 1/${tutorial.steps}` : ''}` : `How to shoot · ${tutorial.step + 1}/${tutorial.steps}`;
-  // The step text itself reads on the message line inside the frame; the card keeps a copy for screen readers.
-  $('#tutorial-text').textContent = TUTORIAL_STEPS[tutorial.step]!;
-  $('#tutorial-next').innerHTML = last ? `<span>Roll camera</span>${ICONS.play}` : `<span>Continue</span>${ICONS.chevron}`;
+  const sceneNumber = String(Math.min((state.shoot?.sceneIndex ?? 0) + 1, 3)).padStart(2, '0');
+  $('#slate-scene').textContent = `${sceneNumber} · ${locationFor(state)}`;
+  $('#slate-take').textContent = String(takeNumber);
+  $('#slate-step').textContent = tutorial.steps > 1 ? `How to shoot · ${tutorial.step + 1}/${tutorial.steps}` : '';
+  $('#roll').innerHTML = last ? `<span>Roll camera</span>${ICONS.play}` : `<span>Next</span>${ICONS.chevron}`;
+  refreshPersonalBest();
   updateHud();
-  $('#title-card').classList.toggle('hidden', tutorial.step !== 0);
+}
+function openSlate(steps: number) {
+  tutorial.step = 0; tutorial.steps = steps; tutorial.showing = true;
+  shell.classList.add('tutorial-open');
+  $('#slate-card').classList.remove('hidden');
+  showTutorialStep();
+}
+function openTitle() {
+  titleOpen = true;
+  tutorial.showing = true;
+  shell.classList.add('title-open');
+  $('#slate-card').classList.add('hidden');
+  $('#title-screen').classList.remove('hidden');
+  $('#play').focus();
+}
+function leaveTitle() {
+  if (!titleOpen) return;
+  unlockAudio();
+  titleOpen = false;
+  shell.classList.remove('title-open');
+  $('#title-screen').classList.add('hidden');
+  let seen = false;
+  try { seen = window.localStorage.getItem('cull.tutorial.v1') === 'seen'; } catch { /* Treat as a first visit. */ }
+  // A first visit walks every coach line on the slate; a return visit only waits on the slate.
+  openSlate(seen ? 1 : TUTORIAL_STEPS.length);
+  $('#roll').focus();
+  render();
 }
 function advanceTutorial() {
-  if (!tutorial.showing) return;
+  if (!tutorial.showing || titleOpen) return;
   unlockAudio();
   if (tutorial.step < tutorial.steps - 1) { tutorial.step++; showTutorialStep(); return; }
   tutorial.showing = false;
-  // Drop the time spent reading so the first frame after the card does not try to catch up.
+  // Drop the time spent reading so the first frame after the slate does not try to catch up.
   previousTime = 0; simAccumulator = 0;
   shell.classList.remove('tutorial-open');
-  $('#tutorial').classList.add('hidden');
-  $('#title-card').classList.add('hidden');
+  $('#slate-card').classList.add('hidden');
+  ($('#roll') as HTMLButtonElement).blur();
   try { window.localStorage.setItem('cull.tutorial.v1', 'seen'); } catch { /* The full tutorial shows again next visit. */ }
   render();
 }
-if (!frozen && !bot && !replayData) {
-  let seen = false;
-  try { seen = window.localStorage.getItem('cull.tutorial.v1') === 'seen'; } catch { /* Treat as a first visit. */ }
-  // A first visit walks every coach card; a return visit only waits on the slate.
-  tutorial.steps = seen ? 1 : TUTORIAL_STEPS.length;
-  tutorial.showing = true;
-  shell.classList.add('tutorial-open');
-  $('#tutorial').classList.remove('hidden');
-  showTutorialStep();
-  $('#tutorial-next').addEventListener('click', advanceTutorial);
+const slateBeforeTakes = !frozen && !bot && !replayData;
+if (slateBeforeTakes) {
+  // A daily link already chose what to play: go straight to its slate.
+  if (daily) { titleOpen = true; leaveTitle(); } else openTitle();
   render();
 }
 if (!frozen) requestAnimationFrame(loop);

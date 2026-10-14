@@ -5,7 +5,8 @@ import { expect, test, type Page } from '@playwright/test';
 /** Past every tutorial card, then a lone Urchin set up just outside a tight frame on her. */
 async function frameDemo(page: Page) {
   await page.goto('/?debug&seed=1');
-  while (await page.evaluate(() => window.__cull.tutorial().showing)) await page.locator('#tutorial-next').click();
+  await page.locator('#play').click();
+  while (await page.evaluate(() => window.__cull.tutorial().showing)) await page.locator('#roll').click();
   await page.evaluate(() => {
     window.__cull.loadLodDemo();
     const { talent } = window.__cull.state();
@@ -36,7 +37,8 @@ for (const key of ['Space', 'Enter'] as const) {
 
 test('a CUT with nothing outside the frame shows the MISSED banner', async ({ page }) => {
   await page.goto('/?debug&seed=1');
-  while (await page.evaluate(() => window.__cull.tutorial().showing)) await page.locator('#tutorial-next').click();
+  await page.locator('#play').click();
+  while (await page.evaluate(() => window.__cull.tutorial().showing)) await page.locator('#roll').click();
   await page.evaluate(() => { window.__cull.loadLodDemo(); window.__cull.setCamera(-2, 1, 40); });
   await page.keyboard.press('Space');
   await expect(page.locator('#cut-banner')).toHaveText(/^MISSED −2s$/);
