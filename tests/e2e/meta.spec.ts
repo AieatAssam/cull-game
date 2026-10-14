@@ -17,6 +17,10 @@ test('records a local result and exports a 1080x1350 contact sheet with a replay
   await expect(page.locator('#download-sheet')).toHaveAttribute('data-ready', 'true');
   await expect(page.locator('#grade-detail')).toContainText('GRADE');
   await expect(page.locator('#filmography-list li').first()).toContainText('BACKLOT');
+  // Results lead with the score; the exports live behind More.
+  await expect(page.locator('#end-score')).toBeVisible();
+  await expect(page.locator('#end-detail')).not.toContainText(/\b1 cuts\b/);
+  await page.locator('#end-more > summary').click();
   const reelButton = page.locator('#make-reel');
   if (await reelButton.isVisible()) {
     await reelButton.click();
@@ -94,6 +98,7 @@ test('unlocked lens rules and lens identity carry through the replay URL', async
   await replay.evaluate(() => window.__cull.step(3));
   expect(await replay.evaluate(() => window.__cull.hash())).toBe(expectedHash);
   await replay.close();
+  await page.locator('#end-more > summary').click();
   await page.selectOption('#lens-select', 'long-lens');
   await page.locator('#restart').click();
   const longLens = await page.evaluate(() => window.__cull.state());
@@ -106,7 +111,9 @@ test('polish controls expose their state, assist is labelled, and reduced motion
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/?debug&frozen=1&seed=13');
   await expect(page.locator('#pause')).toHaveAttribute('aria-label', 'Pause game');
-  await page.locator('#sound-settings summary').click();
+  await page.locator('#pause').click();
+  await expect(page.locator('#menu')).toBeVisible();
+  await expect(page.locator('#pause')).toHaveAttribute('aria-label', 'Resume game');
   await page.locator('#volume-master').evaluate((node: HTMLInputElement) => { node.value = '42'; node.dispatchEvent(new Event('input', { bubbles: true })); });
   await page.locator('#mono-audio').check();
   await page.locator('#calm-audio').check();
@@ -117,12 +124,16 @@ test('polish controls expose their state, assist is labelled, and reduced motion
   await page.screenshot({ path: 'artifacts/screens/m8/390x844.png' });
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.screenshot({ path: 'artifacts/screens/m8/1280x800.png' });
-  await page.locator('#sound-settings summary').click();
   await page.locator('#left-hand').click();
   await expect(page.locator('.stage')).toHaveClass(/left-handed/);
   await expect(page.locator('#left-hand')).toHaveAttribute('aria-pressed', 'true');
   await page.locator('#overcrank').click();
   await expect(page.locator('#overcrank')).toHaveAttribute('aria-pressed', 'true');
+  await page.locator('#reduce-motion').click();
+  await expect(page.locator('html')).toHaveClass(/reduce-motion/);
+  expect(await page.evaluate(() => localStorage.getItem('cull.reducedMotion'))).toBe('true');
+  await page.locator('#resume').click();
+  await expect(page.locator('#menu')).toBeHidden();
   const visibleRings = await page.evaluate(() => {
     window.__cull.loadLodDemo(); window.__cull.step();
     window.__cull.setTier(3); window.__cull.step();

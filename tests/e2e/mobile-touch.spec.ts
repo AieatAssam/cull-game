@@ -16,16 +16,21 @@ for (const viewport of [{ width: 412, height: 915 }, { width: 390, height: 844 }
       const start = await pageView(page);
       expect(start.overflow).toBeLessThanOrEqual(0);
 
-      // Every coach card blocks: no ticks advance and nothing can hurt her while it is up, however long it is read.
+      // The title screen blocks too: nothing rolls until Play.
+      expect(await page.evaluate(() => window.__cull.tutorial())).toMatchObject({ showing: true, title: true, paused: true });
+      await page.waitForTimeout(400);
+      expect(await camera(page)).toMatchObject({ tick: 0, failed: null });
+      await page.locator('#play').tap();
+      // Every coach step on the slate blocks: no ticks advance and nothing can hurt her while it is up, however long it is read.
       for (let step = 0; ; step++) {
         const tutorial = await page.evaluate(() => window.__cull.tutorial());
         if (!tutorial.showing) break;
         expect(tutorial).toMatchObject({ step, paused: true });
-        const [card, frame] = [(await page.locator('#tutorial').boundingBox())!, (await page.locator('#gate').boundingBox())!];
+        const [card, frame] = [(await page.locator('#slate-card').boundingBox())!, (await page.locator('#gate').boundingBox())!];
         expect(card.y).toBeGreaterThanOrEqual(frame.y + frame.height - 1);
         await page.waitForTimeout(400);
         expect(await camera(page)).toMatchObject({ tick: 0, failed: null });
-        await page.locator('#tutorial-next').tap();
+        await page.locator('#roll').tap();
       }
       await expect.poll(async () => (await camera(page)).tick).toBeGreaterThan(0);
       // The gestures run on the wall clock, so swap the live take for the static LOD stage: its lone Urchin has no speed and
@@ -50,25 +55,38 @@ for (const viewport of [{ width: 412, height: 915 }, { width: 390, height: 844 }
       expect((await camera(page)).failed).toBeNull();
     });
 
-    test('touch controls are at least 44 px, sit below the viewfinder, and swap key chips for touch hints', async ({ page }) => {
+    test('touch controls are at least 44 px, sit in the bottom thumb zone, and swap key chips for touch hints', async ({ page }) => {
       await page.goto('/?debug&seed=1');
+      await page.locator('#play').tap();
+      while ((await page.evaluate(() => window.__cull.tutorial().showing))) await page.locator('#roll').tap();
       const small = await page.evaluate(() => [...document.querySelectorAll<HTMLElement>('.stage button, .stage summary, .stage select')]
         .map((el) => ({ label: el.textContent?.trim() || el.getAttribute('aria-label'), box: el.getBoundingClientRect() }))
         .filter(({ box }) => box.width && (box.width < 44 || box.height < 44)).map(({ label }) => label));
       expect(small).toEqual([]);
       const gate = (await page.locator('#gate').boundingBox())!;
+      let top = Number.POSITIVE_INFINITY;
+      let bottom = 0;
       for (const id of ['#hold', '#cut', '#rotate-left', '#rotate-right', '#zoom-out', '#zoom-in']) {
         const box = (await page.locator(id).boundingBox())!;
         expect(box.y).toBeGreaterThanOrEqual(gate.y + gate.height);
         expect(box.y + box.height).toBeLessThanOrEqual(viewport.height);
+        top = Math.min(top, box.y);
+        bottom = Math.max(bottom, box.y + box.height);
       }
+      // The cluster is anchored to the bottom thumb zone, the square gate centred in the space above it.
+      expect(viewport.height - bottom).toBeLessThan(32);
+      expect(Math.abs(gate.width - gate.height)).toBeLessThan(2);
+      // Hold is the left thumb, CUT the right; the pause button sits above the frame, outside it.
+      expect((await page.locator('#hold').boundingBox())!.x).toBeLessThan(viewport.width / 2);
+      const pause = (await page.locator('#pause').boundingBox())!;
+      expect(pause.y + pause.height).toBeLessThanOrEqual(gate.y);
+      expect(Math.abs((gate.y - (pause.y + pause.height)) - (top - (gate.y + gate.height)))).toBeLessThan(24);
+      expect(pause.x + pause.width / 2).toBeGreaterThan(viewport.width / 2);
       const film = (await page.locator('.film').boundingBox())!;
       expect(film.y + film.height).toBeLessThanOrEqual(viewport.height);
       await expect(page.locator('.controls')).toBeHidden();
       await expect(page.locator('.margin .touch-hint')).toBeVisible();
 
-      await page.locator('#tutorial-next').tap();
-      while ((await page.evaluate(() => window.__cull.tutorial().showing))) await page.locator('#tutorial-next').tap();
       const zoom = (await camera(page)).zoom;
       await page.locator('#zoom-in').tap();
       await expect.poll(async () => (await camera(page)).zoom).toBeLessThan(zoom - 3);
@@ -80,7 +98,8 @@ test.describe('touch CUT button', () => {
   test.use({ viewport: { width: 390, height: 844 } });
   test('is a ≥72 px thumb button bottom-right, off the viewfinder, and a tap stamps the cut', async ({ page }) => {
     await page.goto('/?debug&seed=1');
-    while (await page.evaluate(() => window.__cull.tutorial().showing)) await page.locator('#tutorial-next').tap();
+    await page.locator('#play').tap();
+    while (await page.evaluate(() => window.__cull.tutorial().showing)) await page.locator('#roll').tap();
     const [cut, gate] = [(await page.locator('#cut').boundingBox())!, (await page.locator('#gate').boundingBox())!];
     expect(Math.min(cut.width, cut.height)).toBeGreaterThanOrEqual(72);
     expect(cut.y).toBeGreaterThanOrEqual(gate.y + gate.height);
