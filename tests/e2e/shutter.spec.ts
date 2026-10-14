@@ -27,7 +27,10 @@ for (const key of ['Space', 'Enter'] as const) {
     await page.keyboard.press(key);
     await expect(page.locator('#shutter-meter')).toHaveClass(/not-ready/);
     expect(await page.evaluate(() => window.__cull.state().shutter.last!.tick)).toBe(tick);
-    await expect(page.locator('#shutter-label')).toHaveText('READY', { timeout: 5_000 });
+    // Recharge is sim time, not wall time: step the sim through one full recharge so a slow runner can't make this flaky.
+    await page.evaluate(() => window.__cull.step(Math.ceil(1.8 * 60) + 1));
+    expect(await page.evaluate(() => window.__cull.state().shutter.charge)).toBe(1);
+    await expect(page.locator('#shutter-label')).toHaveText('READY');
   });
 }
 
