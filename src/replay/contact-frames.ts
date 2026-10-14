@@ -1,5 +1,5 @@
 import { thirdsDistance } from '../meta/grade';
-import { lensAspect } from '../sim/lenses';
+import { frameView } from '../sim/lenses';
 import { step } from '../sim/step';
 import { stepShoot } from '../sim/shoot';
 import type { InputFrame, SimState } from '../sim/types';
@@ -40,7 +40,7 @@ export async function selectReplayContactFrames(initial: SimState, inputs: reado
       .filter((distance) => distance <= 1.5);
     const closeRank = closeRanks.length ? Math.min(...closeRanks) : undefined;
     const thirds = thirdsDistance(state.talent.x, state.talent.z, state.camera.x, state.camera.z,
-      state.camera.zoom, state.camera.yaw, lensAspect(state.lens));
+      frameView(state.lens, state.gate, state.camera.zoom).zoom, state.camera.yaw, frameView(state.lens, state.gate, state.camera.zoom).aspect);
     const isBestThirds = thirds < bestThirdsDistance;
     if (isBestThirds) bestThirdsDistance = thirds;
 
@@ -64,7 +64,7 @@ export async function selectReplayContactFrames(initial: SimState, inputs: reado
   if (!state.failed && terminalState?.failed) {
     state = terminalState;
     fatal = snapshot(state, 'Fatal frame', thirdsDistance(state.talent.x, state.talent.z,
-      state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, lensAspect(state.lens)));
+      state.camera.x, state.camera.z, frameView(state.lens, state.gate, state.camera.zoom).zoom, state.camera.yaw, frameView(state.lens, state.gate, state.camera.zoom).aspect));
   }
   const frames: ReplayContactFrame[] = [];
   const add = (frame?: ReplayContactFrame) => { if (frame && !frames.includes(frame) && frames.length < 9) frames.push(frame); };

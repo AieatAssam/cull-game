@@ -27,7 +27,7 @@ const aimHoldTicks = Math.round(0.5 * TUNING.tickRate);
 const keyDwellTicks = Math.round(0.08 * TUNING.tickRate);
 const tapTicks = Math.round(0.6 * ZOOM_HOLD_DELAY * TUNING.tickRate);
 const tapGapTicks = Math.round(0.15 * TUNING.tickRate);
-/** A phone's square viewfinder, CSS px. */
+/** A phone's viewfinder width, CSS px; the portrait gate is taller by `portraitGateTall`. */
 const viewportPx = 360;
 const fingerMaxPxPerTick = 1500 * tick;
 const fingerMaxAccelPxPerTick = 20_000 * tick * tick;
@@ -181,9 +181,10 @@ export function createHumanDriver(persona: HumanPersona, seed: number, options: 
           finger = null; fingerFreeAt = ticks + regripTicks;
         } else {
           // Grab the set and drag it 1:1: move the finger until the world point they want centred sits under the frame centre.
-          finger ??= { x: viewportPx / 2 + Math.sign(errorX) * viewportPx * 0.3, y: viewportPx / 2 - Math.sign(errorZ) * viewportPx * 0.3, vx: 0, vy: 0 };
+          const heightPx = state.gate === 'portrait' ? viewportPx * TUNING.portraitGateTall : viewportPx;
+          finger ??= { x: viewportPx / 2 + Math.sign(errorX) * viewportPx * 0.3, y: heightPx / 2 - Math.sign(errorZ) * heightPx * 0.3, vx: 0, vy: 0 };
           dragTarget ??= { x: camera.x, z: camera.z };
-          const view = { camera, lens: state.lens };
+          const view = { camera, lens: state.lens, gate: state.gate };
           const remainingX = frozen ? 0 : goalX - dragTarget.x;
           const remainingZ = frozen ? 0 : goalZ - dragTarget.z;
           const wantX = Math.max(-fingerMaxPxPerTick, Math.min(fingerMaxPxPerTick, -remainingX / camera.zoom * viewportPx));
@@ -191,9 +192,9 @@ export function createHumanDriver(persona: HumanPersona, seed: number, options: 
           finger.vx += Math.max(-fingerMaxAccelPxPerTick, Math.min(fingerMaxAccelPxPerTick, wantX - finger.vx));
           finger.vy += Math.max(-fingerMaxAccelPxPerTick, Math.min(fingerMaxAccelPxPerTick, wantY - finger.vy));
           finger.x += finger.vx; finger.y += finger.vy;
-          dragTarget = dragCameraTarget(dragTarget, finger.vx, finger.vy, viewportPx, viewportPx, view);
+          dragTarget = dragCameraTarget(dragTarget, finger.vx, finger.vy, viewportPx, heightPx, view);
           // Out of glass: lift and re-grip.
-          if (finger.x < 0 || finger.x > viewportPx || finger.y < 0 || finger.y > viewportPx) { finger = null; fingerFreeAt = ticks + regripTicks; }
+          if (finger.x < 0 || finger.x > viewportPx || finger.y < 0 || finger.y > heightPx) { finger = null; fingerFreeAt = ticks + regripTicks; }
         }
       }
       // A lifted drag settles where the finger left the world, as in the browser.

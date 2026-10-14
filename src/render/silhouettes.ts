@@ -54,11 +54,13 @@ function hex(r: number, g: number, b: number) {
   return `#${byte(r)}${byte(g)}${byte(b)}`;
 }
 
-function dominant(data: ImageData) {
+/** Most common colour; `skip` drops one quantised bin (the ink outline, when the fill is what counts). */
+function dominant(data: ImageData, skip?: string) {
   const bins = new Map<string, number>();
   for (let i = 0; i < data.data.length; i += 4) {
     if ((data.data[i + 3] ?? 0) < 40) continue;
     const key = hex(data.data[i]! & 0xf0, data.data[i + 1]! & 0xf0, data.data[i + 2]! & 0xf0);
+    if (key === skip) continue;
     bins.set(key, (bins.get(key) ?? 0) + 1);
   }
   let best = '#000000';
@@ -151,7 +153,8 @@ export function measureSilhouettes(textures: Record<string, THREE.Texture>): Sil
     const height = screenPx(pixelHeight, data.height, kind.world, kind.foreshorten ?? 1);
     heights[kind.name] = Math.round(height * 10) / 10;
     masks.set(kind.name, mask);
-    const fill = dominant(data);
+    // The Talent wears the cast's ink outline (no sticker halo), so she must stand out by her own fill.
+    const fill = kind.name === 'talent' ? dominant(data, hex(0x1e & 0xf0, 0x1a & 0xf0, 0x17 & 0xf0)) : dominant(data);
     fills.set(kind.name, fill);
     if (kind.name !== 'talent' && height < 20) failures.push(`${kind.name} is ${height.toFixed(1)} px tall at zoom 30`);
     draw.fillStyle = '#1e1a17';

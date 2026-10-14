@@ -713,10 +713,10 @@ function tailSwings(n: number) {
 }
 
 function talentTexture(p: Pose, seed: number) {
+  // Ink outline only (style guide): no paper sticker halo round her.
   return cast(talentPuppet(p), {
-    ink: 1,
-    halo: 0.9,
-    haloAlpha: 0.7,
+    ink: 1.9,
+    halo: 0,
     shadow: p.layer === 'tail' ? undefined : p.fallen ? [64, 120, 50, 5] : [65, 121.5, 22, 4.2],
   }, seed, p.fallen ? 1 : TALENT_ASPECT);
 }

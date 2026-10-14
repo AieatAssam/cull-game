@@ -2,7 +2,7 @@ import { NEUTRAL_INPUT } from '../sim/step';
 import { TUNING } from '../sim/tuning';
 import type { InputFrame, SimState } from '../sim/types';
 import { cameraBasis } from '../sim/frame';
-import { lensAspect } from '../sim/lenses';
+import { frameView } from '../sim/lenses';
 import { easeZoomInput, heldZoomInput } from './zoom-control';
 
 // Device → InputFrame mapping shared by the browser (main.ts) and the human-like balance bots (src/bots/human.ts).
@@ -29,10 +29,11 @@ export interface DragTarget { x: number; z: number; }
  * the last move on a `width`×`height` viewfinder; the target moves by the world distance those px span at this zoom/yaw.
  */
 export function dragCameraTarget(target: DragTarget, dx: number, dy: number, width: number, height: number,
-  view: Pick<SimState, 'camera' | 'lens'>): DragTarget {
-  const { zoom, yaw } = view.camera;
-  const u = -dx / Math.max(1, width) * zoom * lensAspect(view.lens);
-  const v = dy / Math.max(1, height) * zoom / TUNING.projectionPitchScale;
+  view: Pick<SimState, 'camera' | 'lens' | 'gate'>): DragTarget {
+  const { yaw } = view.camera;
+  const frame = frameView(view.lens, view.gate, view.camera.zoom);
+  const u = -dx / Math.max(1, width) * frame.zoom * frame.aspect;
+  const v = dy / Math.max(1, height) * frame.zoom / TUNING.projectionPitchScale;
   const { cos, sin } = cameraBasis(yaw);
   return { x: target.x + u * cos + v * sin, z: target.z - u * sin + v * cos };
 }

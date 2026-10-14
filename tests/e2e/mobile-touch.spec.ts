@@ -73,14 +73,18 @@ for (const viewport of [{ width: 412, height: 915 }, { width: 390, height: 844 }
         top = Math.min(top, box.y);
         bottom = Math.max(bottom, box.y + box.height);
       }
-      // The cluster is anchored to the bottom thumb zone, the square gate centred in the space above it.
+      // The cluster is anchored to the bottom thumb zone; portrait phones get the 2:3 gate, full width above it.
       expect(viewport.height - bottom).toBeLessThan(32);
-      expect(Math.abs(gate.width - gate.height)).toBeLessThan(2);
+      expect(Math.abs(gate.height - gate.width * 1.5)).toBeLessThan(2);
+      expect(gate.width).toBeGreaterThan(viewport.width - 24);
       // Hold is the left thumb, CUT the right; the pause button sits above the frame, outside it.
       expect((await page.locator('#hold').boundingBox())!.x).toBeLessThan(viewport.width / 2);
       const pause = (await page.locator('#pause').boundingBox())!;
       expect(pause.y + pause.height).toBeLessThanOrEqual(gate.y);
-      expect(Math.abs((gate.y - (pause.y + pause.height)) - (top - (gate.y + gate.height)))).toBeLessThan(24);
+      // The portrait gate hugs the pause row above and the message strip below; spare height goes above the controls.
+      const notes = (await page.locator('.gate-notes').boundingBox())!;
+      expect(gate.y - (pause.y + pause.height)).toBeLessThan(16);
+      expect(notes.y - (gate.y + gate.height)).toBeLessThan(16);
       expect(pause.x + pause.width / 2).toBeGreaterThan(viewport.width / 2);
       const film = (await page.locator('.film').boundingBox())!;
       expect(film.y + film.height).toBeLessThanOrEqual(viewport.height);

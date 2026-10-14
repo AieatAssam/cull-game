@@ -1,7 +1,7 @@
 import { inFrame, projectPoint } from './frame';
 import { activeShot, gateOpen, gateReleaseSeconds, markShots, releasing, shotBlocksTalent } from './framing';
 import { lodTier, type LodTier } from './lod';
-import { lensAspect, lensLodFactor } from './lenses';
+import { frameView, lensLodFactor } from './lenses';
 import { TUNING } from './tuning';
 import { pathZAt } from '../gen/generate';
 import { advanceRumourRadius, advanceWrap, isDeletedByWrap, isWrapActive, monitorConeContains, redMonitorOverlapsTarget, type MonitorCone } from './m6';
@@ -12,8 +12,9 @@ const dt = 1 / TUNING.tickRate;
 const distance = (ax: number, az: number, bx: number, bz: number) => Math.hypot(ax - bx, az - bz);
 
 function framed(state: SimState, x: number, z: number, radius: number, height: number) {
-  return inFrame(x, z, radius, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, height,
-    lensAspect(state.lens), state.lens === 'tilt-shift' ? state.camera.focusOffset : null, state.lens === 'fisheye');
+  const view = frameView(state.lens, state.gate, state.camera.zoom);
+  return inFrame(x, z, radius, state.camera.x, state.camera.z, view.zoom, state.camera.yaw, height,
+    view.aspect, state.lens === 'tilt-shift' ? state.camera.focusOffset : null, state.lens === 'fisheye');
 }
 function detailFactor(state: SimState, x: number, z: number) {
   const projected = projectPoint(x, z, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw);
@@ -41,7 +42,8 @@ function monitorCone(entity: CastEntity): MonitorCone {
 
 /** Mirrors the HUD call sheet ("Coming in"): unspawned cast just past the gate edge. */
 function onCallSheet(state: SimState, entity: CastEntity) {
-  const projected = projectPoint(entity.x, entity.z, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, lensAspect(state.lens));
+  const view = frameView(state.lens, state.gate, state.camera.zoom);
+  const projected = projectPoint(entity.x, entity.z, state.camera.x, state.camera.z, view.zoom, state.camera.yaw, view.aspect);
   const outside = Math.max(Math.abs(projected.x), Math.abs(projected.y)) - 0.5;
   return outside >= 0 && outside <= TUNING.callSheetMargin;
 }

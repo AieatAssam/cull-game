@@ -1,5 +1,7 @@
 export const TUNING = {
   gateAspect: 1,
+  // Portrait phone gate (2:3): visible height over width; fills a portrait phone between pause row and thumb controls. Run config, see DECISIONS 2026-10-14 (phone frame).
+  portraitGateTall: 1.5,
   cameraPitch: 55,
   projectionPitchScale: 0.8191520442889918,
   projectionPitchCosine: 0.5735764363510462,
