@@ -3,9 +3,11 @@ import { expect, test } from '@playwright/test';
 const SHOTS = ['Close-up', 'Medium shot', 'Wide shot', 'Stand-in', 'Gone'];
 
 test('caption and toast never name different shot sizes', async ({ page }) => {
-  test.setTimeout(90_000);
+  // 600 ticks × 3 seeds is CPU-heavy on shared CI runners; give it room rather than cut coverage.
+  test.setTimeout(240_000);
   for (const seed of [1, 19, 2026]) {
-    await page.goto(`/?debug&frozen=1&seed=${seed}&shoot=1`);
+    await page.goto(`/?debug&frozen=1&seed=${seed}&shoot=1`, { waitUntil: 'load' });
+    await page.waitForFunction(() => typeof window.__cull?.step === 'function');
     const clashes = await page.evaluate(({ shots, ticks }) => {
       const named = (text: string) => shots.filter((shot) => text.includes(shot));
       const bad: string[] = [];
