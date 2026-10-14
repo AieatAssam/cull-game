@@ -36,6 +36,8 @@ import { lensAspect, lensLodFactor, lensRenderTicks, type LensId } from './sim/l
 import { COACH_LINES, closeCallsForGrade, describeShot } from './ui/describe-shot';
 import { cutBanner, cutStampText, gatePoint, takeReadout, threatMarkers } from './ui/shutter-hud';
 import { offFrameThreats } from './sim/threats';
+import { ICONS } from './ui/icons';
+import { MessageChannel, type MessageOffer } from './ui/message-channel';
 import type { CastEntity, CutResult, InputFrame, SimState } from './sim/types';
 
 const spriteAssets = createDailiesCast();
@@ -126,13 +128,14 @@ const tutorial = { step: 0, steps: 0, showing: false };
 const shell = document.createElement('section');
 shell.className = 'stage';
 shell.innerHTML = `
-  <header class="topbar"><div class="brand"><span class="rec-dot"></span><strong>CULL</strong><span class="tagline">CAMERA DEPARTMENT</span></div><label class="stock-control">STOCK <select id="film-stock" aria-label="Film stock"><option value="clean">35 MM · CLEAN</option><option value="kodachrome">KODACHROME · B</option><option value="bleach">BLEACH BYPASS · A</option><option value="ilford">ILFORD B&W · S</option></select></label><details class="sound-settings" id="sound-settings"><summary id="sound-summary">SOUND</summary><div class="sound-panel"><button id="mute-audio" type="button" aria-pressed="false">MUTE ALL</button><label>MASTER <input id="volume-master" aria-label="Master volume" type="range" min="0" max="100" value="100" /></label><label>MUSIC <input id="volume-music" aria-label="Music volume" type="range" min="0" max="100" value="80" /></label><label>EFFECTS <input id="volume-sfx" aria-label="Effects volume" type="range" min="0" max="100" value="80" /></label><label><input id="mono-audio" type="checkbox" /> MONO</label><label><input id="calm-audio" type="checkbox" /> CALM MIX</label></div></details><div class="readout"><a class="daily-link" href="?daily=1">DAILY</a><span>TAKE 01</span><b id="timecode">01:30</b><span id="lens">35 MM</span><button class="pause-button" id="pause" aria-label="Pause game">Ⅱ</button></div></header>
-  <div class="composition"><aside class="margin margin-left"><div class="slate">SCENE 01<br><strong>BACKLOT</strong><small>SEED <span id="seed">00001</span></small><small id="best">BEST —</small></div><div class="hint"><span class="hint-mark">↖</span> <span class="key-hint">WASD / DRAG<br>TO FRAME THE SHOT</span><span class="touch-hint">DRAG TO FRAME<br>PINCH TO ZOOM</span><div class="preview" id="preview"></div></div></aside>
-    <div class="gate-wrap"><div class="gate-label"><span id="gate-ratio">VIEWFINDER · GATE 1:1</span><span id="lod">SHE IS IN A MEDIUM SHOT</span></div><div class="gate-slot"><div class="gate" id="gate"><div class="thirds"></div><div class="focus-band" id="focus-band" hidden></div><div class="gate-corners"></div><div class="sprockets left"></div><div class="sprockets right"></div><div id="mount" class="mount"></div><div class="depth-blur top"></div><div class="depth-blur bottom"></div><div class="lost-edge" id="lost-edge"></div><div class="lost-arrow hidden" id="lost-arrow"><span>➤</span><b>HER</b></div><div class="lost-banner hidden" id="lost-banner"><strong>LOST HER</strong><small id="lost-count">2.5 s LEFT</small><div class="lost-track"><i id="lost-bar"></i></div></div><div class="title-card hidden" id="title-card"><p class="title-kicker">SCENE 01 · TAKE 01</p><h1>CULL</h1></div><div class="cut-flash" id="cut-flash"></div><div class="edge-flash" id="edge-flash"></div><div class="threats" id="threats" aria-hidden="true"></div><div class="cut-layer" id="cut-layer" aria-live="polite"></div><div class="cut-banner hidden" id="cut-banner"></div></div></div><div class="shutter-row"><div class="shutter-meter" id="shutter-meter" role="meter" aria-label="Shutter charge" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span class="shutter-label" id="shutter-label">READY</span><div class="shutter-track"><i id="shutter-bar"></i></div></div><b class="take-score" id="take-score">TAKE ×1  0</b></div><div class="gate-notes"><p class="frame-message" id="message">Keep her in the shot.</p><div class="tutorial hidden" id="tutorial" role="dialog" aria-labelledby="tutorial-text"><p class="tutorial-kicker" id="tutorial-kicker"></p><p class="tutorial-text" id="tutorial-text"></p><button id="tutorial-next" type="button">CONTINUE</button></div></div><div class="gate-foot"><span>55° TABLETOP</span><span id="status">ROLLING</span></div></div>
-    <aside class="margin margin-right"><div class="camera-mark">Slate<small>CAM 01</small></div><div class="call-sheet"><span>CALL SHEET</span><div id="call-sheet">Looking outside the frame…</div></div></aside>
-  </div>
-  <footer class="controlbar"><div class="controls"><span><kbd>WASD</kbd> PAN</span><span><kbd>−</kbd> / <kbd>+</kbd> ZOOM</span><span><kbd>SPACE</kbd> / <kbd>ENTER</kbd> CUT</span><span><kbd>H</kbd> HOLD</span><span><kbd>Q</kbd> / <kbd>E</kbd> ROTATE</span></div><p class="touch-hint">Drag to frame · pinch to zoom · CUT slices what's outside</p><div class="mobile-controls"><button id="hold" type="button" aria-label="Hold Talent">HOLD</button><div class="touch-buttons"><button id="rotate-left" type="button" aria-label="Rotate left">↺</button><button id="rotate-right" type="button" aria-label="Rotate right">↻</button><button id="zoom-out" type="button" aria-label="Zoom out">−</button><button id="zoom-in" type="button" aria-label="Zoom in">+</button></div><label class="zoom-slider">ZOOM <input id="zoom-slider" aria-label="Zoom" type="range" min="10" max="48" value="30" /></label><button id="cut" class="cut-button" type="button" aria-label="Cut: slice everything outside the frame" style="--charge:1"><span>CUT</span></button></div><div class="assist-controls"><button id="left-hand" type="button" aria-pressed="false">LEFT HAND</button><button id="overcrank" type="button" aria-pressed="false">75% SPEED</button></div><div class="film"><span>FILM</span><div class="film-track"><i id="filmbar"></i></div><b id="film">90s</b><em id="film-drain" hidden>−${TUNING.offscreenFilmDrainPerSecond}s/s</em></div></footer>
-  <div class="end-card hidden" id="end-card"><div class="end-stamp">TAKE ENDED</div><h1 id="end-title">CUT</h1><p id="end-detail"></p><p id="share-card"></p><div id="grade-detail" class="grade-detail"></div><details class="grade-method"><summary>How the grade works</summary><p>The grade averages four things: how often she sits on a thirds mark, how smooth the camera was, close cuts (10 points each, up to 100), and how many film reels you kept. S is 90 or above, A is 75, B is 60, and the rest is C.</p></details><details class="lens-feats"><summary>LENS FEATS</summary><ul id="lens-feat-list"></ul></details><label class="next-lens">NEXT TAKE LENS <select id="lens-select" aria-label="Lens for next take"></select></label><div class="end-actions"><a id="download-sheet" download>CONTACT SHEET ↓</a><button id="make-reel">DIRECTOR'S REEL</button><a id="download-reel" class="hidden" download>WEBM ↓</a><button id="share">SHARE</button><a id="replay-link" target="_blank" rel="noreferrer">REPLAY ↗</a></div><details class="filmography"><summary>FILMOGRAPHY · LAST 5 TAKES</summary><ol id="filmography-list"></ol></details><button id="restart">NEW TAKE ↗</button></div>
+  <div class="legacy-hud" aria-live="polite"><div class="brand"><strong>CULL</strong></div><div class="margin"><div class="slate">SCENE 01<br><strong>BACKLOT</strong><small>SEED <span id="seed">00001</span></small><small id="best">BEST —</small></div><span class="touch-hint">Drag to frame, pinch to zoom</span></div><span id="status">ROLLING</span><span id="timecode">01:30</span><span id="lod">SHE IS IN A MEDIUM SHOT</span><p id="message">Keep her in the shot.</p><div id="call-sheet">Looking outside the frame…</div><b class="take-score" id="take-score">TAKE ×1  0</b><div class="lost-banner hidden" id="lost-banner"><strong>Lost her</strong><small id="lost-count"></small><div class="lost-track"><i id="lost-bar"></i></div></div></div>
+  <header class="topbar"><label class="stock-control">Stock <select id="film-stock" aria-label="Film stock"><option value="clean">35 mm · clean</option><option value="kodachrome">Kodachrome · B</option><option value="bleach">Bleach bypass · A</option><option value="ilford">Ilford B&amp;W · S</option></select></label><details class="sound-settings" id="sound-settings"><summary id="sound-summary">${ICONS.sound}<span>Sound</span></summary><div class="sound-panel"><button id="mute-audio" type="button" aria-pressed="false">Mute all</button><label>Master <input id="volume-master" aria-label="Master volume" type="range" min="0" max="100" value="100" /></label><label>Music <input id="volume-music" aria-label="Music volume" type="range" min="0" max="100" value="80" /></label><label>Effects <input id="volume-sfx" aria-label="Effects volume" type="range" min="0" max="100" value="80" /></label><label><input id="mono-audio" type="checkbox" /> Mono</label><label><input id="calm-audio" type="checkbox" /> Calm mix</label></div></details><div class="assist-controls"><button id="left-hand" type="button" aria-pressed="false">Left hand</button><button id="overcrank" type="button" aria-pressed="false">75% speed</button></div><a class="daily-link" href="?daily=1">Daily</a><button class="pause-button" id="pause" type="button" aria-label="Pause game">${ICONS.pause}</button></header>
+  <div class="gate-slot"><div class="gate" id="gate"><div class="thirds"></div><div class="focus-band" id="focus-band" hidden></div><div id="mount" class="mount"></div><div class="depth-blur top"></div><div class="depth-blur bottom"></div><div class="gate-corners"></div><div class="lost-edge" id="lost-edge"></div><div class="lost-arrow hidden" id="lost-arrow"><span>${ICONS.arrow}</span><b>Her</b></div><div class="title-card hidden" id="title-card"><h1>CULL</h1></div><div class="cut-flash" id="cut-flash"></div><div class="edge-flash" id="edge-flash"></div><div class="threats" id="threats" aria-hidden="true"></div><div class="cut-layer" id="cut-layer" aria-live="polite"></div>
+    <div class="hud" aria-hidden="true"><div class="hud-tl"><span class="rec-dot"></span><b class="hud-score" id="hud-score"><small>×1</small> 0</b></div><div class="hud-tc"><span id="gate-ratio"></span></div><div class="hud-tr"><span class="cut-banner hidden" id="cut-banner"></span><em id="film-drain" hidden>−${TUNING.offscreenFilmDrainPerSecond}s/s</em><b class="hud-counter" id="film">90s</b><span class="hud-lens" id="lens">35 mm</span></div><p class="hud-message" id="hud-message"></p><div class="shutter-meter" id="shutter-meter" role="meter" aria-label="Shutter charge" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span class="shutter-label" id="shutter-label">READY</span><div class="shutter-track"><i id="shutter-bar"></i></div></div></div>
+    <div class="film" aria-hidden="true"><div class="film-track"><i id="filmbar"></i></div></div><div class="pause-dim" aria-hidden="true">${ICONS.play}</div></div></div>
+  <div class="gate-notes"><div class="tutorial hidden" id="tutorial" role="dialog" aria-labelledby="tutorial-text"><p class="tutorial-kicker" id="tutorial-kicker"></p><p class="tutorial-text" id="tutorial-text"></p><button id="tutorial-next" type="button">Continue</button></div></div>
+  <footer class="controlbar"><div class="controls"><span><kbd>WASD</kbd> pan</span><span><kbd>−</kbd><kbd>+</kbd> zoom</span><span><kbd>Space</kbd> cut</span><span><kbd>H</kbd> hold</span><span><kbd>Q</kbd><kbd>E</kbd> rotate</span><span><kbd>P</kbd> pause</span></div><div class="mobile-controls"><button id="hold" type="button" aria-label="Hold Talent">Hold</button><div class="touch-buttons"><button id="rotate-left" type="button" aria-label="Rotate left">${ICONS.rotateLeft}</button><button id="rotate-right" type="button" aria-label="Rotate right">${ICONS.rotateRight}</button><button id="zoom-out" type="button" aria-label="Zoom out">${ICONS.zoomOut}</button><button id="zoom-in" type="button" aria-label="Zoom in">${ICONS.zoomIn}</button></div><label class="zoom-slider">Zoom <input id="zoom-slider" aria-label="Zoom" type="range" min="10" max="48" value="30" /></label><button id="cut" class="cut-button" type="button" aria-label="Cut: slice everything outside the frame" style="--charge:1"><span>CUT</span></button></div></footer>
+  <div class="end-card hidden" id="end-card"><div class="end-stamp">Take ended</div><h1 id="end-title">CUT</h1><p id="end-detail"></p><p id="share-card"></p><div id="grade-detail" class="grade-detail"></div><details class="grade-method"><summary>How the grade works</summary><p>The grade averages four things: how often she sits on a thirds mark, how smooth the camera was, close cuts (10 points each, up to 100), and how many film reels you kept. S is 90 or above, A is 75, B is 60, and the rest is C.</p></details><details class="lens-feats"><summary>Lens feats</summary><ul id="lens-feat-list"></ul></details><label class="next-lens">Next take lens <select id="lens-select" aria-label="Lens for next take"></select></label><div class="end-actions"><a id="download-sheet" download>Contact sheet</a><button id="make-reel">Director's reel</button><a id="download-reel" class="hidden" download>Download reel</a><button id="share">${ICONS.share}<span>Share</span></button><a id="replay-link" target="_blank" rel="noreferrer">Replay</a></div><details class="filmography"><summary>Filmography · last 5 takes</summary><ol id="filmography-list"></ol></details><button id="restart">Another take</button></div>
 `;
 app.append(shell);
 const $ = <T extends HTMLElement>(selector: string) => shell.querySelector<T>(selector)!;
@@ -150,7 +153,7 @@ function refreshFilmStocks() {
     if (option.value === 'clean') continue;
     option.disabled = !unlocked.includes(option.value as FilmStock);
     const stock = filmStocks.find((item) => item.id === option.value);
-    if (stock) option.textContent = `${stock.label} · ${stock.minimum}${option.disabled ? ' · LOCKED' : ''}`;
+    if (stock) option.textContent = `${stock.label} · ${stock.minimum}${option.disabled ? ' · locked' : ''}`;
   }
   currentStock = loadFilmStock(window.localStorage, entries);
   select.value = currentStock;
@@ -161,8 +164,8 @@ function refreshLensSelector() {
   try { entries = loadFilmography(window.localStorage); } catch { /* Keep only the default lens available. */ }
   const unlocked = new Set(unlockedLenses(entries));
   const select = $('#lens-select') as HTMLSelectElement;
-  const options = [Object.assign(document.createElement('option'), { value: '35mm', textContent: '35 MM · STANDARD' }),
-    ...lensFeats.map((feat) => Object.assign(document.createElement('option'), { value: feat.id, textContent: `${feat.name}${unlocked.has(feat.id) ? '' : ' · LOCKED'}`, disabled: !unlocked.has(feat.id) }))];
+  const options = [Object.assign(document.createElement('option'), { value: '35mm', textContent: '35 mm · standard' }),
+    ...lensFeats.map((feat) => Object.assign(document.createElement('option'), { value: feat.id, textContent: `${feat.name}${unlocked.has(feat.id) ? '' : ' · locked'}`, disabled: !unlocked.has(feat.id) }))];
   select.replaceChildren(...options);
   if (!unlocked.has(pendingLens)) pendingLens = '35mm';
   select.value = pendingLens;
@@ -205,8 +208,8 @@ for (const [id, key] of [['volume-master', 'master'], ['volume-music', 'music'],
 const muteButton = $('#mute-audio');
 const showMute = () => {
   muteButton.setAttribute('aria-pressed', String(audio.settings.muted));
-  muteButton.textContent = audio.settings.muted ? 'UNMUTE' : 'MUTE ALL';
-  $('#sound-summary').textContent = audio.settings.muted ? 'SOUND OFF' : 'SOUND';
+  muteButton.textContent = audio.settings.muted ? 'Unmute' : 'Mute all';
+  $('#sound-summary span').textContent = audio.settings.muted ? 'Sound off' : 'Sound';
 };
 showMute();
 muteButton.addEventListener('click', () => {
@@ -881,9 +884,9 @@ async function saveRunSummary() {
   directorReelFrames = sheetFrames.map((frame) => frame.image);
   download.href = sheet.toDataURL('image/png');
   download.download = `cull-${state.seed}.png`;
-  download.textContent = 'CONTACT SHEET ↓';
+  download.textContent = 'Contact sheet';
   download.dataset.ready = 'true'; download.setAttribute('aria-busy', 'false');
-  shareButton.disabled = false; reelButton.disabled = false; reelButton.textContent = "DIRECTOR'S REEL";
+  shareButton.disabled = false; reelButton.disabled = false; reelButton.textContent = "Director's reel";
   const shareCard = `CULL #${state.seed} · ${entry.location} · ${state.lens} · ${entry.meters} m · ✂ ${entry.cuts} cuts · ${entry.score} pts · ${grade} grade${overcrankUsed ? ' · 75% SPEED ASSIST' : ''}`;
   $('#share-card').textContent = shareCard;
   $('#grade-detail').textContent = `GRADE ${grade} · THIRDS ${metrics.thirdsPercent}% · SMOOTH ${Math.round(metrics.smoothness)} · CLOSE CALLS ${metrics.closeCalls} · REELS ${metrics.reelsCollected}/${metrics.reelsAvailable}`;
@@ -1040,6 +1043,8 @@ function callSheetLines() {
   return lines.slice(0, 4).join('\n') || 'Nothing waiting just outside the frame.';
 }
 /** Out-of-frame feedback: past the grace the gate flashes, a banner counts down to the cut, the film meter shows the burn and an edge arrow points to her. */
+/** The danger line for the message channel while she is out of shot, or null. */
+let lostLine: string | null = null;
 function updateLostHer() {
   const ticks = lostDemoTicks ?? state.talent.offscreenTicks;
   const view = { talent: { ...state.talent, offscreenTicks: ticks } };
@@ -1050,11 +1055,13 @@ function updateLostHer() {
   $('#lost-arrow').classList.toggle('hidden', !lost);
   $('#film-drain').hidden = !lost;
   shell.querySelector('.film')!.classList.toggle('draining', lost);
-  if (!lost) return;
+  if (!lost) { lostLine = null; return; }
   const progress = lostProgress(view);
+  const left = Math.max(0, TUNING.offscreenFailSeconds - ticks / TUNING.tickRate);
   gate.style.setProperty('--lost', String(progress));
   $('#lost-bar').style.width = `${(1 - progress) * 100}%`;
-  $('#lost-count').textContent = `${Math.max(0, TUNING.offscreenFailSeconds - ticks / TUNING.tickRate).toFixed(1)} s LEFT · FILM BURNING`;
+  $('#lost-count').textContent = `${left.toFixed(1)} s left · film burning`;
+  lostLine = `Find her — ${left.toFixed(1)} s`;
   const aspect = lensAspect(state.lens);
   const at = projectPoint(state.talent.x, state.talent.z, state.camera.x, state.camera.z, state.camera.zoom, state.camera.yaw, aspect);
   const angle = Math.atan2(at.y, at.x);
@@ -1064,8 +1071,34 @@ function updateLostHer() {
   arrow.style.left = `${50 + Math.cos(angle) * reach * 100}%`;
   arrow.style.top = `${50 + Math.sin(angle) * reach * 100}%`;
   arrow.style.setProperty('--angle', `${angle}rad`);
+  // The carmine glow rises from the frame edge nearest her and fades toward the centre.
+  gate.style.setProperty('--lost-angle', `${angle - Math.PI / 2}rad`);
   arrow.style.setProperty('--tag-x', `${-Math.cos(angle) * 34}px`);
   arrow.style.setProperty('--tag-y', `${-Math.sin(angle) * 30}px`);
+}
+const messages = new MessageChannel();
+const LEGEND_TICKS = 12 * TUNING.tickRate;
+let shownPaused = false;
+const coarsePointer = window.matchMedia('(pointer: coarse)');
+/** Feeds every caption source into the one message line: danger > tutorial/coach > incoming threat > shot advice > tip. */
+function updateMessageLine(shotAdvice: string, coachNote: string | null, sheet: string) {
+  const offers: MessageOffer[] = [];
+  if (!state.failed && invalidReplay) offers.push({ text: 'This replay link is invalid.', priority: 'danger' });
+  if (lostLine) offers.push({ text: lostLine, priority: 'danger', key: 'lost-her' });
+  if ($('#gate').classList.contains('hostile-lock')) offers.push({ text: 'A hostile camera has her: frame it out.', priority: 'danger' });
+  if (tutorial.showing) offers.push({ text: TUTORIAL_STEPS[tutorial.step]!, priority: 'tutorial' });
+  if (coachNote) offers.push({ text: coachNote, priority: 'tutorial' });
+  if (!tutorial.showing && !state.failed && state.tick < LEGEND_TICKS) {
+    offers.push({ text: coarsePointer.matches ? 'Drag to frame, pinch to zoom. CUT slices what is outside.' : 'WASD or drag to frame. Space cuts.', priority: 'tutorial', key: 'first-hint' });
+  }
+  const incoming = sheet.split('\n').find((line) => line.startsWith('Coming in'));
+  if (incoming) offers.push({ text: incoming.replace(' · ', ': '), priority: 'threat' });
+  offers.push({ text: shotAdvice, priority: 'shot' });
+  const shown = state.failed ? null : messages.update(offers, performance.now());
+  const line = $('#hud-message');
+  const text = shown?.text ?? '';
+  if (line.textContent !== text) line.textContent = text;
+  line.dataset.priority = shown?.priority ?? '';
 }
 function updateHud() {
   if (state.shoot) $('.slate').innerHTML = `SCENE 0${Math.min(state.shoot.sceneIndex + 1, 3)}<br><strong>${state.shoot.biome}</strong><small>SEED <span>${String(state.seed).padStart(5, '0')}</span></small><small id="best">BEST —</small>`;
@@ -1074,16 +1107,22 @@ function updateHud() {
   $('#timecode').textContent = `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
   $('#film').textContent = `${seconds}s`;
   $('#filmbar').style.width = `${Math.max(0, Math.min(100, state.film / 180 * 100))}%`;
-  $('#filmbar').style.background = state.film < 20 ? '#c8322a' : '#ff7a1a';
-  $('#lens').textContent = state.lens === 'long-lens' ? '85 MM' : `${Math.round(Math.max(24, Math.min(85, 85 - (state.camera.zoom - 10) * 61 / 38)))} MM`;
+  shell.querySelector('.film')!.classList.toggle('low', state.film < 20);
+  $('#lens').textContent = state.lens === 'long-lens' ? '85 mm' : `${Math.round(Math.max(24, Math.min(85, 85 - (state.camera.zoom - 10) * 61 / 38)))} mm`;
   shell.classList.toggle('anamorphic', state.lens === 'anamorphic');
   shell.classList.toggle('fisheye', state.lens === 'fisheye');
-  $('#gate-ratio').textContent = state.lens === 'anamorphic' ? 'VIEWFINDER · GATE 2.39:1'
-    : state.lens === 'tilt-shift' ? 'VIEWFINDER · FOCUS BAND 40% · W/S MOVE'
-      : state.lens === 'fisheye' ? 'FISHEYE · WRAP GATE EDGES'
-        : state.lens === 'super8' ? 'SUPER 8 · 12 FPS' : 'VIEWFINDER · GATE 1:1';
+  // The gate names its ratio only when a lens changes it.
+  $('#gate-ratio').textContent = state.lens === 'anamorphic' ? 'Gate 2.39:1'
+    : state.lens === 'tilt-shift' ? 'Focus band 40% · W/S move'
+      : state.lens === 'fisheye' ? 'Fisheye · wraps the gate edges'
+        : state.lens === 'super8' ? 'Super 8 · 12 fps' : '';
   const panHint = $('.controls span');
-  panHint.innerHTML = state.lens === 'tilt-shift' ? '<kbd>A</kbd> / <kbd>D</kbd> PAN · <kbd>W</kbd> / <kbd>S</kbd> FOCUS' : '<kbd>WASD</kbd> PAN';
+  const panHtml = state.lens === 'tilt-shift' ? '<kbd>A</kbd><kbd>D</kbd> pan · <kbd>W</kbd><kbd>S</kbd> focus' : '<kbd>WASD</kbd> pan';
+  if (panHint.innerHTML !== panHtml) panHint.innerHTML = panHtml;
+  // The key legend shows through the first seconds of a take and whenever the take is paused.
+  shell.classList.toggle('legend-open', tutorial.showing || paused || (!state.failed && state.tick < LEGEND_TICKS));
+  shell.classList.toggle('paused', paused && !state.failed);
+  if (paused !== shownPaused) { shownPaused = paused; $('#pause').innerHTML = paused ? ICONS.play : ICONS.pause; $('#pause').setAttribute('aria-label', paused ? 'Resume game' : 'Pause game'); }
   const focusBand = $('#focus-band');
   focusBand.hidden = state.lens !== 'tilt-shift';
   focusBand.style.top = `${(0.5 - state.camera.focusOffset - 0.2) * 100}%`;
@@ -1092,12 +1131,14 @@ function updateHud() {
   $('#lod').textContent = copy.gate;
   const cutNoteLive = cutNote && performance.now() < cutNote.until && !state.failed && !talentLost(state);
   $('#message').textContent = !state.failed && invalidReplay ? 'INVALID REPLAY URL' : cutNoteLive ? cutNote!.text : copy.toast;
+  const sheet = callSheetLines();
   if (sliderZoomTarget !== null && Math.abs(sliderZoomTarget - state.camera.zoom) < 0.12) sliderZoomTarget = null;
   const zoomSlider = $('#zoom-slider') as HTMLInputElement;
   zoomSlider.value = String(Math.round(sliderZoomTarget ?? state.camera.zoom));
   zoomSlider.disabled = state.lens === 'long-lens';
-  $('#call-sheet').textContent = callSheetLines();
+  $('#call-sheet').textContent = sheet;
   updateLostHer();
+  updateMessageLine(copy.toast, cutNoteLive ? cutNote!.text : null, sheet);
   updateShutterHud();
   const filmBar = shell.querySelector<HTMLElement>('.film-track')!;
   filmBar.style.setProperty('--remaining', `${Math.max(0, state.film / 90 * 100)}%`);
@@ -1223,7 +1264,7 @@ function showCut(result: CutResult, before: ReadonlyArray<{ id: string; x: numbe
 }
 /** Keeps every stamp box wholly inside the gate (with padding) and nudges later stamps clear of earlier ones. */
 function placeStamps(layer: HTMLElement) {
-  const padX = 34, padY = 12, gap = 4; // padX clears the sprocket strips
+  const padX = 16, padY = 24, gap = 4; // padY clears the film strip and the corner readouts
   const width = layer.clientWidth, height = layer.clientHeight;
   if (!width || !height) return;
   const placed: { x: number; y: number; w: number; h: number }[] = [];
@@ -1252,7 +1293,6 @@ function pressCut() {
   if (state.shutter.charge < 1) shutterNotReady();
   cutPress = true;
 }
-const CHEVRON = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 4 L28 16 L6 28 L12 16 Z" /></svg>';
 /** Off-frame threats merged into edge arrows, laid out against the gate's current pixel size. */
 function currentThreatMarkers() {
   const gate = $('#gate');
@@ -1272,10 +1312,13 @@ function updateShutterHud() {
   if (ready && !shutterWasReady) for (const el of [meter, button]) { el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
   shutterWasReady = ready;
   $('#take-score').textContent = takeReadout(state.shutter.combo, state.score);
+  const scoreHtml = `<small>×${Math.max(1, state.shutter.combo)}</small> ${Math.round(state.score).toLocaleString('en-US')}`;
+  const hudScore = $('#hud-score');
+  if (hudScore.innerHTML !== scoreHtml) hudScore.innerHTML = scoreHtml;
   const layer = $('#threats');
   const markers = state.failed || tutorial.showing ? [] : currentThreatMarkers();
   while (layer.children.length > markers.length) layer.lastElementChild!.remove();
-  while (layer.children.length < markers.length) { const arrow = document.createElement('i'); arrow.className = 'threat'; arrow.innerHTML = `<span>${CHEVRON}</span><small></small>`; layer.append(arrow); }
+  while (layer.children.length < markers.length) { const arrow = document.createElement('i'); arrow.className = 'threat'; arrow.innerHTML = `<span>${ICONS.arrow}</span><small></small>`; layer.append(arrow); }
   markers.forEach((marker, index) => {
     const arrow = layer.children[index] as HTMLElement;
     arrow.dataset.urgency = marker.urgency;
@@ -1285,6 +1328,14 @@ function updateShutterHud() {
     arrow.style.setProperty('--scale', marker.scale.toFixed(2));
     arrow.querySelector('small')!.textContent = marker.label;
   });
+}
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+let filmOffset = 0;
+/** The bottom film strip's perforations travel while the camera rolls (render time, never sim): faster while film burns, frozen on pause, static in reduced motion. */
+function advanceFilmStrip(frameTime: number) {
+  if (paused || tutorial.showing || state.failed || reducedMotion.matches || frameTime <= 0) return;
+  filmOffset = (filmOffset + Math.min(frameTime, 100) / 1000 * (lostLine ? 72 : 24)) % 16;
+  shell.querySelector<HTMLElement>('.film-track')!.style.setProperty('--film-offset', `${(-filmOffset).toFixed(2)}px`);
 }
 function stepFrame() {
   snapshotForLerp();
@@ -1307,6 +1358,7 @@ function loop(now: number) {
   }
   simAccumulator += Math.min(frameTime / 1000, 0.1);
   previousTime = now;
+  advanceFilmStrip(frameTime);
   let ticks = 0;
   const ticksPerRender = lensRenderTicks(state.lens);
   const tickInterval = ticksPerRender / (TUNING.tickRate * (overcrank ? 0.75 : 1));
@@ -1436,7 +1488,7 @@ $('#make-reel').addEventListener('click', () => {
   const draw = () => {
     context.fillStyle = '#1b1e24'; context.fillRect(0, 0, 720, 720);
     context.drawImage(frames[frameIndex % frames.length]!, 0, 0, 720, 720);
-    context.fillStyle = '#ff4b3e'; context.font = 'bold 24px monospace'; context.fillText(`CULL · ${String(state.seed).padStart(5, '0')}`, 24, 690);
+    context.fillStyle = '#c8322a'; context.font = 'bold 24px monospace'; context.fillText(`CULL · ${String(state.seed).padStart(5, '0')}`, 24, 690);
   };
   draw();
   recorder.addEventListener('dataavailable', (event) => { if (event.data.size > 0) chunks.push(event.data); });
@@ -1446,10 +1498,10 @@ $('#make-reel').addEventListener('click', () => {
     directorReelUrl = URL.createObjectURL(new Blob(chunks, { type: mimeType }));
     const link = $('#download-reel') as HTMLAnchorElement;
     link.href = directorReelUrl; link.download = `cull-${state.seed}-reel.webm`; link.classList.remove('hidden');
-    ($('#make-reel') as HTMLButtonElement).textContent = "MAKE REEL AGAIN";
+    ($('#make-reel') as HTMLButtonElement).textContent = 'Make reel again';
   }, { once: true });
   recorder.start();
-  ($('#make-reel') as HTMLButtonElement).textContent = 'RECORDING…';
+  ($('#make-reel') as HTMLButtonElement).textContent = 'Recording…';
   const interval = window.setInterval(() => { frameIndex++; draw(); }, 1000 / 12);
   window.setTimeout(() => { window.clearInterval(interval); if (recorder.state !== 'inactive') recorder.stop(); }, 6000);
 });
@@ -1467,7 +1519,7 @@ $('#restart').addEventListener('click', () => {
   frameInput = { ...NEUTRAL_INPUT }; resultSaved = false; displayedLocation = locationFor(state); refreshPersonalBest();
   entityMeshes.clear(); urchinBuckets.reset();
   for (const child of [...scene.children]) if (child instanceof THREE.Group && child !== talent && child !== terrainGroup) scene.remove(child);
-  terrainTiles = null; $('#end-card').classList.add('hidden'); refreshLensSelector();
+  terrainTiles = null; $('#end-card').classList.add('hidden'); messages.reset(); refreshLensSelector();
 });
 $('#left-hand').addEventListener('click', () => {
   leftHanded = !leftHanded;
@@ -1512,9 +1564,11 @@ new ResizeObserver(() => {
 render();
 function showTutorialStep() {
   const last = tutorial.step >= tutorial.steps - 1;
-  $('#tutorial-kicker').textContent = tutorial.step === 0 ? `SCENE 01 · TAKE 01${tutorial.steps > 1 ? ` · 1/${tutorial.steps}` : ''}` : `HOW TO SHOOT · ${tutorial.step + 1}/${tutorial.steps}`;
+  $('#tutorial-kicker').textContent = tutorial.step === 0 ? `Scene 1 · take 1${tutorial.steps > 1 ? ` · 1/${tutorial.steps}` : ''}` : `How to shoot · ${tutorial.step + 1}/${tutorial.steps}`;
+  // The step text itself reads on the message line inside the frame; the card keeps a copy for screen readers.
   $('#tutorial-text').textContent = TUTORIAL_STEPS[tutorial.step]!;
-  $('#tutorial-next').textContent = last ? 'ROLL CAMERA ▶' : 'CONTINUE ▶';
+  $('#tutorial-next').innerHTML = last ? `<span>Roll camera</span>${ICONS.play}` : `<span>Continue</span>${ICONS.chevron}`;
+  updateHud();
   $('#title-card').classList.toggle('hidden', tutorial.step !== 0);
 }
 function advanceTutorial() {

@@ -21,6 +21,8 @@ These are the only scene and cast colours. Do not introduce a second accent.
 
 Talent carmine and hazard clay stay the same in every scene so the cast reads on every set.
 
+UI-only tones (tokens in `src/style.css`): **Stage** `#241c16` is the page behind the gate; **Muted** `#d9cbb6` is a paper tint for secondary copy on the results card. Tints are Paper at 8/14/40/60% and Ink at 60/80% alpha (`--paper-40`, `--ink-60`, …); no other hex values in the UI.
+
 ## Scenes
 
 Each scene changes the set, not the cast.
@@ -62,10 +64,17 @@ Framing something out deletes it. Show that on the edge it crossed:
 ## UI
 
 - Display face: Fraunces (OFL), for the title, scene name, and CUT stamp.
-- UI face: Source Sans 3 (OFL). Nothing smaller than 13 px.
-- Motifs: sprocket holes on the gate, a slate title card, brass for links, carmine for the record dot.
-- The film number sits beside the bar, never on it. The bar itself never grows past its track.
-- The call sheet names what is in the shot and what is about to enter, in plain words ("spiny ball", "rolling rock"), not entity ids.
+- UI face: Source Sans 3 (OFL), weights 400/600. Three sizes: 14 px (labels, body), 20 px (HUD numerals, desktop message line), 40–64 px clamp (display). Nothing smaller than 14 px.
+- Sentence case in the source strings; caps only for tags of three letters or fewer (CUT, REC), tracked 0.08em.
+- Spacing on an 8 px grid (8/16/24/32). The frame inset is 16 px.
+- No borders. Tonal fills (Paper 8–14%, Ink 60–80%) and space do the work; the only lines are the frame corners, meters and the 2 px Brass focus ring.
+- Accents: Burn is the player's action (CUT, film, score highlights). Carmine is danger, the Talent and REC only. Brass is links and focus only.
+- Motion: `--ease-out` for entering/reacting, `--ease-in-out` for state changes; 120 ms UI, 240 ms panel, 900 ms stamp. At most one infinite pulse on screen. Reduced motion keeps opacity, drops transforms, and freezes the film strip.
+- Film is one horizontal perforated strip along the frame's bottom edge: its lit length is the film left and its perforations travel while rolling, frozen on pause. The film number sits in the frame's top-right corner, never on the strip.
+- In-take HUD lives on the glass: score + REC top-left, film counter top-right, one message line bottom-centre. Nothing is drawn over the centre of the frame.
+- Feedback tiers: (1) cut stamp at the edge, Fraunces, 0.9 s, success; (2) penalty tick, Source Sans 600 Burn, beside the counter, 0.8 s, minor; (3) danger frame state, carmine glow on the edge nearest her + edge arrow + message line, critical. No centred boxes.
+- One message line, fed by a priority queue (danger > coach > incoming threat > shot advice > tip; 1.2 s minimum dwell, no repeat within 4 s). Threats are named in plain words ("spiny ball", "rolling rock"), not entity ids.
+- Icons: one inline-SVG set (`src/ui/icons.ts`), 24 px grid, 2 px stroke, square caps, `currentColor`. No text glyphs as icons, no external-link arrows on in-game actions.
 
 ## Type
 
