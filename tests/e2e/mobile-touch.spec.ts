@@ -28,6 +28,9 @@ for (const viewport of [{ width: 412, height: 915 }, { width: 390, height: 844 }
         await page.locator('#tutorial-next').tap();
       }
       await expect.poll(async () => (await camera(page)).tick).toBeGreaterThan(0);
+      // The gestures run on the wall clock, so swap the live take for the static LOD stage: its lone Urchin has no speed and
+      // cannot home on her off-frame, so a slow runner can't lose her mid-gesture. The camera and touch path are unchanged.
+      await page.evaluate(() => window.__cull.loadLodDemo());
       const gate = (await page.locator('#gate').boundingBox())!;
 
       const cx = gate.x + gate.width / 2; const cy = gate.y + gate.height / 2;

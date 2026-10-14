@@ -71,6 +71,7 @@ button, input, select, summary { font: inherit; }
 .gate, .controlbar, .mobile-controls { touch-action: none; }
 .touch-hint { display: none; }
 .gate-wrap { display: flex; flex-direction: column; gap: 8px; min-width: 0; min-height: 0; }
+.gate-slot { display: contents; }
 .gate-label, .gate-foot { display: flex; justify-content: space-between; gap: 8px; }
 .gate {
   position: relative;
@@ -281,13 +282,14 @@ kbd { color: var(--paper); border: 1px solid #8a7562; padding: 2px 6px; border-r
 .focus-band { position: absolute; z-index: 3; left: 0; width: 100%; height: 40%; border-top: 1px solid #e2b04acc; border-bottom: 1px solid #e2b04acc; background: #e2b04a22; pointer-events: none; }
 .stage.fisheye .gate { border-radius: 28%; }
 .stage.fisheye .mount { clip-path: ellipse(75% 76% at 50% 50%); }
+.stage.anamorphic { --gate-aspect: 2.39; }
 .stage.anamorphic .gate { aspect-ratio: 2.39; }
 
 @media (min-width: 801px) and (pointer: fine) { .mobile-controls { display: none; } }
 @media (max-width: 800px) {
   .stage { gap: 6px; }
   .composition { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr) auto; gap: 8px; }
-  .gate-wrap { grid-row: 2; width: min(94vw, calc(100dvh - 230px)); justify-self: center; }
+  .gate-wrap { grid-row: 2; }
   .margin { height: auto; flex-direction: row; align-items: flex-start; }
   .margin-right { display: flex; }
   .call-sheet { border-top: 0; padding-top: 0; }
@@ -330,10 +332,17 @@ kbd { color: var(--paper); border: 1px solid #8a7562; padding: 2px 6px; border-r
   .film-track { flex: 1 1 auto; width: auto; }
   .call-sheet > span { display: none; }
   .call-sheet div { font-size: 13px; line-height: 1.3; height: 3.9em; overflow: hidden; }
-  .gate-wrap { gap: 6px; width: min(94vw, calc(100dvh - 562px)); }
+  /* The viewport is the budget: the chrome takes what its fonts need and the viewfinder shrinks to fit the rest, so nothing scrolls. */
+  .stage { height: 100vh; height: 100dvh; }
+  .composition { min-height: 0; }
+  .gate-wrap { gap: 6px; width: 100%; height: 100%; }
+  .gate-slot { display: grid; place-items: center; flex: 1 1 0; min-height: 0; container-type: size; }
+  .gate { width: min(100cqw, 100cqh * var(--gate-aspect, 1)); }
   .shutter-row { font-size: 11px; }
-  .gate-notes { min-height: 62px; }
-  .frame-message { font-size: 13px; }
+  /* A fixed caption strip keeps the viewfinder one size while rolling; the paused coach card takes the call sheet's room and the viewfinder gives up the rest. */
+  .gate-notes { height: 62px; min-height: 0; flex: 0 0 auto; }
+  .frame-message { font-size: 13px; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+  .stage.tutorial-open .gate-notes { height: auto; }
   .tutorial-text { font-size: 14px; }
   .stage.tutorial-open .margin-right { display: none; }
 }
