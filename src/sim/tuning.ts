@@ -67,6 +67,10 @@ export const TUNING = {
   defangGateFraction: [0.14, 0.28] as const,
   portraitGateGap: [0.16, 0.28] as const,
   gateMarkDistance: 1.4,
+  // Loop review 2026-10-13 round 2: after the defang cut she holds her mark this long under an "ACTION" cue (with an exit arrow
+  // at her feet) before walking on, so the frame the cut left her at the edge of can be brought back to her (it was 0 s: 100% of
+  // Backlot/City LOST HER deaths). Per scene index like zoomRangesByScene: Backlot is the tightest; City and Night keep ≥ 0.6 s.
+  gateReleaseSecondsByScene: [0.35, 0.9, 0.9, 0.9] as const,
   wrapLastSceneFraction: 0.25,
   wrapSpeeds: [1.8, 2.2, 2.6] as const,
   threatBudgets: [1, 1.6, 2.3, 2.8] as const,

@@ -34,7 +34,7 @@ export interface SimState {
   score: number;
   cuts: string[];
   closeCalls: number;
-  shots?: Array<{ at: number; kind: 'defang' | 'portrait'; done: boolean; opened?: number }>;
+  shots?: Array<{ at: number; kind: 'defang' | 'portrait'; done: boolean; opened?: number; releaseTick?: number }>;
   shoot?: { sceneIndex: number; biome: 'BACKLOT' | 'MINIATURE CITY' | 'NIGHT SHOOT' | 'LONG TAKE'; wrapDistance: number | null; wrapCaught: boolean; finaleTicks: number; };
 }
 export interface FrameRect { left: number; right: number; bottom: number; top: number; }

@@ -57,7 +57,7 @@ const U = 128;
 const CAST_SIZE = 256;
 
 function ctx2d(canvas: HTMLCanvasElement): Ctx {
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
   if (!ctx) throw new Error('Canvas unavailable');
   return ctx;
 }

@@ -5,6 +5,7 @@ import { stateHash } from './sim/hash';
 import { updateRenderCamera } from './render/camera';
 import { cameraBasis, projectPoint } from './sim/frame';
 import { NEUTRAL_INPUT, lostProgress, step, talentLost } from './sim/step';
+import { exitHeading, releasing } from './sim/framing';
 import { lodTier } from './sim/lod';
 import { assistInput, composeInput, dragCameraTarget, dragSettled, pinchZoomTarget, type DragTarget } from './ui/input-map';
 import { nextZoomStep } from './ui/zoom-control';
@@ -20,7 +21,7 @@ import { measureSilhouettes } from './render/silhouettes';
 import { PATH_RISE, SPRITE_SIZE, createSetDressing, createTableTextures, raisedPathGeometry } from './render/set-dressing';
 import { DPR_SCALES, nextDprTier } from './render/adaptive-dpr';
 import { LockOverlay, lockFan, updateLockFan, type LockMark } from './render/hostile-lock';
-import { createDustPuff, createShockMark, fallPlay, flinchPlay2, idlePlay, springStep, walkPlay } from './render/talent-fx';
+import { createDustPuff, createExitArrow, createShockMark, fallPlay, flinchPlay2, idlePlay, springStep, walkPlay } from './render/talent-fx';
 import { AudioDirector, type AudioSettings } from './audio/director';
 import { dailySeed } from './meta/daily';
 import { loadFilmography, personalBest, recordResult } from './meta/filmography';
@@ -348,9 +349,17 @@ const tailSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: spriteAssets
 tailSprite.center.set(0.5, 0);
 tailSprite.renderOrder = 3;
 talent.add(tailSprite);
+// X-ray cutaway (loop review 2026-10-13 round 2): a flat warm silhouette drawn through the set, under the body. Where
+// she is in the open the body covers it exactly; behind a City block it is all you see, so the set never hides her.
+// Only the Miniature City look has blocks taller than her, so elsewhere it is hidden (and costs no draw call).
+const xraySprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: spriteAssets.walk[0], color: '#ffb347', transparent: true, opacity: 0.55, alphaTest: 0.04, depthTest: false, depthWrite: false }));
+xraySprite.renderOrder = 2;
+talent.add(xraySprite);
 const shockMark = createShockMark();
 const dustPuff = createDustPuff();
-talent.add(talentSprite, shockMark, dustPuff);
+// ACTION telegraph: chevrons at her feet point the way she walks off her mark (loop review 2026-10-13 round 2).
+const exitArrow = createExitArrow();
+talent.add(talentSprite, shockMark, dustPuff, exitArrow);
 scene.add(talent);
 /** Real-time pose clock and the springs behind her secondary motion. All render-only. */
 let talentPoseKind = '';
@@ -412,6 +421,12 @@ function syncTalentLod() {
   talentSprite.center.set(0.5, WAIST);
   talentSprite.position.set(-Math.sin(bodyLean) * waist, play.lift + Math.cos(bodyLean) * waist, 0).applyQuaternion(camera.quaternion);
   talentSprite.material.rotation = bodyLean - (upright ? facing * hem : 0);
+  xraySprite.visible = renderedLook === 1;
+  if (xraySprite.material.map !== map) xraySprite.material.map = map;
+  xraySprite.scale.copy(talentSprite.scale);
+  xraySprite.center.copy(talentSprite.center);
+  xraySprite.position.copy(talentSprite.position);
+  xraySprite.material.rotation = talentSprite.material.rotation;
   tailSprite.visible = kind === 'walk' || kind === 'idle';
   if (tailSprite.visible) {
     const tails = spriteAssets.tails;
@@ -437,6 +452,17 @@ function syncTalentLod() {
     const spread = 0.6 + 0.4 * Math.min((age - 0.38) / 0.35, 1);
     dustPuff.scale.set(width * 1.75 * spread, width * 0.42 * spread, 1);
   }
+}
+
+function syncExitArrow() {
+  const heading = !state.failed && releasing(state) ? exitHeading(state) : null;
+  exitArrow.visible = heading !== null;
+  if (!heading) return;
+  // Pulse along the arrow so the beat reads as "about to go", not as set dressing.
+  const pulse = 1 + 0.08 * Math.sin(performance.now() / 1000 * Math.PI * 4);
+  const length = renderedTalentHeight * 1.6 * pulse;
+  exitArrow.scale.set(length, 1, length);
+  exitArrow.rotation.y = Math.atan2(-heading.z, heading.x);
 }
 
 /** Read-only pose pick: fall on a failed take, flinch when a hazard is within the close-call radius, idle while waiting. */
@@ -898,6 +924,7 @@ function renderViewfinder(showTransientRings = true) {
   syncTalentLod();
   const talentPoint = displayPoint(state.talent.x, state.talent.z);
   talent.position.set(talentPoint.x, PATH_RISE, talentPoint.z);
+  syncExitArrow();
   syncEntities(showTransientRings);
   renderer.render(scene, camera);
 }
@@ -1045,7 +1072,7 @@ function updateHud() {
   const focusBand = $('#focus-band');
   focusBand.hidden = state.lens !== 'tilt-shift';
   focusBand.style.top = `${(0.5 - state.camera.focusOffset - 0.2) * 100}%`;
-  $('#status').textContent = tutorial.showing ? 'STANDING BY' : state.waiting ? 'HOLDING FOR SET…' : paused ? 'PAUSED' : state.camera.moving ? 'IN MOTION' : 'ROLLING';
+  $('#status').textContent = tutorial.showing ? 'STANDING BY' : releasing(state) ? 'ACTION' : state.waiting ? 'HOLDING FOR SET…' : paused ? 'PAUSED' : state.camera.moving ? 'IN MOTION' : 'ROLLING';
   const copy = describeShot(state);
   $('#lod').textContent = copy.gate;
   const cutNoteLive = cutNote && performance.now() < cutNote.until && !state.failed && !talentLost(state);

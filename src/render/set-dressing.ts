@@ -286,7 +286,7 @@ export function bevelledBlockGeometry(width = 0.82, height = 1.7, depth = 0.82):
 function canvasTexture(draw: (ctx: CanvasRenderingContext2D, size: number) => void, size: number, repeat: boolean) {
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = size;
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
   if (!ctx) throw new Error('Canvas unavailable');
   draw(ctx, size);
   const map = new THREE.CanvasTexture(canvas);

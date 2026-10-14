@@ -137,3 +137,107 @@ Deaths at the defang gate (film-out) are gone. What is left is mostly **offscree
 - Backlot roster kinds (2).
 
 Next lever if the full-Shoot human clear needs to rise: Miniature City tracking, or fix 5.
+
+## 2026-10-13 round 2
+
+### Instrumentation
+
+`/tmp`-only harness (not committed). It drives `createHumanDriver` through `stepShoot` and keeps a 6 s ring buffer per tick. The buffer holds her position and velocity, camera offset/zoom/velocity, the composed input (after the assist), HOLD, `assistSuspended`, the open gate, the nearest hazard and her LOD tier. At each `lost-talent` death it looks back to the tick she left frame and records:
+- her speed in the second before and at the exit;
+- the path turn across ±0.5 s;
+- the zoom;
+- the nearest hazard within 4 u;
+- whether a defang gate was open in the previous 2 s;
+- whether the input was panning away from her or idle;
+- whether the assist was suspended;
+- the exit side.
+
+The death counts reproduce the balance harness exactly: keys 47 / touch 46 full-Shoot clears out of 200.
+
+### Findings (200 seeds per persona, before)
+
+| | human-keys | human-touch |
+|---|---|---|
+| Backlot + City offscreen deaths | 110 | 120 |
+| …she was **standing still** in the second before leaving frame | 110 (100%) | 120 (100%) |
+| …a hazard within 4 u at the exit | 1 (extras) | 0 |
+| …path turn ≥ 45° within ±0.5 s | 10 | 9 |
+| …zoom at exit | 38 (all) | 38 (all) |
+| …exit side | right (all) | right (all) |
+| …input panning *away* from her for > 50% of the prior second | 79 | 118 |
+| …assist suspended | 0 | 0 |
+
+**One cause accounts for all of them: the defang release.** A defang cut needs her near a frame edge, about 0.46 · zoom off-centre, with the Urchin panned out past the other side. On the tick the close cut lands, `markShots` sets `done` and she goes from 0 to full walk speed (2.5 u/s at zoom 38), with no warning. At that moment:
+- she is within about 1 u of the right edge;
+- the camera is still moving left, because the player was panning the Urchin out;
+- the player's 200–300 ms reaction delay has not elapsed.
+
+She exits right within about 0.3 s. Then the personas do what players do once the danger is gone: they tap back to a tighter framing (38 → 24), which pushes her farther out. They also chase her last-seen spot. The 30% assist cannot win that back inside the 3 s LOST HER window. Trace: seed 1 human-keys, City, tick 6347–6581.
+
+Ruled out:
+- **Sharp turns:** under 10% of these deaths had a ≥ 45° turn nearby. She was walking straight off the edge.
+- **Hazard-driven speed changes:** no hazard was near.
+- **Assist fighting a pan:** it was never suspended, and it pulls toward her.
+- **City occlusion:** the bots read the sim, not pixels, so blocks cannot hide her from them. For human players, blocks taller than her can still cover her, so the render fix below is for players, not for the bots' numbers.
+
+### Fixes (fair: nothing is easier to *do*, the sudden start is telegraphed)
+
+1. **ACTION beat** (sim, `gateReleaseSeconds` 0.6 s, `markShots` / `releasing`):
+   - After the defang cut she holds her mark for 0.6 s before walking on.
+   - The HUD shows the status **ACTION** and the toast "ACTION! She walks on in a moment. Bring the frame back to her."
+   - The bots perceive this only as a human would: the gate text drops (`openGate` is null), so they stop framing the cut and re-centre on her.
+2. **Fix 5, gate film burn** (sim): HOLD and waiting still burn 2×, except while a defang gate, or its ACTION beat, is holding her. Normal 1× burn applies.
+3. **X-ray cutaway** (render-only, `xraySprite` in `main.ts`):
+   - A warm, 55%-opacity flat silhouette of her current sprite is drawn with `depthTest: false` under her body.
+   - In the open her body covers it exactly. Behind a City block, the silhouette is what you see.
+4. **Copy:** the defang toast says film runs at normal speed while she waits, and coach line 3 mentions ACTION.
+
+The lost-her assist and `src/bots/human.ts` are unchanged.
+
+### Tuning tries (`--stage=0 --mode=both --seeds=200 --jitter=8 --workers=8`)
+
+| try | beat | keys Shoot | touch Shoot | keys Backlot | touch Backlot |
+|---|---|---|---|---|---|
+| before | 0 s | 23.5% | 23% | 69.5% | 65.5% |
+| 1 (kept) | 0.6 s | **51.5%** | **52.5%** | 83% | 85% |
+| 2 | 0.5 s | 45% | 50% | 79% | 84% |
+
+Try 2 was shoot-only. Try 1 is kept: both personas land in the full-Shoot band (50–65%), and Backlot overshoots 60–80% by 3–5 pp. A shorter beat cannot satisfy both targets: try 2 dropped keys' Shoot below 50% while touch Backlot stayed at 84%.
+
+### After (try 1): human deaths by scene × killer
+
+| | human-keys before → after | human-touch before → after |
+|---|---|---|
+| BACKLOT | offscreen 57, film 4 → offscreen 32, film 2 | offscreen 68, film 1 → offscreen 30 |
+| MINIATURE CITY | offscreen 53, film 4 → offscreen 29, film 4 | offscreen 52, film 6 → offscreen 22, film 9 |
+| NIGHT SHOOT | offscreen 29, film 3, red-monitor 3 → offscreen 22, film 3, red-monitor 5 | offscreen 23, film 3, red-monitor 1 → offscreen 14, film 14, red-monitor 6 |
+
+The remaining Backlot and City offscreen deaths (keys 61, touch 52) are still all after a defang release, with the camera panning away. Players who were mid-pan when the cut landed still lose her. The next fair lever is a visible "she exits this side" footprint or arrow at the edge during the beat, not a longer beat.
+
+### Round 2 addendum: exit telegraph and per-scene beat
+
+1. **Exit telegraph** (render, `createExitArrow` in `talent-fx.ts`, `exitHeading` in `framing.ts`):
+   - During the ACTION beat, three inked brass chevrons lie on the floor at her feet, pointing along the path she will walk (the next path node, or the fork branch already taken).
+   - The arrow pulses.
+   - Bots see it only as a human would. `PlayerView.action` is the arrow's direction while the beat runs *and* she is on screen; otherwise it is null.
+   - The human personas lead the frame 0.2 · zoom along the arrow on ACTION (`actionLead`). Their limits (reaction, aim, cadence, dwell, finger) are unchanged. Adaptive and the scripted bots ignore the arrow.
+2. **Per-scene beat** (`TUNING.gateReleaseSecondsByScene`, indexed like `zoomRangesByScene`; the strip plays as scene 0). Backlot is tightest; City, Night and the Long Take keep ≥ 0.6 s.
+
+Tries (`--stage=0 --mode=shoot --seeds=200 --jitter=8`; 3 allowed):
+
+| try | Backlot / City / Night beat | keys Shoot | touch Shoot | keys Backlot | touch Backlot |
+|---|---|---|---|---|---|
+| round 2 try 1 (no arrow) | 0.6 / 0.6 / 0.6 s | 51.5% | 52.5% | 83% | 85% |
+| A | 0.45 / 0.6 / 0.6 s | 48% | 58.5% | 76% | 82.5% |
+| B | 0.4 / 0.75 / 0.75 s | 48.5% | 55% | 75% | 81.5% |
+| **C (kept)** | **0.35 / 0.9 / 0.9 s** | **54.5%** | **59%** | **74%** | **81%** |
+
+Try C is kept, and the full `--mode=both` run reproduces it exactly. Both personas are in the full-Shoot band (50–65%). Keys' Backlot (74%) is in the 60–80% band. **Touch's Backlot is 81%, 1 pp over.** Touch's Backlot barely responds to the beat (0.6 → 0.35 s moved it 85 → 81%). The touch deaths that remain are a drag still running when the cut lands, which the reaction delay cannot catch. Strip: keys 73%, touch 78%. Adaptive Shoot 99.5%; tracker, gatekeeper, metronome, wide, close and chaos 0%.
+
+Human deaths by scene × killer (try C):
+
+| | human-keys | human-touch |
+|---|---|---|
+| BACKLOT | offscreen 50, film 2 | offscreen 38 |
+| MINIATURE CITY | offscreen 15, film 4 | film 10, offscreen 9 |
+| NIGHT SHOOT | offscreen 10, red-monitor 6, film 4 | film 12, red-monitor 7, offscreen 6 |

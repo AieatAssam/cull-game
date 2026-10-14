@@ -82,6 +82,7 @@ export function markShots(state: SimState) {
     // Bible M2: a zoom alone no longer defangs; it needs a close cut made since the gate opened.
     if (defang.opened !== undefined && state.closeCalls > defang.opened) {
       defang.done = true;
+      defang.releaseTick = state.tick + Math.round(gateReleaseSeconds(state) * TUNING.tickRate);
       // The stand-in leaves its mark once the shot is made, whoever was cut.
       for (const entity of state.entities) if (entity.gate === defangIndex && !entity.cut) { entity.cut = true; entity.spawned = false; }
     }
@@ -95,7 +96,29 @@ export function markShots(state: SimState) {
 }
 
 export function shotBlocksTalent(state: SimState): boolean {
-  return state.shots?.some((shot) => !shot.done && state.talent.x >= shot.at - 0.35) ?? false;
+  return state.shots?.some((shot) => !shot.done && state.talent.x >= shot.at - 0.35) || releasing(state);
+}
+
+/** The ACTION beat's length for the current scene (the strip world plays as scene 0). */
+export function gateReleaseSeconds(state: Pick<SimState, 'shoot'>): number {
+  const byScene = TUNING.gateReleaseSecondsByScene;
+  return byScene[Math.min(state.shoot?.sceneIndex ?? 0, byScene.length - 1)]!;
+}
+
+/** Unit direction she will walk off her mark (the next path node, or the fork branch already taken), or null at the end. */
+export function exitHeading(state: Pick<SimState, 'talent' | 'path' | 'forks' | 'routeChoices'>): { x: number; z: number } | null {
+  const { talent } = state;
+  const fork = state.forks.find((entry) => entry.at === talent.pathIndex);
+  const choice = fork ? state.routeChoices[fork.at] : undefined;
+  const next = fork && choice !== undefined ? fork.options[choice] : state.path[talent.pathIndex + 1];
+  if (!next) return null;
+  const length = Math.hypot(next.x - talent.x, next.z - talent.z);
+  return length > 1e-6 ? { x: (next.x - talent.x) / length, z: (next.z - talent.z) / length } : null;
+}
+
+/** The "ACTION" beat: a made defang still holds her on her mark for `gateReleaseSeconds` before she walks on. */
+export function releasing(state: Pick<SimState, 'shots' | 'tick'>): boolean {
+  return state.shots?.some((shot) => shot.releaseTick !== undefined && state.tick < shot.releaseTick) ?? false;
 }
 
 export function activeShot(state: SimState): ShotGoal | undefined {

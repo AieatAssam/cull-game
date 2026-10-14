@@ -87,7 +87,7 @@ function delayed(policy: Policy, reactionTicks: number): Policy {
       history.push(view);
       if (history.length > reactionTicks + 1) history.shift();
       const seen = history[0]!;
-      return policy.act({ gate: seen.gate, state: { ...seen.state, camera: view.state.camera, tick: view.state.tick } });
+      return policy.act({ gate: seen.gate, action: seen.action, state: { ...seen.state, camera: view.state.camera, tick: view.state.tick } });
     },
   };
 }

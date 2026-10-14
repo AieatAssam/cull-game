@@ -1,4 +1,5 @@
 import { inFrame, projectPoint } from '../sim/frame';
+import { exitHeading, releasing } from '../sim/framing';
 import { lensAspect } from '../sim/lenses';
 import { monitorConeContains } from '../sim/m6';
 import { TUNING } from '../sim/tuning';
@@ -9,7 +10,8 @@ import type { CastEntity, SimState } from '../sim/types';
  * - cast that is on screen (framed, or inside a friendly monitor cone), as `step` decides it;
  * - call-sheet entries: unspawned cast just past the frame edge (`callSheetMargin`), as `main.ts` lists them;
  * - the Talent where it was last seen, its shot size, the camera, film, slate (scene/biome), the set path;
- * - the shot-list gate only while its HUD text is up (the Talent is held at it).
+ * - the shot-list gate only while its HUD text is up (the Talent is held at it);
+ * - the ACTION exit arrow, only while it is drawn at her feet and she is on screen.
  * Everything else (pending spawns elsewhere, cast cut off-screen, gate positions) is stripped.
  */
 export interface PlayerView {
@@ -17,6 +19,8 @@ export interface PlayerView {
   state: SimState;
   /** The gate the HUD is asking for right now, or null. */
   gate: 'defang' | 'portrait' | null;
+  /** The ACTION beat's exit arrow (unit, world x/z) while it is on screen, or null. */
+  action?: { x: number; z: number } | null;
 }
 
 const entityRadius = (entity: CastEntity) => entity.kind === 'boulder' ? TUNING.boulderRadius : entity.kind === 'urchin' ? TUNING.urchinRadius
@@ -74,8 +78,10 @@ export function createObserver(): Observer {
       .filter((entity) => entityOnScreen(state, entity) || onCallSheet(state, entity))
       .map((entity) => ({ ...entity, members: entity.members?.map((member) => ({ ...member })) }));
     const gate = openGate(state);
+    const action = releasing(state) && talentOnScreen(state) ? exitHeading(state) : null;
     return {
       gate,
+      action,
       state: {
         ...state,
         camera: { ...state.camera },

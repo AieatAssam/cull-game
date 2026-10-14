@@ -74,7 +74,8 @@ describe('M6 simulation integration', () => {
       expect(state.failed).toBeNull();
       expect(state.shoot?.sceneIndex).toBe(scene + 1);
       expect(state.totalDistance).toBe(123);
-      expect(state.film).toBeCloseTo(90 + 30 * (scene + 1) - 2 * (scene + 1) / 60, 5);
+      // Placed past the scene's unmade defang mark, so the gate is holding her: film runs at 1×, not 2× (loop review round 2, fix 5).
+      expect(state.film).toBeCloseTo(90 + 30 * (scene + 1) - (scene + 1) / 60, 5);
     }
     expect(state.shoot?.biome).toBe('LONG TAKE');
     state.shoot!.finaleTicks = 40 * 60 - 1;

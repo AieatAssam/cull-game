@@ -33,6 +33,8 @@ const fingerMaxAccelPxPerTick = 20_000 * tick * tick;
 const regripTicks = Math.round(0.12 * TUNING.tickRate);
 /** Pan is good enough within this fraction of the frame width; humans don't chase the last few pixels. */
 const deadband = 0.05;
+/** On ACTION, how far (fraction of the frame width) a player leads the frame along the exit arrow. */
+const actionLead = 0.2;
 
 export function humanTraits(seed: number, persona: HumanPersona): HumanTraits {
   const key = (Math.imul(seed, 0x9e3779b1) ^ (persona === 'human-keys' ? 0x4b45 : 0x5443)) >>> 0;
@@ -48,7 +50,7 @@ interface Memory { hostile?: { x: number; z: number; range: number }; hideAxis?:
 
 /** What a player is trying to frame, from what they saw: the Adaptive plan, but from a stale view. */
 function intent(view: PlayerView, memory: Memory): Intent {
-  const { state, gate } = view;
+  const { state, gate, action } = view;
   const talent = state.talent;
   const near = (entity: { x: number; z: number }) => Math.hypot(entity.x - talent.x, entity.z - talent.z);
   const danger = state.entities.some((entity) => !entity.cut && entity.kind === 'urchin' && near(entity) < 14);
@@ -73,6 +75,8 @@ function intent(view: PlayerView, memory: Memory): Intent {
     return framing.axis === 'x' ? { x: framing.value, z: talent.z, zoom: hide ? Math.max(zoom, state.camera.zoom) : zoom, target, hold: false }
       : { x: talent.x, z: framing.value, zoom: hide ? Math.max(zoom, state.camera.zoom) : zoom, target, hold: false };
   }
+  // ACTION: the arrow at her feet says which way she walks; lead the frame that way so she walks into it.
+  if (action) return { x: talent.x + action.x * actionLead * zoom, z: talent.z + action.z * actionLead * zoom, zoom, target: 'action', hold: false };
   return { x: talent.x, z: talent.z, zoom, target: 'talent', hold: blocking };
 }
 
@@ -119,7 +123,7 @@ export function createHumanDriver(persona: HumanPersona, seed: number, options: 
     if (ticks % decisionTicks === 0 || !plan) {
       if (ticks >= hesitateUntil && random() < traits.hesitationChance) hesitateUntil = ticks + Math.round((0.3 + random() * 0.3) * TUNING.tickRate);
       // Perception is stale; proprioception (the camera they are moving) is not.
-      plan = intent({ gate: seen.gate, state: { ...seen.state, camera, tick: state.tick } }, memory);
+      plan = intent({ gate: seen.gate, action: seen.action, state: { ...seen.state, camera, tick: state.tick } }, memory);
       if (plan.target !== aim.target || ticks - aim.since >= aimHoldTicks) {
         aim = { x: gaussian(random) * traits.aimSigma, z: gaussian(random) * traits.aimSigma, target: plan.target, since: ticks };
       }

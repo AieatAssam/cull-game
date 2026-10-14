@@ -1,5 +1,5 @@
 import { inFrame, projectPoint, projectedAabb } from './frame';
-import { markShots, shotBlocksTalent } from './framing';
+import { activeShot, markShots, releasing, shotBlocksTalent } from './framing';
 import { lodTier, type LodTier } from './lod';
 import { lensAspect, lensLodFactor } from './lenses';
 import { TUNING } from './tuning';
@@ -335,7 +335,10 @@ export function step(previous: SimState, input: InputFrame = NEUTRAL_INPUT): Sim
 
   if (state.entities.some((glass) => glass.kind === 'glass' && glass.cut
     && Math.abs(talent.x - glass.x) <= 0.5 && Math.abs(talent.z - glass.z) <= 0.5)) fail(state, 'fell');
-  state.film -= dt * (input.hold || state.waiting ? 2 : 1);
+  // HOLD and waiting burn 2×, except while a defang gate itself is holding her (loop review 2026-10-13, fix 5):
+  // the gate already stops her, so the player is not charged double for setting up the close cut.
+  const defangHolding = blocked && (activeShot(state)?.kind === 'defang' || releasing(state));
+  state.film -= dt * ((input.hold || state.waiting) && !defangHolding ? 2 : 1);
   // Past the grace window a lost Talent burns film on top of the normal drain.
   if (talentLost(state)) state.film -= dt * TUNING.offscreenFilmDrainPerSecond;
   if (state.film <= 0) { state.film = 0; fail(state, 'out-of-film'); }
