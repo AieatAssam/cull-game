@@ -103,6 +103,7 @@ button, input, select, summary { font: inherit; }
 .title-screen { background: var(--stage); align-content: center; gap: var(--space-2); text-align: center; }
 .wordmark { margin: 0; font-family: Fraunces, Georgia, serif; font-size: clamp(64px, 18vw, 144px); line-height: 1; letter-spacing: 0.12em; color: var(--paper); }
 .tagline { margin: 0 0 var(--space-3); color: var(--paper-60); font-size: var(--text-m); }
+.abandoned-note { margin: 0 0 var(--space-3); color: #e0a040; font-size: var(--text-s, 0.85rem); letter-spacing: 0.08em; text-transform: uppercase; }
 .screen-actions { display: grid; gap: var(--space-1); width: min(280px, 100%); margin: 0 auto; }
 .menu-panel { display: grid; gap: var(--space-3); width: min(400px, 100%); }
 .menu-panel h2 { margin: 0; font-family: Fraunces, Georgia, serif; font-size: 32px; letter-spacing: var(--caps); }

@@ -33,7 +33,7 @@ import { filmStocks, loadFilmStock, saveFilmStock, unlockedFilmStocks, type Film
 import { lensFeats, unlockedLenses } from './meta/lenses';
 import { monitorConeContains } from './sim/m6';
 import { applyGate, frameView, lensLodFactor, type GateId, lensRenderTicks, type LensId } from './sim/lenses';
-import { COACH_LINES, closeCallsForGrade, describeShot } from './ui/describe-shot';
+import { closeCallsForGrade, describeShot } from './ui/describe-shot';
 import { cutBanner, cutStampText, gatePoint, takeReadout, threatMarkers } from './ui/shutter-hud';
 import { offFrameThreats } from './sim/threats';
 import { ICONS } from './ui/icons';
@@ -132,7 +132,11 @@ let previousTime = 0;
 let frameSamples: number[] = [];
 let hitStopUntil = 0;
 /** The intro and the coach lines are cards read before the take rolls; while one shows the loop advances no ticks. */
-const TUTORIAL_STEPS = ['Nothing exists unless it is in the shot. You hold the camera. She walks. CUT slices whatever you leave outside.', ...COACH_LINES] as const;
+/** First-visit slate steps, one short line each, worded for the device in hand. */
+const tutorialSteps = (touch: boolean) => touch
+  ? ['She walks on her own. Drag to keep her in the frame; pinch to zoom. Lose her for 3 s and the take is gone.', 'Tap CUT to slice everything outside the frame, then wait for READY. Edge arrows show threats.', 'Cut close to her for bonus score and film. A CUT with nothing outside, or with her out of shot, costs film.']
+  : ['She walks on her own. WASD or drag to keep her in the frame; − / + to zoom. Lose her for 3 s and the take is gone.', 'Space or Enter cuts everything outside the frame, then wait for READY. Edge arrows show threats.', 'Cut close to her for bonus score and film. A CUT with nothing outside, or with her out of shot, costs film.'];
+const TUTORIAL_STEP_COUNT = 3;
 const tutorial = { step: 0, steps: 0, showing: false };
 /** The title screen sits in front of the slate; while it is up `tutorial.showing` is also true, so no ticks run. */
 let titleOpen = false;
@@ -152,7 +156,7 @@ shell.innerHTML = `
     <div class="film" aria-hidden="true"><div class="film-track"><i id="filmbar"></i></div></div></div></div>
   <div class="gate-notes"><div class="slate-card hidden" id="slate-card" role="dialog" aria-labelledby="slate-scene"><div class="slate-board"><div><small>Scene</small><b id="slate-scene">01 · BACKLOT</b></div><div><small>Take</small><b id="slate-take">1</b></div><div><small>Best</small><b id="slate-best">—</b></div></div><div class="slate-row"><label class="stock-control">Stock <select id="film-stock" aria-label="Film stock"><option value="clean">35 mm · clean</option><option value="kodachrome">Kodachrome · B</option><option value="bleach">Bleach bypass · A</option><option value="ilford">Ilford B&amp;W · S</option></select></label><small class="slate-seed">Seed <span id="slate-seed">00001</span></small><span class="slate-step" id="slate-step"></span><button id="roll" class="primary" type="button"><span>Roll camera</span>${ICONS.play}</button></div></div></div>
   <footer class="controlbar"><div class="controls"><span><kbd>WASD</kbd> pan</span><span><kbd>−</kbd><kbd>+</kbd> zoom</span><span><kbd>Space</kbd> cut</span><span><kbd>H</kbd> hold</span><span><kbd>Q</kbd><kbd>E</kbd> rotate</span><span><kbd>P</kbd> pause</span></div><div class="mobile-controls"><button id="hold" type="button" aria-label="Hold Talent">Hold</button><div class="touch-buttons"><button id="rotate-left" type="button" aria-label="Rotate left">${ICONS.rotateLeft}</button><button id="rotate-right" type="button" aria-label="Rotate right">${ICONS.rotateRight}</button><button id="zoom-out" type="button" aria-label="Zoom out">${ICONS.zoomOut}</button><button id="zoom-in" type="button" aria-label="Zoom in">${ICONS.zoomIn}</button></div><label class="zoom-slider">Zoom <input id="zoom-slider" aria-label="Zoom" type="range" min="10" max="48" value="30" /></label><button id="cut" class="cut-button" type="button" aria-label="Cut: slice everything outside the frame" style="--charge:1"><span>CUT</span></button></div></footer>
-  <div class="screen title-screen hidden" id="title-screen" role="dialog" aria-label="CULL"><h1 class="wordmark">CULL</h1><p class="tagline">Nothing exists unless it is framed.</p><div class="screen-actions"><button id="play" class="primary" type="button">${ICONS.play}<span>Play</span></button><a id="title-daily" class="secondary" href="?daily=1">Daily</a><button id="title-settings" class="secondary" type="button">Settings</button></div></div>
+  <div class="screen title-screen hidden" id="title-screen" role="dialog" aria-label="CULL"><h1 class="wordmark">CULL</h1><p class="tagline">Nothing exists unless it is framed.</p><p class="abandoned-note">Abandoned prototype · no longer developed</p><div class="screen-actions"><button id="play" class="primary" type="button">${ICONS.play}<span>Play</span></button><a id="title-daily" class="secondary" href="?daily=1">Daily</a><button id="title-settings" class="secondary" type="button">Settings</button></div></div>
   <div class="screen menu hidden" id="menu" role="dialog" aria-modal="true" aria-labelledby="menu-title"><div class="menu-panel"><h2 id="menu-title">Paused</h2><div class="menu-actions"><button id="resume" class="primary" type="button">Resume</button><button id="restart-take" class="secondary" type="button">Restart take</button></div>
     <section class="menu-section" aria-labelledby="settings-title"><h3 id="settings-title">Settings</h3><div class="sound-panel"><button id="mute-audio" type="button" aria-pressed="false">Mute all</button><label>Master <input id="volume-master" aria-label="Master volume" type="range" min="0" max="100" value="100" /></label><label>Music <input id="volume-music" aria-label="Music volume" type="range" min="0" max="100" value="80" /></label><label>Effects <input id="volume-sfx" aria-label="Effects volume" type="range" min="0" max="100" value="80" /></label><label><input id="mono-audio" type="checkbox" /> Mono</label><label><input id="calm-audio" type="checkbox" /> Calm mix</label></div><div class="menu-toggles"><button id="left-hand" type="button" aria-pressed="false">Left hand</button><button id="overcrank" type="button" aria-pressed="false">75% speed</button><button id="reduce-motion" type="button" aria-pressed="false">Reduced motion</button></div></section>
     <section class="menu-section" aria-labelledby="legend-title"><h3 id="legend-title">Controls</h3><p class="legend-keys"><span><kbd>WASD</kbd> pan</span> <span><kbd>−</kbd><kbd>+</kbd> zoom</span> <span><kbd>Space</kbd> cut</span> <span><kbd>H</kbd> hold</span> <span><kbd>Q</kbd><kbd>E</kbd> rotate</span> <span><kbd>P</kbd> pause</span></p><p class="legend-touch">Drag to frame, pinch to zoom. CUT slices everything outside the frame. Hold keeps her on her mark.</p></section>
@@ -1119,11 +1123,8 @@ function updateMessageLine(shotAdvice: string, coachNote: string | null, sheet: 
   if (!state.failed && invalidReplay) offers.push({ text: 'This replay link is invalid.', priority: 'danger' });
   if (lostLine) offers.push({ text: lostLine, priority: 'danger', key: 'lost-her' });
   if ($('#gate').classList.contains('hostile-lock')) offers.push({ text: 'A hostile camera has her: frame it out.', priority: 'danger' });
-  if (tutorial.showing && !titleOpen) offers.push({ text: TUTORIAL_STEPS[tutorial.step]!, priority: 'tutorial' });
+  if (tutorial.showing && !titleOpen) offers.push({ text: tutorial.steps > 1 ? tutorialSteps(coarsePointer.matches)[tutorial.step]! : 'Frame her, then roll camera.', priority: 'tutorial' });
   if (coachNote) offers.push({ text: coachNote, priority: 'tutorial' });
-  if (!tutorial.showing && !state.failed && takeNumber === 1 && state.tick < LEGEND_TICKS) {
-    offers.push({ text: coarsePointer.matches ? 'Drag to frame, pinch to zoom. CUT slices what is outside.' : 'WASD or drag to frame. Space cuts.', priority: 'tutorial', key: 'first-hint' });
-  }
   const incoming = sheet.split('\n').find((line) => line.startsWith('Coming in'));
   if (incoming) offers.push({ text: incoming.replace(' · ', ': '), priority: 'threat' });
   offers.push({ text: shotAdvice, priority: 'shot' });
@@ -1693,7 +1694,7 @@ function leaveTitle() {
   let seen = false;
   try { seen = window.localStorage.getItem('cull.tutorial.v1') === 'seen'; } catch { /* Treat as a first visit. */ }
   // A first visit walks every coach line on the slate; a return visit only waits on the slate.
-  openSlate(seen ? 1 : TUTORIAL_STEPS.length);
+  openSlate(seen ? 1 : TUTORIAL_STEP_COUNT);
   $('#roll').focus();
   render();
 }
